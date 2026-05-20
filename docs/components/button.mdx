@@ -1,0 +1,331 @@
+---
+title: Button
+description: Displays a button or a component that looks like a button.
+---
+
+Displays a button or a component that looks like a button.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Plus } from "lucide";
+import { Button, Icon } from "areia";
+
+const plusIcon = Icon({ icon: Plus });
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-wrap items-center gap-2">
+      ${Button({ variant: "secondary", label: "Button" })}
+      ${Button({
+        variant: "secondary",
+        shape: "square",
+        icon: plusIcon,
+        "aria-label": "Add",
+      })}
+    </div>
+  `,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Button } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Button } from "areia/components/button";
+```
+
+## Usage
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Button({ variant: "secondary", label: "Click me" })}`,
+);
+```
+
+## Examples
+
+### Variants
+
+#### Primary
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Button({ variant: "primary", label: "Primary" })}`,
+);
+```
+
+#### Secondary
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Button({ variant: "secondary", label: "Secondary" })}`,
+);
+```
+
+#### Ghost
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () => html`${Button({ variant: "ghost", label: "Ghost" })}`,
+);
+```
+
+#### Destructive
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Button({
+      variant: "destructive",
+      label: "Destructive",
+    })}`,
+);
+```
+
+#### Outline
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Button({ variant: "outline", label: "Outline" })}`,
+);
+```
+
+#### Secondary Destructive
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Button({
+      variant: "secondary-destructive",
+      label: "Secondary Destructive",
+    })}`,
+);
+```
+
+### Sizes
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-wrap items-center gap-3">
+      ${Button({
+        size: "xs",
+        variant: "secondary",
+        label: "Extra Small",
+      })}
+      ${Button({
+        size: "sm",
+        variant: "secondary",
+        label: "Small",
+      })}
+      ${Button({
+        size: "base",
+        variant: "secondary",
+        label: "Base",
+      })}
+      ${Button({
+        size: "lg",
+        variant: "secondary",
+        label: "Large",
+      })}
+    </div>
+  `,
+);
+```
+
+### With Icon
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Plus } from "lucide";
+import { Button, Icon } from "areia";
+
+const plusIcon = Icon({ icon: Plus });
+
+export default ilha.render(
+  () =>
+    html`${Button({
+      variant: "secondary",
+      icon: plusIcon,
+      label: "Create Ilha app",
+    })}`,
+);
+```
+
+### Icon Only
+
+For icon-only buttons, use `shape="square"` or `shape="circle"` with the `icon` prop. Always include `aria-label` for accessibility — without visible text, screen readers need the label to convey the button’s purpose.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Plus } from "lucide";
+import { Button, Icon } from "areia";
+
+const plusIcon = Icon({ icon: Plus });
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-wrap items-center gap-3">
+      ${Button({
+        variant: "secondary",
+        shape: "square",
+        icon: plusIcon,
+        "aria-label": "Add item",
+      })}
+      ${Button({
+        variant: "secondary",
+        shape: "circle",
+        icon: plusIcon,
+        "aria-label": "Add item",
+      })}
+    </div>
+  `,
+);
+```
+
+### Loading State
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Button({
+      variant: "primary",
+      loading: true,
+      label: "Loading...",
+    })}`,
+);
+```
+
+### Disabled State
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Button({
+      variant: "secondary",
+      disabled: true,
+      label: "Disabled",
+    })}`,
+);
+```
+
+### Title
+
+Use the native `title` attribute when additional context helps the user understand the action.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Plus } from "lucide";
+import { Button, Icon } from "areia";
+
+const plusIcon = Icon({ icon: Plus });
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-wrap items-center gap-3">
+      ${Button({
+        variant: "secondary",
+        title: "Create a new Ilha app",
+        label: "Create Ilha app",
+      })}
+      ${Button({
+        variant: "secondary",
+        shape: "square",
+        icon: plusIcon,
+        "aria-label": "Add item",
+        title: "Add item",
+      })}
+    </div>
+  `,
+);
+```
+
+### Link as Button
+
+Use `LinkButton` when the interaction should navigate somewhere but still look like a button. Use `Button` for in-place actions like submitting, opening, or toggling UI.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { ExternalLink } from "lucide";
+import { LinkButton, Icon } from "areia";
+
+const externalIcon = Icon({ icon: ExternalLink });
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-wrap items-center gap-3">
+      ${LinkButton({
+        href: "/components/link",
+        variant: "secondary",
+        label: "Read Link docs",
+      })}
+      ${LinkButton({
+        href: "https://ilha.build/",
+        variant: "ghost",
+        icon: externalIcon,
+        external: true,
+        label: "Ilha Docs",
+      })}
+    </div>
+  `,
+);
+```
+
+## API Reference
+
+| Prop        | Type                                                                                           | Default       | Description                                               |
+| ----------- | ---------------------------------------------------------------------------------------------- | ------------- | --------------------------------------------------------- |
+| `shape`     | `"base" \| "square" \| "circle"`                                                               | `"base"`      | Controls the button shape.                                |
+| `size`      | `"xs" \| "sm" \| "base" \| "lg"`                                                               | `"base"`      | Controls button height, padding, gap, and text size.      |
+| `variant`   | `"primary" \| "secondary" \| "ghost" \| "destructive" \| "secondary-destructive" \| "outline"` | `"secondary"` | Controls the visual style.                                |
+| `label`     | `unknown`                                                                                      | -             | Content rendered inside the button.                       |
+| `class`     | `string`                                                                                       | -             | Additional CSS classes merged with the generated classes. |
+| `className` | `string`                                                                                       | -             | Alias for `class`.                                        |
+| `icon`      | `unknown`                                                                                      | -             | Markup rendered before the label.                         |
+| `loading`   | `boolean`                                                                                      | -             | Shows a loading spinner and disables interaction.         |
+| `title`     | `string`                                                                                       | -             | Native tooltip text.                                      |
+| `disabled`  | `boolean`                                                                                      | -             | Disables the button.                                      |
+| `name`      | `string`                                                                                       | -             | Native button name attribute.                             |
+| `type`      | `"submit" \| "reset" \| "button"`                                                              | `"button"`    | Native button type attribute.                             |
+| `value`     | `string \| string[] \| number`                                                                 | -             | Native button value attribute.                            |

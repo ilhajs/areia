@@ -1,0 +1,11 @@
+[
+  {
+    "text": "Components",
+    "link": "/components/button",
+    "activeMatch": "/button/"
+  },
+  {
+    "text": "Document",
+    "link": "https://rspress.rs/"
+  }
+]

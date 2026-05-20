@@ -1,0 +1,250 @@
+---
+title: Banner
+description: Displays contextual inline messages for informational, alert, or error states.
+---
+
+Displays contextual inline messages for informational, alert, or error states.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Info, TriangleAlert } from "lucide";
+import { Banner, Icon } from "areia";
+
+const infoIcon = Icon({ icon: Info, class: "size-5" });
+
+const warningIcon = Icon({ icon: TriangleAlert, class: "size-5" });
+
+export default ilha.render(
+  () => html`
+    <div class="flex w-full max-w-2xl flex-col gap-3">
+      ${Banner({
+        icon: infoIcon,
+        title: "Update available",
+        description: "A new version is ready to install.",
+      })}
+      ${Banner({
+        icon: warningIcon,
+        variant: "alert",
+        title: "Session expiring",
+        description: "Your session will expire in 5 minutes.",
+      })}
+      ${Banner({
+        icon: warningIcon,
+        variant: "error",
+        title: "Save failed",
+        description:
+          "We couldn't save your changes. Please try again.",
+      })}
+    </div>
+  `,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Banner } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Banner } from "areia/components/banner";
+```
+
+## Usage
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Info } from "lucide";
+import { Banner, Icon } from "areia";
+
+const infoIcon = Icon({ icon: Info, class: "size-5" });
+
+export default ilha.render(
+  () =>
+    html`${Banner({
+      icon: infoIcon,
+      title: "Update available",
+      description: "A new version is ready to install.",
+    })}`,
+);
+```
+
+## Examples
+
+### Variants
+
+#### Default
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Info } from "lucide";
+import { Banner, Icon } from "areia";
+
+const infoIcon = Icon({ icon: Info, class: "size-5" });
+
+export default ilha.render(
+  () =>
+    html`${Banner({
+      icon: infoIcon,
+      title: "Update available",
+      description: "A new version is ready to install.",
+    })}`,
+);
+```
+
+#### Alert
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { TriangleAlert } from "lucide";
+import { Banner, Icon } from "areia";
+
+const warningIcon = Icon({ icon: TriangleAlert, class: "size-5" });
+
+export default ilha.render(
+  () =>
+    html`${Banner({
+      icon: warningIcon,
+      variant: "alert",
+      title: "Session expiring",
+      description: "Your session will expire in 5 minutes.",
+    })}`,
+);
+```
+
+#### Error
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { TriangleAlert } from "lucide";
+import { Banner, Icon } from "areia";
+
+const warningIcon = Icon({ icon: TriangleAlert, class: "size-5" });
+
+export default ilha.render(
+  () =>
+    html`${Banner({
+      icon: warningIcon,
+      variant: "error",
+      title: "Save failed",
+      description:
+        "We couldn't save your changes. Please try again.",
+    })}`,
+);
+```
+
+### With Icon
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { TriangleAlert } from "lucide";
+import { Banner, Icon } from "areia";
+
+const warningIcon = Icon({ icon: TriangleAlert, class: "size-5" });
+
+export default ilha.render(
+  () =>
+    html`${Banner({
+      icon: warningIcon,
+      variant: "alert",
+      title: "Review required",
+      description:
+        "Please review your project settings before proceeding.",
+    })}`,
+);
+```
+
+### With Action
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Info } from "lucide";
+import { Banner, Button, Icon } from "areia";
+
+const infoIcon = Icon({ icon: Info, class: "size-5" });
+
+export default ilha.render(
+  () =>
+    html`${Banner({
+      icon: infoIcon,
+      title: "Update available",
+      description: "A new version is ready to install.",
+      action: Button({
+        size: "sm",
+        variant: "primary",
+        label: "Update now",
+      }),
+    })}`,
+);
+```
+
+### With Multiple Actions
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { TriangleAlert } from "lucide";
+import { Banner, Button, Icon } from "areia";
+
+const warningIcon = Icon({ icon: TriangleAlert, class: "size-5" });
+
+export default ilha.render(
+  () =>
+    html`${Banner({
+      icon: warningIcon,
+      variant: "alert",
+      title: "Session expiring",
+      description: "Your session will expire in 5 minutes.",
+      action: html`
+        ${Button({
+          size: "sm",
+          variant: "ghost",
+          label: "Dismiss",
+        })}
+        ${Button({
+          size: "sm",
+          variant: "secondary",
+          label: "Extend session",
+        })}
+      `,
+    })}`,
+);
+```
+
+### Custom Content
+
+Use markup in `description` when the message needs links, emphasis, or other inline content.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Info } from "lucide";
+import { Banner, Icon } from "areia";
+
+const infoIcon = Icon({ icon: Info, class: "size-5" });
+
+export default ilha.render(
+  () =>
+    html`${Banner({
+      icon: infoIcon,
+      title: "Custom content supported",
+      description: html`This banner supports
+        <strong>custom content</strong> with Ilha markup.`,
+    })}`,
+);
+```
+
+## API Reference
+
+| Prop          | Type                              | Default     | Description                                                                 |
+| ------------- | --------------------------------- | ----------- | --------------------------------------------------------------------------- |
+| `icon`        | `unknown`                         | -           | Icon markup rendered before the banner content.                             |
+| `title`       | `unknown`                         | -           | Primary heading text for the banner.                                        |
+| `description` | `unknown`                         | -           | Secondary description displayed below the title.                            |
+| `action`      | `unknown`                         | -           | Action slot rendered at the trailing end of structured banners.             |
+| `text`        | `unknown`                         | -           | Simple banner content used when `title` and `description` are not provided. |
+| `variant`     | `"default" \| "alert" \| "error"` | `"default"` | Visual style of the banner.                                                 |
+| `class`       | `string`                          | -           | Additional CSS classes merged with the generated classes.                   |
+| `className`   | `string`                          | -           | Alias for `class`.                                                          |

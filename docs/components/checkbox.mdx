@@ -1,0 +1,342 @@
+---
+title: Checkbox
+description: A control that allows the user to toggle between checked and not checked.
+---
+
+A control that allows the user to toggle between checked and not checked. It uses DOM primitives like native checkbox inputs, labels, fieldsets, and legends.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox({ label: "Accept terms and conditions" })}`,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Checkbox } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Checkbox } from "areia/components/checkbox";
+```
+
+## Usage
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () => html`${Checkbox({ label: "Remember me" })}`,
+);
+```
+
+## Examples
+
+### Default
+
+Checkbox with a built-in label. The label automatically displays in a horizontal layout with the checkbox before the label.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox({ label: "Accept terms and conditions" })}`,
+);
+```
+
+### Checked
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox({
+      label: "Enable notifications",
+      checked: true,
+    })}`,
+);
+```
+
+### Indeterminate
+
+Used for “select all” patterns when some but not all items are selected.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox({
+      label: "Select all",
+      indeterminate: true,
+    })}`,
+);
+```
+
+### Label First Layout
+
+Use `controlFirst: false` to place the label before the checkbox.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox({
+      label: "Enable notifications",
+      controlFirst: false,
+    })}`,
+);
+```
+
+### Disabled
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox({ label: "Disabled", disabled: true })}`,
+);
+```
+
+### Error
+
+The error variant provides visual styling. For error messages, use `Checkbox.Group`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox({
+      label: "Required field",
+      variant: "error",
+      required: true,
+    })}`,
+);
+```
+
+### Without Visible Label
+
+When a checkbox does not have visible label text, provide an accessible name with `aria-label`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () => html`${Checkbox({ "aria-label": "Select row" })}`,
+);
+```
+
+### Checkbox Group
+
+Group multiple checkboxes with a legend and description. Use `Checkbox.Group` and `Checkbox.Item`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox.Group(
+      {
+        legend: "Notification preferences",
+        description: "Choose how you want to receive updates.",
+      },
+      [
+        Checkbox.Item({
+          label: "Email notifications",
+          value: "email",
+          checked: true,
+        }),
+        Checkbox.Item({
+          label: "SMS notifications",
+          value: "sms",
+        }),
+        Checkbox.Item({
+          label: "Product updates",
+          value: "updates",
+        }),
+      ],
+    )}`,
+);
+```
+
+### Checkbox Group with Error
+
+Show validation errors at the group level.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox.Group(
+      {
+        legend: "Notification preferences",
+        error: "Select at least one notification method.",
+      },
+      [
+        Checkbox.Item({
+          label: "Email notifications",
+          value: "email",
+          variant: "error",
+        }),
+        Checkbox.Item({
+          label: "SMS notifications",
+          value: "sms",
+          variant: "error",
+        }),
+      ],
+    )}`,
+);
+```
+
+### Visually Hidden Legend
+
+Use `Checkbox.Legend` with `class: "sr-only"` to keep the legend accessible to screen readers while hiding it visually. This is useful when the group is already labeled by nearby visible text.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-col gap-3">
+      <p class="text-base font-medium text-areia-default">
+        Notification preferences
+      </p>
+      ${Checkbox.Group([
+        Checkbox.Legend({
+          label: "Notification preferences",
+          class: "sr-only",
+        }),
+        Checkbox.Item({
+          label: "Email notifications",
+          value: "email",
+          checked: true,
+        }),
+        Checkbox.Item({
+          label: "SMS notifications",
+          value: "sms",
+        }),
+      ])}
+    </div>
+  `,
+);
+```
+
+### Custom Legend Styling
+
+Use `Checkbox.Legend` when you need custom typography, colors, or layout instead of the `legend` string prop.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Checkbox } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Checkbox.Group([
+      Checkbox.Legend({
+        label: "Notification preferences",
+        class:
+          "text-sm uppercase tracking-wide text-areia-subtle",
+      }),
+      Checkbox.Item({
+        label: "Email notifications",
+        value: "email",
+        checked: true,
+      }),
+      Checkbox.Item({
+        label: "SMS notifications",
+        value: "sms",
+      }),
+    ])}`,
+);
+```
+
+## API Reference
+
+### Checkbox
+
+Single checkbox component with built-in label and horizontal layout.
+
+| Prop            | Type                   | Default     | Description                                                                          |
+| --------------- | ---------------------- | ----------- | ------------------------------------------------------------------------------------ |
+| `variant`       | `"default" \| "error"` | `"default"` | Visual variant.                                                                      |
+| `label`         | `unknown`              | -           | Label content for the checkbox.                                                      |
+| `labelTooltip`  | `string`               | -           | Tooltip text rendered as a native title on the label text.                           |
+| `controlFirst`  | `boolean`              | `true`      | When true, checkbox appears before label. When false, label appears before checkbox. |
+| `checked`       | `boolean`              | -           | Whether the checkbox is checked.                                                     |
+| `indeterminate` | `boolean`              | -           | Whether the checkbox is in an indeterminate visual state.                            |
+| `disabled`      | `boolean`              | -           | Whether the checkbox is disabled.                                                    |
+| `name`          | `string`               | -           | Name for form submission.                                                            |
+| `value`         | `string`               | -           | Value for form submission.                                                           |
+| `required`      | `boolean`              | -           | Whether the field is required.                                                       |
+| `class`         | `string`               | -           | Additional CSS classes applied to the checkbox control.                              |
+| `className`     | `string`               | -           | Alias for `class`.                                                                   |
+
+### Checkbox.Group
+
+Wrapper for multiple checkboxes with legend, description, and error support.
+
+| Prop            | Type        | Default | Description                                                         |
+| --------------- | ----------- | ------- | ------------------------------------------------------------------- |
+| `legend`        | `unknown`   | -       | Legend content for the group.                                       |
+| first argument  | `unknown[]` | -       | Checkbox item markup when no group props are needed.                |
+| second argument | `unknown[]` | -       | Checkbox item markup, usually `Checkbox.Item(...)` calls.           |
+| `children`      | `unknown`   | -       | Inline checkbox item markup. Prefer the second argument for groups. |
+| `error`         | `unknown`   | -       | Error message for the group.                                        |
+| `description`   | `unknown`   | -       | Helper text for the group.                                          |
+| `disabled`      | `boolean`   | -       | Whether all controls in the fieldset are disabled.                  |
+| `class`         | `string`    | -       | Additional CSS classes.                                             |
+| `className`     | `string`    | -       | Alias for `class`.                                                  |
+
+### Checkbox.Legend
+
+Composable legend sub-component for `Checkbox.Group`. Use it instead of the `legend` prop when you need custom legend styling.
+
+| Prop        | Type      | Default | Description             |
+| ----------- | --------- | ------- | ----------------------- |
+| `label`     | `unknown` | -       | Legend content.         |
+| `class`     | `string`  | -       | Additional CSS classes. |
+| `className` | `string`  | -       | Alias for `class`.      |
+
+### Checkbox.Item
+
+Individual checkbox within `Checkbox.Group`. It accepts the same props as `Checkbox`, plus `value` for form submission.
+
+## Accessibility
+
+### Label Requirement
+
+Single checkboxes should have a visible `label`, an `aria-label`, or an `aria-labelledby` value so assistive technologies can announce their purpose.
+
+### Keyboard Navigation
+
+Because this component uses native `<input type="checkbox">`, Space toggles the checkbox and Tab moves focus between controls.
+
+### Screen Readers
+
+`Checkbox.Group` uses semantic `<fieldset>` and `<legend>` elements for proper grouping announcements.
