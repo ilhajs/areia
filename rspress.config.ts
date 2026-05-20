@@ -5,18 +5,25 @@ import { pluginTwoslash } from "@rspress/plugin-twoslash";
 
 export default defineConfig({
   root: path.join(__dirname, "docs"),
-  title: "My Site",
-  icon: "/rspress-icon.png",
-  logo: {
-    light: "/rspress-light-logo.png",
-    dark: "/rspress-dark-logo.png",
-  },
+  title: "Areia",
+  icon: "/logo.svg",
+  logo: "/logo.svg",
   themeConfig: {
     socialLinks: [
       {
         icon: "github",
         mode: "link",
-        content: "https://github.com/web-infra-dev/rspress",
+        content: "https://github.com/ilhajs/areia",
+      },
+      {
+        icon: "discord",
+        mode: "link",
+        content: "https://discord.gg/WnVTMCTz74",
+      },
+      {
+        icon: "x",
+        mode: "link",
+        content: "https://x.com/ilha_js",
       },
     ],
   },
