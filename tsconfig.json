@@ -6,8 +6,6 @@
     "noEmit": true,
     "skipLibCheck": true,
     "useDefineForClassFields": true,
-
-    /* modules */
     "module": "ESNext",
     "moduleDetection": "force",
     "moduleResolution": "bundler",
@@ -15,8 +13,6 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
-
-    /* type checking */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -26,7 +22,8 @@
       "$components/*": ["./src/components/*"],
       "areia": ["./src/index.ts"],
       "areia/components/*": ["./src/components/*"]
-    }
+    },
+    "types": ["@types/bun"]
   },
   "include": ["docs", "theme", "rspress.config.ts", "src"],
   "mdx": {

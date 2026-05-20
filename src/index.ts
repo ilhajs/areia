@@ -112,6 +112,19 @@ export {
   TooltipTrigger,
   tooltipVariants,
 } from "$components/tooltip";
+export {
+  Table,
+  TableBody,
+  TableCell,
+  TableCheckCell,
+  TableCheckHead,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableResizeHandle,
+  TableRow,
+  tableVariants,
+} from "$components/table";
 export { Textarea, textareaVariants } from "$components/textarea";
 export type {
   TextareaError,
@@ -138,6 +151,22 @@ export type {
   TooltipTriggerInput,
   TooltipVariantsProps,
 } from "$components/tooltip";
+export type {
+  TableBodyInput,
+  TableCellInput,
+  TableCheckCellInput,
+  TableCheckHeadInput,
+  TableFooterInput,
+  TableHeadInput,
+  TableHeaderInput,
+  TableInput,
+  TableLayout,
+  TableResizeHandleInput,
+  TableRowInput,
+  TableRowVariant,
+  TableStickyColumn,
+  TableVariantsProps,
+} from "$components/table";
 export type {
   ButtonInput,
   ButtonShape,
