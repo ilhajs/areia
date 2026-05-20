@@ -495,7 +495,7 @@ export default ilha.render(
 
 ### Resize Handle
 
-`Table.ResizeHandle` renders a visual handle you can wire up to your own column resizing logic.
+`Table.ResizeHandle` resizes its containing `th` or `td` by updating the cell width while you drag it. Place it inside a relatively positioned cell.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
@@ -597,7 +597,13 @@ Selection cells with Areia checkboxes.
 
 ### Table.ResizeHandle
 
-Draggable-looking handle for column resizing. Wire it to TanStack Table or custom resize logic.
+Handle for column resizing. Dragging it updates the containing `th` or `td` width inline.
+
+| Prop        | Type     | Default | Description                                  |
+| ----------- | -------- | ------- | -------------------------------------------- |
+| `minWidth`  | `number` | `40`    | Minimum cell width in pixels while dragging. |
+| `class`     | `string` | -       | Additional CSS classes.                      |
+| `className` | `string` | -       | Alias for `class`.                           |
 
 ## TanStack Table Integration
 

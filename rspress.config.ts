@@ -51,6 +51,7 @@ export default defineConfig({
     pluginTwoslash({
       twoslashOptions: {
         compilerOptions: {
+          strict: true,
           baseUrl: __dirname,
           paths: {
             areia: ["./src/index.ts"],

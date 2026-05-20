@@ -113,6 +113,26 @@ export {
   tooltipVariants,
 } from "$components/tooltip";
 export {
+  Popover,
+  PopoverArrow,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverRoot,
+  PopoverTitle,
+  PopoverTrigger,
+  popoverVariants,
+} from "$components/popover";
+export {
+  Pagination,
+  PaginationControls,
+  PaginationInfo,
+  PaginationPageSize,
+  PaginationRoot,
+  PaginationSeparator,
+  paginationVariants,
+} from "$components/pagination";
+export {
   Table,
   TableBody,
   TableCell,
@@ -151,6 +171,29 @@ export type {
   TooltipTriggerInput,
   TooltipVariantsProps,
 } from "$components/tooltip";
+export type {
+  PopoverAlign,
+  PopoverArrowInput,
+  PopoverCloseInput,
+  PopoverContentInput,
+  PopoverDescriptionInput,
+  PopoverInput,
+  PopoverSide,
+  PopoverTitleInput,
+  PopoverTriggerInput,
+  PopoverVariantsProps,
+} from "$components/popover";
+export type {
+  PaginationControlsInput,
+  PaginationControlsVariant,
+  PaginationInfoInput,
+  PaginationInput,
+  PaginationLabels,
+  PaginationPageSelector,
+  PaginationPageSizeInput,
+  PaginationSeparatorInput,
+  PaginationVariantsProps,
+} from "$components/pagination";
 export type {
   TableBodyInput,
   TableCellInput,

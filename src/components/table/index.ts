@@ -291,16 +291,46 @@ export type TableResizeHandleInput = Omit<
   "className" | "children" | "type"
 > &
   Record<string, unknown> & {
+    /** Minimum column width in pixels while dragging. */
+    minWidth?: number;
     class?: string;
     className?: string;
   };
 
+const resizeHandlePointerDown = `
+  const handle = event.currentTarget;
+  const cell = handle.closest('th,td');
+  if (!cell) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const startX = event.clientX;
+  const startWidth = cell.getBoundingClientRect().width;
+  const minWidth = Number(handle.dataset.minWidth || 40);
+  const onMove = (moveEvent) => {
+    const width = Math.max(minWidth, startWidth + moveEvent.clientX - startX);
+    cell.style.width = width + 'px';
+    cell.style.minWidth = width + 'px';
+  };
+  const onUp = () => {
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onUp);
+    handle.releasePointerCapture?.(event.pointerId);
+  };
+  handle.setPointerCapture?.(event.pointerId);
+  document.addEventListener('pointermove', onMove);
+  document.addEventListener('pointerup', onUp, { once: true });
+`
+  .replace(/\s+/g, " ")
+  .trim();
+
 export function TableResizeHandle(input: TableResizeHandleInput = {}) {
-  const { class: className, className: aliasedClassName, ...props } = input;
+  const { class: className, className: aliasedClassName, minWidth = 40, ...props } = input;
 
   return html`<button
     type="button"
     aria-label="Resize column"
+    onpointerdown="${resizeHandlePointerDown}"
+    data-min-width="${minWidth}"
     class="${cn(
       "invisible absolute top-0 right-0 m-0 flex h-full w-2.5 cursor-col-resize touch-none items-center justify-center border-0 bg-areia-background p-0 select-none group-hover:visible focus-visible:ring-2 focus-visible:ring-areia-ring",
       className,
