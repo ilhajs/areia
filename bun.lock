@@ -6,6 +6,7 @@
       "name": "rspress-doc-template",
       "dependencies": {
         "@data-slot/combobox": "^0.2.166",
+        "@data-slot/dialog": "^0.2.166",
         "@data-slot/popover": "^0.2.166",
         "@data-slot/tooltip": "^0.2.166",
         "clsx": "^2.1.1",
@@ -102,6 +103,8 @@
     "@data-slot/combobox": ["@data-slot/combobox@0.2.166", "", { "dependencies": { "@data-slot/core": "0.2.166" } }, "sha512-BPF4WKfTFeiksrlp8kyU7g3iEuICY9EBoWzrrzDWmq8di3nDI3phAO2f42M6xG7JSNf6Rvu9K8IsXzOyZk5DXA=="],
 
     "@data-slot/core": ["@data-slot/core@0.2.166", "", {}, "sha512-/DuzMFIqiefdjheX5fMhaqs4YPp0/t+/pN9EgnB2jLSDk8384WkBCPGq76T/Ypb0MjVlHFiexKDnx9+k+bdcjw=="],
+
+    "@data-slot/dialog": ["@data-slot/dialog@0.2.166", "", { "dependencies": { "@data-slot/core": "0.2.166" } }, "sha512-ioMkbfCMVt4x8VrNEa0V32ncs57Q3GEVqEn+uDUBoOU6Qyv2q1ebI0IMkK/54kSeUHut7FilECGUJzuvc7TJAQ=="],
 
     "@data-slot/popover": ["@data-slot/popover@0.2.166", "", { "dependencies": { "@data-slot/core": "0.2.166" } }, "sha512-NW35Efz0oEquMec1X4y/nVxTGOYPWEkcoErN3/wtj7QqRZtpyJnQMP2rxm59+il9kvUIdUCAgtWl9CyIg55CXw=="],
 

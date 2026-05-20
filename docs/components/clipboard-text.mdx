@@ -1,0 +1,164 @@
+---
+title: Clipboard Text
+description: Displays read-only text with a one-click copy action.
+---
+
+Displays read-only text with a one-click copy action.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { ClipboardText } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${ClipboardText.Root({
+      text: "npm install areia",
+      tooltip: true,
+      class: "w-80",
+    })}
+  `,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { ClipboardText } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { ClipboardText } from "areia/components/clipboard-text";
+```
+
+## Usage
+
+Use `ClipboardText.Root` when the copy button should be interactive.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { ClipboardText } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${ClipboardText.Root({
+      text: "0c239dd2-92b4-4b68-bf35-8d6e1c5c12fd",
+      class: "w-96",
+    })}
+  `,
+);
+```
+
+## Examples
+
+### Copy different text
+
+Display a shortened value while copying the full value with `textToCopy`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { ClipboardText } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${ClipboardText.Root({
+      text: "sk_live_••••••••••••abc123",
+      textToCopy: "sk_live_abc123-full-secret-value",
+      class: "w-80",
+      tooltip: {
+        text: "Copy secret",
+        copiedText: "Copied secret",
+      },
+    })}
+  `,
+);
+```
+
+### Sizes
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { ClipboardText } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="grid w-96 gap-3">
+      ${ClipboardText.Root({
+        text: "Small clipboard text",
+        size: "sm",
+      })}
+      ${ClipboardText.Root({
+        text: "Default clipboard text",
+        size: "base",
+      })}
+      ${ClipboardText.Root({
+        text: "Large clipboard text",
+        size: "lg",
+      })}
+    </div>
+  `,
+);
+```
+
+### Tooltip
+
+Pass `tooltip: true` for the default tooltip, or configure the tooltip text, copied announcement, and side.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { ClipboardText } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${ClipboardText.Root({
+      text: "https://example.com/invite/areia",
+      class: "w-96",
+      tooltip: {
+        text: "Copy invite link",
+        copiedText: "Invite link copied",
+        side: "bottom",
+      },
+    })}
+  `,
+);
+```
+
+### Labels
+
+Customize the copy button label for localization.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { ClipboardText } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${ClipboardText.Root({
+      text: "areia-token-123",
+      labels: {
+        copyAction: "Copiar para a área de transferência",
+      },
+    })}
+  `,
+);
+```
+
+## API Reference
+
+### `ClipboardText.Root`
+
+| Prop                | Type                              | Default               | Description                                 |
+| ------------------- | --------------------------------- | --------------------- | ------------------------------------------- |
+| `text`              | `string`                          | —                     | Text displayed and copied.                  |
+| `textToCopy`        | `string`                          | `text`                | Text copied instead of the displayed value. |
+| `size`              | `"sm" \| "base" \| "lg"`          | `"lg"`                | Clipboard text size.                        |
+| `tooltip`           | `boolean \| ClipboardTextTooltip` | `false`               | Enables and configures the copy tooltip.    |
+| `labels.copyAction` | `string`                          | `"Copy to clipboard"` | Accessible label for the copy button.       |
+| `onCopy`            | `(text: string) => void`          | —                     | Called after a successful copy.             |
+
+### Static render
+
+`ClipboardText(...)` renders the same markup without mounting the clipboard behavior. Prefer `ClipboardText.Root(...)` for interactive usage.

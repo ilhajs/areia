@@ -1,0 +1,257 @@
+---
+title: Dialog
+description: Displays modal content over the page.
+---
+
+Displays modal content over the page.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Dialog } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${Dialog.Root({
+      trigger: Button({ label: "Open dialog" }),
+      contentClass: "grid gap-4 p-6",
+      content: html`
+        <div class="grid gap-2">
+          ${Dialog.Title({ children: "Edit profile" })}
+          ${Dialog.Description({
+            children:
+              "Make changes to your profile. Close the dialog when you are done.",
+          })}
+        </div>
+        <div class="flex justify-end gap-2">
+          ${Dialog.Close({
+            children: Button({
+              variant: "secondary",
+              label: "Cancel",
+            }),
+          })}
+          ${Dialog.Close({
+            children: Button({
+              variant: "primary",
+              label: "Save",
+            }),
+          })}
+        </div>
+      `,
+    })}
+  `,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Dialog } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Dialog } from "areia/components/dialog";
+```
+
+## Usage
+
+Use `Dialog.Root` for an interactive dialog. The component renders the required `dialog`, `dialog-trigger`, `dialog-portal`, `dialog-overlay`, and `dialog-content` slots for `@data-slot/dialog`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Dialog } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${Dialog.Root({
+      trigger: Button({ label: "Open" }),
+      contentClass: "grid gap-4 p-6",
+      content: html`
+        ${Dialog.Title({ children: "Dialog title" })}
+        ${Dialog.Description({
+          children: "Helpful supporting text for the dialog.",
+        })}
+        ${Dialog.Close({
+          children: Button({ label: "Close" }),
+        })}
+      `,
+    })}
+  `,
+);
+```
+
+## Examples
+
+### Alert dialog
+
+Use `role: "alertdialog"` for confirmation flows that require explicit acknowledgment. Alert dialogs do not close on outside click by default.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Dialog } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${Dialog.Root({
+      role: "alertdialog",
+      trigger: Button({
+        variant: "destructive",
+        label: "Delete project",
+      }),
+      contentClass: "grid gap-4 p-6",
+      content: html`
+        <div class="grid gap-2">
+          ${Dialog.Title({ children: "Delete project?" })}
+          ${Dialog.Description({
+            children:
+              "This action cannot be undone. The project and all related data will be permanently deleted.",
+          })}
+        </div>
+        <div class="flex justify-end gap-2">
+          ${Dialog.Close({
+            children: Button({
+              variant: "secondary",
+              label: "Cancel",
+            }),
+          })}
+          ${Dialog.Close({
+            children: Button({
+              variant: "destructive",
+              label: "Delete",
+            }),
+          })}
+        </div>
+      `,
+    })}
+  `,
+);
+```
+
+### Sizes
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Dialog } from "areia";
+
+const sizes = ["sm", "base", "lg", "xl"] as const;
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-wrap gap-2">
+      ${sizes.map(
+        (size) => html`
+          ${Dialog.Root({
+            size,
+            trigger: Button({
+              variant: "secondary",
+              label: size,
+            }),
+            contentClass: "grid gap-4 p-6",
+            content: html`
+              ${Dialog.Title({ children: `${size} dialog` })}
+              ${Dialog.Description({
+                children:
+                  "Dialogs constrain their minimum width by size.",
+              })}
+              ${Dialog.Close({
+                children: Button({ label: "Close" }),
+              })}
+            `,
+          })}
+        `,
+      )}
+    </div>
+  `,
+);
+```
+
+### Close behavior
+
+Configure outside-click, Escape, initial open state, and scroll locking through root options.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Dialog } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${Dialog.Root({
+      closeOnClickOutside: false,
+      closeOnEscape: true,
+      lockScroll: true,
+      trigger: Button({ label: "Open locked dialog" }),
+      contentClass: "grid gap-4 p-6",
+      content: html`
+        ${Dialog.Title({ children: "Explicit close" })}
+        ${Dialog.Description({
+          children:
+            "Clicking outside this dialog will not close it.",
+        })}
+        ${Dialog.Close({
+          children: Button({ label: "Close" }),
+        })}
+      `,
+    })}
+  `,
+);
+```
+
+### Compound helpers
+
+You can compose slots manually when you need lower-level control. Use `Dialog.Root` at the top so the primitive is mounted.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Dialog } from "areia";
+
+export default ilha.render(
+  () => html`
+    ${Dialog.Root({
+      children: Button({ label: "Manual trigger" }),
+      contentClass: "p-6",
+      content: html`
+        <div class="grid gap-4">
+          ${Dialog.Title({ children: "Manual composition" })}
+          ${Dialog.Description({
+            children:
+              "Trigger, title, description, and close are slot helpers.",
+          })}
+          ${Dialog.Close({
+            children: Button({ label: "Done" }),
+          })}
+        </div>
+      `,
+    })}
+  `,
+);
+```
+
+## API Reference
+
+### `Dialog.Root`
+
+| Prop                  | Type                             | Default                            | Description                                     |
+| --------------------- | -------------------------------- | ---------------------------------- | ----------------------------------------------- |
+| `trigger`             | `unknown`                        | —                                  | Custom trigger markup.                          |
+| `children`            | `unknown`                        | —                                  | Trigger content when `trigger` is not provided. |
+| `content`             | `unknown`                        | —                                  | Dialog panel content.                           |
+| `size`                | `"sm" \| "base" \| "lg" \| "xl"` | `"base"`                           | Dialog width.                                   |
+| `role`                | `"dialog" \| "alertdialog"`      | `"dialog"`                         | Dialog semantic role.                           |
+| `defaultOpen`         | `boolean`                        | `false`                            | Initial open state.                             |
+| `closeOnClickOutside` | `boolean`                        | `true` (`false` for alert dialogs) | Close when clicking outside content.            |
+| `closeOnEscape`       | `boolean`                        | `true`                             | Close when pressing Escape.                     |
+| `lockScroll`          | `boolean`                        | `true`                             | Lock body scroll while open.                    |
+| `onOpenChange`        | `(open: boolean) => void`        | —                                  | Called when open state changes.                 |
+
+### Compound exports
+
+- `Dialog.Trigger`
+- `Dialog.Portal`
+- `Dialog.Overlay`
+- `Dialog.Content`
+- `Dialog.Title`
+- `Dialog.Description`
+- `Dialog.Close`

@@ -37,6 +37,43 @@ export type {
   CheckboxVariant,
   CheckboxVariantsProps,
 } from "$components/checkbox";
+export {
+  ClipboardText,
+  ClipboardTextRoot,
+  clipboardTextVariants,
+} from "$components/clipboard-text";
+export type {
+  ClipboardTextInput,
+  ClipboardTextLabels,
+  ClipboardTextSize,
+  ClipboardTextTooltip,
+  ClipboardTextVariantsProps,
+} from "$components/clipboard-text";
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+  dialogVariants,
+} from "$components/dialog";
+export type {
+  DialogCloseInput,
+  DialogContentInput,
+  DialogDescriptionInput,
+  DialogInput,
+  DialogOverlayInput,
+  DialogPortalInput,
+  DialogRole,
+  DialogSize,
+  DialogTitleInput,
+  DialogTriggerInput,
+  DialogVariantsProps,
+} from "$components/dialog";
 export { Icon } from "$components/icon";
 export type { IconInput } from "$components/icon";
 export { Input, inputVariants } from "$components/input";
