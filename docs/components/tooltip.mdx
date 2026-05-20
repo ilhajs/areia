@@ -1,0 +1,418 @@
+---
+title: Tooltip
+description: A popup that displays contextual information when an element is hovered or focused.
+---
+
+A popup that displays contextual information when an element is hovered or focused.
+
+Areia's `Tooltip` is built on `@data-slot/tooltip` and rendered as an Ilha island when you use `Tooltip.Root`. It handles hover/focus interactions, warm-up behavior between nearby tooltips, collision-aware positioning, Escape dismissal, and accessible tooltip attributes.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Plus } from "lucide";
+import { Button, Icon, Tooltip } from "areia";
+
+const plusIcon = Icon({ icon: Plus });
+
+export default ilha.render(
+  () =>
+    html`${Tooltip.Root({
+      content: "Create project",
+      children: Button({
+        shape: "square",
+        icon: plusIcon,
+        "aria-label": "Create project",
+      }),
+    })}`,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Tooltip } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Tooltip } from "areia/components/tooltip";
+```
+
+## Usage
+
+Use `Tooltip.Root` for an interactive island. The root renders the tooltip markup and initializes the `@data-slot/tooltip` controller after mount.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Tooltip } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Tooltip.Root({
+      content: "Helpful contextual information",
+      children: Button({ label: "Hover me" }),
+    })}`,
+);
+```
+
+For static server-rendered markup or custom initialization, use `Tooltip(...)` directly. For most application usage, prefer `Tooltip.Root`.
+
+## Examples
+
+### Basic Tooltip
+
+Use `content` for the popup and `children` for the trigger content.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Info } from "lucide";
+import { Button, Icon, Tooltip } from "areia";
+
+const infoIcon = Icon({ icon: Info });
+
+export default ilha.render(
+  () =>
+    html`${Tooltip.Root({
+      content: "This action cannot be undone.",
+      children: Button({
+        variant: "secondary",
+        shape: "square",
+        icon: infoIcon,
+        "aria-label": "More information",
+      }),
+    })}`,
+);
+```
+
+### Text Trigger
+
+When the trigger is not an action, render it as a `span`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Tooltip } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Tooltip.Root({
+      triggerAs: "span",
+      triggerClass:
+        "underline decoration-dotted underline-offset-4",
+      content:
+        "Areia is a vanilla TypeScript component library.",
+      children: "Areia",
+    })}`,
+);
+```
+
+### Multiple Tooltips
+
+Tooltips share `@data-slot/tooltip` warm-up behavior automatically. After one tooltip closes, hovering another tooltip within `skipDelayDuration` opens it without the normal delay.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Languages, Plus, Settings } from "lucide";
+import { Button, Icon, Tooltip } from "areia";
+
+const plusIcon = Icon({ icon: Plus });
+const languagesIcon = Icon({ icon: Languages });
+const settingsIcon = Icon({ icon: Settings });
+
+export default ilha.render(
+  () => html`
+    <div class="flex items-center gap-2">
+      ${Tooltip.Root({
+        content: "Create project",
+        children: Button({
+          shape: "square",
+          icon: plusIcon,
+          "aria-label": "Create project",
+        }),
+      })}
+      ${Tooltip.Root({
+        content: "Translate",
+        children: Button({
+          shape: "square",
+          icon: languagesIcon,
+          "aria-label": "Translate",
+        }),
+      })}
+      ${Tooltip.Root({
+        content: "Settings",
+        children: Button({
+          shape: "square",
+          icon: settingsIcon,
+          "aria-label": "Settings",
+        }),
+      })}
+    </div>
+  `,
+);
+```
+
+### Side
+
+Use `side` to choose the preferred side of the trigger. Collision handling may flip the tooltip at runtime when there is not enough space.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Tooltip } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="grid grid-cols-2 gap-3">
+      ${Tooltip.Root({
+        side: "top",
+        content: "Top tooltip",
+        children: Button({ label: "Top" }),
+      })}
+      ${Tooltip.Root({
+        side: "bottom",
+        content: "Bottom tooltip",
+        children: Button({ label: "Bottom" }),
+      })}
+      ${Tooltip.Root({
+        side: "left",
+        content: "Left tooltip",
+        children: Button({ label: "Left" }),
+      })}
+      ${Tooltip.Root({
+        side: "right",
+        content: "Right tooltip",
+        children: Button({ label: "Right" }),
+      })}
+    </div>
+  `,
+);
+```
+
+### Alignment
+
+Use `align` to align the tooltip along the selected side.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Tooltip } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="flex items-center gap-3">
+      ${Tooltip.Root({
+        align: "start",
+        content: "Start aligned",
+        children: Button({ label: "Start" }),
+      })}
+      ${Tooltip.Root({
+        align: "center",
+        content: "Center aligned",
+        children: Button({ label: "Center" }),
+      })}
+      ${Tooltip.Root({
+        align: "end",
+        content: "End aligned",
+        children: Button({ label: "End" }),
+      })}
+    </div>
+  `,
+);
+```
+
+### Delay Control
+
+Use `delay` to control how long to wait before opening. Use `skipDelayDuration` to control the warm-up window after a tooltip closes.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Tooltip } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-wrap items-center gap-3">
+      ${Tooltip.Root({
+        delay: 1000,
+        content: "Opens after one second",
+        children: Button({ label: "1s delay" }),
+      })}
+      ${Tooltip.Root({
+        delay: 0,
+        skipDelayDuration: 0,
+        content: "Opens instantly with no warm-up window",
+        children: Button({ label: "Instant" }),
+      })}
+    </div>
+  `,
+);
+```
+
+### Without Arrow
+
+Set `arrow: false` to hide the decorative arrow.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Tooltip } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Tooltip.Root({
+      arrow: false,
+      content: "No arrow",
+      children: Button({ label: "Hover me" }),
+    })}`,
+);
+```
+
+### Custom Content
+
+The `content` prop accepts Ilha markup.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Tooltip } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Tooltip.Root({
+      content: html`
+        <div class="flex max-w-48 flex-col gap-1">
+          <span class="font-medium">Deploy preview</span>
+          <span class="text-areia-subtle"
+            >Creates a temporary preview environment.</span
+          >
+        </div>
+      `,
+      children: Button({ label: "Deploy" }),
+    })}`,
+);
+```
+
+### Custom Trigger
+
+Use `trigger` when you need complete control over the trigger markup. The custom trigger must include `data-slot="tooltip-trigger"`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Tooltip } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Tooltip.Root({
+      content: "Custom trigger markup",
+      trigger: html`<span
+        data-slot="tooltip-trigger"
+        tabindex="0"
+        class="inline-flex rounded-full bg-areia-surface-muted px-2 py-1 text-sm text-areia-default"
+      >
+        Beta
+      </span>`,
+    })}`,
+);
+```
+
+### Static Composition
+
+Use low-level parts for static markup or when you want to call `createTooltip` yourself.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Tooltip } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Tooltip({
+      content: "Static tooltip markup",
+      children: "Hover me",
+      triggerAs: "span",
+    })}`,
+);
+```
+
+## API Reference
+
+### Tooltip.Root
+
+`Tooltip.Root` is an Ilha island. It accepts standard HTML `div` attributes plus `@data-slot/tooltip` options.
+
+| Prop                | Type                                                                       | Default    | Description                                                                                                 |
+| ------------------- | -------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| `content`           | `unknown`                                                                  | -          | Content to display inside the tooltip popup.                                                                |
+| `children`          | `unknown`                                                                  | -          | Trigger content when `trigger` is not provided.                                                             |
+| `trigger`           | `unknown`                                                                  | -          | Custom trigger markup. Must include `data-slot="tooltip-trigger"`.                                          |
+| `triggerAs`         | `"button" \| "span" \| "div" \| "a"`                                       | `"span"`   | Tag used for the generated trigger. Defaults to `span` to avoid nested buttons when wrapping `Button(...)`. |
+| `arrow`             | `boolean`                                                                  | `true`     | Whether to render the decorative arrow.                                                                     |
+| `class`             | `string`                                                                   | -          | Additional CSS classes applied to the tooltip root.                                                         |
+| `className`         | `string`                                                                   | -          | Alias for `class`.                                                                                          |
+| `triggerClass`      | `string`                                                                   | -          | Additional CSS classes applied to the generated trigger.                                                    |
+| `triggerClassName`  | `string`                                                                   | -          | Alias for `triggerClass`.                                                                                   |
+| `contentClass`      | `string`                                                                   | -          | Additional CSS classes applied to the tooltip popup.                                                        |
+| `contentClassName`  | `string`                                                                   | -          | Alias for `contentClass`.                                                                                   |
+| `side`              | `"top" \| "right" \| "bottom" \| "left" \| "inline-start" \| "inline-end"` | `"top"`    | Preferred side relative to the trigger.                                                                     |
+| `align`             | `"start" \| "center" \| "end"`                                             | `"center"` | Preferred alignment along the selected side.                                                                |
+| `sideOffset`        | `number`                                                                   | `4`        | Distance from the trigger in pixels.                                                                        |
+| `alignOffset`       | `number`                                                                   | `0`        | Offset from the aligned edge in pixels.                                                                     |
+| `avoidCollisions`   | `boolean`                                                                  | `true`     | Flip or shift to stay inside the viewport.                                                                  |
+| `collisionPadding`  | `number`                                                                   | `8`        | Viewport edge padding used for collision handling.                                                          |
+| `delay`             | `number`                                                                   | `300`      | Delay before showing the tooltip in milliseconds.                                                           |
+| `skipDelayDuration` | `number`                                                                   | `300`      | Warm-up window where another tooltip opens without delay. Set `0` to disable.                               |
+| `portal`            | `boolean`                                                                  | `true`     | Portal content to `document.body` while open.                                                               |
+| `onOpenChange`      | `(open: boolean) => void`                                                  | -          | Called when visibility changes.                                                                             |
+
+### Tooltip.Trigger
+
+Generated trigger element.
+
+| Prop        | Type                                 | Default  | Description             |
+| ----------- | ------------------------------------ | -------- | ----------------------- |
+| `as`        | `"button" \| "span" \| "div" \| "a"` | `"span"` | Trigger tag name.       |
+| `children`  | `unknown`                            | -        | Trigger content.        |
+| `class`     | `string`                             | -        | Additional CSS classes. |
+| `className` | `string`                             | -        | Alias for `class`.      |
+
+### Tooltip.Content
+
+Popup container.
+
+| Prop        | Type                                                                       | Default | Description                        |
+| ----------- | -------------------------------------------------------------------------- | ------- | ---------------------------------- |
+| `children`  | `unknown`                                                                  | -       | Tooltip content.                   |
+| `arrow`     | `boolean`                                                                  | `true`  | Whether to render `Tooltip.Arrow`. |
+| `side`      | `"top" \| "right" \| "bottom" \| "left" \| "inline-start" \| "inline-end"` | `"top"` | Preferred side styling.            |
+| `class`     | `string`                                                                   | -       | Additional CSS classes.            |
+| `className` | `string`                                                                   | -       | Alias for `class`.                 |
+
+### Tooltip.Arrow
+
+Decorative arrow element. The controller positions it with inline `top`/`left` values and `data-side` attributes.
+
+| Prop        | Type      | Default | Description             |
+| ----------- | --------- | ------- | ----------------------- |
+| `children`  | `unknown` | SVG     | Custom arrow content.   |
+| `class`     | `string`  | -       | Additional CSS classes. |
+| `className` | `string`  | -       | Alias for `class`.      |
+
+## Accessibility
+
+### Behavior
+
+- Opens on pointer hover for mouse/pen input.
+- Opens on keyboard focus.
+- Touch hover is ignored; touch devices use focus behavior.
+- Pressing `Escape` hides the tooltip.
+- Moving from the trigger to the tooltip content keeps it open.
+- Disabled triggers do not open tooltips.
+
+### ARIA
+
+The controller automatically handles:
+
+- `role="tooltip"` on the popup content.
+- `aria-describedby` on the trigger while the tooltip is open.
+- `aria-hidden="true"` / `"false"` on the tooltip content.
+- Stable generated IDs for content when needed.
+
+### Trigger Labels
+
+Tooltips are supplemental. Icon-only triggers still need an accessible name, usually with `aria-label` on the trigger button.

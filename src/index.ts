@@ -55,6 +55,22 @@ export {
   SelectSeparator,
   selectVariants,
 } from "$components/select";
+export {
+  Combobox,
+  ComboboxChip,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxGroupLabel,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxRoot,
+  ComboboxSeparator,
+  ComboboxTriggerInput,
+  ComboboxTriggerValue,
+  comboboxVariants,
+} from "$components/combobox";
 export type {
   SelectError,
   SelectGroupInput,
@@ -67,7 +83,35 @@ export type {
   SelectVariant,
   SelectVariantsProps,
 } from "$components/select";
+export type {
+  ComboboxChipInput,
+  ComboboxContentInput,
+  ComboboxEmptyInput,
+  ComboboxError,
+  ComboboxGroupInput,
+  ComboboxGroupLabelInput,
+  ComboboxInput as ComboboxInputProps,
+  ComboboxInputSide,
+  ComboboxItemDescriptor,
+  ComboboxItemInput,
+  ComboboxItems,
+  ComboboxListInput,
+  ComboboxPopupInputInput,
+  ComboboxSeparatorInput,
+  ComboboxSize,
+  ComboboxTriggerInputInput,
+  ComboboxTriggerValueInput,
+  ComboboxVariantsProps,
+} from "$components/combobox";
 export { Radio, RadioGroup, RadioItem, RadioLegend, radioVariants } from "$components/radio";
+export {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+  tooltipVariants,
+} from "$components/tooltip";
 export { Textarea, textareaVariants } from "$components/textarea";
 export type {
   TextareaError,
@@ -85,6 +129,15 @@ export type {
   RadioVariant,
   RadioVariantsProps,
 } from "$components/radio";
+export type {
+  TooltipAlign,
+  TooltipArrowInput,
+  TooltipContentInput,
+  TooltipInput,
+  TooltipSide,
+  TooltipTriggerInput,
+  TooltipVariantsProps,
+} from "$components/tooltip";
 export type {
   ButtonInput,
   ButtonShape,
