@@ -68,6 +68,14 @@ export type {
   SelectVariantsProps,
 } from "$components/select";
 export { Radio, RadioGroup, RadioItem, RadioLegend, radioVariants } from "$components/radio";
+export { Textarea, textareaVariants } from "$components/textarea";
+export type {
+  TextareaError,
+  TextareaInput,
+  TextareaSize,
+  TextareaVariant,
+  TextareaVariantsProps,
+} from "$components/textarea";
 export type {
   RadioAppearance,
   RadioControlPosition,

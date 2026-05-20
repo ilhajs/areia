@@ -1,0 +1,392 @@
+---
+title: Textarea
+description: A multi-line text input for longer content with built-in label, description, and error support.
+---
+
+A multi-line text input for longer content with built-in label, description, and error support. Supports vertical resizing by default.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      label: "Bio",
+      description:
+        "Tell us a little about yourself. Max 500 characters.",
+      placeholder: "I design and build design systems...",
+      rows: 4,
+    })}`,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Textarea } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Textarea } from "areia/components/textarea";
+```
+
+## Usage
+
+### With Built-in Field
+
+Use the `label` prop to enable the built-in field wrapper with label, description, and error support.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      id: "notes",
+      label: "Notes",
+      description:
+        "Add any additional context for the reviewer.",
+      placeholder: "Write your notes here...",
+      rows: 3,
+    })}`,
+);
+```
+
+### Bare Textarea
+
+For custom form layouts, use `Textarea` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      "aria-label": "Message",
+      placeholder: "Type your message...",
+      rows: 4,
+    })}`,
+);
+```
+
+## Examples
+
+### With Label and Description
+
+The `label` prop enables the built-in field wrapper with automatic vertical layout.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      id: "bio",
+      label: "Bio",
+      description:
+        "A short description that appears on your public profile.",
+      placeholder: "I design and build design systems...",
+      rows: 4,
+    })}`,
+);
+```
+
+### With Error
+
+Pass `error` as a string for simple error messages. Error styling is automatically applied when the `error` prop is truthy.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      id: "message-error",
+      label: "Message",
+      placeholder: "Type your message...",
+      value:
+        "This message is way too long for the field limit...",
+      error: "Message must be less than 500 characters.",
+    })}`,
+);
+```
+
+### With Validation Object
+
+Pass `error` as an object with a `message` property when you want to keep validation metadata near the field.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      id: "comment",
+      label: "Comment",
+      required: true,
+      placeholder: "Share your thoughts...",
+      error: {
+        message: "Comment is required.",
+        match: "valueMissing",
+      },
+    })}`,
+);
+```
+
+### Sizes
+
+Four sizes are available: `xs`, `sm`, `base`, and `lg`. Sizes control text size, padding, and border radius — the height is determined by `rows` and content.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="flex w-full max-w-sm flex-col gap-3">
+      ${Textarea({
+        size: "xs",
+        "aria-label": "Extra small textarea",
+        placeholder: "Extra small",
+        rows: 2,
+      })}
+      ${Textarea({
+        size: "sm",
+        "aria-label": "Small textarea",
+        placeholder: "Small",
+        rows: 2,
+      })}
+      ${Textarea({
+        size: "base",
+        "aria-label": "Base textarea",
+        placeholder: "Base",
+        rows: 2,
+      })}
+      ${Textarea({
+        size: "lg",
+        "aria-label": "Large textarea",
+        placeholder: "Large",
+        rows: 2,
+      })}
+    </div>
+  `,
+);
+```
+
+### Custom Row Count
+
+Use the `rows` prop to control the initial visible height before the content grows.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="flex w-full max-w-sm flex-col gap-3">
+      ${Textarea({
+        label: "Short response",
+        placeholder: "A couple of lines...",
+        rows: 2,
+      })}
+      ${Textarea({
+        label: "Detailed response",
+        placeholder: "Take your time to explain...",
+        rows: 5,
+      })}
+    </div>
+  `,
+);
+```
+
+### Disabled
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      label: "Notes",
+      placeholder: "Write your notes here...",
+      disabled: true,
+    })}`,
+);
+```
+
+### Optional Field
+
+Set `required: false` to show optional text after the label.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      id: "comments",
+      label: "Additional comments",
+      required: false,
+      placeholder: "Anything else we should know...",
+      rows: 3,
+    })}`,
+);
+```
+
+### With Label Tooltip
+
+Use `labelTooltip` to add additional context via a native `title` attribute on the label.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      id: "release-notes",
+      label: "Release notes",
+      labelTooltip:
+        "These notes are published with the release and visible to all users.",
+      placeholder: "What changed in this version?",
+      rows: 4,
+    })}`,
+);
+```
+
+### Rich Label
+
+The `label` prop accepts Ilha markup for richer formatting.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      id: "review-notes",
+      label: html`Notes for <strong>review</strong>`,
+      required: true,
+      placeholder: "Add notes for the reviewer...",
+      rows: 3,
+    })}`,
+);
+```
+
+### Bare Textarea with Error
+
+Error messages and descriptions can render without a visible label. Use `aria-label` to keep the textarea accessible.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Textarea({
+      id: "feedback-error",
+      "aria-label": "Feedback",
+      placeholder: "Share your feedback...",
+      description:
+        "Your feedback helps us improve the product.",
+      error: "Feedback is currently unavailable.",
+    })}`,
+);
+```
+
+### Custom Resize Behavior
+
+The textarea defaults to vertical-only resize (`resize-vertical`). Override it by passing a Tailwind resize utility via `class`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Textarea } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="flex w-full max-w-sm flex-col gap-3">
+      ${Textarea({
+        label: "Vertical resize",
+        placeholder: "Resize vertically only...",
+        rows: 3,
+      })}
+      ${Textarea({
+        label: "Horizontal resize",
+        placeholder: "Resize horizontally only...",
+        class: "resize-horizontal",
+        rows: 3,
+      })}
+      ${Textarea({
+        label: "No resize",
+        placeholder: "Cannot be resized...",
+        class: "resize-none",
+        rows: 3,
+      })}
+    </div>
+  `,
+);
+```
+
+## API Reference
+
+`Textarea` accepts standard HTML textarea attributes plus the following props.
+
+| Prop           | Type                                               | Default     | Description                                                                       |
+| -------------- | -------------------------------------------------- | ----------- | --------------------------------------------------------------------------------- |
+| `label`        | `unknown`                                          | -           | Label content for the textarea. Enables the field wrapper.                        |
+| `labelTooltip` | `string`                                           | -           | Tooltip text rendered as a native title on the label text.                        |
+| `description`  | `unknown`                                          | -           | Helper text displayed below the textarea.                                         |
+| `error`        | `unknown \| { message: unknown; match?: unknown }` | -           | Error message. When truthy, error styling is automatically applied.               |
+| `rows`         | `number`                                           | `3`         | Number of visible text rows controlling the initial height.                       |
+| `size`         | `"xs" \| "sm" \| "base" \| "lg"`                   | `"base"`    | Textarea size controlling text size, padding, and border radius.                  |
+| `variant`      | `"default" \| "error"`                             | `"default"` | Visual variant. Explicit `variant` takes precedence over automatic error styling. |
+| `class`        | `string`                                           | -           | Additional CSS classes applied to the textarea.                                   |
+| `className`    | `string`                                           | -           | Alias for `class`.                                                                |
+
+### Value Resolution
+
+The initial textarea content is resolved in this order of precedence:
+
+1. `value` — controlled value
+2. `defaultValue` — uncontrolled default
+3. `children` — content passed between tags
+
+The resolved value is rendered as the textarea's text content, not as a `value` HTML attribute.
+
+### Validation Error Types
+
+When using `error` as an object, the `match` property can mirror HTML5 `ValidityState` keys.
+
+| Match          | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| `valueMissing` | Required field is empty.                                  |
+| `tooShort`     | Value is shorter than `minLength`.                        |
+| `tooLong`      | Value is longer than `maxLength`.                         |
+| `true`         | Always show the error, useful for server-side validation. |
+
+## Accessibility
+
+### Label Requirement
+
+Textareas should have an accessible name via one of:
+
+- `label` prop
+- `placeholder` plus `aria-label` for bare textareas
+- `aria-labelledby` for custom label association
+
+### Error Association
+
+When an `id` is provided, descriptions and error messages are automatically associated with the textarea using `aria-describedby`.
