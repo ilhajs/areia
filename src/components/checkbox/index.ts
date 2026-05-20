@@ -121,9 +121,10 @@ function checkboxControl(input: CheckboxInput) {
     variant = CHECKBOX_DEFAULT_VARIANTS.variant,
     ...rest
   } = input;
-  const active = Boolean(checked || indeterminate);
 
-  return html`<span class="relative inline-flex size-4 shrink-0 items-center justify-center">
+  return html`<span
+    class="relative inline-flex size-4 shrink-0 items-center justify-center [&:has(input:checked)>input]:bg-areia-foreground [&:has(input:checked)>input]:ring-areia-foreground [&:has(input:checked)>span]:flex [&:has(input[data-indeterminate])>input]:bg-areia-foreground [&:has(input[data-indeterminate])>input]:ring-areia-foreground [&:has(input[data-indeterminate])>span]:flex"
+  >
     <input
       type="checkbox"
       class="${cn(
@@ -131,7 +132,6 @@ function checkboxControl(input: CheckboxInput) {
         checkboxVariants({ variant }),
         !disabled &&
           "cursor-pointer hover:ring-areia-control-border focus:ring-areia-ring focus:ring-2 focus-visible:ring-2 focus-visible:ring-areia-ring",
-        active && "bg-areia-foreground ring-areia-foreground",
         disabled && "cursor-not-allowed opacity-50",
         className,
         aliasedClassName,
@@ -147,10 +147,7 @@ function checkboxControl(input: CheckboxInput) {
       )}
     />
     <span
-      class="${cn(
-        "pointer-events-none absolute inset-0 flex items-center justify-center text-areia-inverse",
-        !active && "invisible",
-      )}"
+      class="pointer-events-none absolute inset-0 hidden items-center justify-center text-areia-inverse"
     >
       ${indeterminate ? minusIcon() : checkIcon()}
     </span>

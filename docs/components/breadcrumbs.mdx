@@ -1,0 +1,271 @@
+---
+title: Breadcrumbs
+description: A navigation component that shows the current page's location within a navigational hierarchy.
+---
+
+A navigation component that shows the current page's location within a navigational hierarchy. On mobile, intermediate items automatically collapse to an ellipsis when there are more than two items in the trail.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { House, Folder } from "lucide";
+import { Breadcrumbs, Icon } from "areia";
+
+const homeIcon = Icon({ icon: House });
+const folderIcon = Icon({ icon: Folder });
+
+export default ilha.render(
+  () =>
+    html`${Breadcrumbs({
+      items: [
+        { href: "/", label: "Home", icon: homeIcon },
+        {
+          href: "/projects",
+          label: "Projects",
+          icon: folderIcon,
+        },
+        { label: "Current Project" },
+      ],
+    })}`,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Breadcrumbs } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Breadcrumbs } from "areia/components/breadcrumbs";
+```
+
+## Usage
+
+Pass an `items` array describing the trail. The **last item** is automatically treated as the current page — it renders without a link and receives `aria-current="page"`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Breadcrumbs } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Breadcrumbs({
+      items: [
+        { href: "/", label: "Home" },
+        { href: "/docs", label: "Docs" },
+        { label: "Breadcrumbs" },
+      ],
+    })}`,
+);
+```
+
+## Examples
+
+### Basic
+
+A simple three-level breadcrumb trail.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Breadcrumbs } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Breadcrumbs({
+      items: [
+        { href: "/", label: "Home" },
+        { href: "/docs", label: "Docs" },
+        { label: "Breadcrumbs" },
+      ],
+    })}`,
+);
+```
+
+### Sizes
+
+Two sizes are available: `sm` for compact UIs and `base` for the default appearance.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Breadcrumbs } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="flex flex-col gap-8">
+      ${Breadcrumbs({
+        size: "sm",
+        items: [
+          { href: "/", label: "Home" },
+          { href: "/docs", label: "Docs" },
+          { label: "Small Breadcrumbs" },
+        ],
+      })}
+      ${Breadcrumbs({
+        size: "base",
+        items: [
+          { href: "/", label: "Home" },
+          { href: "/docs", label: "Docs" },
+          { label: "Base Breadcrumbs" },
+        ],
+      })}
+    </div>
+  `,
+);
+```
+
+### With Icons
+
+Each item accepts an optional `icon` prop. Use the `Icon` component with any Lucide icon to add context to the trail.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { House, Folder } from "lucide";
+import { Breadcrumbs, Icon } from "areia";
+
+const homeIcon = Icon({ icon: House });
+const folderIcon = Icon({ icon: Folder });
+
+export default ilha.render(
+  () =>
+    html`${Breadcrumbs({
+      items: [
+        { href: "/", label: "Home", icon: homeIcon },
+        {
+          href: "/projects",
+          label: "Projects",
+          icon: folderIcon,
+        },
+        { label: "Current Project" },
+      ],
+    })}`,
+);
+```
+
+### Loading
+
+Set `loading` to `true` to replace the current page label with a pulsing skeleton placeholder while data is being fetched.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { House } from "lucide";
+import { Breadcrumbs, Icon } from "areia";
+
+const homeIcon = Icon({ icon: House });
+
+export default ilha.render(
+  () =>
+    html`${Breadcrumbs({
+      loading: true,
+      items: [
+        { href: "/", label: "Home", icon: homeIcon },
+        { href: "/docs", label: "Docs" },
+        { label: "Loading..." },
+      ],
+    })}`,
+);
+```
+
+### Clipboard
+
+Provide a `copyUrl` to show a copy-to-clipboard button that appears on hover. After copying, a checkmark is displayed for two seconds.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Breadcrumbs } from "areia";
+
+export default ilha.render(
+  () =>
+    html`${Breadcrumbs({
+      items: [
+        { href: "/", label: "Home" },
+        { href: "/docs", label: "Docs" },
+        { label: "Current Page" },
+      ],
+      copyUrl: "https://example.com/docs/current-page",
+    })}`,
+);
+```
+
+### Compound Composition
+
+When you need full control over the markup, use the sub-components directly. This bypasses the automatic mobile ellipsis and clipboard behavior, so you must handle those yourself.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import {
+  BreadcrumbsLink,
+  BreadcrumbsSeparator,
+  BreadcrumbsCurrent,
+} from "areia";
+
+export default ilha.render(
+  () =>
+    html`<nav
+      class="flex items-center gap-1 text-base"
+      aria-label="breadcrumb"
+    >
+      ${BreadcrumbsLink({ href: "/", label: "Home" })}
+      ${BreadcrumbsSeparator()}
+      ${BreadcrumbsLink({ href: "/docs", label: "Docs" })}
+      ${BreadcrumbsSeparator()}
+      ${BreadcrumbsCurrent({ label: "Current Page" })}
+    </nav>`,
+);
+```
+
+## API Reference
+
+### Breadcrumbs
+
+| Prop        | Type               | Default  | Description                                                            |
+| ----------- | ------------------ | -------- | ---------------------------------------------------------------------- |
+| `items`     | `BreadcrumbItem[]` | —        | Breadcrumb trail items. The last item is treated as the current page.  |
+| `size`      | `"sm" \| "base"`   | `"base"` | Controls the overall size of the breadcrumbs.                          |
+| `loading`   | `boolean`          | `false`  | When true, the current page label is replaced with a loading skeleton. |
+| `copyUrl`   | `string`           | —        | When provided, a copy-to-clipboard button appears on hover.            |
+| `class`     | `string`           | —        | Additional CSS classes merged via `cn()`.                              |
+| `className` | `string`           | —        | Alias for `class`.                                                     |
+
+### BreadcrumbItem
+
+| Prop    | Type      | Default | Description                                        |
+| ------- | --------- | ------- | -------------------------------------------------- |
+| `href`  | `string`  | —       | Link target URL. Omit for the current (last) item. |
+| `label` | `unknown` | —       | Display label for the breadcrumb item.             |
+| `icon`  | `unknown` | —       | Icon rendered before the label.                    |
+
+### Breadcrumbs.Link
+
+| Prop        | Type      | Default | Description                       |
+| ----------- | --------- | ------- | --------------------------------- |
+| `href`      | `string`  | —       | Link target URL.                  |
+| `label`     | `unknown` | —       | Content rendered inside the link. |
+| `icon`      | `unknown` | —       | Icon rendered before the label.   |
+| `class`     | `string`  | —       | Additional CSS classes.           |
+| `className` | `string`  | —       | Alias for `class`.                |
+
+### Breadcrumbs.Current
+
+| Prop        | Type      | Default | Description                                               |
+| ----------- | --------- | ------- | --------------------------------------------------------- |
+| `label`     | `unknown` | —       | Label for the current page.                               |
+| `icon`      | `unknown` | —       | Icon rendered before the label.                           |
+| `loading`   | `boolean` | —       | When true, shows a loading skeleton instead of the label. |
+| `class`     | `string`  | —       | Additional CSS classes.                                   |
+| `className` | `string`  | —       | Alias for `class`.                                        |
+
+### Breadcrumbs.Separator
+
+No component-specific props. Renders a chevron SVG separator.
+
+### Breadcrumbs.Clipboard
+
+| Prop        | Type     | Default | Description                        |
+| ----------- | -------- | ------- | ---------------------------------- |
+| `text`      | `string` | —       | The text to copy to the clipboard. |
+| `class`     | `string` | —       | Additional CSS classes.            |
+| `className` | `string` | —       | Alias for `class`.                 |
