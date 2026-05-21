@@ -1,0 +1,421 @@
+---
+title: Autocomplete
+description: A free-form text input with an optional filtered suggestion list.
+---
+
+A free-form text input with an optional filtered suggestion list. Unlike `Combobox`, the value is not constrained to the items list.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Autocomplete } from "areia";
+
+const fruits = [
+  "Apple",
+  "Apricot",
+  "Banana",
+  "Blueberry",
+  "Cherry",
+  "Date",
+];
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-sm">
+      ${Autocomplete.Root({
+        label: "Search fruit",
+        placeholder: "Type any fruit...",
+        items: fruits,
+        openOnFocus: true,
+      })}
+    </div>
+  `,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Autocomplete } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Autocomplete } from "areia/components/autocomplete";
+```
+
+## When to Use
+
+Use `Autocomplete` when the input value can be free-form text and suggestions are optional hints. Use `Combobox` when the final value must come from a predefined list.
+
+| Scenario                                      | Use            |
+| --------------------------------------------- | -------------- |
+| Search box, product finder, address lookup    | `Autocomplete` |
+| Country picker, font selector, role selector  | `Combobox`     |
+| Large or dynamic dataset with API suggestions | `Autocomplete` |
+| Small static list that must enforce validity  | `Combobox`     |
+| User can type anything and free text is valid | `Autocomplete` |
+| User should browse all options on demand      | `Combobox`     |
+
+## Usage
+
+Use `Autocomplete.Root` for an interactive Ilha island. The root wires input events, suggestion filtering, keyboard navigation, and suggestion selection.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Autocomplete } from "areia";
+
+const products = [
+  "Workers",
+  "Pages",
+  "R2",
+  "D1",
+  "KV",
+  "Durable Objects",
+];
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-sm">
+      ${Autocomplete.Root({
+        placeholder: "Search products...",
+        items: products,
+      })}
+    </div>
+  `,
+);
+```
+
+Use `Autocomplete(...)` for static markup or when you want to wire behavior yourself. For most application usage, prefer `Autocomplete.Root`.
+
+## Examples
+
+### Basic
+
+A basic free-form input with a flat list of string suggestions.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Autocomplete } from "areia";
+
+const fruits = [
+  "Apple",
+  "Apricot",
+  "Banana",
+  "Blueberry",
+  "Cherry",
+  "Date",
+];
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-sm">
+      ${Autocomplete.Root({
+        placeholder: "Type a fruit...",
+        items: fruits,
+        openOnFocus: true,
+      })}
+    </div>
+  `,
+);
+```
+
+### With Field
+
+Add `label`, `description`, and `required` to enable the built-in field wrapper.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Autocomplete } from "areia";
+
+const countries = [
+  { value: "United States", label: "United States" },
+  { value: "United Kingdom", label: "United Kingdom" },
+  { value: "Canada", label: "Canada" },
+  { value: "Australia", label: "Australia" },
+  { value: "Japan", label: "Japan" },
+];
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-sm">
+      ${Autocomplete.Root({
+        id: "shipping-country",
+        label: "Shipping country",
+        description:
+          "Start typing to see suggestions. Custom values are allowed.",
+        placeholder: "Type a country...",
+        required: true,
+        items: countries,
+        openOnFocus: true,
+      })}
+    </div>
+  `,
+);
+```
+
+### Error State
+
+Display validation errors with the `error` prop. The typed value is still free-form; validation belongs to your application.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Autocomplete } from "areia";
+
+const addresses = [
+  "100 Main St",
+  "200 Market St",
+  "300 Oak Ave",
+  "400 Pine Rd",
+];
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-sm">
+      ${Autocomplete.Root({
+        id: "address",
+        label: "Address",
+        placeholder: "Search address...",
+        defaultValue: "Unknown place",
+        items: addresses,
+        error:
+          "Choose a serviceable address or enter a full address manually.",
+      })}
+    </div>
+  `,
+);
+```
+
+### Sizes
+
+Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Autocomplete } from "areia";
+
+const items = ["Workers", "Pages", "R2", "D1"];
+
+export default ilha.render(
+  () => html`
+    <div class="flex w-full max-w-sm flex-col gap-3">
+      ${Autocomplete.Root({
+        size: "xs",
+        placeholder: "Extra small",
+        items,
+      })}
+      ${Autocomplete.Root({
+        size: "sm",
+        placeholder: "Small",
+        items,
+      })}
+      ${Autocomplete.Root({
+        size: "base",
+        placeholder: "Base",
+        items,
+      })}
+      ${Autocomplete.Root({
+        size: "lg",
+        placeholder: "Large",
+        items,
+      })}
+    </div>
+  `,
+);
+```
+
+### Custom Filtering
+
+Pass a custom `filter` function for advanced logic such as filtering on object labels. Set `filter: false` when suggestions are already filtered by an API.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Autocomplete } from "areia";
+
+const locations = [
+  { value: "iad", label: "Washington, D.C. (IAD)" },
+  { value: "sfo", label: "San Francisco (SFO)" },
+  { value: "lhr", label: "London (LHR)" },
+  { value: "nrt", label: "Tokyo (NRT)" },
+];
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-sm">
+      ${Autocomplete.Root({
+        label: "Edge location",
+        placeholder: "Search by city or airport code...",
+        items: locations,
+        filter: (item, query) =>
+          String(item.label)
+            .toLowerCase()
+            .includes(query.toLowerCase()) ||
+          item.value
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+        openOnFocus: true,
+      })}
+    </div>
+  `,
+);
+```
+
+### Grouped Suggestions
+
+For fully custom layouts, compose the subcomponents manually. Suggestions remain optional helpers; the input value is still free-form.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Autocomplete } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-sm">
+      ${Autocomplete.Root({
+        label: "Server location",
+        placeholder: "Type a region...",
+        openOnFocus: true,
+        children: [
+          Autocomplete.InputGroup({
+            placeholder: "Type a region...",
+          }),
+          Autocomplete.Content({
+            children: Autocomplete.List({
+              children: [
+                Autocomplete.Group({
+                  children: [
+                    Autocomplete.GroupLabel({
+                      children: "North America",
+                    }),
+                    Autocomplete.Item({
+                      value: "iad",
+                      children: "Washington, D.C. (IAD)",
+                    }),
+                    Autocomplete.Item({
+                      value: "sfo",
+                      children: "San Francisco (SFO)",
+                    }),
+                  ],
+                }),
+                Autocomplete.Group({
+                  children: [
+                    Autocomplete.GroupLabel({
+                      children: "Europe",
+                    }),
+                    Autocomplete.Item({
+                      value: "lhr",
+                      children: "London (LHR)",
+                    }),
+                    Autocomplete.Item({
+                      value: "ams",
+                      children: "Amsterdam (AMS)",
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          }),
+        ],
+      })}
+    </div>
+  `,
+);
+```
+
+### Listening for Changes
+
+`Autocomplete.Root` emits bubbling custom events so you can integrate it with application state without constraining the input to a list value.
+
+```ts twoslash
+const autocomplete = document.querySelector(
+  '[data-slot="autocomplete"]',
+);
+
+autocomplete?.addEventListener(
+  "autocomplete:value-change",
+  (event) => {
+    const { value } = (event as CustomEvent).detail;
+    console.log(value);
+  },
+);
+
+autocomplete?.addEventListener(
+  "autocomplete:open-change",
+  (event) => {
+    const { open } = (event as CustomEvent).detail;
+    console.log(open);
+  },
+);
+```
+
+## API Reference
+
+### Autocomplete
+
+Extends native `div` attributes.
+
+| Prop             | Type                                                                  | Default  | Description                                                     |
+| ---------------- | --------------------------------------------------------------------- | -------- | --------------------------------------------------------------- |
+| `items`          | `string[] \| AutocompleteItemDescriptor[] \| Record<string, unknown>` | -        | Suggestions shown as the user types.                            |
+| `value`          | `string \| number`                                                    | -        | Controlled text input value.                                    |
+| `defaultValue`   | `string \| number`                                                    | -        | Initial text input value.                                       |
+| `onValueChange`  | `(value: string) => void`                                             | -        | Called by `Autocomplete.Root` when text changes or item chosen. |
+| `onOpenChange`   | `(open: boolean) => void`                                             | -        | Called by `Autocomplete.Root` when suggestions open/close.      |
+| `children`       | `unknown`                                                             | -        | Custom autocomplete content.                                    |
+| `label`          | `unknown`                                                             | -        | Label content. Enables the field wrapper.                       |
+| `required`       | `boolean`                                                             | -        | Sets the native required attribute.                             |
+| `labelTooltip`   | `string`                                                              | -        | Tooltip text displayed next to the label.                       |
+| `description`    | `unknown`                                                             | -        | Helper text below the field.                                    |
+| `error`          | `unknown \| { message: unknown; match?: unknown }`                    | -        | Error message or validation error object.                       |
+| `placeholder`    | `string`                                                              | -        | Placeholder text for the input.                                 |
+| `disabled`       | `boolean`                                                             | -        | Disables the input.                                             |
+| `openOnFocus`    | `boolean`                                                             | `false`  | Opens suggestions when the input receives focus.                |
+| `maxItems`       | `number`                                                              | -        | Maximum number of suggestions rendered from `items`.            |
+| `filter`         | `boolean \| ((item, query) => boolean)`                               | `true`   | Built-in filtering control.                                     |
+| `size`           | `"xs" \| "sm" \| "base" \| "lg"`                                      | `"base"` | Input size.                                                     |
+| `class`          | `string`                                                              | -        | Additional classes for the root.                                |
+| `className`      | `string`                                                              | -        | Alias for `class`.                                              |
+| `inputClass`     | `string`                                                              | -        | Additional classes for the input.                               |
+| `inputClassName` | `string`                                                              | -        | Alias for `inputClass`.                                         |
+
+### Autocomplete.Root
+
+`Autocomplete.Root` is an Ilha island. It renders the same markup as `Autocomplete(...)`, then wires input events, filtering, item clicks, keyboard navigation, and outside-click dismissal.
+
+It emits:
+
+| Event                       | Detail      | Description                         |
+| --------------------------- | ----------- | ----------------------------------- |
+| `autocomplete:value-change` | `{ value }` | Fired when the input value changes. |
+| `autocomplete:open-change`  | `{ open }`  | Fired when suggestions open/close.  |
+
+### Subcomponents
+
+| Component                 | Description                                 |
+| ------------------------- | ------------------------------------------- |
+| `Autocomplete.InputGroup` | Text input styled like Areia `Input`.       |
+| `Autocomplete.Content`    | Suggestion popup container.                 |
+| `Autocomplete.List`       | Scrollable suggestion list.                 |
+| `Autocomplete.Item`       | Individual suggestion item.                 |
+| `Autocomplete.Empty`      | Empty-state content.                        |
+| `Autocomplete.Group`      | Groups suggestions under a heading.         |
+| `Autocomplete.GroupLabel` | Heading label for a suggestion group.       |
+| `Autocomplete.Separator`  | Horizontal divider between groups or items. |
+
+## Design Guidelines
+
+### Autocomplete vs Combobox
+
+- Use `Autocomplete` when typed text is the submitted value and suggestions are helpers.
+- Use `Combobox` when the final value must be one of the listed options.
+- Do not add a dropdown toggle to Autocomplete; users discover suggestions by typing or focusing.
+- For large/dynamic datasets, update `items` from your application or disable built-in filtering with `filter: false`.
+
+### Accessibility
+
+- Provide `label`, `aria-label`, or `aria-labelledby` for every autocomplete input.
+- Suggestions are optional; do not rely on the list as the only way to complete the field.
+- Keep suggestion labels clear and distinct.
+- Use `description` to explain that custom values are allowed when it is not obvious.

@@ -1,0 +1,360 @@
+---
+title: Layer Card
+description: Displays a card with a layered visual treatment for navigation, summaries, or feature highlights.
+---
+
+Displays a card with a layered visual treatment for navigation, summaries, or feature highlights.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { ArrowRight } from "lucide";
+import { Button, Icon, LayerCard } from "areia";
+
+const arrowIcon = Icon({ icon: ArrowRight });
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-md">
+      ${LayerCard({
+        children: [
+          LayerCard.Secondary({ children: "Next Steps" }),
+          LayerCard.Primary({
+            children: html`
+              <div
+                class="flex items-center justify-between gap-4"
+              >
+                <div class="flex flex-col gap-1">
+                  <h3 class="font-medium">
+                    Get started with Areia
+                  </h3>
+                  <p class="text-sm text-areia-subtle">
+                    Learn how to install and use the component
+                    library.
+                  </p>
+                </div>
+                ${Button({
+                  variant: "ghost",
+                  shape: "square",
+                  icon: arrowIcon,
+                  "aria-label": "Open guide",
+                })}
+              </div>
+            `,
+          }),
+        ],
+      })}
+    </div>
+  `,
+);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { LayerCard } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { LayerCard } from "areia/components/layer-card";
+```
+
+## Usage
+
+Use `LayerCard.Secondary` for the elevated header row and `LayerCard.Primary` for the main surface.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { LayerCard } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-md">
+      ${LayerCard({
+        children: [
+          LayerCard.Secondary({ children: "Documentation" }),
+          LayerCard.Primary({
+            children: html`
+              <h3 class="font-medium">Component guide</h3>
+              <p class="text-sm text-areia-subtle">
+                Learn how to use Areia components.
+              </p>
+            `,
+          }),
+        ],
+      })}
+    </div>
+  `,
+);
+```
+
+`LayerCard` also supports a simple surface-style mode. Render content directly inside `LayerCard` when you do not need a secondary header row.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { LayerCard } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-md">
+      ${LayerCard({
+        class: "p-4",
+        children: html`
+          <h3 class="font-medium">Quick start guide</h3>
+          <p class="text-sm text-areia-subtle">
+            Learn how to install and configure Areia.
+          </p>
+        `,
+      })}
+    </div>
+  `,
+);
+```
+
+## Examples
+
+### Basic Card
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { LayerCard } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-md">
+      ${LayerCard({
+        children: [
+          LayerCard.Secondary({ children: "Getting Started" }),
+          LayerCard.Primary({
+            children: html`
+              <h3 class="font-medium">Quick start guide</h3>
+              <p class="text-sm text-areia-subtle">
+                A short walkthrough for new users.
+              </p>
+            `,
+          }),
+        ],
+      })}
+    </div>
+  `,
+);
+```
+
+### Surface-style Card
+
+For simple card containers, render content directly inside `LayerCard` without `LayerCard.Primary`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { LayerCard } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-md">
+      ${LayerCard({
+        class: "p-4",
+        children: html`
+          <h3 class="font-medium">Quick start guide</h3>
+          <p class="text-sm text-areia-subtle">
+            Build consistent interfaces with reusable
+            primitives.
+          </p>
+        `,
+      })}
+    </div>
+  `,
+);
+```
+
+### Multiple Cards
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Boxes, Code2 } from "lucide";
+import { Icon, LayerCard } from "areia";
+
+const boxesIcon = Icon({ icon: Boxes, class: "size-4" });
+const codeIcon = Icon({ icon: Code2, class: "size-4" });
+
+export default ilha.render(
+  () => html`
+    <div class="grid w-full max-w-2xl gap-3 sm:grid-cols-2">
+      ${LayerCard({
+        children: [
+          LayerCard.Secondary({
+            children: html`${boxesIcon}<span>Components</span>`,
+          }),
+          LayerCard.Primary({
+            children: html`
+              <h3 class="font-medium">Browse components</h3>
+              <p class="text-sm text-areia-subtle">
+                Explore every available UI primitive.
+              </p>
+            `,
+          }),
+        ],
+      })}
+      ${LayerCard({
+        children: [
+          LayerCard.Secondary({
+            children: html`${codeIcon}<span>Examples</span>`,
+          }),
+          LayerCard.Primary({
+            children: html`
+              <h3 class="font-medium">View examples</h3>
+              <p class="text-sm text-areia-subtle">
+                Copy patterns for common product screens.
+              </p>
+            `,
+          }),
+        ],
+      })}
+    </div>
+  `,
+);
+```
+
+### Toolbar Card
+
+Layer cards work well for compact toolbars and summaries.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Badge, Input, LayerCard } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-2xl">
+      ${LayerCard({
+        children: [
+          LayerCard.Secondary({
+            children: html`
+              <span>Subrequests</span>
+              ${Badge({ variant: "neutral", label: "128" })}
+            `,
+          }),
+          LayerCard.Primary({
+            children: html`
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center gap-2">
+                  ${Input({
+                    size: "sm",
+                    placeholder: "Search origins...",
+                    "aria-label": "Search origins",
+                    class: "min-w-0 flex-1",
+                  })}
+                  ${Badge({ variant: "success", label: "2xx" })}
+                  ${Badge({ variant: "warning", label: "4xx" })}
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-sm">
+                  <span class="font-medium">Origin</span>
+                  <span class="font-medium">Requests</span>
+                  <span class="font-medium">Duration</span>
+                  <span class="text-areia-subtle"
+                    >api.example.com</span
+                  >
+                  <span>82</span>
+                  <span>120ms</span>
+                  <span class="text-areia-subtle"
+                    >cdn.example.com</span
+                  >
+                  <span>46</span>
+                  <span>48ms</span>
+                </div>
+              </div>
+            `,
+          }),
+        ],
+      })}
+    </div>
+  `,
+);
+```
+
+### Test Attributes
+
+`LayerCard.Primary` and `LayerCard.Secondary` accept standard HTML attributes, including `data-testid`.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { LayerCard } from "areia";
+
+export default ilha.render(
+  () => html`
+    <div class="w-full max-w-md">
+      ${LayerCard({
+        children: [
+          LayerCard.Secondary({
+            "data-testid": "layer-card-secondary",
+            children: "Getting Started",
+          }),
+          LayerCard.Primary({
+            "data-testid": "layer-card-primary",
+            children: html`
+              <h3 class="font-medium">Quick start guide</h3>
+              <p class="text-sm text-areia-subtle">
+                A short walkthrough for new users.
+              </p>
+            `,
+          }),
+        ],
+      })}
+    </div>
+  `,
+);
+```
+
+## API Reference
+
+### LayerCard
+
+Extends native `div` attributes.
+
+| Prop        | Type      | Default | Description                                             |
+| ----------- | --------- | ------- | ------------------------------------------------------- |
+| `children`  | `unknown` | -       | Card content. Use direct content or section components. |
+| `class`     | `string`  | -       | Additional CSS classes merged with generated classes.   |
+| `className` | `string`  | -       | Alias for `class`.                                      |
+
+### LayerCard.Primary
+
+Extends native `div` attributes.
+
+| Prop        | Type      | Default | Description                                           |
+| ----------- | --------- | ------- | ----------------------------------------------------- |
+| `children`  | `unknown` | -       | Main card content.                                    |
+| `class`     | `string`  | -       | Additional CSS classes merged with generated classes. |
+| `className` | `string`  | -       | Alias for `class`.                                    |
+
+### LayerCard.Secondary
+
+Extends native `div` attributes.
+
+| Prop        | Type      | Default | Description                                           |
+| ----------- | --------- | ------- | ----------------------------------------------------- |
+| `children`  | `unknown` | -       | Secondary header or metadata content.                 |
+| `class`     | `string`  | -       | Additional CSS classes merged with generated classes. |
+| `className` | `string`  | -       | Alias for `class`.                                    |
+
+## Design Guidelines
+
+### When to Use LayerCard
+
+- Use layered cards for navigation items, feature highlights, and summary cards with a distinct header row.
+- Use surface-style cards for simple containers where a header row is unnecessary.
+- Keep the secondary layer short: labels, categories, icons, or lightweight metadata work best.
+
+### Composition
+
+- Put high-emphasis content and actions in `LayerCard.Primary`.
+- Put category labels or supporting context in `LayerCard.Secondary`.
+- Use direct `children` plus padding classes for plain surface cards.
+
+### Accessibility
+
+- Use semantic headings inside card content when the card introduces a section.
+- If the entire card is clickable, make the interactive element clear and keyboard accessible.
+- Keep action buttons labeled with visible text or `aria-label`.

@@ -69,18 +69,26 @@ export function comboboxVariants({
 export type ComboboxItemDescriptor = {
   /** Display label for the option. */
   label: unknown;
-  /** Submitted/selected string value. */
+  /** Submitted/selected string value. The final combobox value should come from one of these values. */
   value: string;
   /** When true, the option cannot be selected. */
   disabled?: boolean;
 };
 
+/** Options available for selection. Use Autocomplete instead when arbitrary free text is valid. */
 export type ComboboxItems =
   | Record<string, unknown | { label: unknown; disabled?: boolean }>
   | ComboboxItemDescriptor[];
 
 export type ComboboxError = unknown | { message: unknown; match?: unknown };
 
+/**
+ * Searchable constrained selector.
+ *
+ * Combobox combines a text input, a popup, and a dropdown trigger for choosing
+ * from predefined options. Use Autocomplete when the user's typed text is the
+ * submitted value and suggestions are merely hints.
+ */
 export type ComboboxInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   ComboboxVariantsProps &
   Omit<ComboboxOptions, "disabled" | "required" | "placeholder"> &
@@ -89,7 +97,7 @@ export type ComboboxInput = Omit<HTMLElementProps<HTMLDivElement>, "className" |
     label?: unknown;
     /** Tooltip text rendered as a native title on the label text. */
     labelTooltip?: string;
-    /** Combobox options. Accepts object maps or arrays. */
+    /** Constrained options. The selected value should come from this list. */
     items?: ComboboxItems;
     /** Explicit list/content markup. Prefer the second `Combobox` argument for custom markup. */
     children?: unknown;
@@ -97,12 +105,21 @@ export type ComboboxInput = Omit<HTMLElementProps<HTMLDivElement>, "className" |
     description?: unknown;
     /** Error message. When truthy, error styling is automatically applied. */
     error?: ComboboxError;
-    /** Placeholder text for the input or trigger value. */
+    /** Placeholder text for the search input or trigger value. */
     placeholder?: string;
     /** Disable interaction. */
     disabled?: boolean;
     /** Form validation required. */
     required?: boolean;
+    /**
+     * Called when the search/filter text changes. This is not necessarily the selected value.
+     * Use `onValueChange` for committed option selection.
+     */
+    onInputValueChange?: ComboboxOptions["onInputValueChange"];
+    /** Called when the committed option value changes. */
+    onValueChange?: ComboboxOptions["onValueChange"];
+    /** Called when the options popup opens or closes. */
+    onOpenChange?: ComboboxOptions["onOpenChange"];
     /** Additional CSS classes applied to the combobox root. */
     class?: string;
     className?: string;
@@ -216,7 +233,7 @@ function placementDataAttrs(
   });
 }
 
-export type ComboboxTriggerInputInput = Omit<
+export type ComboboxSearchTriggerInput = Omit<
   HTMLElementProps<HTMLInputElement>,
   "className" | "size"
 > &
@@ -229,7 +246,10 @@ export type ComboboxTriggerInputInput = Omit<
     className?: string;
   };
 
-export function ComboboxTriggerInput(input: ComboboxTriggerInputInput = {}) {
+/** @deprecated Use `ComboboxSearchTriggerInput` instead. */
+export type ComboboxTriggerInputInput = ComboboxSearchTriggerInput;
+
+export function ComboboxTriggerInput(input: ComboboxSearchTriggerInput = {}) {
   const {
     clearLabel = "Clear selection",
     showOptionsLabel = "Show options",
@@ -258,6 +278,7 @@ export function ComboboxTriggerInput(input: ComboboxTriggerInputInput = {}) {
       ${raw(toAttrs(props))}
     />
     <button
+      type="button"
       data-slot="combobox-clear"
       aria-label="${clearLabel}"
       class="${cn(
@@ -268,6 +289,7 @@ export function ComboboxTriggerInput(input: ComboboxTriggerInputInput = {}) {
       ${xIcon(iconStyles.iconSize)}
     </button>
     <button
+      type="button"
       data-slot="combobox-trigger"
       aria-label="${showOptionsLabel}"
       class="${cn(
@@ -304,6 +326,7 @@ export function ComboboxTriggerValue(input: ComboboxTriggerValueInput = {}) {
   const iconStyles = triggerValueIconStyles[size];
 
   return html`<button
+    type="button"
     data-slot="combobox-trigger"
     class="${cn(
       inputVariants({ size, variant }),
@@ -404,7 +427,7 @@ export function ComboboxItem(input: ComboboxItemInput) {
     )}"
     ${raw(toAttrs({ ...props, "data-label": label, "data-disabled": disabled, disabled }))}
   >
-    <div class="col-start-1">${children}</div>
+    <div class="col-start-1">${raw(render(children))}</div>
     <span data-slot="combobox-item-indicator" class="col-start-2 flex items-center"
       >${checkIcon()}</span
     >
@@ -416,7 +439,7 @@ export type ComboboxEmptyInput = Omit<HTMLElementProps<HTMLDivElement>, "classNa
 
 export function ComboboxEmpty(input: ComboboxEmptyInput = {}) {
   const {
-    children = "No results found.",
+    children = "No options found.",
     class: className,
     className: aliasedClassName,
     ...props
@@ -430,7 +453,7 @@ export function ComboboxEmpty(input: ComboboxEmptyInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${children}
+    ${raw(render(children))}
   </div>`;
 }
 
@@ -462,10 +485,14 @@ export function ComboboxGroupLabel(input: ComboboxGroupLabelInput = {}) {
   const { children, class: className, className: aliasedClassName, ...props } = input;
   return html`<div
     data-slot="combobox-label"
-    class="${cn("mx-1.5 px-2 py-1.5 text-sm text-areia-subtle", className, aliasedClassName)}"
+    class="${cn(
+      "mx-1.5 px-2 py-1.5 text-sm font-medium text-areia-subtle",
+      className,
+      aliasedClassName,
+    )}"
     ${raw(toAttrs(props))}
   >
-    ${children}
+    ${raw(render(children))}
   </div>`;
 }
 
@@ -481,7 +508,7 @@ export function ComboboxSeparator(input: ComboboxSeparatorInput = {}) {
   ></div>`;
 }
 
-export type ComboboxPopupInputInput = Omit<
+export type ComboboxSearchInputInput = Omit<
   HTMLElementProps<HTMLInputElement>,
   "className" | "size"
 > &
@@ -492,7 +519,10 @@ export type ComboboxPopupInputInput = Omit<
     className?: string;
   };
 
-export function ComboboxInput(input: ComboboxPopupInputInput = {}) {
+/** @deprecated Use `ComboboxSearchInputInput` instead. */
+export type ComboboxPopupInputInput = ComboboxSearchInputInput;
+
+export function ComboboxInput(input: ComboboxSearchInputInput = {}) {
   const {
     size = COMBOBOX_DEFAULT_VARIANTS.size,
     variant = "default",
@@ -536,8 +566,9 @@ export function ComboboxChip(input: ComboboxChipInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${children}
+    ${raw(render(children))}
     <button
+      type="button"
       aria-label="${removeLabel}"
       class="flex cursor-pointer rounded-md border-0 bg-transparent p-1 hover:bg-areia-control-hover"
     >
@@ -573,7 +604,7 @@ function renderCombobox(input: ComboboxInput, children?: unknown[]) {
     children: inputChildren,
     defaultOpen,
     defaultValue,
-    description: _description,
+    description,
     disabled,
     error,
     filter: _filter,
@@ -595,6 +626,14 @@ function renderCombobox(input: ComboboxInput, children?: unknown[]) {
     ...rootProps
   } = input;
   const variant = error ? "error" : "default";
+  const normalizedError = normalizeError(error);
+  const descriptionId = fieldId(id, "description");
+  const errorId = fieldId(id, "error");
+  const describedBy = cn(
+    typeof rootProps["aria-describedby"] === "string" ? rootProps["aria-describedby"] : undefined,
+    description != null ? descriptionId : undefined,
+    normalizedError != null ? errorId : undefined,
+  );
   const content = children ?? (items ? renderItems(items) : inputChildren);
 
   return html`<div
@@ -622,6 +661,8 @@ function renderCombobox(input: ComboboxInput, children?: unknown[]) {
       required,
       size,
       variant: variant as "default" | "error",
+      "aria-invalid": normalizedError != null ? "true" : rootProps["aria-invalid"],
+      "aria-describedby": describedBy || undefined,
     })}
     ${ComboboxContent({
       ...rootProps,

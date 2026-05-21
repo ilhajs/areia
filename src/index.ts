@@ -1,3 +1,32 @@
+export {
+  Autocomplete,
+  AutocompleteContent,
+  AutocompleteEmpty,
+  AutocompleteGroup,
+  AutocompleteGroupLabel,
+  AutocompleteInputGroup,
+  AutocompleteItem,
+  AutocompleteList,
+  AutocompleteRoot,
+  AutocompleteSeparator,
+  autocompleteVariants,
+} from "$components/autocomplete";
+export type {
+  AutocompleteContentInput,
+  AutocompleteEmptyInput,
+  AutocompleteError,
+  AutocompleteGroupInput,
+  AutocompleteGroupLabelInput,
+  AutocompleteInput,
+  AutocompleteInputGroupInput,
+  AutocompleteItemDescriptor,
+  AutocompleteItemInput,
+  AutocompleteItems,
+  AutocompleteListInput,
+  AutocompleteSeparatorInput,
+  AutocompleteSize,
+  AutocompleteVariantsProps,
+} from "$components/autocomplete";
 export { Badge, badgeVariants } from "$components/badge";
 export type { BadgeInput, BadgeVariant, BadgeVariantsProps } from "$components/badge";
 export {
@@ -94,6 +123,17 @@ export type {
 } from "$components/input";
 export { Label, labelContentVariants, labelVariants } from "$components/label";
 export type { LabelInput, LabelVariantsProps } from "$components/label";
+export {
+  LayerCard,
+  LayerCardPrimary,
+  LayerCardSecondary,
+  layerCardVariants,
+} from "$components/layer-card";
+export type {
+  LayerCardInput,
+  LayerCardSectionInput,
+  LayerCardVariantsProps,
+} from "$components/layer-card";
 export { Link, LinkExternalIcon, linkVariants } from "$components/link";
 export type {
   LinkExternalIconInput,
@@ -151,6 +191,8 @@ export type {
   ComboboxItems,
   ComboboxListInput,
   ComboboxPopupInputInput,
+  ComboboxSearchInputInput,
+  ComboboxSearchTriggerInput,
   ComboboxSeparatorInput,
   ComboboxSize,
   ComboboxTriggerInputInput,
