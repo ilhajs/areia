@@ -49,6 +49,14 @@ export type {
   ClipboardTextTooltip,
   ClipboardTextVariantsProps,
 } from "$components/clipboard-text";
+export { DatePicker, DatePickerRoot, datePickerVariants } from "$components/date-picker";
+export type {
+  DatePickerInput,
+  DatePickerMode,
+  DatePickerSelected,
+  DatePickerVariantsProps,
+  DateRange,
+} from "$components/date-picker";
 export {
   Dialog,
   DialogClose,
@@ -84,6 +92,15 @@ export type {
   InputVariant,
   InputVariantsProps,
 } from "$components/input";
+export { Label, labelContentVariants, labelVariants } from "$components/label";
+export type { LabelInput, LabelVariantsProps } from "$components/label";
+export { Link, LinkExternalIcon, linkVariants } from "$components/link";
+export type {
+  LinkExternalIconInput,
+  LinkInput,
+  LinkVariant,
+  LinkVariantsProps,
+} from "$components/link";
 export {
   Select,
   SelectGroup,

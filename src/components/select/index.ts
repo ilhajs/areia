@@ -3,6 +3,7 @@ import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { INPUT_VARIANTS, type InputSize } from "$components/input";
+import { Label } from "$components/label";
 
 /** Select variant definitions. */
 export const SELECT_VARIANTS = {
@@ -316,12 +317,12 @@ function SelectBase(inputOrChildren: SelectInput | unknown[] = {}, children?: un
 
   return html`<div class="flex w-full flex-col gap-1.5">
     ${label != null
-      ? html`<label
-          class="text-base font-medium text-areia-default"
-          ${raw(toAttrs({ for: id, title: labelTooltip }))}
-        >
-          ${label}${required === false ? html`<span class="text-areia-muted"> optional</span>` : ""}
-        </label>`
+      ? Label({
+          for: typeof id === "string" ? id : undefined,
+          label,
+          showOptional: required === false,
+          tooltip: labelTooltip,
+        })
       : ""}
     ${control}
     ${normalizedError != null

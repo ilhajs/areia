@@ -2,6 +2,7 @@ import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { Label } from "$components/label";
 
 /** Radio variant definitions mapping variant names to their Tailwind classes. */
 export const RADIO_VARIANTS = {
@@ -180,7 +181,7 @@ export function RadioItem(input: RadioItemInput) {
       )}"
     >
       <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span class="text-base font-medium text-areia-default">${label}</span>
+        ${Label({ asContent: true, label, class: "text-base font-medium text-areia-default" })}
         ${description != null
           ? html`<span class="text-sm text-areia-subtle">${description}</span>`
           : ""}
@@ -198,8 +199,7 @@ export function RadioItem(input: RadioItemInput) {
       aliasedClassName,
     )}"
   >
-    ${control}
-    <span class="text-base text-areia-default">${label}</span>
+    ${control} ${Label({ asContent: true, label, class: "text-base text-areia-default" })}
   </label>`;
 }
 

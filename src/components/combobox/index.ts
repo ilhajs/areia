@@ -4,6 +4,7 @@ import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { INPUT_VARIANTS, inputVariants } from "$components/input";
+import { Label } from "$components/label";
 
 /** Combobox variant definitions. */
 export const COMBOBOX_VARIANTS = {
@@ -640,12 +641,12 @@ function renderField(input: ComboboxInput, children?: unknown[]) {
 
   return html`<div class="flex w-full flex-col gap-1.5">
     ${label != null
-      ? html`<label
-          class="text-base font-medium text-areia-default"
-          ${raw(toAttrs({ for: id, title: labelTooltip }))}
-        >
-          ${label}${required === false ? html`<span class="text-areia-muted"> optional</span>` : ""}
-        </label>`
+      ? Label({
+          for: typeof id === "string" ? id : undefined,
+          label,
+          showOptional: required === false,
+          tooltip: labelTooltip,
+        })
       : ""}
     ${raw(render(control))}
     ${normalizedError != null

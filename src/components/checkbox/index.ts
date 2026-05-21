@@ -1,7 +1,8 @@
 import { html, raw } from "ilha";
-import { cn } from "$lib/cn";
+import { cn, safeRandomId } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { Label } from "$components/label";
 
 /** Checkbox variant definitions mapping variant names to their Tailwind classes. */
 export const CHECKBOX_VARIANTS = {
@@ -157,11 +158,12 @@ function checkboxControl(input: CheckboxInput) {
 /** Single checkbox with an optional built-in label wrapper. */
 function CheckboxBase(input: CheckboxInput = {}) {
   const { label, labelTooltip, controlFirst = true, required, disabled, ...rest } = input;
-  const control = checkboxControl({ ...rest, disabled, required });
+  const controlId = typeof rest.id === "string" ? rest.id : safeRandomId();
+  const control = checkboxControl({ ...rest, id: controlId, disabled, required });
 
   if (label == null) return control;
 
-  return html`<label
+  return html`<span
     class="${cn(
       "inline-flex items-center gap-2 text-base text-areia-default",
       controlFirst ? "flex-row" : "flex-row-reverse justify-end",
@@ -169,10 +171,14 @@ function CheckboxBase(input: CheckboxInput = {}) {
     )}"
   >
     ${control}
-    <span ${raw(toAttrs({ title: labelTooltip }))}>
-      ${label}${required === false ? html`<span class="text-areia-muted"> optional</span>` : ""}
-    </span>
-  </label>`;
+    ${Label({
+      for: controlId,
+      label,
+      showOptional: required === false,
+      tooltip: labelTooltip,
+      class: disabled ? "cursor-not-allowed" : "cursor-pointer",
+    })}
+  </span>`;
 }
 
 export type CheckboxItemInput = CheckboxInput & {

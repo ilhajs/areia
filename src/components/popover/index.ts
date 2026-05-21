@@ -80,6 +80,7 @@ function dataAttrs(
 }
 
 function rawValue(value: unknown): string | undefined {
+  if (typeof value === "string") return value;
   if (
     typeof value === "object" &&
     value !== null &&
@@ -89,6 +90,30 @@ function rawValue(value: unknown): string | undefined {
     return value.value;
   }
   return undefined;
+}
+
+function islandCallParts(
+  value: unknown,
+): { island: { toString?: (props?: unknown) => string }; props?: unknown } | undefined {
+  if (!value || (typeof value !== "object" && typeof value !== "function")) return undefined;
+  const symbol = Object.getOwnPropertySymbols(value).find(
+    (item) => item.description === "ilha.islandCall",
+  );
+  if (!symbol) return undefined;
+  const record = value as Record<PropertyKey, unknown>;
+  const island = record["island"];
+  if (!island || (typeof island !== "object" && typeof island !== "function")) return undefined;
+  return { island: island as { toString?: (props?: unknown) => string }, props: record["props"] };
+}
+
+function render(value: unknown): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(render).join("");
+  const markup = rawValue(value);
+  if (markup !== undefined) return markup;
+  const islandCall = islandCallParts(value);
+  if (islandCall?.island.toString) return islandCall.island.toString(islandCall.props);
+  return String(value);
 }
 
 function withSlot(value: unknown, slot: string, className?: string, aliasedClassName?: string) {
@@ -233,7 +258,7 @@ export function PopoverContent(input: PopoverContentInput = {}) {
     )}
     ${raw(toAttrs(props))}
   >
-    ${arrow ? PopoverArrow({ side }) : ""} ${children}
+    ${arrow ? PopoverArrow({ side }) : ""} ${raw(render(children))}
   </div>`;
 }
 
@@ -359,7 +384,8 @@ function renderPopover(input: PopoverInput = {}) {
   } = input;
 
   const generatedTrigger =
-    trigger ??
+    withSlot(trigger, "popover-trigger", triggerClass, triggerClassName) ??
+    (trigger != null ? raw(render(trigger)) : undefined) ??
     withSlot(children, "popover-trigger", triggerClass, triggerClassName) ??
     PopoverTrigger({ as: triggerAs, class: triggerClass, className: triggerClassName, children });
 
@@ -399,7 +425,7 @@ function renderPopover(input: PopoverInput = {}) {
   </div>`;
 }
 
-export const PopoverRoot = ilha
+const PopoverRootIsland = ilha
   .input<PopoverInput>()
   .onMount(({ host, input }) => {
     const root = host.matches('[data-slot="popover"]')
@@ -440,8 +466,21 @@ export const PopoverRoot = ilha
   })
   .render(({ input }) => renderPopover(input));
 
+function normalizePopoverInput(input: PopoverInput = {}): PopoverInput {
+  return {
+    ...input,
+    content: input.content == null ? input.content : render(input.content),
+    trigger: input.trigger == null ? input.trigger : render(input.trigger),
+    children: input.children == null ? input.children : render(input.children),
+  };
+}
+
+export function PopoverRoot(input: PopoverInput = {}) {
+  return PopoverRootIsland(normalizePopoverInput(input));
+}
+
 function PopoverBase(input: PopoverInput = {}) {
-  return renderPopover(input);
+  return renderPopover(normalizePopoverInput(input));
 }
 
 export const Popover = Object.assign(PopoverBase, {
