@@ -27,6 +27,7 @@
         "tsdown": "^0.22.0",
         "typescript": "^6.0.3",
         "unrun": "^0.3.0",
+        "vanilla-sonner": "^0.5.2",
       },
     },
     "packages/areia": {
@@ -34,10 +35,10 @@
       "version": "0.1.0",
       "dependencies": {
         "@areia/slots": "workspace:*",
-        "clsx": "^2.1.1",
-        "date-fns": "^4.2.1",
-        "ilha": "^0.5.0",
-        "tailwind-merge": "^3.6.0",
+        "clsx": "2.1.1",
+        "date-fns": "4.2.1",
+        "ilha": "0.5.0",
+        "tailwind-merge": "3.6.0",
       },
       "devDependencies": {
         "lucide": "^1.16.0",
@@ -908,6 +909,8 @@
     "unrun": ["unrun@0.3.0", "", { "dependencies": { "rolldown": "^1.0.0" }, "peerDependencies": { "synckit": "^0.11.11" }, "optionalPeers": ["synckit"], "bin": { "unrun": "./dist/cli.mjs" } }, "sha512-5xw2AIVS2WR9Lqhz76qDIQLxipKRidf7Nq+Iz5SZ8shk1OmRlxnc6FyI/1Q2m99WLj6cbqaKFdESfWE99KPzlA=="],
 
     "update-browserslist-db": ["update-browserslist-db@1.2.3", "", { "dependencies": { "escalade": "^3.2.0", "picocolors": "^1.1.1" }, "peerDependencies": { "browserslist": ">= 4.21.0" }, "bin": { "update-browserslist-db": "cli.js" } }, "sha512-Js0m9cx+qOgDxo0eMiFGEueWztz+d4+M3rGlmKPT+T4IS/jP4ylw3Nwpu6cpTTP8R1MAC1kF4VbdLt3ARf209w=="],
+
+    "vanilla-sonner": ["vanilla-sonner@0.5.2", "", {}, "sha512-VIrEwqFdCwgGWC1ysR572ovsmXd2Obg4xidVQw5p5eAexuwDTMGNe35qP3xw5Zc6VqkcT8FOwp40qxAVQI1SFQ=="],
 
     "vfile": ["vfile@6.0.3", "", { "dependencies": { "@types/unist": "^3.0.0", "vfile-message": "^4.0.0" } }, "sha512-KzIbH/9tXat2u30jf+smMwFCsno4wHVdNmzFyL+T/L3UGqqk6JKfVqOFOZEpZSHADH1k40ab6NUIXZq422ov3Q=="],
 

@@ -2,6 +2,7 @@ import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { Tooltip } from "$components/tooltip";
 
 /** Button variant definitions mapping shape, size, and variant names to their Tailwind classes. */
 export const BUTTON_VARIANTS = {
@@ -170,6 +171,7 @@ export function Button(input: ButtonInput = {}) {
     loading,
     shape = "base",
     size = "base",
+    title,
     type,
     variant = "secondary",
     ...rest
@@ -182,7 +184,7 @@ export function Button(input: ButtonInput = {}) {
     aliasedClassName,
   );
 
-  return html`<button
+  const button = html`<button
     type="${type ?? "button"}"
     class="${classes}"
     ${raw(toAttrs({ ...rest, disabled: Boolean(loading || disabled) }))}
@@ -190,6 +192,15 @@ export function Button(input: ButtonInput = {}) {
     ${loading ? loaderIcon(size) : icon}
     ${label != null ? html`<span class="contents">${label}</span>` : ""}
   </button>`;
+
+  if (title == null || title === "") return button;
+
+  return Tooltip({
+    content: title,
+    children: button,
+    triggerClass: "contents",
+    contentClass: "font-sans text-xs",
+  });
 }
 
 export type LinkButtonInput = Omit<HTMLElementProps<HTMLAnchorElement>, "className"> &

@@ -108,14 +108,22 @@ describe("Button", () => {
         label: "Save",
         id: "save-button",
         "data-testid": "save",
-        title: "Save changes",
       }),
     );
 
     expect(output).toContain('id="save-button"');
     expect(output).toContain('data-testid="save"');
-    expect(output).toContain('title="Save changes"');
     expect(output).not.toContain("&quot;save-button&quot;");
+  });
+
+  it("renders title as tooltip content instead of a native title attribute", () => {
+    const output = markup(Button({ label: "Save", title: "Save changes" }));
+
+    expect(output).toContain('data-slot="tooltip"');
+    expect(output).toContain('data-slot="tooltip-trigger"');
+    expect(output).toContain('data-slot="tooltip-content"');
+    expect(output).toContain("Save changes");
+    expect(output).not.toContain('title="Save changes"');
   });
 
   it("merges class and className", () => {

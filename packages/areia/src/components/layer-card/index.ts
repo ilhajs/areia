@@ -4,13 +4,13 @@ import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
 export const LAYER_CARD_SURFACE_CLASSES =
-  "overflow-hidden rounded-lg bg-areia-background shadow-xs ring ring-areia-divider";
+  "overflow-hidden rounded-lg bg-areia-background shadow-xs ring ring-areia-foreground/10";
 export const LAYER_CARD_LAYERED_ROOT_CLASSES =
-  "flex w-full flex-col overflow-hidden rounded-lg bg-areia-surface-muted text-base ring ring-areia-border";
+  "flex w-full flex-col overflow-hidden rounded-lg bg-areia-surface-muted text-base ring ring-areia-foreground/10";
 export const LAYER_CARD_SECONDARY_CLASSES =
   "-my-2 flex items-center gap-2 bg-areia-surface-muted p-4 text-base font-medium text-areia-subtle";
 export const LAYER_CARD_PRIMARY_CLASSES =
-  "relative flex flex-col gap-2 overflow-hidden rounded-lg bg-areia-background p-4 pr-3 text-inherit no-underline ring ring-areia-divider";
+  "relative flex flex-col gap-2 overflow-hidden rounded-lg bg-areia-background p-4 pr-3 text-inherit no-underline ring ring-areia-foreground/10";
 
 /** LayerCard variant definitions (currently empty, reserved for future additions). */
 export const LAYER_CARD_VARIANTS = {} as const;

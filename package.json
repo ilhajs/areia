@@ -37,6 +37,7 @@
     "tailwindcss": "^4.3.0",
     "tsdown": "^0.22.0",
     "typescript": "^6.0.3",
-    "unrun": "^0.3.0"
+    "unrun": "^0.3.0",
+    "vanilla-sonner": "^0.5.2"
   }
 }

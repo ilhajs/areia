@@ -1,6 +1,6 @@
 import ilha, { html, raw } from "ilha";
-import { createCheckbox, type CheckboxOptions } from "../../../../slots/src/checkbox";
-import { cn, safeRandomId } from "$lib/cn";
+import { Checkbox as CheckboxPrimitive } from "@areia/slots";
+import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Label } from "$components/label";
@@ -36,16 +36,6 @@ export interface CheckboxVariantsProps {
 }
 
 type VariantConfig = Record<string, { classes: string }>;
-type Renderable = unknown;
-
-function render(value: Renderable): string {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
-  }
-  return String(value);
-}
 
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
   variants: TVariants,
@@ -176,12 +166,12 @@ function checkboxControl(input: CheckboxInput) {
 /** Single checkbox with an optional built-in label wrapper. */
 function renderCheckbox(input: CheckboxInput = {}) {
   const { label, labelTooltip, controlFirst = true, required, disabled, ...rest } = input;
-  const controlId = typeof rest.id === "string" ? rest.id : safeRandomId();
+  const controlId = typeof rest.id === "string" ? rest.id : undefined;
   const control = checkboxControl({ ...rest, id: controlId, disabled, required });
 
   if (label == null) return control;
 
-  return html`<span
+  return html`<label
     class="${cn(
       "inline-flex items-center gap-2 text-base text-areia-default",
       controlFirst ? "flex-row" : "flex-row-reverse justify-end",
@@ -190,13 +180,13 @@ function renderCheckbox(input: CheckboxInput = {}) {
   >
     ${control}
     ${Label({
-      for: controlId,
       label,
       showOptional: required === false,
       tooltip: labelTooltip,
+      asContent: true,
       class: disabled ? "cursor-not-allowed" : "cursor-pointer",
     })}
-  </span>`;
+  </label>`;
 }
 
 export type CheckboxItemInput = CheckboxInput & {
@@ -278,7 +268,7 @@ export function CheckboxGroup(
     ${raw(toAttrs({ ...rest, disabled }))}
   >
     ${legend != null ? CheckboxLegend({ label: legend }) : ""}
-    <div class="flex flex-col gap-2">${raw(render(content))}</div>
+    <div class="flex flex-col gap-2">${content ?? ""}</div>
     ${error != null
       ? html`<p class="text-sm text-areia-destructive-soft-foreground">${error}</p>`
       : ""}
@@ -294,14 +284,14 @@ export const CheckboxRoot = ilha
       : host.querySelector('[data-slot="checkbox"]');
     if (!root) return;
 
-    const controller = createCheckbox(root, {
+    const controller = CheckboxPrimitive.createCheckbox(root, {
       defaultChecked: typeof input.checked === "boolean" ? input.checked : undefined,
       indeterminate: typeof input.indeterminate === "boolean" ? input.indeterminate : undefined,
       disabled: typeof input.disabled === "boolean" ? input.disabled : undefined,
       required: typeof input.required === "boolean" ? input.required : undefined,
       name: typeof input.name === "string" ? input.name : undefined,
       value: typeof input.value === "string" ? input.value : undefined,
-    } satisfies CheckboxOptions);
+    } satisfies CheckboxPrimitive.CheckboxOptions);
 
     return () => controller.destroy();
   })
