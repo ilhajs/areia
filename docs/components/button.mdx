@@ -12,7 +12,7 @@ import { Button, Icon } from "areia";
 
 const plusIcon = Icon({ icon: Plus });
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-2">
       ${Button({ variant: "secondary", label: "Button" })}
@@ -25,6 +25,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -47,10 +49,12 @@ import { Button } from "areia/components/button";
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({ variant: "secondary", label: "Click me" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -63,10 +67,12 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({ variant: "primary", label: "Primary" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 #### Secondary
@@ -75,10 +81,12 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({ variant: "secondary", label: "Secondary" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 #### Ghost
@@ -87,9 +95,11 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`${Button({ variant: "ghost", label: "Ghost" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 #### Destructive
@@ -98,13 +108,15 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({
       variant: "destructive",
       label: "Destructive",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 #### Outline
@@ -113,10 +125,12 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({ variant: "outline", label: "Outline" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 #### Secondary Destructive
@@ -125,13 +139,15 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({
       variant: "secondary-destructive",
       label: "Secondary Destructive",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
@@ -140,7 +156,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-3">
       ${Button({
@@ -166,6 +182,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Icon
@@ -177,7 +195,7 @@ import { Button, Icon } from "areia";
 
 const plusIcon = Icon({ icon: Plus });
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({
       variant: "secondary",
@@ -185,6 +203,8 @@ export default ilha.render(
       label: "Create Ilha app",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Icon Only
@@ -198,7 +218,7 @@ import { Button, Icon } from "areia";
 
 const plusIcon = Icon({ icon: Plus });
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-3">
       ${Button({
@@ -216,6 +236,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Loading State
@@ -224,7 +246,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({
       variant: "primary",
@@ -232,6 +254,8 @@ export default ilha.render(
       label: "Loading...",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled State
@@ -240,7 +264,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({
       variant: "secondary",
@@ -248,6 +272,8 @@ export default ilha.render(
       label: "Disabled",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Title
@@ -261,7 +287,7 @@ import { Button, Icon } from "areia";
 
 const plusIcon = Icon({ icon: Plus });
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-3">
       ${Button({
@@ -279,6 +305,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Link as Button
@@ -292,7 +320,7 @@ import { LinkButton, Icon } from "areia";
 
 const externalIcon = Icon({ icon: ExternalLink });
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-3">
       ${LinkButton({
@@ -310,6 +338,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

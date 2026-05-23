@@ -18,10 +18,10 @@ const fruits = [
   "Date",
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-sm">
-      ${Autocomplete.Root({
+      ${Autocomplete({
         label: "Search fruit",
         placeholder: "Type any fruit...",
         items: fruits,
@@ -30,6 +30,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -61,7 +63,7 @@ Use `Autocomplete` when the input value can be free-form text and suggestions ar
 
 ## Usage
 
-Use `Autocomplete.Root` for an interactive Ilha island. The root wires input events, suggestion filtering, keyboard navigation, and suggestion selection.
+Call `Autocomplete(...)` for an interactive Ilha island. The root wires input events, suggestion filtering, keyboard navigation, and suggestion selection.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
@@ -76,19 +78,21 @@ const products = [
   "Durable Objects",
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-sm">
-      ${Autocomplete.Root({
+      ${Autocomplete({
         placeholder: "Search products...",
         items: products,
       })}
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
-Use `Autocomplete(...)` for static markup or when you want to wire behavior yourself. For most application usage, prefer `Autocomplete.Root`.
+Use `Autocomplete.Static(...)` for static markup or when you want to wire behavior yourself. For most application usage, call `Autocomplete(...)`.
 
 ## Examples
 
@@ -109,10 +113,10 @@ const fruits = [
   "Date",
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-sm">
-      ${Autocomplete.Root({
+      ${Autocomplete({
         placeholder: "Type a fruit...",
         items: fruits,
         openOnFocus: true,
@@ -120,6 +124,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Field
@@ -138,10 +144,10 @@ const countries = [
   { value: "Japan", label: "Japan" },
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-sm">
-      ${Autocomplete.Root({
+      ${Autocomplete({
         id: "shipping-country",
         label: "Shipping country",
         description:
@@ -154,6 +160,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Error State
@@ -171,10 +179,10 @@ const addresses = [
   "400 Pine Rd",
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-sm">
-      ${Autocomplete.Root({
+      ${Autocomplete({
         id: "address",
         label: "Address",
         placeholder: "Search address...",
@@ -186,6 +194,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
@@ -198,25 +208,25 @@ import { Autocomplete } from "areia";
 
 const items = ["Workers", "Pages", "R2", "D1"];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Autocomplete.Root({
+      ${Autocomplete({
         size: "xs",
         placeholder: "Extra small",
         items,
       })}
-      ${Autocomplete.Root({
+      ${Autocomplete({
         size: "sm",
         placeholder: "Small",
         items,
       })}
-      ${Autocomplete.Root({
+      ${Autocomplete({
         size: "base",
         placeholder: "Base",
         items,
       })}
-      ${Autocomplete.Root({
+      ${Autocomplete({
         size: "lg",
         placeholder: "Large",
         items,
@@ -224,6 +234,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Filtering
@@ -241,10 +253,10 @@ const locations = [
   { value: "nrt", label: "Tokyo (NRT)" },
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-sm">
-      ${Autocomplete.Root({
+      ${Autocomplete({
         label: "Edge location",
         placeholder: "Search by city or airport code...",
         items: locations,
@@ -260,6 +272,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Grouped Suggestions
@@ -270,10 +284,10 @@ For fully custom layouts, compose the subcomponents manually. Suggestions remain
 import ilha, { html } from "ilha";
 import { Autocomplete } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-sm">
-      ${Autocomplete.Root({
+      ${Autocomplete({
         label: "Server location",
         placeholder: "Type a region...",
         openOnFocus: true,
@@ -322,11 +336,13 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Listening for Changes
 
-`Autocomplete.Root` emits bubbling custom events so you can integrate it with application state without constraining the input to a list value.
+`Autocomplete` emits bubbling custom events so you can integrate it with application state without constraining the input to a list value.
 
 ```ts twoslash
 const autocomplete = document.querySelector(
@@ -356,33 +372,33 @@ autocomplete?.addEventListener(
 
 Extends native `div` attributes.
 
-| Prop             | Type                                                                  | Default  | Description                                                     |
-| ---------------- | --------------------------------------------------------------------- | -------- | --------------------------------------------------------------- |
-| `items`          | `string[] \| AutocompleteItemDescriptor[] \| Record<string, unknown>` | -        | Suggestions shown as the user types.                            |
-| `value`          | `string \| number`                                                    | -        | Controlled text input value.                                    |
-| `defaultValue`   | `string \| number`                                                    | -        | Initial text input value.                                       |
-| `onValueChange`  | `(value: string) => void`                                             | -        | Called by `Autocomplete.Root` when text changes or item chosen. |
-| `onOpenChange`   | `(open: boolean) => void`                                             | -        | Called by `Autocomplete.Root` when suggestions open/close.      |
-| `children`       | `unknown`                                                             | -        | Custom autocomplete content.                                    |
-| `label`          | `unknown`                                                             | -        | Label content. Enables the field wrapper.                       |
-| `required`       | `boolean`                                                             | -        | Sets the native required attribute.                             |
-| `labelTooltip`   | `string`                                                              | -        | Tooltip text displayed next to the label.                       |
-| `description`    | `unknown`                                                             | -        | Helper text below the field.                                    |
-| `error`          | `unknown \| { message: unknown; match?: unknown }`                    | -        | Error message or validation error object.                       |
-| `placeholder`    | `string`                                                              | -        | Placeholder text for the input.                                 |
-| `disabled`       | `boolean`                                                             | -        | Disables the input.                                             |
-| `openOnFocus`    | `boolean`                                                             | `false`  | Opens suggestions when the input receives focus.                |
-| `maxItems`       | `number`                                                              | -        | Maximum number of suggestions rendered from `items`.            |
-| `filter`         | `boolean \| ((item, query) => boolean)`                               | `true`   | Built-in filtering control.                                     |
-| `size`           | `"xs" \| "sm" \| "base" \| "lg"`                                      | `"base"` | Input size.                                                     |
-| `class`          | `string`                                                              | -        | Additional classes for the root.                                |
-| `className`      | `string`                                                              | -        | Alias for `class`.                                              |
-| `inputClass`     | `string`                                                              | -        | Additional classes for the input.                               |
-| `inputClassName` | `string`                                                              | -        | Alias for `inputClass`.                                         |
+| Prop             | Type                                                                  | Default  | Description                                                |
+| ---------------- | --------------------------------------------------------------------- | -------- | ---------------------------------------------------------- |
+| `items`          | `string[] \| AutocompleteItemDescriptor[] \| Record<string, unknown>` | -        | Suggestions shown as the user types.                       |
+| `value`          | `string \| number`                                                    | -        | Controlled text input value.                               |
+| `defaultValue`   | `string \| number`                                                    | -        | Initial text input value.                                  |
+| `onValueChange`  | `(value: string) => void`                                             | -        | Called by `Autocomplete` when text changes or item chosen. |
+| `onOpenChange`   | `(open: boolean) => void`                                             | -        | Called by `Autocomplete` when suggestions open/close.      |
+| `children`       | `unknown`                                                             | -        | Custom autocomplete content.                               |
+| `label`          | `unknown`                                                             | -        | Label content. Enables the field wrapper.                  |
+| `required`       | `boolean`                                                             | -        | Sets the native required attribute.                        |
+| `labelTooltip`   | `string`                                                              | -        | Tooltip text displayed next to the label.                  |
+| `description`    | `unknown`                                                             | -        | Helper text below the field.                               |
+| `error`          | `unknown \| { message: unknown; match?: unknown }`                    | -        | Error message or validation error object.                  |
+| `placeholder`    | `string`                                                              | -        | Placeholder text for the input.                            |
+| `disabled`       | `boolean`                                                             | -        | Disables the input.                                        |
+| `openOnFocus`    | `boolean`                                                             | `false`  | Opens suggestions when the input receives focus.           |
+| `maxItems`       | `number`                                                              | -        | Maximum number of suggestions rendered from `items`.       |
+| `filter`         | `boolean \| ((item, query) => boolean)`                               | `true`   | Built-in filtering control.                                |
+| `size`           | `"xs" \| "sm" \| "base" \| "lg"`                                      | `"base"` | Input size.                                                |
+| `class`          | `string`                                                              | -        | Additional classes for the root.                           |
+| `className`      | `string`                                                              | -        | Alias for `class`.                                         |
+| `inputClass`     | `string`                                                              | -        | Additional classes for the input.                          |
+| `inputClassName` | `string`                                                              | -        | Alias for `inputClass`.                                    |
 
-### Autocomplete.Root
+### Autocomplete
 
-`Autocomplete.Root` is an Ilha island. It renders the same markup as `Autocomplete(...)`, then wires input events, filtering, item clicks, keyboard navigation, and outside-click dismissal.
+`Autocomplete` is an Ilha island. It renders the same markup as `Autocomplete(...)`, then wires input events, filtering, item clicks, keyboard navigation, and outside-click dismissal.
 
 It emits:
 

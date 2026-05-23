@@ -9,9 +9,9 @@ Displays modal content over the page.
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Dialog.Root({
+    ${Dialog({
       trigger: Button({ label: "Open dialog" }),
       contentClass: "grid gap-4 p-6",
       content: html`
@@ -40,6 +40,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -58,15 +60,15 @@ import { Dialog } from "areia/components/dialog";
 
 ## Usage
 
-Use `Dialog.Root` for an interactive dialog. The component renders the required `dialog`, `dialog-trigger`, `dialog-portal`, `dialog-overlay`, and `dialog-content` slots for `@data-slot/dialog`.
+Use `Dialog` for an interactive dialog. The component renders the required `dialog`, `dialog-trigger`, `dialog-portal`, `dialog-overlay`, and `dialog-content` slots for `@data-slot/dialog`.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Dialog.Root({
+    ${Dialog({
       trigger: Button({ label: "Open" }),
       contentClass: "grid gap-4 p-6",
       content: html`
@@ -81,6 +83,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -93,9 +97,9 @@ Use `role: "alertdialog"` for confirmation flows that require explicit acknowled
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Dialog.Root({
+    ${Dialog({
       role: "alertdialog",
       trigger: Button({
         variant: "destructive",
@@ -128,6 +132,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
@@ -138,12 +144,12 @@ import { Button, Dialog } from "areia";
 
 const sizes = ["sm", "base", "lg", "xl"] as const;
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap gap-2">
       ${sizes.map(
         (size) => html`
-          ${Dialog.Root({
+          ${Dialog({
             size,
             trigger: Button({
               variant: "secondary",
@@ -166,6 +172,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Close behavior
@@ -176,9 +184,9 @@ Configure outside-click, Escape, initial open state, and scroll locking through 
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Dialog.Root({
+    ${Dialog({
       closeOnClickOutside: false,
       closeOnEscape: true,
       lockScroll: true,
@@ -197,19 +205,21 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Compound helpers
 
-You can compose slots manually when you need lower-level control. Use `Dialog.Root` at the top so the primitive is mounted.
+You can compose slots manually when you need lower-level control. Use `Dialog` at the top so the primitive is mounted.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Dialog.Root({
+    ${Dialog({
       children: Button({ label: "Manual trigger" }),
       contentClass: "p-6",
       content: html`
@@ -227,11 +237,13 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference
 
-### `Dialog.Root`
+### `Dialog`
 
 | Prop                  | Type                             | Default                            | Description                                     |
 | --------------------- | -------------------------------- | ---------------------------------- | ----------------------------------------------- |

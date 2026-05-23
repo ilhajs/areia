@@ -9,10 +9,12 @@ A control that allows the user to toggle between checked and not checked. It use
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox({ label: "Accept terms and conditions" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -35,9 +37,11 @@ import { Checkbox } from "areia/components/checkbox";
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`${Checkbox({ label: "Remember me" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -50,10 +54,12 @@ Checkbox with a built-in label. The label automatically displays in a horizontal
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox({ label: "Accept terms and conditions" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Checked
@@ -62,13 +68,15 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox({
       label: "Enable notifications",
       checked: true,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Indeterminate
@@ -79,13 +87,15 @@ Used for “select all” patterns when some but not all items are selected.
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox({
       label: "Select all",
       indeterminate: true,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Label First Layout
@@ -96,13 +106,15 @@ Use `controlFirst: false` to place the label before the checkbox.
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox({
       label: "Enable notifications",
       controlFirst: false,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
@@ -111,10 +123,12 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox({ label: "Disabled", disabled: true })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Error
@@ -125,7 +139,7 @@ The error variant provides visual styling. For error messages, use `Checkbox.Gro
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox({
       label: "Required field",
@@ -133,6 +147,8 @@ export default ilha.render(
       required: true,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Without Visible Label
@@ -143,9 +159,11 @@ When a checkbox does not have visible label text, provide an accessible name wit
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`${Checkbox({ "aria-label": "Select row" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Checkbox Group
@@ -156,7 +174,7 @@ Group multiple checkboxes with a legend and description. Use `Checkbox.Group` an
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox.Group(
       {
@@ -180,6 +198,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Checkbox Group with Error
@@ -190,7 +210,7 @@ Show validation errors at the group level.
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox.Group(
       {
@@ -211,6 +231,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Visually Hidden Legend
@@ -221,7 +243,7 @@ Use `Checkbox.Legend` with `class: "sr-only"` to keep the legend accessible to s
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-col gap-3">
       <p class="text-base font-medium text-areia-default">
@@ -245,6 +267,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Legend Styling
@@ -255,7 +279,7 @@ Use `Checkbox.Legend` when you need custom typography, colors, or layout instead
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Checkbox.Group([
       Checkbox.Legend({
@@ -274,6 +298,8 @@ export default ilha.render(
       }),
     ])}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

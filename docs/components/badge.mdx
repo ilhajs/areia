@@ -9,7 +9,7 @@ Displays a small label for status, categorization, or metadata.
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-2">
       ${Badge({ variant: "primary", label: "Primary" })}
@@ -23,6 +23,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -45,9 +47,11 @@ import { Badge } from "areia/components/badge";
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`${Badge({ label: "New" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -60,7 +64,7 @@ Use semantic variants for common status and categorization states.
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-2">
       ${Badge({ variant: "primary", label: "Primary" })}
@@ -74,6 +78,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Other Variants
@@ -84,7 +90,7 @@ Use color variants for product-specific labels where semantic badges are not eno
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-2">
       ${Badge({ variant: "neutral", label: "Neutral" })}
@@ -98,6 +104,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### In a Sentence
@@ -108,7 +116,7 @@ Badges can be used inline with nearby text to call attention to lightweight meta
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <p class="flex items-center gap-2 text-areia-default">
       Ilha Islands
@@ -116,6 +124,8 @@ export default ilha.render(
     </p>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

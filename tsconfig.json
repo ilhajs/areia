@@ -1,32 +1,11 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["DOM", "ES2023"],
-    "jsx": "react-jsx",
-    "target": "ES2023",
-    "noEmit": true,
-    "skipLibCheck": true,
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleDetection": "force",
-    "moduleResolution": "bundler",
-    "verbatimModuleSyntax": true,
-    "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "paths": {
-      "$docs/*": ["./docs/*"],
-      "$lib/*": ["./src/lib/*"],
-      "$components/*": ["./src/components/*"],
-      "areia": ["./src/index.ts"],
-      "areia/components/*": ["./src/components/*"]
-    },
-    "types": ["@types/bun"]
+      "areia": ["./packages/areia/src/index.ts"],
+      "@areia/slots": ["./packages/slots/src/index.ts"]
+    }
   },
-  "include": ["docs", "theme", "rspress.config.ts", "src"],
-  "mdx": {
-    "checkMdx": true
-  }
+  "include": ["packages/*/src/**/*"],
+  "exclude": ["**/dist", "**/node_modules"]
 }

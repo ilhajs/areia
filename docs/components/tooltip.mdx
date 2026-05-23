@@ -5,7 +5,7 @@ description: A popup that displays contextual information when an element is hov
 
 A popup that displays contextual information when an element is hovered or focused.
 
-Areia's `Tooltip` is built on `@data-slot/tooltip` and rendered as an Ilha island when you use `Tooltip.Root`. It handles hover/focus interactions, warm-up behavior between nearby tooltips, collision-aware positioning, Escape dismissal, and accessible tooltip attributes.
+Areia's `Tooltip` is built on `@data-slot/tooltip` and rendered as an Ilha island when you use `Tooltip`. It handles hover/focus interactions, warm-up behavior between nearby tooltips, collision-aware positioning, Escape dismissal, and accessible tooltip attributes.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
@@ -14,9 +14,9 @@ import { Button, Icon, Tooltip } from "areia";
 
 const plusIcon = Icon({ icon: Plus });
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Tooltip.Root({
+    html`${Tooltip({
       content: "Create project",
       children: Button({
         shape: "square",
@@ -25,6 +25,8 @@ export default ilha.render(
       }),
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -43,22 +45,24 @@ import { Tooltip } from "areia/components/tooltip";
 
 ## Usage
 
-Use `Tooltip.Root` for an interactive island. The root renders the tooltip markup and initializes the `@data-slot/tooltip` controller after mount.
+Call `Tooltip(...)` for an interactive island. The root renders the tooltip markup and initializes the `@data-slot/tooltip` controller after mount.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Tooltip.Root({
+    html`${Tooltip({
       content: "Helpful contextual information",
       children: Button({ label: "Hover me" }),
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
-For static server-rendered markup or custom initialization, use `Tooltip(...)` directly. For most application usage, prefer `Tooltip.Root`.
+For static server-rendered markup or custom initialization, use `Tooltip.Static(...)`. For most application usage, call `Tooltip(...)`.
 
 ## Examples
 
@@ -73,9 +77,9 @@ import { Button, Icon, Tooltip } from "areia";
 
 const infoIcon = Icon({ icon: Info });
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Tooltip.Root({
+    html`${Tooltip({
       content: "This action cannot be undone.",
       children: Button({
         variant: "secondary",
@@ -85,6 +89,8 @@ export default ilha.render(
       }),
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Text Trigger
@@ -95,9 +101,9 @@ When the trigger is not an action, render it as a `span`.
 import ilha, { html } from "ilha";
 import { Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Tooltip.Root({
+    html`${Tooltip({
       triggerAs: "span",
       triggerClass:
         "underline decoration-dotted underline-offset-4",
@@ -106,6 +112,8 @@ export default ilha.render(
       children: "Areia",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Multiple Tooltips
@@ -121,10 +129,10 @@ const plusIcon = Icon({ icon: Plus });
 const languagesIcon = Icon({ icon: Languages });
 const settingsIcon = Icon({ icon: Settings });
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex items-center gap-2">
-      ${Tooltip.Root({
+      ${Tooltip({
         content: "Create project",
         children: Button({
           shape: "square",
@@ -132,7 +140,7 @@ export default ilha.render(
           "aria-label": "Create project",
         }),
       })}
-      ${Tooltip.Root({
+      ${Tooltip({
         content: "Translate",
         children: Button({
           shape: "square",
@@ -140,7 +148,7 @@ export default ilha.render(
           "aria-label": "Translate",
         }),
       })}
-      ${Tooltip.Root({
+      ${Tooltip({
         content: "Settings",
         children: Button({
           shape: "square",
@@ -151,6 +159,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Side
@@ -161,25 +171,25 @@ Use `side` to choose the preferred side of the trigger. Collision handling may f
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="grid grid-cols-2 gap-3">
-      ${Tooltip.Root({
+      ${Tooltip({
         side: "top",
         content: "Top tooltip",
         children: Button({ label: "Top" }),
       })}
-      ${Tooltip.Root({
+      ${Tooltip({
         side: "bottom",
         content: "Bottom tooltip",
         children: Button({ label: "Bottom" }),
       })}
-      ${Tooltip.Root({
+      ${Tooltip({
         side: "left",
         content: "Left tooltip",
         children: Button({ label: "Left" }),
       })}
-      ${Tooltip.Root({
+      ${Tooltip({
         side: "right",
         content: "Right tooltip",
         children: Button({ label: "Right" }),
@@ -187,6 +197,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Alignment
@@ -197,20 +209,20 @@ Use `align` to align the tooltip along the selected side.
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex items-center gap-3">
-      ${Tooltip.Root({
+      ${Tooltip({
         align: "start",
         content: "Start aligned",
         children: Button({ label: "Start" }),
       })}
-      ${Tooltip.Root({
+      ${Tooltip({
         align: "center",
         content: "Center aligned",
         children: Button({ label: "Center" }),
       })}
-      ${Tooltip.Root({
+      ${Tooltip({
         align: "end",
         content: "End aligned",
         children: Button({ label: "End" }),
@@ -218,6 +230,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Delay Control
@@ -228,15 +242,15 @@ Use `delay` to control how long to wait before opening. Use `skipDelayDuration` 
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-3">
-      ${Tooltip.Root({
+      ${Tooltip({
         delay: 1000,
         content: "Opens after one second",
         children: Button({ label: "1s delay" }),
       })}
-      ${Tooltip.Root({
+      ${Tooltip({
         delay: 0,
         skipDelayDuration: 0,
         content: "Opens instantly with no warm-up window",
@@ -245,6 +259,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Without Arrow
@@ -255,14 +271,16 @@ Set `arrow: false` to hide the decorative arrow.
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Tooltip.Root({
+    html`${Tooltip({
       arrow: false,
       content: "No arrow",
       children: Button({ label: "Hover me" }),
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Content
@@ -273,9 +291,9 @@ The `content` prop accepts Ilha markup.
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Tooltip.Root({
+    html`${Tooltip({
       content: html`
         <div class="flex max-w-48 flex-col gap-1">
           <span class="font-medium">Deploy preview</span>
@@ -287,6 +305,8 @@ export default ilha.render(
       children: Button({ label: "Deploy" }),
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Trigger
@@ -297,9 +317,9 @@ Use `trigger` when you need complete control over the trigger markup. The custom
 import ilha, { html } from "ilha";
 import { Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Tooltip.Root({
+    html`${Tooltip({
       content: "Custom trigger markup",
       trigger: html`<span
         data-slot="tooltip-trigger"
@@ -310,6 +330,8 @@ export default ilha.render(
       </span>`,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Static Composition
@@ -320,21 +342,23 @@ Use low-level parts for static markup or when you want to call `createTooltip` y
 import ilha, { html } from "ilha";
 import { Tooltip } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Tooltip({
+    html`${Tooltip.Static({
       content: "Static tooltip markup",
       children: "Hover me",
       triggerAs: "span",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference
 
-### Tooltip.Root
+### Tooltip
 
-`Tooltip.Root` is an Ilha island. It accepts standard HTML `div` attributes plus `@data-slot/tooltip` options.
+`Tooltip` is an Ilha island. It accepts standard HTML `div` attributes plus `@data-slot/tooltip` options.
 
 | Prop                | Type                                                                       | Default    | Description                                                                                                 |
 | ------------------- | -------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------- |

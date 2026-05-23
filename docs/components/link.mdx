@@ -9,7 +9,7 @@ Displays a styled anchor for inline text links with multiple variants and an ext
 import ilha, { html } from "ilha";
 import { Link } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div
       class="flex flex-wrap items-center gap-4 text-areia-default"
@@ -28,6 +28,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -52,7 +54,7 @@ The default `Link` renders an underlined anchor with primary color styling.
 import ilha, { html } from "ilha";
 import { Link } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <p class="text-areia-default">
       Read our
@@ -61,6 +63,8 @@ export default ilha.render(
     </p>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -73,7 +77,7 @@ Links flow naturally within paragraph text with proper underline offset.
 import ilha, { html } from "ilha";
 import { Link } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <p class="max-w-prose text-areia-default">
       This is a paragraph with an
@@ -83,6 +87,8 @@ export default ilha.render(
     </p>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### External Link with Icon
@@ -93,7 +99,7 @@ Use `Link.ExternalIcon` to visually indicate links that navigate away from your 
 import ilha, { html } from "ilha";
 import { Link } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Link({
       href: "https://kumo-ui.com",
@@ -102,6 +108,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Current Variant
@@ -112,7 +120,7 @@ The `current` variant inherits color from its parent. Use it for links inside co
 import ilha, { html } from "ilha";
 import { Link } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <p class="text-areia-destructive-soft-foreground">
       This error message contains a
@@ -121,6 +129,8 @@ export default ilha.render(
     </p>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Plain Variant
@@ -131,7 +141,7 @@ Use `plain` when an underline would be distracting, such as navigation, menus, a
 import ilha, { html } from "ilha";
 import { Link } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <nav class="flex flex-wrap gap-4">
       ${Link({
@@ -148,6 +158,8 @@ export default ilha.render(
     </nav>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Classes
@@ -158,7 +170,7 @@ Pass `class` or `className` to merge additional classes with the generated varia
 import ilha, { html } from "ilha";
 import { Link } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Link({
       href: "#",
@@ -167,6 +179,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference
@@ -201,7 +215,7 @@ SVG icon component to indicate external links. It accepts arbitrary SVG attribut
 import ilha, { html } from "ilha";
 import { Link } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Link({
       href: "https://example.com",
@@ -213,6 +227,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Design Guidelines

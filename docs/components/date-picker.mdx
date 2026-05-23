@@ -1,25 +1,27 @@
 ---
-title: DatePicker
+title: Date Picker
 description: A date selection calendar supporting single, multiple, and range selection modes.
 ---
 
 A date selection calendar supporting single, multiple, and range selection modes.
 
-Areia's `DatePicker` uses `date-fns` for month generation and renders a vanilla Tailwind calendar. Use `DatePicker.Root` when you want an interactive Ilha island; it updates its own calendar UI and emits date-picker events.
+Areia's `DatePicker` uses `date-fns` for month generation and renders a vanilla Tailwind calendar. Use `DatePicker` when you want an interactive Ilha island; it updates its own calendar UI and emits date-picker events.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${DatePicker.Root({
+    ${DatePicker({
       mode: "single",
       selected: new Date(2026, 4, 21),
       defaultMonth: new Date(2026, 4, 1),
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -47,14 +49,16 @@ DatePicker supports three selection modes: `single`, `multiple`, and `range`.
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
-export default ilha.render(
-  () => html`${DatePicker.Root({ mode: "single" })}`,
+const Example = ilha.render(
+  () => html`${DatePicker({ mode: "single" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
-Use `DatePicker.Root` for interactive behavior. It dispatches `date-picker:change` when selection changes and `date-picker:month-change` when users navigate months.
+Call `DatePicker(...)` for interactive behavior. It dispatches `date-picker:change` when selection changes and `date-picker:month-change` when users navigate months.
 
-Use `DatePicker(...)` for static markup or when you want to initialize/wire behavior yourself.
+Use `DatePicker.Static(...)` for static markup or when you want to initialize/wire behavior yourself. For most application usage, call `DatePicker(...)`.
 
 ## Examples
 
@@ -66,10 +70,10 @@ Select a single date. This is the most common use case for date pickers.
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-col gap-3">
-      ${DatePicker.Root({
+      ${DatePicker({
         mode: "single",
         selected: new Date(2026, 4, 21),
         defaultMonth: new Date(2026, 4, 1),
@@ -80,6 +84,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Multiple Date Selection
@@ -90,10 +96,10 @@ Select multiple individual dates. Use `maxSelected` to limit the number of selec
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-col gap-3">
-      ${DatePicker.Root({
+      ${DatePicker({
         mode: "multiple",
         selected: [
           new Date(2026, 4, 7),
@@ -109,6 +115,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Date Range Selection
@@ -124,9 +132,9 @@ const range: DateRange = {
   to: new Date(2026, 4, 18),
 };
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${DatePicker.Root({
+    ${DatePicker({
       mode: "range",
       selected: range,
       defaultMonth: new Date(2026, 4, 1),
@@ -134,6 +142,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Min and Max Dates
@@ -144,10 +154,10 @@ Use `min` and `max` to disable dates before or after an allowed range.
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-col gap-3">
-      ${DatePicker.Root({
+      ${DatePicker({
         mode: "single",
         defaultMonth: new Date(2026, 4, 1),
         min: new Date(2026, 4, 5),
@@ -159,6 +169,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled Dates
@@ -169,9 +181,9 @@ Use `disabled` to make specific dates unavailable.
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${DatePicker.Root({
+    ${DatePicker({
       mode: "multiple",
       defaultMonth: new Date(2026, 4, 1),
       disabled: [
@@ -184,6 +196,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Week Start
@@ -194,15 +208,17 @@ Use `weekStartsOn` to choose the first day of the week. `0` is Sunday and `1` is
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${DatePicker.Root({
+    ${DatePicker({
       mode: "single",
       defaultMonth: new Date(2026, 4, 1),
       weekStartsOn: 1,
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Without Outside Days
@@ -213,15 +229,17 @@ Set `showOutsideDays: false` to hide adjacent-month dates in the calendar grid.
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${DatePicker.Root({
+    ${DatePicker({
       mode: "single",
       defaultMonth: new Date(2026, 4, 1),
       showOutsideDays: false,
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Popover
@@ -235,14 +253,14 @@ import { Button, DatePicker, Icon, Popover } from "areia";
 
 const calendarIcon = Icon({ icon: Calendar });
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Popover.Root({
+    ${Popover({
       trigger: Button({
         icon: calendarIcon,
         label: "Pick a date",
       }),
-      content: DatePicker.Root({
+      content: DatePicker({
         mode: "single",
         defaultMonth: new Date(2026, 4, 1),
       }),
@@ -250,6 +268,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Range with Popover
@@ -273,14 +293,14 @@ const range: DateRange = {
   to: new Date(2026, 4, 18),
 };
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Popover.Root({
+    ${Popover({
       trigger: Button({
         icon: calendarIcon,
         label: "May 12 – May 18",
       }),
-      content: DatePicker.Root({
+      content: DatePicker({
         mode: "range",
         selected: range,
         defaultMonth: new Date(2026, 4, 1),
@@ -290,11 +310,13 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Listening for Changes
 
-`DatePicker.Root` emits bubbling custom events so you can integrate it with application state.
+`DatePicker` emits bubbling custom events so you can integrate it with application state.
 
 ```ts twoslash
 const picker = document.querySelector(
@@ -321,27 +343,27 @@ picker?.addEventListener(
 
 Extends native `div` attributes.
 
-| Prop              | Type                                       | Default    | Description                                                |
-| ----------------- | ------------------------------------------ | ---------- | ---------------------------------------------------------- |
-| `mode`            | `"single" \| "multiple" \| "range"`        | `"single"` | Selection mode.                                            |
-| `selected`        | `Date \| Date[] \| DateRange \| undefined` | -          | Selected date, dates, or range depending on `mode`.        |
-| `month`           | `Date`                                     | -          | Controlled first visible month.                            |
-| `defaultMonth`    | `Date`                                     | -          | Initial month when uncontrolled.                           |
-| `numberOfMonths`  | `number`                                   | `1`        | Number of consecutive months to render.                    |
-| `weekStartsOn`    | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6`          | `0`        | First day of the week.                                     |
-| `showOutsideDays` | `boolean`                                  | `true`     | Shows adjacent-month days to fill the calendar grid.       |
-| `min`             | `Date`                                     | -          | Disables dates before this date.                           |
-| `max`             | `Date`                                     | -          | Disables dates after this date.                            |
-| `disabled`        | `Date[] \| ((date: Date) => boolean)`      | -          | Dates that cannot be selected.                             |
-| `maxSelected`     | `number`                                   | -          | Maximum number of selected dates in `multiple` mode.       |
-| `onChange`        | `(selected: DatePickerSelected) => void`   | -          | Called by `DatePicker.Root` when selection changes.        |
-| `onMonthChange`   | `(month: Date) => void`                    | -          | Called by `DatePicker.Root` when month navigation changes. |
-| `class`           | `string`                                   | -          | Additional CSS classes merged with the generated classes.  |
-| `className`       | `string`                                   | -          | Alias for `class`.                                         |
+| Prop              | Type                                       | Default    | Description                                               |
+| ----------------- | ------------------------------------------ | ---------- | --------------------------------------------------------- |
+| `mode`            | `"single" \| "multiple" \| "range"`        | `"single"` | Selection mode.                                           |
+| `selected`        | `Date \| Date[] \| DateRange \| undefined` | -          | Selected date, dates, or range depending on `mode`.       |
+| `month`           | `Date`                                     | -          | Controlled first visible month.                           |
+| `defaultMonth`    | `Date`                                     | -          | Initial month when uncontrolled.                          |
+| `numberOfMonths`  | `number`                                   | `1`        | Number of consecutive months to render.                   |
+| `weekStartsOn`    | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6`          | `0`        | First day of the week.                                    |
+| `showOutsideDays` | `boolean`                                  | `true`     | Shows adjacent-month days to fill the calendar grid.      |
+| `min`             | `Date`                                     | -          | Disables dates before this date.                          |
+| `max`             | `Date`                                     | -          | Disables dates after this date.                           |
+| `disabled`        | `Date[] \| ((date: Date) => boolean)`      | -          | Dates that cannot be selected.                            |
+| `maxSelected`     | `number`                                   | -          | Maximum number of selected dates in `multiple` mode.      |
+| `onChange`        | `(selected: DatePickerSelected) => void`   | -          | Called by `DatePicker` when selection changes.            |
+| `onMonthChange`   | `(month: Date) => void`                    | -          | Called by `DatePicker` when month navigation changes.     |
+| `class`           | `string`                                   | -          | Additional CSS classes merged with the generated classes. |
+| `className`       | `string`                                   | -          | Alias for `class`.                                        |
 
-### DatePicker.Root
+### DatePicker
 
-`DatePicker.Root` is an Ilha island. It renders the same calendar markup as `DatePicker(...)`, then wires click handlers for month navigation and date selection.
+`DatePicker` is an Ilha island. It renders the same calendar markup as `DatePicker(...)`, then wires click handlers for month navigation and date selection.
 
 It emits:
 

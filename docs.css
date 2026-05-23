@@ -23,6 +23,10 @@
   @apply border-l-0! h-100!;
 }
 
+.rp-preview--iframe-follow__code {
+  @apply overflow-y-scroll!;
+}
+
 #root {
   @apply h-screen flex flex-col items-center justify-center p-4;
 }
@@ -194,6 +198,56 @@
   --areia-control-active: var(--color-neutral-700, oklch(37.1% 0 0));
   --areia-control-disabled: oklch(17% 0 0 / 0.5);
   --areia-control-disabled-foreground: var(--areia-text-disabled);
+}
+
+@layer components {
+  .win95-button {
+    @apply border-2 border-t-white border-l-white border-r-black border-b-black bg-[#c0c0c0] px-3 py-1 text-black active:border-t-black active:border-l-black active:border-r-white active:border-b-white;
+  }
+
+  .win95-inset {
+    @apply border-2 border-t-black border-l-black border-r-white border-b-white bg-white;
+  }
+
+  .win95-panel {
+    @apply border-2 border-t-white border-l-white border-r-black border-b-black bg-[#c0c0c0];
+  }
+
+  .win95-menu {
+    @apply min-w-40 border-2 border-t-white border-l-white border-r-black border-b-black bg-[#c0c0c0] p-1 shadow-[2px_2px_0_#000];
+  }
+
+  .win95-menu-item {
+    @apply block w-full px-3 py-1 text-left hover:bg-blue-900 hover:text-white data-[disabled]:text-neutral-500;
+  }
+
+  .win95-label {
+    @apply px-2 py-1 font-bold;
+  }
+
+  .win95-separator {
+    @apply my-1 h-px border-b border-white bg-neutral-500;
+  }
+
+  .win95-titlebar {
+    @apply mb-2 bg-blue-900 px-2 py-1 font-bold text-white;
+  }
+
+  .win95-window {
+    @apply border-2 border-t-white border-l-white border-r-black border-b-black bg-[#c0c0c0] p-3 shadow-[4px_4px_0_#000];
+  }
+
+  .win95-input {
+    @apply border-2 border-t-black border-l-black border-r-white border-b-white bg-white px-2 py-1 outline-none;
+  }
+
+  .win95-check {
+    @apply inline-flex size-4 items-center justify-center border-2 border-t-black border-l-black border-r-white border-b-white bg-white align-middle;
+  }
+
+  .win95-check-mark {
+    @apply block size-2 bg-black;
+  }
 }
 
 @theme {

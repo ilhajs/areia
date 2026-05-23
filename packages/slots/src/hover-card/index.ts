@@ -1,0 +1,681 @@
+import {
+  getPart,
+  getRoots,
+  getDataBool,
+  getDataEnum,
+  getDataNumber,
+  reuseRootBinding,
+  hasRootBinding,
+  setRootBinding,
+  clearRootBinding,
+  createDismissLayer,
+  computeFloatingPosition,
+  computeFloatingTransformOrigin,
+  measurePopupContentRect,
+  createPositionSync,
+  createPortalLifecycle,
+  createPresenceLifecycle,
+} from "../core";
+import { setAria, ensureId } from "../core";
+import { on, emit } from "../core";
+
+export type HoverCardSide = "top" | "right" | "bottom" | "left";
+const SIDES = ["top", "right", "bottom", "left"] as const;
+export type HoverCardAlign = "start" | "center" | "end";
+const ALIGNS = ["start", "center", "end"] as const;
+
+export type HoverCardReason = "pointer" | "focus" | "blur" | "dismiss" | "api";
+
+// Global state for warm-up behavior across hover-card instances
+let globalWarmUntil = 0;
+const FOCUS_OPEN_INTENT_WINDOW_MS = 750;
+const POINTER_HOVER_INTENT_WINDOW_MS = 250;
+const registeredWarmHandoffTriggers = new Set<HTMLElement>();
+const warmHandoffListeners = new Set<
+  (sourceTrigger: HTMLElement, reason: HoverCardReason) => void
+>();
+
+const isWarmHandoffTarget = (target: Node | null, sourceTrigger: HTMLElement): boolean => {
+  if (!target) return false;
+  for (const trigger of registeredWarmHandoffTriggers) {
+    if (trigger === sourceTrigger) continue;
+    if (trigger.contains(target)) return true;
+  }
+  return false;
+};
+
+const notifyWarmHandoff = (sourceTrigger: HTMLElement, reason: HoverCardReason): void => {
+  for (const listener of warmHandoffListeners) {
+    listener(sourceTrigger, reason);
+  }
+};
+
+export interface HoverCardOptions {
+  /** Initial open state (uncontrolled mode only) */
+  defaultOpen?: boolean;
+  /** Controlled open state. Internal interactions do not mutate when set. */
+  open?: boolean;
+  /** Delay before opening on hover/keyboard focus (ms). @default 700 */
+  delay?: number;
+  /** Duration to skip delay after closing (ms). Set to 0 to disable warm-up. @default 300 */
+  skipDelayDuration?: number;
+  /** Delay before closing after leave/blur (ms). @default 300 */
+  closeDelay?: number;
+
+  /** The preferred side of the trigger to render against. @default "bottom" */
+  side?: HoverCardSide;
+  /** The preferred alignment against the trigger. @default "center" */
+  align?: HoverCardAlign;
+  /** The distance in pixels from the trigger. @default 4 */
+  sideOffset?: number;
+  /** Offset in pixels from the alignment edge. @default 0 */
+  alignOffset?: number;
+  /** When true, flips/shifts content to avoid viewport collisions. @default true */
+  avoidCollisions?: boolean;
+  /** Viewport padding used when avoiding collisions. @default 8 */
+  collisionPadding?: number;
+
+  /** Portal content to body while open. @default true */
+  portal?: boolean;
+  /** Close when clicking outside. @default true */
+  closeOnClickOutside?: boolean;
+  /** Close when pressing Escape. @default true */
+  closeOnEscape?: boolean;
+
+  /** Callback when open state changes */
+  onOpenChange?: (open: boolean) => void;
+}
+
+export interface HoverCardController {
+  /** Open the hover-card (request in controlled mode) */
+  open(): void;
+  /** Close the hover-card (request in controlled mode) */
+  close(): void;
+  /** Toggle the hover-card (request in controlled mode) */
+  toggle(): void;
+  /** Force open state update (works in both controlled/uncontrolled modes) */
+  setOpen(open: boolean): void;
+  /** Current open state */
+  readonly isOpen: boolean;
+  /** Cleanup all event listeners */
+  destroy(): void;
+}
+
+const ROOT_BINDING_KEY = "@areia/slots:HoverCard";
+const DUPLICATE_BINDING_WARNING =
+  "[@areia/slots:HoverCard] createHoverCard() called more than once for the same root. Returning the existing controller. Destroy it before rebinding with new options.";
+
+/**
+ * Create a hover-card controller for a root element
+ *
+ * Expected markup:
+ * ```html
+ * <div data-slot="hover-card">
+ *   <button data-slot="hover-card-trigger">Hover me</button>
+ *   <div data-slot="hover-card-content">Preview content</div>
+ * </div>
+ * ```
+ */
+export function createHoverCard(
+  root: Element,
+  options: HoverCardOptions = {},
+): HoverCardController {
+  const existingController = reuseRootBinding<HoverCardController>(
+    root,
+    ROOT_BINDING_KEY,
+    DUPLICATE_BINDING_WARNING,
+  );
+  if (existingController) return existingController;
+
+  const trigger = getPart<HTMLElement>(root, "hover-card-trigger");
+  const content = getPart<HTMLElement>(root, "hover-card-content");
+  const authoredPositionerCandidate = getPart<HTMLElement>(root, "hover-card-positioner");
+  const authoredPositioner =
+    authoredPositionerCandidate && content && authoredPositionerCandidate.contains(content)
+      ? authoredPositionerCandidate
+      : null;
+  const authoredPortalCandidate = getPart<HTMLElement>(root, "hover-card-portal");
+  const authoredPortal =
+    authoredPortalCandidate &&
+    authoredPositioner &&
+    authoredPortalCandidate.contains(authoredPositioner)
+      ? authoredPortalCandidate
+      : null;
+
+  if (!trigger || !content) {
+    throw new Error("Hover-card requires trigger and content slots");
+  }
+
+  // Resolve options with explicit precedence: JS > data-* > default
+  const controlled = options.open !== undefined;
+  const defaultOpen = options.defaultOpen ?? getDataBool(root, "defaultOpen") ?? false;
+  const delay = options.delay ?? getDataNumber(root, "delay") ?? 700;
+  const skipDelayDuration =
+    options.skipDelayDuration ?? getDataNumber(root, "skipDelayDuration") ?? 300;
+  const closeDelay = options.closeDelay ?? getDataNumber(root, "closeDelay") ?? 300;
+  const onOpenChange = options.onOpenChange;
+  const closeOnClickOutside =
+    options.closeOnClickOutside ?? getDataBool(root, "closeOnClickOutside") ?? true;
+  const closeOnEscape = options.closeOnEscape ?? getDataBool(root, "closeOnEscape") ?? true;
+  const portalOption =
+    options.portal ?? getDataBool(content, "portal") ?? getDataBool(root, "portal") ?? true;
+
+  // Placement precedence: JS option > content > authored positioner > root
+  const getPlacementEnum = <T extends string>(key: string, allowed: readonly T[]): T | undefined =>
+    getDataEnum(content, key, allowed) ??
+    (authoredPositioner ? getDataEnum(authoredPositioner, key, allowed) : undefined) ??
+    getDataEnum(root, key, allowed);
+  const getPlacementNumber = (key: string): number | undefined =>
+    getDataNumber(content, key) ??
+    (authoredPositioner ? getDataNumber(authoredPositioner, key) : undefined) ??
+    getDataNumber(root, key);
+  const getPlacementBool = (key: string): boolean | undefined =>
+    getDataBool(content, key) ??
+    (authoredPositioner ? getDataBool(authoredPositioner, key) : undefined) ??
+    getDataBool(root, key);
+
+  const preferredSide = options.side ?? getPlacementEnum("side", SIDES) ?? "bottom";
+  const preferredAlign = options.align ?? getPlacementEnum("align", ALIGNS) ?? "center";
+  const sideOffset = options.sideOffset ?? getPlacementNumber("sideOffset") ?? 4;
+  const alignOffset = options.alignOffset ?? getPlacementNumber("alignOffset") ?? 0;
+  const avoidCollisions = options.avoidCollisions ?? getPlacementBool("avoidCollisions") ?? true;
+  const collisionPadding = options.collisionPadding ?? getPlacementNumber("collisionPadding") ?? 8;
+
+  let isOpen = options.open ?? defaultOpen;
+  let isInstantTransition = false;
+  let isDestroyed = false;
+  let pointerOnTrigger = false;
+  let pointerOnContent = false;
+  let focusWithin = false;
+  let openTimeout: ReturnType<typeof setTimeout> | null = null;
+  let closeTimeout: ReturnType<typeof setTimeout> | null = null;
+  let lastTabKeydownAt = -Infinity;
+  let lastPointerMoveAt = -Infinity;
+
+  const cleanups: Array<() => void> = [];
+  const portal = createPortalLifecycle({
+    content,
+    root,
+    enabled: portalOption,
+    wrapperSlot: authoredPositioner ? undefined : "hover-card-positioner",
+    container: authoredPositioner ?? undefined,
+    mountTarget: authoredPositioner ? (authoredPortal ?? authoredPositioner) : undefined,
+  });
+
+  // ARIA setup
+  const contentId = ensureId(content, "hover-card-content");
+  trigger.setAttribute("aria-haspopup", "dialog");
+  trigger.setAttribute("aria-controls", contentId);
+  content.setAttribute("data-side", preferredSide);
+  content.setAttribute("data-align", preferredAlign);
+
+  const isTriggerDisabled = () =>
+    trigger.hasAttribute("disabled") || trigger.getAttribute("aria-disabled") === "true";
+
+  const clearOpenTimeout = () => {
+    if (!openTimeout) return;
+    clearTimeout(openTimeout);
+    openTimeout = null;
+  };
+
+  const clearCloseTimeout = () => {
+    if (!closeTimeout) return;
+    clearTimeout(closeTimeout);
+    closeTimeout = null;
+  };
+
+  const clearTimers = () => {
+    clearOpenTimeout();
+    clearCloseTimeout();
+  };
+
+  const resetInteractionState = () => {
+    clearTimers();
+    pointerOnTrigger = false;
+    pointerOnContent = false;
+    focusWithin = false;
+  };
+
+  const emitChange = (open: boolean, reason: HoverCardReason) => {
+    emit(root, "hover-card:change", { open, reason, trigger, content });
+    onOpenChange?.(open);
+  };
+
+  const updatePosition = () => {
+    const positioner = portal.container as HTMLElement;
+    const win = root.ownerDocument.defaultView ?? window;
+    const tr = trigger.getBoundingClientRect();
+    const cr = measurePopupContentRect(content);
+    const pos = computeFloatingPosition({
+      anchorRect: tr,
+      contentRect: cr,
+      side: preferredSide,
+      align: preferredAlign,
+      sideOffset,
+      alignOffset,
+      avoidCollisions,
+      collisionPadding,
+    });
+    const transformOrigin = computeFloatingTransformOrigin({
+      side: pos.side,
+      align: pos.align,
+      anchorRect: tr,
+      popupX: pos.x,
+      popupY: pos.y,
+    });
+
+    positioner.style.position = "absolute";
+    positioner.style.top = "0px";
+    positioner.style.left = "0px";
+    positioner.style.transform = `translate3d(${pos.x + win.scrollX}px, ${pos.y + win.scrollY}px, 0)`;
+    positioner.style.setProperty("--transform-origin", transformOrigin);
+    positioner.style.willChange = "transform";
+    positioner.style.margin = "0";
+
+    content.setAttribute("data-side", pos.side);
+    content.setAttribute("data-align", pos.align);
+    if (positioner !== content) {
+      positioner.setAttribute("data-side", pos.side);
+      positioner.setAttribute("data-align", pos.align);
+    }
+  };
+
+  const setDataState = (state: "open" | "closed") => {
+    const positioner = portal.container as HTMLElement;
+    root.setAttribute("data-state", state);
+    content.setAttribute("data-state", state);
+    if (positioner !== content) {
+      positioner.setAttribute("data-state", state);
+    }
+
+    if (state === "open") {
+      root.setAttribute("data-open", "");
+      content.setAttribute("data-open", "");
+      if (positioner !== content) {
+        positioner.setAttribute("data-open", "");
+      }
+      if (isInstantTransition) {
+        root.setAttribute("data-instant", "");
+        content.setAttribute("data-instant", "");
+        if (positioner !== content) {
+          positioner.setAttribute("data-instant", "");
+        }
+      } else {
+        root.removeAttribute("data-instant");
+        content.removeAttribute("data-instant");
+        if (positioner !== content) {
+          positioner.removeAttribute("data-instant");
+        }
+      }
+      root.removeAttribute("data-closed");
+      content.removeAttribute("data-closed");
+      if (positioner !== content) {
+        positioner.removeAttribute("data-closed");
+      }
+      return;
+    }
+
+    root.setAttribute("data-closed", "");
+    content.setAttribute("data-closed", "");
+    if (positioner !== content) {
+      positioner.setAttribute("data-closed", "");
+    }
+    if (isInstantTransition) {
+      root.setAttribute("data-instant", "");
+      content.setAttribute("data-instant", "");
+      if (positioner !== content) {
+        positioner.setAttribute("data-instant", "");
+      }
+    } else {
+      root.removeAttribute("data-instant");
+      content.removeAttribute("data-instant");
+      if (positioner !== content) {
+        positioner.removeAttribute("data-instant");
+      }
+    }
+    root.removeAttribute("data-open");
+    content.removeAttribute("data-open");
+    if (positioner !== content) {
+      positioner.removeAttribute("data-open");
+    }
+  };
+
+  const presence = createPresenceLifecycle({
+    element: content,
+    onExitComplete: () => {
+      if (isDestroyed) return;
+      portal.restore();
+      content.hidden = true;
+    },
+  });
+
+  const positionSync = createPositionSync({
+    observedElements: [trigger, content],
+    isActive: () => isOpen,
+    ancestorScroll: false,
+    onUpdate: updatePosition,
+  });
+
+  const applyState = (open: boolean, reason: HoverCardReason, instant = false) => {
+    if (isOpen === open) return;
+
+    if (!open && isOpen && skipDelayDuration > 0) {
+      globalWarmUntil = Date.now() + skipDelayDuration;
+    }
+
+    isInstantTransition = instant;
+    isOpen = open;
+    setAria(trigger, "expanded", isOpen);
+
+    if (open) {
+      portal.mount();
+      content.hidden = false;
+      setDataState("open");
+      presence.enter();
+      updatePosition();
+      positionSync.start();
+      positionSync.update();
+    } else {
+      setDataState("closed");
+      presence.exit();
+      positionSync.stop();
+    }
+
+    emitChange(isOpen, reason);
+  };
+
+  const requestState = (open: boolean, reason: HoverCardReason, instant = false) => {
+    if (isOpen === open) return;
+    if (controlled) {
+      emitChange(open, reason);
+      return;
+    }
+    applyState(open, reason, instant);
+  };
+
+  const forceState = (open: boolean, reason: HoverCardReason, instant = false) => {
+    applyState(open, reason, instant);
+  };
+
+  const requestClosedState = (reason: HoverCardReason, instant = false) => {
+    resetInteractionState();
+    requestState(false, reason, instant);
+  };
+
+  const forceClosedState = (reason: HoverCardReason, instant = false) => {
+    resetInteractionState();
+    forceState(false, reason, instant);
+  };
+
+  const closeForWarmHandoff = (sourceTrigger: HTMLElement, reason: HoverCardReason) => {
+    if (sourceTrigger === trigger || !isOpen) return;
+    requestClosedState(reason, true);
+  };
+
+  registeredWarmHandoffTriggers.add(trigger);
+  warmHandoffListeners.add(closeForWarmHandoff);
+  cleanups.push(() => {
+    warmHandoffListeners.delete(closeForWarmHandoff);
+    registeredWarmHandoffTriggers.delete(trigger);
+  });
+
+  const scheduleOpen = (reason: HoverCardReason) => {
+    clearCloseTimeout();
+    clearOpenTimeout();
+
+    if (skipDelayDuration > 0 && Date.now() < globalWarmUntil) {
+      requestState(true, reason, true);
+      return;
+    }
+
+    if (delay <= 0) {
+      requestState(true, reason);
+      return;
+    }
+
+    openTimeout = setTimeout(() => {
+      openTimeout = null;
+      requestState(true, reason);
+    }, delay);
+  };
+
+  const scheduleClose = (reason: HoverCardReason) => {
+    clearOpenTimeout();
+    clearCloseTimeout();
+
+    if (closeDelay <= 0) {
+      requestState(false, reason);
+      return;
+    }
+
+    closeTimeout = setTimeout(() => {
+      closeTimeout = null;
+      requestState(false, reason);
+    }, closeDelay);
+  };
+
+  const maybeScheduleClose = (reason: HoverCardReason) => {
+    if (pointerOnTrigger || pointerOnContent || focusWithin) return;
+    scheduleClose(reason);
+  };
+
+  // Initial state
+  setAria(trigger, "expanded", isOpen);
+  setDataState(isOpen ? "open" : "closed");
+  content.hidden = !isOpen;
+
+  if (isOpen) {
+    portal.mount();
+    presence.enter();
+    content.hidden = false;
+    updatePosition();
+    positionSync.start();
+    positionSync.update();
+  }
+
+  // Pointer interaction on trigger
+  cleanups.push(
+    on(
+      root.ownerDocument,
+      "keydown",
+      (e) => {
+        if ((e as KeyboardEvent).key === "Tab") {
+          lastTabKeydownAt = Date.now();
+        }
+      },
+      { capture: true },
+    ),
+    on(
+      root.ownerDocument,
+      "pointerdown",
+      () => {
+        lastTabKeydownAt = -Infinity;
+        lastPointerMoveAt = -Infinity;
+      },
+      { capture: true },
+    ),
+    on(
+      root.ownerDocument,
+      "pointermove",
+      (e) => {
+        if ((e as PointerEvent).pointerType === "touch") return;
+        lastPointerMoveAt = Date.now();
+      },
+      { capture: true },
+    ),
+    on(trigger, "pointerenter", (e) => {
+      if (e.pointerType === "touch") return;
+      pointerOnTrigger = true;
+      if (isTriggerDisabled()) return;
+      if (Date.now() - lastPointerMoveAt > POINTER_HOVER_INTENT_WINDOW_MS) return;
+      notifyWarmHandoff(trigger, "pointer");
+      scheduleOpen("pointer");
+    }),
+    on(trigger, "pointermove", (e) => {
+      if (e.pointerType === "touch") return;
+      // Enter may occur before the move event while crossing boundaries.
+      if (!pointerOnTrigger || isTriggerDisabled()) return;
+      if (isOpen || openTimeout) return;
+      notifyWarmHandoff(trigger, "pointer");
+      scheduleOpen("pointer");
+    }),
+    on(trigger, "pointerleave", (e) => {
+      if (e.pointerType === "touch") return;
+      pointerOnTrigger = false;
+      const related = e.relatedTarget as Node | null;
+      if (related && content.contains(related)) return;
+      if (isWarmHandoffTarget(related, trigger)) {
+        requestClosedState("pointer", true);
+        return;
+      }
+      maybeScheduleClose("pointer");
+    }),
+  );
+
+  // Pointer interaction on content (hoverable content)
+  cleanups.push(
+    on(content, "pointerenter", (e) => {
+      if (e.pointerType === "touch") return;
+      pointerOnContent = true;
+      clearCloseTimeout();
+    }),
+    on(content, "pointerleave", (e) => {
+      if (e.pointerType === "touch") return;
+      pointerOnContent = false;
+      const related = e.relatedTarget as Node | null;
+      if (related && trigger.contains(related)) return;
+      if (isWarmHandoffTarget(related, trigger)) {
+        requestClosedState("pointer", true);
+        return;
+      }
+      maybeScheduleClose("pointer");
+    }),
+  );
+
+  // Focus interaction
+  cleanups.push(
+    on(trigger, "focusin", () => {
+      if (isTriggerDisabled()) return;
+      // Ignore pure programmatic focus (e.g. dialog initial autofocus).
+      if (Date.now() - lastTabKeydownAt > FOCUS_OPEN_INTENT_WINDOW_MS) return;
+      focusWithin = true;
+      notifyWarmHandoff(trigger, "focus");
+      scheduleOpen("focus");
+    }),
+    on(trigger, "focusout", (e) => {
+      const related = e.relatedTarget as Node | null;
+      if (related && (trigger.contains(related) || content.contains(related))) return;
+      focusWithin = false;
+      if (isWarmHandoffTarget(related, trigger)) {
+        requestClosedState("blur", true);
+        return;
+      }
+      maybeScheduleClose("blur");
+    }),
+    on(content, "focusin", () => {
+      focusWithin = true;
+      clearCloseTimeout();
+    }),
+    on(content, "focusout", (e) => {
+      const related = e.relatedTarget as Node | null;
+      if (related && (trigger.contains(related) || content.contains(related))) return;
+      focusWithin = false;
+      if (isWarmHandoffTarget(related, trigger)) {
+        requestClosedState("blur", true);
+        return;
+      }
+      maybeScheduleClose("blur");
+    }),
+  );
+
+  cleanups.push(
+    createDismissLayer({
+      root,
+      isOpen: () => isOpen,
+      onDismiss: () => requestClosedState("dismiss"),
+      closeOnClickOutside,
+      closeOnEscape,
+    }),
+  );
+
+  // Inbound event
+  cleanups.push(
+    on(root, "hover-card:set", (e) => {
+      const detail = (e as CustomEvent).detail;
+      // Preferred: { open: boolean }
+      // Deprecated: { value: boolean }
+      let open: boolean | undefined;
+      if (detail?.open !== undefined) {
+        open = detail.open;
+      } else if (detail?.value !== undefined) {
+        open = detail.value;
+      }
+      if (typeof open !== "boolean") return;
+      if (open) {
+        clearTimers();
+        forceState(true, "api");
+      } else {
+        forceClosedState("api");
+      }
+    }),
+  );
+
+  const controller: HoverCardController = {
+    open: () => {
+      if (isTriggerDisabled()) return;
+      clearTimers();
+      requestState(true, "api");
+    },
+    close: () => {
+      requestClosedState("api");
+    },
+    toggle: () => {
+      if (!isOpen && isTriggerDisabled()) return;
+      if (isOpen) {
+        requestClosedState("api");
+      } else {
+        clearTimers();
+        requestState(true, "api");
+      }
+    },
+    setOpen: (open) => {
+      if (open) {
+        clearTimers();
+        forceState(true, "api");
+      } else {
+        forceClosedState("api");
+      }
+    },
+    get isOpen() {
+      return isOpen;
+    },
+    destroy: () => {
+      isDestroyed = true;
+      resetInteractionState();
+      positionSync.stop();
+      presence.cleanup();
+      portal.cleanup();
+      cleanups.forEach((fn) => fn());
+      cleanups.length = 0;
+      clearRootBinding(root, ROOT_BINDING_KEY, controller);
+    },
+  };
+
+  setRootBinding(root, ROOT_BINDING_KEY, controller);
+  return controller;
+}
+
+/**
+ * Find and bind all hover-card components in a scope
+ * Returns array of controllers for programmatic access
+ */
+export function create(scope: ParentNode = document): HoverCardController[] {
+  const controllers: HoverCardController[] = [];
+
+  for (const root of getRoots(scope, "hover-card")) {
+    if (hasRootBinding(root, ROOT_BINDING_KEY)) continue;
+    controllers.push(createHoverCard(root));
+  }
+
+  return controllers;
+}

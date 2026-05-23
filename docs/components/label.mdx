@@ -9,7 +9,7 @@ Displays a form label with support for optional indicators and contextual toolti
 import ilha, { html } from "ilha";
 import { Label } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-col gap-3">
       ${Label({
@@ -29,6 +29,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -55,7 +57,7 @@ Some form components include built-in label support. Use their `label`, `require
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-4">
       ${Input({
@@ -75,6 +77,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Standalone Label
@@ -85,7 +89,7 @@ For custom form layouts, use `Label` directly and associate it with a control us
 import ilha, { html } from "ilha";
 import { Input, Label } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-1.5">
       ${Label({ for: "username", label: "Username" })}
@@ -93,6 +97,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -105,7 +111,7 @@ Use `showOptional` to display subtle “(optional)” text after the label.
 import ilha, { html } from "ilha";
 import { Input, Label } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-1.5">
       ${Label({
@@ -117,6 +123,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Tooltip
@@ -127,7 +135,7 @@ Use `tooltip` to show an info icon with additional context.
 import ilha, { html } from "ilha";
 import { Input, Label } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-1.5">
       ${Label({
@@ -144,6 +152,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Rich Label Content
@@ -154,7 +164,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { CheckboxItem, Label } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${CheckboxItem({
       value: "terms",
@@ -166,6 +176,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Form with Mixed Fields
@@ -176,7 +188,7 @@ Use optional indicators only where they help users understand which fields are r
 import ilha, { html } from "ilha";
 import { Input, Label, Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <form class="flex w-full max-w-sm flex-col gap-4">
       ${Input({
@@ -208,6 +220,8 @@ export default ilha.render(
     </form>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### As Content
@@ -218,7 +232,7 @@ Use `asContent` when another component already renders the outer label element a
 import ilha, { html } from "ilha";
 import { Label } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <label class="text-base font-medium text-areia-default">
       ${Label({
@@ -231,6 +245,8 @@ export default ilha.render(
     </label>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

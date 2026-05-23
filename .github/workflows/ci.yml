@@ -13,7 +13,10 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
-          path: node_modules
+          path: |
+            node_modules
+            packages/*/node_modules
+            apps/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
       - name: Install dependencies
         run: bun install
@@ -28,14 +31,17 @@ jobs:
       - name: Restore node_modules
         uses: actions/cache@v4
         with:
-          path: node_modules
+          path: |
+            node_modules
+            packages/*/node_modules
+            apps/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
       - name: Build libs
         run: bun run build
       - name: Test
         run: bun run test
       - name: Publish nightly release
-        run: bunx pkg-pr-new publish
+        run: bunx pkg-pr-new publish './packages/*'
 
   docs:
     name: Build docs
@@ -53,7 +59,10 @@ jobs:
       - name: Restore node_modules
         uses: actions/cache@v4
         with:
-          path: node_modules
+          path: |
+            node_modules
+            packages/*/node_modules
+            apps/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
       - name: Build Website
         run: bun run docs:build

@@ -1,0 +1,1141 @@
+import {
+  getPart,
+  getParts,
+  getRoots,
+  hasRootBinding,
+  reuseRootBinding,
+  setRootBinding,
+  clearRootBinding,
+  getDataBool,
+  getDataNumber,
+  getDataString,
+  getDataEnum,
+} from "../core";
+import { setAria, ensureId } from "../core";
+import { on, emit } from "../core";
+import { lockScroll, unlockScroll } from "../core";
+import {
+  computeFloatingPosition,
+  computeFloatingTransformOrigin,
+  measurePopupContentRect,
+  ensureItemVisibleInContainer,
+  focusElement,
+  createPositionSync,
+  createPortalLifecycle,
+  createPresenceLifecycle,
+  createDismissLayer,
+} from "../core";
+
+/** Side of the trigger to place the content */
+export type Side = "top" | "bottom";
+const SIDES = ["top", "bottom"] as const;
+
+/** Alignment of the content relative to the trigger */
+export type Align = "start" | "center" | "end";
+const ALIGNS = ["start", "center", "end"] as const;
+
+/** Positioning mode for the content */
+export type Position = "item-aligned" | "popper";
+const POSITIONS = ["item-aligned", "popper"] as const;
+
+export interface SelectOptions {
+  /** Initial selected value */
+  defaultValue?: string;
+  /** Callback when value changes */
+  onValueChange?: (value: string | null) => void;
+  /** Initial open state */
+  defaultOpen?: boolean;
+  /** Callback when open state changes */
+  onOpenChange?: (open: boolean) => void;
+  /** Placeholder text when no value selected */
+  placeholder?: string;
+  /** Disable interaction */
+  disabled?: boolean;
+  /** Form validation required */
+  required?: boolean;
+  /** Form field name (auto-creates hidden input) */
+  name?: string;
+
+  /**
+   * Positioning mode for the content.
+   * - "item-aligned": Positions content so selected item aligns with trigger (like native select)
+   * - "popper": Positions content below/above trigger like a dropdown
+   * @default "item-aligned"
+   */
+  position?: Position;
+
+  // Positioning props (Radix-compatible, used when position="popper")
+  /**
+   * The preferred side of the trigger to render against.
+   * Will be reversed when collisions occur and `avoidCollisions` is enabled.
+   * @default "bottom"
+   */
+  side?: Side;
+  /**
+   * The preferred alignment against the trigger.
+   * May change when collisions occur.
+   * @default "start"
+   */
+  align?: Align;
+  /**
+   * The distance in pixels from the trigger.
+   * @default 4
+   */
+  sideOffset?: number;
+  /**
+   * An offset in pixels from the "start" or "end" alignment options.
+   * @default 0
+   */
+  alignOffset?: number;
+  /**
+   * When true, overrides side/align preferences to prevent collisions with viewport edges.
+   * @default true
+   */
+  avoidCollisions?: boolean;
+  /**
+   * The padding between the content and the viewport edges when avoiding collisions.
+   * @default 8
+   */
+  collisionPadding?: number;
+  /**
+   * Lock body scroll when open.
+   * @default true
+   */
+  lockScroll?: boolean;
+  /**
+   * Whether moving the pointer over items should highlight and focus them.
+   * @default true
+   */
+  highlightItemOnHover?: boolean;
+}
+
+export interface SelectController {
+  /** Current selected value */
+  readonly value: string | null;
+  /** Current open state */
+  readonly isOpen: boolean;
+  /** Select a value programmatically */
+  select(value: string): void;
+  /** Open the popup */
+  open(): void;
+  /** Close the popup */
+  close(): void;
+  /** Cleanup all event listeners */
+  destroy(): void;
+}
+
+const ROOT_BINDING_KEY = "@areia/slots:Select";
+const DUPLICATE_BINDING_WARNING =
+  "[@areia/slots:Select] createSelect() called more than once for the same root. Returning the existing controller. Destroy it before rebinding with new options.";
+
+/**
+ * Create a select controller for a root element.
+ *
+ * Supports Radix-compatible positioning props for precise placement:
+ * - `side`: "top" | "bottom" (default: "bottom")
+ * - `align`: "start" | "center" | "end" (default: "start")
+ * - `sideOffset`: distance from trigger in px (default: 4)
+ * - `alignOffset`: offset from alignment edge in px (default: 0)
+ * - `avoidCollisions`: flip/shift to stay in viewport (default: true)
+ * - `collisionPadding`: viewport edge padding in px (default: 8)
+ *
+ * ## Events
+ * - **Outbound** `select:change` (on root): Fires when value changes.
+ *   `event.detail: { value: string | null }`
+ * - **Outbound** `select:open-change` (on root): Fires when popup opens/closes.
+ *   `event.detail: { open: boolean }`
+ * - **Inbound** `select:set` (on root): Set value or open state.
+ *   `event.detail: { value: string } | { open: boolean }`
+ */
+export function createSelect(root: Element, options: SelectOptions = {}): SelectController {
+  const existingController = reuseRootBinding<SelectController>(
+    root,
+    ROOT_BINDING_KEY,
+    DUPLICATE_BINDING_WARNING,
+  );
+  if (existingController) {
+    return existingController;
+  }
+
+  const trigger = getPart<HTMLElement>(root, "select-trigger");
+  const content = getPart<HTMLElement>(root, "select-content");
+  const valueSlot = getPart<HTMLElement>(root, "select-value");
+  const authoredPositionerCandidate = getPart<HTMLElement>(root, "select-positioner");
+  const authoredPositioner =
+    authoredPositionerCandidate && content && authoredPositionerCandidate.contains(content)
+      ? authoredPositionerCandidate
+      : null;
+  const authoredPortalCandidate = getPart<HTMLElement>(root, "select-portal");
+  const authoredPortal =
+    authoredPortalCandidate &&
+    authoredPositioner &&
+    authoredPortalCandidate.contains(authoredPositioner)
+      ? authoredPortalCandidate
+      : null;
+
+  if (!trigger || !content) {
+    throw new Error("Select requires trigger and content slots");
+  }
+
+  // Resolve options with explicit precedence: JS > data-* (root, then valueSlot) > default
+  const defaultValue = options.defaultValue ?? getDataString(root, "defaultValue") ?? null;
+  const defaultOpen = options.defaultOpen ?? getDataBool(root, "defaultOpen") ?? false;
+  // Check root first, then valueSlot for placeholder (some implementations put it on the span)
+  const placeholder =
+    options.placeholder ??
+    getDataString(root, "placeholder") ??
+    (valueSlot ? getDataString(valueSlot, "placeholder") : undefined) ??
+    "";
+  const disabled = options.disabled ?? getDataBool(root, "disabled") ?? false;
+  const required = options.required ?? getDataBool(root, "required") ?? false;
+  const name = options.name ?? getDataString(root, "name") ?? null;
+  const onValueChange = options.onValueChange;
+  const onOpenChange = options.onOpenChange;
+
+  // Placement precedence: JS option > content > authored positioner > root
+  const getPlacementEnum = <T extends string>(key: string, allowed: readonly T[]): T | undefined =>
+    getDataEnum(content, key, allowed) ??
+    (authoredPositioner ? getDataEnum(authoredPositioner, key, allowed) : undefined) ??
+    getDataEnum(root, key, allowed);
+  const getPlacementNumber = (key: string): number | undefined =>
+    getDataNumber(content, key) ??
+    (authoredPositioner ? getDataNumber(authoredPositioner, key) : undefined) ??
+    getDataNumber(root, key);
+  const getPlacementBool = (key: string): boolean | undefined =>
+    getDataBool(content, key) ??
+    (authoredPositioner ? getDataBool(authoredPositioner, key) : undefined) ??
+    getDataBool(root, key);
+
+  // Position mode
+  const position = options.position ?? getPlacementEnum("position", POSITIONS) ?? "item-aligned";
+
+  // Placement options (used for popper mode)
+  const preferredSide = options.side ?? getPlacementEnum("side", SIDES) ?? "bottom";
+  const preferredAlign = options.align ?? getPlacementEnum("align", ALIGNS) ?? "start";
+  const sideOffset = options.sideOffset ?? getPlacementNumber("sideOffset") ?? 4;
+  const alignOffset = options.alignOffset ?? getPlacementNumber("alignOffset") ?? 0;
+  const avoidCollisions = options.avoidCollisions ?? getPlacementBool("avoidCollisions") ?? true;
+  const collisionPadding = options.collisionPadding ?? getPlacementNumber("collisionPadding") ?? 8;
+  const lockScrollOption = options.lockScroll ?? getDataBool(root, "lockScroll") ?? true;
+  const highlightItemOnHover =
+    options.highlightItemOnHover ?? getDataBool(root, "highlightItemOnHover") ?? true;
+
+  let isOpen = false;
+  let currentValue: string | null = defaultValue;
+  let previousActiveElement: HTMLElement | null = null;
+  let highlightedIndex = -1;
+  let typeaheadBuffer = "";
+  let typeaheadTimeout: ReturnType<typeof setTimeout> | null = null;
+  let keyboardMode = false;
+  let lastPointerX = 0;
+  let lastPointerY = 0;
+  let lastPointerType = "";
+  let pendingPointerOpen = false;
+  const cleanups: Array<() => void> = [];
+
+  // Cached on open
+  let items: HTMLElement[] = [];
+  let enabledItems: HTMLElement[] = [];
+  let itemToIndex = new Map<HTMLElement, number>();
+
+  // Hidden input for form integration
+  let hiddenInput: HTMLInputElement | null = null;
+
+  // Track if this instance locked scroll
+  let didLockScroll = false;
+
+  // Portal lifecycle for moving content to body
+  const portal = createPortalLifecycle({
+    content,
+    root,
+    wrapperSlot: authoredPositioner ? undefined : "select-positioner",
+    container: authoredPositioner ?? undefined,
+    mountTarget: authoredPositioner ? (authoredPortal ?? authoredPositioner) : undefined,
+  });
+  let isDestroyed = false;
+  let shouldRestoreFocusOnClose = true;
+
+  const isItemDisabled = (el: HTMLElement) =>
+    el.hasAttribute("disabled") ||
+    el.hasAttribute("data-disabled") ||
+    el.getAttribute("aria-disabled") === "true";
+  const isHoverPointer = (e: PointerEvent) => e.pointerType !== "touch";
+
+  // ARIA setup
+  const triggerId = ensureId(trigger, "select-trigger");
+  const contentId = ensureId(content, "select-content");
+  trigger.setAttribute("role", "combobox");
+  trigger.setAttribute("aria-haspopup", "listbox");
+  trigger.setAttribute("aria-controls", contentId);
+  if (!trigger.hasAttribute("type")) {
+    trigger.setAttribute("type", "button");
+  }
+  content.setAttribute("role", "listbox");
+  content.setAttribute("aria-labelledby", triggerId);
+  content.tabIndex = -1;
+
+  // Native <label for="..."> support: find label whose `for` matches the trigger's id
+  const nativeLabel = document.querySelector<HTMLLabelElement>(
+    `label[for="${CSS.escape(triggerId)}"]`,
+  );
+  if (nativeLabel) {
+    const labelId = ensureId(nativeLabel, "select-label");
+    const existing = trigger.getAttribute("aria-labelledby");
+    trigger.setAttribute("aria-labelledby", existing ? `${existing} ${labelId}` : labelId);
+    cleanups.push(
+      on(nativeLabel, "click", (e) => {
+        e.preventDefault();
+        if (!disabled) updateOpenState(!isOpen);
+      }),
+    );
+  }
+
+  if (disabled) {
+    trigger.setAttribute("aria-disabled", "true");
+    trigger.setAttribute("data-disabled", "");
+    if (trigger instanceof HTMLButtonElement) {
+      trigger.disabled = true;
+    }
+  }
+  if (required) {
+    trigger.setAttribute("aria-required", "true");
+  }
+
+  // Create hidden input for form integration
+  if (name) {
+    hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.name = name;
+    hiddenInput.value = currentValue ?? "";
+    root.appendChild(hiddenInput);
+  }
+
+  // Cache items on open
+  const cacheItems = () => {
+    items = getParts<HTMLElement>(content, "select-item");
+
+    for (const item of items) {
+      item.setAttribute("role", "option");
+      if (item.hasAttribute("data-disabled") || item.hasAttribute("disabled")) {
+        item.setAttribute("aria-disabled", "true");
+      } else {
+        item.removeAttribute("aria-disabled");
+      }
+      item.tabIndex = -1;
+
+      // Mark selected item
+      const itemValue = item.dataset["value"];
+      if (itemValue === currentValue) {
+        setAria(item, "selected", true);
+        item.setAttribute("data-selected", "");
+      } else {
+        setAria(item, "selected", false);
+        item.removeAttribute("data-selected");
+      }
+    }
+
+    enabledItems = items.filter((el) => !isItemDisabled(el));
+    itemToIndex = new Map(enabledItems.map((el, i) => [el, i]));
+
+    // Set groups' ARIA
+    const groups = getParts<HTMLElement>(content, "select-group");
+    for (const group of groups) {
+      group.setAttribute("role", "group");
+      const label = getPart<HTMLElement>(group, "select-label");
+      if (label) {
+        const labelId = ensureId(label, "select-label");
+        group.setAttribute("aria-labelledby", labelId);
+      }
+    }
+  };
+
+  const getViewport = () => getPart<HTMLElement>(content, "select-viewport");
+
+  const getScrollContainer = () => getViewport() ?? content;
+
+  const getItemText = (item: HTMLElement) => getPart<HTMLElement>(item, "select-item-text");
+
+  const getTrimmedText = (element: HTMLElement | null | undefined) => {
+    const text = element?.textContent?.trim();
+    return text ? text : undefined;
+  };
+
+  const getItemLabelText = (item: HTMLElement | null | undefined, fallback = "") => {
+    if (!item) return fallback;
+    return (
+      (item.dataset["label"]?.trim() || undefined) ??
+      getTrimmedText(getItemText(item)) ??
+      getTrimmedText(item) ??
+      fallback
+    );
+  };
+
+  const syncResolvedPositionAttributes = (alignTriggerActive = position === "item-aligned") => {
+    content.setAttribute("data-position", position);
+    content.setAttribute("data-align-trigger", alignTriggerActive ? "true" : "false");
+
+    const viewport = getViewport();
+    if (viewport) {
+      viewport.setAttribute("data-position", position);
+    }
+  };
+
+  type ContentRect = Pick<
+    DOMRectReadOnly,
+    "top" | "right" | "bottom" | "left" | "width" | "height"
+  >;
+  type AnchorRect = Pick<DOMRectReadOnly, "top" | "left" | "right" | "bottom" | "width" | "height">;
+  type Axis = "top" | "left";
+
+  const getMeasuredRect = (element: HTMLElement | null): DOMRect | null => {
+    if (!element) return null;
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 || rect.height > 0 ? rect : null;
+  };
+
+  const getTriggerAlignmentRect = (triggerRect: DOMRect): AnchorRect => {
+    const valueRect = getMeasuredRect(valueSlot);
+    return valueRect ?? triggerRect;
+  };
+
+  const getOffsetInAncestorPaddingBox = (
+    item: HTMLElement,
+    ancestor: HTMLElement,
+    ancestorRect: ContentRect,
+    scrollOffset: number,
+    axis: Axis,
+  ) => {
+    // Prefer offset-parent traversal when the ancestor is in the chain, and
+    // fall back to rect math otherwise (e.g. before final layout settles).
+    const offsetKey = axis === "top" ? "offsetTop" : "offsetLeft";
+    const clientKey = axis === "top" ? "clientTop" : "clientLeft";
+    const rectKey = axis === "top" ? "top" : "left";
+
+    let offset = 0;
+    let node: HTMLElement | null = item;
+    while (node && node !== ancestor) {
+      offset += node[offsetKey];
+      const offsetParent: Element | null = node.offsetParent;
+      if (!(offsetParent instanceof HTMLElement)) {
+        offset = Number.NaN;
+        break;
+      }
+      if (offsetParent !== ancestor) {
+        offset += offsetParent[clientKey];
+      }
+      node = offsetParent;
+    }
+    if (node === ancestor && Number.isFinite(offset)) {
+      return offset;
+    }
+
+    const itemRect = item.getBoundingClientRect();
+    return itemRect[rectKey] - ancestorRect[rectKey] - ancestor[clientKey] + scrollOffset;
+  };
+
+  const getOffsetInAncestorBorderBox = (
+    item: HTMLElement,
+    ancestor: HTMLElement,
+    ancestorRect: ContentRect,
+    scrollOffset: number,
+    axis: Axis,
+  ) =>
+    getOffsetInAncestorPaddingBox(item, ancestor, ancestorRect, scrollOffset, axis) +
+    (axis === "top" ? ancestor.clientTop : ancestor.clientLeft);
+
+  const getItemTopInContent = (item: HTMLElement, cr: ContentRect, scrollContainer: HTMLElement) =>
+    getOffsetInAncestorBorderBox(item, content, cr, scrollContainer.scrollTop, "top");
+
+  const getItemAlignmentAnchor = (item: HTMLElement): HTMLElement => {
+    const itemText = getItemText(item);
+    if (getMeasuredRect(itemText)) {
+      return itemText!;
+    }
+    return item;
+  };
+
+  // Compute base position data for item-aligned mode
+  const computeItemAlignedPos = (tr: DOMRect, cr: ContentRect, scrollContainer: HTMLElement) => {
+    // Prefer selected item for stable anchoring, then highlighted, then first enabled item.
+    const highlightedItem = highlightedIndex >= 0 ? enabledItems[highlightedIndex] : undefined;
+    const selectedItem = items.find((item) => item.dataset["value"] === currentValue);
+    const alignItem = selectedItem ?? highlightedItem ?? enabledItems[0];
+    const triggerAlignmentRect = getTriggerAlignmentRect(tr);
+    const valueRect = getMeasuredRect(valueSlot);
+
+    // Calculate x position (align left edges, match trigger width)
+    let x = tr.left;
+
+    // Calculate y position so aligned item is at trigger's vertical center.
+    // This is the base (unclamped) y when content scrollTop is 0.
+    let y: number;
+    let anchorTopInContent = 0;
+    let anchorHeight = triggerAlignmentRect.height;
+    if (alignItem) {
+      const itemText = getItemText(alignItem);
+      const hasExactTextAlignment = Boolean(valueRect && getMeasuredRect(itemText));
+      const alignAnchor =
+        hasExactTextAlignment && itemText ? itemText : getItemAlignmentAnchor(alignItem);
+      const alignAnchorRect = getMeasuredRect(alignAnchor) ?? alignAnchor.getBoundingClientRect();
+      anchorTopInContent = getItemTopInContent(alignAnchor, cr, scrollContainer);
+      anchorHeight =
+        alignAnchorRect.height ||
+        alignAnchor.offsetHeight ||
+        alignItem.getBoundingClientRect().height ||
+        alignItem.offsetHeight ||
+        triggerAlignmentRect.height;
+
+      if (hasExactTextAlignment && valueRect) {
+        x = valueRect.left - (alignAnchorRect.left - cr.left);
+      }
+
+      // Position content so the item's center aligns from the content padding box.
+      y =
+        triggerAlignmentRect.top +
+        triggerAlignmentRect.height / 2 -
+        anchorTopInContent -
+        anchorHeight / 2;
+    } else {
+      // No items at all - align top of content with trigger
+      y = tr.top;
+    }
+
+    return {
+      x,
+      y,
+      alignItem,
+      anchorTopInContent,
+      anchorHeight,
+      triggerAlignmentRect,
+    };
+  };
+
+  const updatePosition = () => {
+    const positioner = portal.container as HTMLElement;
+    const win = root.ownerDocument.defaultView ?? window;
+    const tr = trigger.getBoundingClientRect();
+    const scrollContainer = getScrollContainer();
+
+    // Set min-width to match trigger width
+    content.style.minWidth = `${tr.width}px`;
+
+    // Get content rect after setting min-width
+    const cr = measurePopupContentRect(content);
+
+    let pos: { x: number; y: number };
+    let side: Side = "bottom";
+    let transformOrigin: string;
+    let alignTriggerActive = position === "item-aligned";
+
+    if (position === "item-aligned") {
+      const computedStyles = win.getComputedStyle(content);
+      const minHeight = Number.parseFloat(computedStyles.minHeight) || 0;
+      const triggerCollisionThreshold = 20;
+      const availableHeight = Math.max(0, win.innerHeight - collisionPadding * 2);
+      const hasTriggerGeometry = tr.width > 0 || tr.height > 0;
+      const nearViewportEdge =
+        hasTriggerGeometry &&
+        (tr.top < collisionPadding + triggerCollisionThreshold ||
+          tr.bottom > win.innerHeight - collisionPadding - triggerCollisionThreshold);
+      const heightTooConstrained =
+        cr.height > 0 &&
+        ((scrollContainer.scrollHeight <= scrollContainer.clientHeight &&
+          cr.height > availableHeight + 0.5) ||
+          (minHeight > 0 &&
+            availableHeight + 0.5 <
+              Math.min(scrollContainer.scrollHeight || cr.height, minHeight)));
+
+      if (nearViewportEdge || heightTooConstrained) {
+        alignTriggerActive = false;
+        const floating = computeFloatingPosition({
+          anchorRect: tr,
+          contentRect: cr,
+          side: preferredSide,
+          align: preferredAlign,
+          sideOffset,
+          alignOffset,
+          avoidCollisions,
+          collisionPadding,
+          allowedSides: SIDES,
+        });
+        pos = { x: floating.x, y: floating.y };
+        side = floating.side as Side;
+        transformOrigin = computeFloatingTransformOrigin({
+          side,
+          align: floating.align,
+          anchorRect: tr,
+          popupX: pos.x,
+          popupY: pos.y,
+        });
+      } else {
+        const aligned = computeItemAlignedPos(tr, cr, scrollContainer);
+        pos = { x: aligned.x, y: aligned.y };
+        const triggerCenterX =
+          aligned.triggerAlignmentRect.left + aligned.triggerAlignmentRect.width / 2;
+        const triggerCenterY =
+          aligned.triggerAlignmentRect.top + aligned.triggerAlignmentRect.height / 2;
+        const minY = collisionPadding;
+        const maxY = win.innerHeight - cr.height - collisionPadding;
+        const clampY = (value: number) =>
+          avoidCollisions ? (maxY < minY ? minY : Math.min(Math.max(value, minY), maxY)) : value;
+        const minX = collisionPadding;
+        const maxX = win.innerWidth - cr.width - collisionPadding;
+        const clampX = (value: number) =>
+          avoidCollisions ? (maxX < minX ? minX : Math.min(Math.max(value, minX), maxX)) : value;
+
+        pos.x = clampX(pos.x);
+
+        if (aligned.alignItem) {
+          const maxScrollTop = Math.max(
+            0,
+            scrollContainer.scrollHeight - scrollContainer.clientHeight,
+          );
+          const getTriggerCenterInContent = (currentY: number) => triggerCenterY - currentY;
+          const getDesiredScrollTop = (currentY: number) =>
+            aligned.anchorTopInContent +
+            aligned.anchorHeight / 2 -
+            getTriggerCenterInContent(currentY);
+          if (maxScrollTop > 0) {
+            // Keep popup near the trigger and use internal scroll to align.
+            pos.y = clampY(triggerCenterY - cr.height / 2);
+            let scrollTop = Math.min(Math.max(getDesiredScrollTop(pos.y), 0), maxScrollTop);
+            scrollContainer.scrollTop = scrollTop;
+            pos.y = clampY(
+              triggerCenterY - (aligned.anchorTopInContent - scrollTop + aligned.anchorHeight / 2),
+            );
+            scrollTop = Math.min(Math.max(getDesiredScrollTop(pos.y), 0), maxScrollTop);
+            scrollContainer.scrollTop = scrollTop;
+            pos.y = clampY(
+              triggerCenterY - (aligned.anchorTopInContent - scrollTop + aligned.anchorHeight / 2),
+            );
+          } else {
+            // No internal scrolling: align directly from item geometry.
+            scrollContainer.scrollTop = 0;
+            pos.y = clampY(aligned.y);
+          }
+        } else {
+          scrollContainer.scrollTop = 0;
+          pos.y = clampY(aligned.y);
+        }
+
+        // Determine effective side based on final position
+        side = pos.y < tr.top ? "top" : "bottom";
+
+        const originX = Math.min(Math.max(triggerCenterX - pos.x, 0), cr.width);
+        const originY = Math.min(Math.max(triggerCenterY - pos.y, 0), cr.height);
+        transformOrigin = `${originX}px ${originY}px`;
+      }
+    } else {
+      const floating = computeFloatingPosition({
+        anchorRect: tr,
+        contentRect: cr,
+        side: preferredSide,
+        align: preferredAlign,
+        sideOffset,
+        alignOffset,
+        avoidCollisions,
+        collisionPadding,
+        allowedSides: SIDES,
+      });
+      pos = { x: floating.x, y: floating.y };
+      side = floating.side as Side;
+      transformOrigin = computeFloatingTransformOrigin({
+        side,
+        align: floating.align,
+        anchorRect: tr,
+        popupX: pos.x,
+        popupY: pos.y,
+      });
+    }
+    const resolvedAlign: Align =
+      position === "item-aligned" && alignTriggerActive ? "center" : preferredAlign;
+
+    if (lockScrollOption) {
+      positioner.style.position = "fixed";
+      positioner.style.top = "0px";
+      positioner.style.left = "0px";
+      positioner.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`;
+    } else {
+      positioner.style.position = "absolute";
+      positioner.style.top = "0px";
+      positioner.style.left = "0px";
+      positioner.style.transform = `translate3d(${pos.x + win.scrollX}px, ${pos.y + win.scrollY}px, 0)`;
+    }
+    positioner.style.setProperty("--transform-origin", transformOrigin);
+    positioner.style.willChange = "transform";
+    positioner.style.margin = "0";
+    syncResolvedPositionAttributes(alignTriggerActive);
+    content.setAttribute("data-side", side);
+    content.setAttribute("data-align", resolvedAlign);
+    if (positioner !== content) {
+      positioner.setAttribute("data-side", side);
+      positioner.setAttribute("data-align", resolvedAlign);
+    }
+  };
+
+  const positionSync = createPositionSync({
+    observedElements: [trigger, content],
+    isActive: () => isOpen,
+    ancestorScroll: lockScrollOption,
+    onUpdate: updatePosition,
+    ignoreScrollTarget: (target) => target instanceof Node && content.contains(target),
+  });
+
+  const updateHighlight = (index: number, focus = true, ensureVisible = true) => {
+    const scrollContainer = getScrollContainer();
+    for (let i = 0; i < enabledItems.length; i++) {
+      const el = enabledItems[i]!;
+      if (i === index) {
+        el.setAttribute("data-highlighted", "");
+        if (ensureVisible) {
+          ensureItemVisibleInContainer(el, scrollContainer);
+        }
+        if (focus) el.focus();
+      } else {
+        el.removeAttribute("data-highlighted");
+      }
+    }
+    highlightedIndex = index;
+  };
+
+  const clearHighlight = () => {
+    for (const el of items) el.removeAttribute("data-highlighted");
+    highlightedIndex = -1;
+  };
+  const clearHighlightAndFocusContent = () => {
+    clearHighlight();
+    focusElement(content);
+  };
+
+  const setDataState = (state: "open" | "closed") => {
+    root.setAttribute("data-state", state);
+    trigger.setAttribute("data-state", state);
+    content.setAttribute("data-state", state);
+    if (state === "open") {
+      root.setAttribute("data-open", "");
+      trigger.setAttribute("data-open", "");
+      content.setAttribute("data-open", "");
+      root.removeAttribute("data-closed");
+      trigger.removeAttribute("data-closed");
+      content.removeAttribute("data-closed");
+    } else {
+      root.setAttribute("data-closed", "");
+      trigger.setAttribute("data-closed", "");
+      content.setAttribute("data-closed", "");
+      root.removeAttribute("data-open");
+      trigger.removeAttribute("data-open");
+      content.removeAttribute("data-open");
+    }
+  };
+
+  const restoreFocus = () => {
+    requestAnimationFrame(() => {
+      if (previousActiveElement && document.contains(previousActiveElement)) {
+        focusElement(previousActiveElement);
+      } else if (trigger && document.contains(trigger)) {
+        focusElement(trigger);
+      }
+      previousActiveElement = null;
+    });
+  };
+
+  const finishClose = () => {
+    if (isDestroyed) return;
+    portal.restore();
+    content.hidden = true;
+    if (shouldRestoreFocusOnClose) {
+      restoreFocus();
+    } else {
+      previousActiveElement = null;
+    }
+  };
+
+  const presence = createPresenceLifecycle({
+    element: content,
+    onExitComplete: finishClose,
+  });
+
+  const updateValueDisplay = () => {
+    if (!valueSlot) return;
+
+    if (currentValue === null) {
+      valueSlot.textContent = placeholder;
+      trigger.setAttribute("data-placeholder", "");
+    } else {
+      const selectedItem = items.find((item) => item.dataset["value"] === currentValue);
+      const label = getItemLabelText(selectedItem, currentValue);
+      valueSlot.textContent = label;
+      trigger.removeAttribute("data-placeholder");
+    }
+  };
+
+  const updateOpenState = (
+    open: boolean,
+    options: { skipFocusRestore?: boolean; immediate?: boolean } = {},
+  ) => {
+    const { skipFocusRestore = false, immediate = false } = options;
+
+    if (isOpen === open) return;
+    if (disabled && open) return;
+
+    if (open) {
+      const openedByPointer = pendingPointerOpen;
+      pendingPointerOpen = false;
+      shouldRestoreFocusOnClose = true;
+      previousActiveElement = document.activeElement as HTMLElement;
+      isOpen = true;
+      setAria(trigger, "expanded", true);
+      portal.mount();
+      content.hidden = false;
+      setDataState("open");
+      presence.enter();
+
+      // Lock scroll
+      if (lockScrollOption && !didLockScroll) {
+        lockScroll();
+        didLockScroll = true;
+      }
+
+      cacheItems();
+      keyboardMode = false;
+
+      // Highlight selected item if any
+      const selectedIndex = enabledItems.findIndex((el) => el.dataset["value"] === currentValue);
+      if (selectedIndex >= 0) {
+        updateHighlight(selectedIndex, false, false);
+      } else {
+        clearHighlight();
+      }
+
+      positionSync.start();
+      updatePosition();
+      positionSync.update();
+
+      // Use rAF to refine position after browser has fully rendered content,
+      // and to highlight item under cursor if pointer opened the select
+      requestAnimationFrame(() => {
+        if (!isOpen) return;
+        updatePosition();
+        positionSync.update();
+
+        // Highlight item under cursor if pointer opened the select
+        if (
+          openedByPointer &&
+          highlightItemOnHover &&
+          lastPointerType !== "touch" &&
+          (lastPointerX !== 0 || lastPointerY !== 0)
+        ) {
+          const el = document.elementFromPoint(lastPointerX, lastPointerY);
+          const item = el?.closest?.('[data-slot="select-item"]') as HTMLElement | null;
+          if (item && !isItemDisabled(item) && content.contains(item)) {
+            const index = itemToIndex.get(item);
+            if (index !== undefined) {
+              updateHighlight(index, true, false);
+            }
+          }
+        }
+      });
+
+      content.focus();
+    } else {
+      isOpen = false;
+      pendingPointerOpen = false;
+      lastPointerX = 0;
+      lastPointerY = 0;
+      lastPointerType = "";
+      setAria(trigger, "expanded", false);
+      setDataState("closed");
+      clearHighlight();
+      typeaheadBuffer = "";
+      keyboardMode = false;
+      shouldRestoreFocusOnClose = !skipFocusRestore;
+
+      // Unlock scroll
+      if (didLockScroll) {
+        unlockScroll();
+        didLockScroll = false;
+      }
+
+      positionSync.stop();
+      if (immediate) {
+        presence.cleanup();
+        finishClose();
+      } else {
+        presence.exit();
+      }
+    }
+
+    emit(root, "select:open-change", { open: isOpen });
+    onOpenChange?.(isOpen);
+  };
+
+  const updateValue = (value: string | null, init = false) => {
+    if (currentValue === value && !init) return;
+
+    const oldValue = currentValue;
+    currentValue = value;
+
+    // Update hidden input
+    if (hiddenInput) {
+      hiddenInput.value = value ?? "";
+    }
+
+    // Update root data-value
+    if (value !== null) {
+      root.setAttribute("data-value", value);
+    } else {
+      root.removeAttribute("data-value");
+    }
+
+    // Update selected state on items
+    for (const item of items) {
+      const itemValue = item.dataset["value"];
+      if (itemValue === value) {
+        setAria(item, "selected", true);
+        item.setAttribute("data-selected", "");
+      } else {
+        setAria(item, "selected", false);
+        item.removeAttribute("data-selected");
+      }
+    }
+
+    updateValueDisplay();
+
+    if (!init && oldValue !== value) {
+      emit(root, "select:change", { value });
+      onValueChange?.(value);
+    }
+  };
+
+  const selectItem = (item: HTMLElement) => {
+    if (isItemDisabled(item)) return;
+    const value = item.dataset["value"];
+    if (value === undefined) return;
+
+    updateValue(value);
+    updateOpenState(false, { immediate: true });
+  };
+
+  const handleKeydown = (e: KeyboardEvent) => {
+    const len = enabledItems.length;
+    if (len === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        keyboardMode = true;
+        updateHighlight(highlightedIndex === -1 ? 0 : Math.min(highlightedIndex + 1, len - 1));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        keyboardMode = true;
+        updateHighlight(highlightedIndex === -1 ? len - 1 : Math.max(highlightedIndex - 1, 0));
+        break;
+      case "Home":
+        e.preventDefault();
+        keyboardMode = true;
+        updateHighlight(0);
+        break;
+      case "End":
+        e.preventDefault();
+        keyboardMode = true;
+        updateHighlight(len - 1);
+        break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        if (highlightedIndex >= 0) selectItem(enabledItems[highlightedIndex]!);
+        break;
+      case "Tab":
+        // Skip focus restore to allow normal tab navigation
+        updateOpenState(false, { skipFocusRestore: true });
+        break;
+      case "Escape":
+        e.preventDefault();
+        updateOpenState(false);
+        break;
+      default:
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          e.preventDefault();
+          handleTypeahead(e.key.toLowerCase());
+        }
+    }
+  };
+
+  const handleTypeahead = (char: string) => {
+    if (typeaheadTimeout) clearTimeout(typeaheadTimeout);
+    typeaheadTimeout = setTimeout(() => {
+      typeaheadBuffer = "";
+    }, 500);
+
+    typeaheadBuffer += char;
+
+    let matchIndex = enabledItems.findIndex((el) =>
+      getItemLabelText(el).toLowerCase().startsWith(typeaheadBuffer),
+    );
+
+    if (matchIndex === -1 && typeaheadBuffer.length === 1) {
+      const start = highlightedIndex + 1;
+      for (let i = 0; i < enabledItems.length; i++) {
+        const idx = (start + i) % enabledItems.length;
+        if (getItemLabelText(enabledItems[idx]!).toLowerCase().startsWith(char)) {
+          matchIndex = idx;
+          break;
+        }
+      }
+    }
+
+    if (matchIndex !== -1) {
+      keyboardMode = true;
+      updateHighlight(matchIndex);
+    }
+  };
+
+  const handleTriggerKeydown = (e: KeyboardEvent) => {
+    if (disabled) return;
+
+    switch (e.key) {
+      case "Enter":
+      case " ":
+      case "ArrowDown":
+      case "ArrowUp":
+        e.preventDefault();
+        pendingPointerOpen = false;
+        updateOpenState(true);
+        break;
+    }
+  };
+
+  // Initialize
+  setAria(trigger, "expanded", false);
+  content.hidden = true;
+  syncResolvedPositionAttributes();
+  setDataState("closed");
+
+  // Initial value display
+  cacheItems();
+  updateValue(currentValue, true);
+
+  // Trigger events
+  cleanups.push(
+    on(trigger, "pointerdown", (e) => {
+      lastPointerX = e.clientX;
+      lastPointerY = e.clientY;
+      lastPointerType = e.pointerType;
+      pendingPointerOpen = true;
+    }),
+    on(trigger, "click", () => {
+      if (!disabled) updateOpenState(!isOpen);
+    }),
+    on(trigger, "keydown", handleTriggerKeydown),
+  );
+
+  // Content events
+  cleanups.push(
+    on(content, "keydown", handleKeydown),
+    on(content, "click", (e) => {
+      const item = (e.target as HTMLElement).closest?.(
+        '[data-slot="select-item"]',
+      ) as HTMLElement | null;
+      if (item) selectItem(item);
+    }),
+    on(content, "pointermove", (e) => {
+      if (!highlightItemOnHover || !isHoverPointer(e)) return;
+
+      const item = (e.target as HTMLElement).closest?.(
+        '[data-slot="select-item"]',
+      ) as HTMLElement | null;
+
+      if (keyboardMode) {
+        keyboardMode = false;
+        if (item && itemToIndex.get(item) === highlightedIndex) return;
+      }
+
+      if (item && !isItemDisabled(item)) {
+        const index = itemToIndex.get(item);
+        if (index !== undefined && index !== highlightedIndex) {
+          updateHighlight(index, true);
+        }
+      } else {
+        // Clear highlight when moving to label, separator, or disabled item
+        clearHighlightAndFocusContent();
+      }
+    }),
+    on(content, "pointerleave", (e) => {
+      if (!highlightItemOnHover || !isHoverPointer(e) || keyboardMode) return;
+      clearHighlightAndFocusContent();
+    }),
+  );
+
+  cleanups.push(
+    createDismissLayer({
+      root,
+      isOpen: () => isOpen,
+      onDismiss: () => updateOpenState(false),
+      closeOnClickOutside: true,
+      closeOnEscape: false,
+    }),
+  );
+
+  // Inbound event
+  cleanups.push(
+    on(root, "select:set", (e) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.value !== undefined) {
+        updateValue(detail.value);
+      }
+      if (detail?.open !== undefined) {
+        updateOpenState(detail.open);
+      }
+    }),
+  );
+
+  const controller: SelectController = {
+    get value() {
+      return currentValue;
+    },
+    get isOpen() {
+      return isOpen;
+    },
+    select: (value: string) => updateValue(value),
+    open: () => updateOpenState(true),
+    close: () => updateOpenState(false),
+    destroy: () => {
+      isDestroyed = true;
+      if (typeaheadTimeout) clearTimeout(typeaheadTimeout);
+      positionSync.stop();
+      presence.cleanup();
+      portal.cleanup();
+      // Unlock scroll if still locked
+      if (didLockScroll) {
+        unlockScroll();
+        didLockScroll = false;
+      }
+      cleanups.forEach((fn) => fn());
+      cleanups.length = 0;
+      if (hiddenInput && hiddenInput.parentNode) {
+        hiddenInput.parentNode.removeChild(hiddenInput);
+      }
+      clearRootBinding(root, ROOT_BINDING_KEY, controller);
+    },
+  };
+
+  setRootBinding(root, ROOT_BINDING_KEY, controller);
+
+  if (defaultOpen) updateOpenState(true);
+
+  return controller;
+}
+
+/**
+ * Find and bind all select components in a scope
+ * Returns array of controllers for programmatic access
+ */
+export function create(scope: ParentNode = document): SelectController[] {
+  const controllers: SelectController[] = [];
+  for (const root of getRoots(scope, "select")) {
+    if (hasRootBinding(root, ROOT_BINDING_KEY)) continue;
+    controllers.push(createSelect(root));
+  }
+  return controllers;
+}

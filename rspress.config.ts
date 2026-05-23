@@ -33,9 +33,7 @@ export default defineConfig({
       previewLanguages: ["ts"],
       iframeOptions: {
         customEntry: ({ demoPath }) => {
-          return `import ilha from "ilha";
-          import Component from ${JSON.stringify(demoPath)};
-          Component.mount(document.getElementById("root"));
+          return `import ${JSON.stringify(demoPath)};
         `;
         },
         builderConfig: {
@@ -54,21 +52,30 @@ export default defineConfig({
           strict: true,
           baseUrl: __dirname,
           paths: {
-            areia: ["./src/index.ts"],
-            "areia/components/*": ["./src/components/*"],
-            "$components/*": ["./src/components/*"],
-            "$lib/*": ["./src/lib/*"],
+            areia: ["./packages/areia/src/index.ts"],
+            "@areia/slots": ["./packages/slots/src/index.ts"],
+            "areia/components/*": ["./packages/areia/src/components/*"],
+            "$components/*": ["./packages/areia/src/components/*"],
+            "$lib/*": ["./packages/areia/src/lib/*"],
           },
         },
       },
     }),
   ],
+  markdown: {
+    shiki: {
+      langs: ["tsx", "ts", "js", "html", "json", "css", "bash", "sh", "text"],
+    },
+  },
   globalStyles: path.join(__dirname, "docs.css"),
   builderConfig: {
     resolve: {
       alias: {
-        areia: path.join(__dirname, "src", "index.ts"),
-        "areia/components": path.join(__dirname, "src", "components"),
+        areia: path.join(__dirname, "packages", "areia", "src", "index.ts"),
+        "@areia/slots": path.join(__dirname, "packages", "slots", "src", "index.ts"),
+        "areia/components": path.join(__dirname, "packages", "areia", "src", "components"),
+        $components: path.join(__dirname, "packages", "areia", "src", "components"),
+        $lib: path.join(__dirname, "packages", "areia", "src", "lib"),
       },
     },
   },

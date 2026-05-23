@@ -3,5 +3,10 @@
     "type": "dir-section-header",
     "name": "components",
     "label": "Components"
+  },
+  {
+    "type": "dir-section-header",
+    "name": "primitives",
+    "label": "Primitives"
   }
 ]

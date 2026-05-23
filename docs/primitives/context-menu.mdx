@@ -1,0 +1,301 @@
+---
+title: ContextMenu
+description: A primitive for building context menus triggered by right-click or long-press.
+---
+
+A primitive for building context menus that open at the pointer position on right-click (or long-press on touch devices). Use `ContextMenu` when you need a menu bound to a region rather than a visible trigger button.
+
+```ts preview twoslash
+import { ContextMenu } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <div data-slot="context-menu">
+    <div data-slot="context-menu-trigger" class="win95-inset p-3 w-48 select-none text-center">
+      Right click here
+    </div>
+    <div data-slot="context-menu-content" class="win95-menu">
+      <div data-slot="context-menu-label" class="win95-label">Actions</div>
+      <button data-slot="context-menu-item" data-value="copy" class="win95-menu-item">
+        Copy
+      </button>
+      <button data-slot="context-menu-item" data-value="paste" class="win95-menu-item">
+        Paste
+      </button>
+      <div data-slot="context-menu-separator" class="win95-separator"></div>
+      <button
+        data-slot="context-menu-item"
+        data-value="delete"
+        data-variant="destructive"
+        class="win95-menu-item">
+        Delete
+      </button>
+    </div>
+  </div>
+`;
+
+const root = document.querySelector<HTMLElement>(
+  '[data-slot="context-menu"]',
+)!;
+if (root) {
+  const controller = ContextMenu.createContextMenu(root, {
+    onSelect: (value) => console.log("selected", value),
+  });
+}
+```
+
+## Installation
+
+### Package
+
+```ts twoslash
+import { ContextMenu } from "@areia/slots";
+```
+
+## Usage
+
+Call `createContextMenu` with the root element and optional configuration. The primitive reads slot attributes from the DOM and manages open/close, item highlight, keyboard navigation, and selection.
+
+```ts twoslash
+import { ContextMenu } from "@areia/slots";
+
+const el = document.querySelector<HTMLElement>(
+  '[data-slot="context-menu"]',
+)!;
+if (!el) throw new Error("No root element found");
+
+const controller = ContextMenu.createContextMenu(el, {
+  onOpenChange: (open) => console.log("open changed", open),
+  onSelect: (value) => console.log("selected", value),
+});
+
+// Programmatic control
+controller.open({ x: 200, y: 100 });
+// controller.close();
+// controller.destroy();
+```
+
+### Auto-bind
+
+Use the `create` helper to discover and bind every unattached root in a scope.
+
+```ts twoslash
+import { ContextMenu } from "@areia/slots";
+
+const controllers = ContextMenu.create(document);
+// controllers.forEach((c) => { ... });
+```
+
+## Expected Markup
+
+The primitive expects the following slot structure. Every slot attribute must be present for the controller to wire up correctly.
+
+```html
+<div data-slot="context-menu">
+  <div data-slot="context-menu-trigger">
+    <!-- Region that accepts right-click / long-press -->
+  </div>
+
+  <div data-slot="context-menu-content">
+    <div data-slot="context-menu-label">Actions</div>
+
+    <button data-slot="context-menu-item" data-value="copy">
+      Copy
+    </button>
+    <button data-slot="context-menu-item" data-value="paste">
+      Paste
+    </button>
+
+    <div data-slot="context-menu-separator"></div>
+
+    <button
+      data-slot="context-menu-item"
+      data-value="delete"
+      data-variant="destructive"
+    >
+      Delete
+    </button>
+
+    <button
+      data-slot="context-menu-item"
+      data-value="disabled"
+      data-disabled
+    >
+      Disabled
+    </button>
+
+    <button
+      data-slot="context-menu-checkbox-item"
+      data-value="show-hidden"
+    >
+      Show hidden
+    </button>
+
+    <button
+      data-slot="context-menu-radio-item"
+      data-value="option-a"
+    >
+      Option A
+    </button>
+  </div>
+</div>
+```
+
+### Slot Reference
+
+| Slot                         | Purpose                                               |
+| ---------------------------- | ----------------------------------------------------- |
+| `context-menu`               | Root element. Controller is bound here.               |
+| `context-menu-trigger`       | Area that receives right-click / long-press events.   |
+| `context-menu-content`       | Popup container that appears at the pointer position. |
+| `context-menu-item`          | Selectable menu action.                               |
+| `context-menu-label`         | Non-interactive label for grouping items.             |
+| `context-menu-separator`     | Visual divider between item groups.                   |
+| `context-menu-checkbox-item` | Toggleable item with a checked state.                 |
+| `context-menu-radio-item`    | Selectable item in a radio group.                     |
+
+### Data Attributes
+
+| Attribute                    | Applies to                                  | Description                             |
+| ---------------------------- | ------------------------------------------- | --------------------------------------- |
+| `data-value`                 | `*-item`, `*-checkbox-item`, `*-radio-item` | Value emitted on selection.             |
+| `data-disabled`              | `*-item`, `*-checkbox-item`, `*-radio-item` | Prevents selection and hover.           |
+| `data-variant="destructive"` | `*-item`                                    | Marks the item as a destructive action. |
+
+The controller manages these state attributes on the root:
+
+| Attribute     | Values                | Description                      |
+| ------------- | --------------------- | -------------------------------- |
+| `data-state`  | `"open"` / `"closed"` | Current open state.              |
+| `data-open`   | (present)             | Present when the menu is open.   |
+| `data-closed` | (present)             | Present when the menu is closed. |
+
+Items receive the following state attributes:
+
+| Attribute          | Description                                |
+| ------------------ | ------------------------------------------ |
+| `data-highlighted` | Present on the currently highlighted item. |
+| `data-checked`     | Present on a checked checkbox/radio item.  |
+
+## Events
+
+All events bubble from the root element (`data-slot="context-menu"`).
+
+### Outbound
+
+| Event                      | Detail                                        | Description                          |
+| -------------------------- | --------------------------------------------- | ------------------------------------ |
+| `context-menu:open-change` | `{ open, previousOpen, source, reason }`      | Fires when the menu opens or closes. |
+| `context-menu:select`      | `{ value, item, itemType, source, checked? }` | Fires when an item is selected.      |
+
+#### `context-menu:open-change`
+
+```ts twoslash
+interface ContextMenuOpenChangeDetail {
+  open: boolean;
+  previousOpen: boolean;
+  source: "pointer" | "keyboard" | "programmatic";
+  reason:
+    | "trigger"
+    | "select"
+    | "outside"
+    | "escape"
+    | "tab"
+    | "programmatic";
+}
+```
+
+| Field          | Description                         |
+| -------------- | ----------------------------------- |
+| `open`         | New open state.                     |
+| `previousOpen` | Previous open state.                |
+| `source`       | How the state change was initiated. |
+| `reason`       | Why the state changed.              |
+
+#### `context-menu:select`
+
+```ts twoslash
+interface ContextMenuSelectDetail {
+  value: string;
+  item: HTMLElement;
+  itemType: "item" | "radio" | "checkbox";
+  source: "pointer" | "keyboard";
+  checked?: boolean;
+}
+```
+
+| Field      | Description                                    |
+| ---------- | ---------------------------------------------- |
+| `value`    | The `data-value` of the selected item.         |
+| `item`     | Reference to the selected DOM element.         |
+| `itemType` | The type of item that was selected.            |
+| `source`   | How the selection was triggered.               |
+| `checked`  | New checked state (checkbox/radio items only). |
+
+## API Reference
+
+### Options
+
+`ContextMenu.createContextMenu(root, options)`
+
+| Option                | Type                      | Default | Description                                   |
+| --------------------- | ------------------------- | ------- | --------------------------------------------- |
+| `defaultOpen`         | `boolean`                 | `false` | Initial open state.                           |
+| `closeOnClickOutside` | `boolean`                 | `true`  | Close when clicking outside the menu.         |
+| `closeOnEscape`       | `boolean`                 | `true`  | Close when pressing Escape.                   |
+| `closeOnSelect`       | `boolean`                 | `true`  | Close when an item is selected.               |
+| `disabled`            | `boolean`                 | `false` | Disable user interaction entirely.            |
+| `longPressDelay`      | `number`                  | `500`   | Long-press duration in ms for touch triggers. |
+| `sideOffset`          | `number`                  | —       | Distance in px from the pointer anchor.       |
+| `collisionPadding`    | `number`                  | —       | Viewport collision padding in px.             |
+| `onOpenChange`        | `(open: boolean) => void` | —       | Called when open state changes.               |
+| `onSelect`            | `(value: string) => void` | —       | Called when an item is selected.              |
+
+Options can also be set via `data-*` attributes on the root element, using kebab-case names (e.g. `data-close-on-select="false"`). JS options take precedence over data attributes.
+
+### Controller
+
+| Member                  | Type                                                        | Description                                     |
+| ----------------------- | ----------------------------------------------------------- | ----------------------------------------------- |
+| `isOpen`                | `boolean` (getter)                                          | Current open state.                             |
+| `highlightedValue`      | `string \| null` (getter)                                   | `data-value` of the currently highlighted item. |
+| `open(point?)`          | `(point?: { x: number; y: number }) => void`                | Open at optional viewport coordinates.          |
+| `close()`               | `() => void`                                                | Close the menu.                                 |
+| `setOpen(open, point?)` | `(open: boolean, point?: { x: number; y: number }) => void` | Set open state programmatically.                |
+| `destroy()`             | `() => void`                                                | Remove all event listeners and clean up.        |
+
+## Controller
+
+The controller is the imperative handle returned by `createContextMenu`. Use it for programmatic control in response to application state changes, or when you need to open the menu outside of a right-click interaction.
+
+```ts twoslash
+import { ContextMenu } from "@areia/slots";
+
+const el = document.querySelector<HTMLElement>(
+  '[data-slot="context-menu"]',
+)!;
+if (!el) throw new Error("No root element");
+
+const ctrl = ContextMenu.createContextMenu(el, {
+  onSelect: (v) => console.log(v),
+});
+
+// Read state
+console.log(ctrl.isOpen); // boolean
+console.log(ctrl.highlightedValue); // string | null
+
+// Open at a specific position
+ctrl.open({ x: 300, y: 150 });
+
+// Open at the last known pointer position
+ctrl.open();
+
+// Close
+ctrl.close();
+
+// Set open state with coordinates
+ctrl.setOpen(true, { x: 500, y: 200 });
+ctrl.setOpen(false);
+
+// Tear down all listeners
+ctrl.destroy();
+```

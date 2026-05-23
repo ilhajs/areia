@@ -1,0 +1,36 @@
+{
+  "name": "@areia/slots",
+  "version": "0.1.0",
+  "description": "Headless UI components for Vanilla JavaScript.",
+  "keywords": [
+    "data-slot",
+    "headless",
+    "primitives",
+    "ts",
+    "ui",
+    "vanilla"
+  ],
+  "license": "MIT",
+  "author": "Ryuz <ryuzer@proton.me>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilhajs/areia.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "browser": {
+    "process": false
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && tsdown",
+    "test": "bun test"
+  }
+}

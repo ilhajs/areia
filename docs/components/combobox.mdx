@@ -5,15 +5,15 @@ description: A searchable select component for filtering and choosing from a lis
 
 A searchable select component for filtering and choosing from a list of options.
 
-Areia's `Combobox` is built on `@data-slot/combobox` and rendered as an Ilha island when you use `Combobox.Root`. It supports keyboard navigation, filtering, form integration, disabled options, grouped items, and field helpers for labels, descriptions, and errors.
+Areia's `Combobox` is built on `@data-slot/combobox` and rendered as an Ilha island when you use `Combobox`. It supports keyboard navigation, filtering, form integration, disabled options, grouped items, and field helpers for labels, descriptions, and errors.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "fruit",
       label: "Fruit",
       placeholder: "Search fruit...",
@@ -26,6 +26,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -44,15 +46,15 @@ import { Combobox } from "areia/components/combobox";
 
 ## Usage
 
-Use `Combobox.Root` for an interactive island. The root renders the combobox markup and initializes the `@data-slot/combobox` controller after mount.
+Call `Combobox(...)` for an interactive island. The root renders the combobox markup and initializes the `@data-slot/combobox` controller after mount.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "database",
       label: "Database",
       placeholder: "Search databases...",
@@ -65,9 +67,11 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
-For static server-rendered markup or custom initialization, use `Combobox(...)` directly. For most application usage, prefer `Combobox.Root`.
+For static server-rendered markup without mounting behavior, use `Combobox.Static(...)`. For most application usage, call `Combobox(...)`.
 
 ## Examples
 
@@ -79,9 +83,9 @@ A combobox with a visible label and searchable options.
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "basic-fruit",
       label: "Fruit",
       placeholder: "Choose a fruit",
@@ -94,6 +98,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
@@ -110,25 +116,25 @@ const items = {
   cherry: "Cherry",
 };
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Combobox.Root({
+      ${Combobox({
         size: "xs",
         placeholder: "Extra small",
         items,
       })}
-      ${Combobox.Root({
+      ${Combobox({
         size: "sm",
         placeholder: "Small",
         items,
       })}
-      ${Combobox.Root({
+      ${Combobox({
         size: "base",
         placeholder: "Base",
         items,
       })}
-      ${Combobox.Root({
+      ${Combobox({
         size: "lg",
         placeholder: "Large",
         items,
@@ -136,6 +142,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Description
@@ -146,9 +154,9 @@ The `label`, `description`, and `error` props enable the built-in field wrapper.
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "region",
       label: "Region",
       description: "Choose the region closest to your users.",
@@ -162,6 +170,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Error
@@ -172,9 +182,9 @@ Pass `error` as a string for simple validation messages. Error styling is automa
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "database-error",
       label: "Database",
       required: true,
@@ -188,6 +198,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
@@ -198,9 +210,9 @@ Set `disabled` to prevent interaction.
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       label: "Fruit",
       placeholder: "Search fruit...",
       disabled: true,
@@ -211,6 +223,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled Items
@@ -221,9 +235,9 @@ Use item descriptor objects to disable individual options. Disabled rows are ski
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "plans",
       label: "Plan",
       placeholder: "Search plans...",
@@ -235,6 +249,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Default Value
@@ -245,9 +261,9 @@ Use `defaultValue` with the option value string to preselect an item.
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "default-database",
       label: "Database",
       defaultValue: "postgres",
@@ -259,6 +275,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Form Integration
@@ -269,10 +287,10 @@ Set `name` to create a hidden input that submits the selected value with a nativ
 import ilha, { html } from "ilha";
 import { Button, Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <form class="flex w-full max-w-sm flex-col gap-3">
-      ${Combobox.Root({
+      ${Combobox({
         id: "form-fruit",
         name: "fruit",
         label: "Fruit",
@@ -288,6 +306,8 @@ export default ilha.render(
     </form>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Items
@@ -298,9 +318,9 @@ Use explicit child markup when you need custom labels, grouping, separators, or 
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "custom-items",
       label: "Runtime",
       placeholder: "Search runtimes...",
@@ -334,6 +354,8 @@ export default ilha.render(
       ],
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Grouped Items
@@ -344,9 +366,9 @@ Use `Combobox.Group` and `Combobox.GroupLabel` to organize related options.
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "grouped-location",
       label: "Location",
       placeholder: "Search locations...",
@@ -377,11 +399,13 @@ export default ilha.render(
       ],
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Search Input Inside Popup
 
-Use the low-level parts to render a select-like trigger with a separate search input inside the popup. This composition returns static markup; initialize it with `createCombobox` yourself if you are not using `Combobox.Root`.
+Use the low-level parts to render a select-like trigger with a separate search input inside the popup. This composition returns static markup; initialize it with `createCombobox` yourself if you are not using `Combobox`.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
@@ -405,7 +429,7 @@ const items = [
   }),
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Combobox(
       {
@@ -430,6 +454,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Open on Focus and Auto Highlight
@@ -440,9 +466,9 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Combobox.Root({
+    html`${Combobox({
       id: "quick-search",
       label: "Quick search",
       placeholder: "Start typing...",
@@ -456,6 +482,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Dropdown Height
@@ -474,7 +502,7 @@ const items = {
   five: "Five",
 };
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Combobox(
       {
@@ -498,13 +526,15 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference
 
-### Combobox.Root
+### Combobox
 
-`Combobox.Root` is an Ilha island. It accepts standard HTML `div` attributes plus `@data-slot/combobox` options and Areia field props.
+`Combobox` is an Ilha island. It accepts standard HTML `div` attributes plus `@data-slot/combobox` options and Areia field props.
 
 | Prop                 | Type                                                                                            | Default    | Description                                                                 |
 | -------------------- | ----------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------- |
@@ -517,7 +547,7 @@ export default ilha.render(
 | `description`        | `unknown`                                                                                       | -          | Helper text displayed below the combobox.                                   |
 | `error`              | `unknown \| { message: unknown; match?: unknown }`                                              | -          | Error message. When truthy, error styling is automatically applied.         |
 | `items`              | `Record<string, unknown \| { label: unknown; disabled?: boolean }> \| ComboboxItemDescriptor[]` | -          | Items rendered as selectable options. Object keys are option values.        |
-| `children`           | `unknown`                                                                                       | -          | Explicit combobox content. Prefer the second `Combobox.Root` argument.      |
+| `children`           | `unknown`                                                                                       | -          | Explicit combobox content. Prefer the second `Combobox` argument.           |
 | `placeholder`        | `string`                                                                                        | -          | Placeholder text for the trigger input or trigger value.                    |
 | `defaultValue`       | `string`                                                                                        | -          | Initial selected value.                                                     |
 | `defaultOpen`        | `boolean`                                                                                       | `false`    | Initial open state.                                                         |

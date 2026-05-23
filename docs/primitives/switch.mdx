@@ -1,0 +1,194 @@
+---
+title: Switch
+description: A control that allows the user to toggle between on and off states.
+---
+
+A native-feeling switch built on a `role="switch"` element. It generates a hidden native `<input type="checkbox">` for form submission, supports unchecked-value submission, and emits change events on user interaction.
+
+```ts preview twoslash
+import { Switch } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <label>
+    <span data-slot="switch" class="mr-2 inline-flex h-6 w-11 items-center border-2 border-t-black border-l-black border-r-white border-b-white bg-white p-0.5 align-middle data-[checked]:justify-end">
+      <span data-slot="switch-thumb" class="block size-4 border border-black bg-[#c0c0c0]"></span>
+    </span>
+    Enable notifications
+  </label>
+`;
+
+const root = document.querySelector('[data-slot="switch"]')!;
+const controller = Switch.createSwitch(root, {
+  defaultChecked: false,
+  name: "notifications",
+});
+```
+
+## Installation
+
+### Package
+
+```ts twoslash
+import { Switch } from "@areia/slots";
+```
+
+## Usage
+
+```ts
+import { Switch } from "@areia/slots";
+
+// Auto-bind a single root
+const root = document.querySelector('[data-slot="switch"]');
+const controller = Switch.createSwitch(root, {
+  name: "accept",
+  value: "yes",
+});
+
+// Listen for state changes
+root.addEventListener("switch:change", (e) => {
+  console.log(e.detail.checked);
+});
+
+// Auto-bind all unbound roots in scope
+const controllers = Switch.create();
+```
+
+## Expected Markup
+
+The root element receives `role="switch"` and keyboard handling. A hidden native `<input type="checkbox">` is generated and inserted after the root for form participation. The optional `switch-thumb` slot receives matching state attributes.
+
+```html
+<label>
+  <span data-slot="switch">
+    <span data-slot="switch-thumb"></span>
+  </span>
+  Enable notifications
+</label>
+```
+
+Wrapping the switch in a `<label>` is recommended — the controller detects wrapping labels and `label[for]` associations so that clicking the label text toggles the switch.
+
+### Minimal Markup (no thumb)
+
+```html
+<span data-slot="switch"></span>
+```
+
+### Generated Hidden Input
+
+The controller creates a visually hidden native checkbox and inserts it immediately after the root element:
+
+```html
+<input
+  type="checkbox"
+  tabindex="-1"
+  aria-hidden="true"
+  data-switch-generated="input"
+  style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;pointer-events:none"
+/>
+```
+
+When `uncheckedValue` is configured, a second hidden input is generated to submit a value even when the switch is unchecked.
+
+### Data Slots
+
+| Slot           | Required | Description                                            |
+| -------------- | -------- | ------------------------------------------------------ |
+| `switch`       | Yes      | Root element. Receives `role="switch"` and ARIA attrs. |
+| `switch-thumb` | No       | Visual thumb indicator. Receives matching state attrs. |
+
+### Generated Attributes
+
+| Attribute         | Element(s)  | Description                                              |
+| ----------------- | ----------- | -------------------------------------------------------- |
+| `data-checked`    | Root, thumb | Present when checked.                                    |
+| `data-unchecked`  | Root, thumb | Present when unchecked.                                  |
+| `data-disabled`   | Root, thumb | Present when disabled.                                   |
+| `data-readonly`   | Root, thumb | Present when read-only.                                  |
+| `data-required`   | Root, thumb | Present when required.                                   |
+| `role`            | Root        | Set to `"switch"`.                                       |
+| `aria-checked`    | Root        | `"true"` or `"false"`.                                   |
+| `aria-disabled`   | Root        | `"true"` or removed.                                     |
+| `aria-readonly`   | Root        | `"true"` or removed.                                     |
+| `aria-required`   | Root        | `"true"` or removed.                                     |
+| `aria-labelledby` | Root        | Merged from wrapping `<label>` and `[for]` associations. |
+
+## Events
+
+### Outbound
+
+| Event           | Detail                 | Description                                                                              |
+| --------------- | ---------------------- | ---------------------------------------------------------------------------------------- |
+| `switch:change` | `{ checked: boolean }` | Fired on the root when the checked state changes via user interaction or the controller. |
+
+### Inbound
+
+| Event        | Detail                              | Description                                                                       |
+| ------------ | ----------------------------------- | --------------------------------------------------------------------------------- |
+| `switch:set` | `boolean` or `{ checked: boolean }` | Dispatch on the root to set the checked state. Supports flat `boolean` shorthand. |
+
+## API Reference
+
+### Options
+
+| Option            | Type                         | Default | Description                                                           |
+| ----------------- | ---------------------------- | ------- | --------------------------------------------------------------------- |
+| `defaultChecked`  | `boolean`                    | `false` | Initial checked state.                                                |
+| `disabled`        | `boolean`                    | `false` | Disable user interaction and exclude from form submission.            |
+| `readOnly`        | `boolean`                    | `false` | Prevent user interaction while keeping the value submittable.         |
+| `required`        | `boolean`                    | `false` | Require a checked value for native form validation.                   |
+| `name`            | `string`                     | —       | Form field name.                                                      |
+| `value`           | `string`                     | —       | Submitted value when checked. Defaults to the native checkbox `"on"`. |
+| `uncheckedValue`  | `string`                     | —       | Submitted value when unchecked. Creates an additional hidden input.   |
+| `onCheckedChange` | `(checked: boolean) => void` | —       | Called when the checked state changes.                                |
+
+### Controller
+
+| Member                | Type                         | Description                            |
+| --------------------- | ---------------------------- | -------------------------------------- |
+| `checked`             | `boolean` (getter)           | Current checked state.                 |
+| `toggle()`            | `() => void`                 | Toggle the checked state.              |
+| `check()`             | `() => void`                 | Set checked to `true`.                 |
+| `uncheck()`           | `() => void`                 | Set checked to `false`.                |
+| `setChecked(checked)` | `(checked: boolean) => void` | Set the checked state.                 |
+| `destroy()`           | `() => void`                 | Remove listeners and generated inputs. |
+
+## Controller
+
+The controller is returned by `Switch.createSwitch()` and provides imperative control over the switch state.
+
+```ts
+const controller = Switch.createSwitch(root, { name: "terms" });
+
+// Toggle
+controller.toggle();
+
+// Force check
+controller.check();
+
+// Force uncheck
+controller.uncheck();
+
+// Set checked state
+controller.setChecked(true);
+
+// Read state
+console.log(controller.checked); // true
+
+// Clean up
+controller.destroy();
+```
+
+### Form Integration
+
+The generated hidden input participates in standard form submission and `FormData`. When `uncheckedValue` is set, an extra hidden input ensures a value is submitted even when the switch is unchecked. The controller also listens for the form's `reset` event and restores the initial default state.
+
+### Keyboard Interaction
+
+- **Space** and **Enter** toggle the switch.
+- The root element receives `tabindex="0"` when it is not already a naturally focusable element (such as a `<button>`).
+- If the root is a native `<button>`, it receives `type="button"` to prevent unintended form submission and gets the `disabled` attribute set directly.
+
+### Label Support
+
+The controller detects both wrapping `<label>` elements and explicit `label[for]` associations. Clicking an associated label toggles the switch, and the label's ID is merged into the root's `aria-labelledby`.

@@ -12,7 +12,7 @@ import ilha, { html } from "ilha";
 import { CircleCheck, Info, TriangleAlert } from "lucide";
 import { Icon } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div
       class="flex flex-wrap items-center gap-3 text-areia-default"
@@ -29,6 +29,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -58,7 +60,11 @@ import ilha, { html } from "ilha";
 import { Info } from "lucide";
 import { Icon } from "areia";
 
-export default ilha.render(() => html`${Icon({ icon: Info })}`);
+const Example = ilha.render(
+  () => html`${Icon({ icon: Info })}`,
+);
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -72,7 +78,7 @@ import ilha, { html } from "ilha";
 import { Info } from "lucide";
 import { Icon } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex items-center gap-3 text-areia-default">
       ${Icon({ icon: Info, class: "size-3" })}
@@ -82,6 +88,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Color
@@ -98,7 +106,7 @@ import {
 } from "lucide";
 import { Icon } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex items-center gap-3">
       ${Icon({
@@ -120,6 +128,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Stroke Width
@@ -131,7 +141,7 @@ import ilha, { html } from "ilha";
 import { Info } from "lucide";
 import { Icon } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex items-center gap-3 text-areia-default">
       ${Icon({ icon: Info, strokeWidth: 1 })}
@@ -140,6 +150,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Accessible Icon
@@ -151,9 +163,11 @@ import ilha, { html } from "ilha";
 import { CircleCheck } from "lucide";
 import { Icon } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`${Icon({ icon: CircleCheck, label: "Success" })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### In a Button
@@ -165,7 +179,7 @@ import ilha, { html } from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({
       variant: "secondary",
@@ -173,6 +187,8 @@ export default ilha.render(
       label: "Create item",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Icon Only Button
@@ -184,7 +200,7 @@ import ilha, { html } from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Button({
       variant: "secondary",
@@ -193,6 +209,8 @@ export default ilha.render(
       "aria-label": "Create item",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

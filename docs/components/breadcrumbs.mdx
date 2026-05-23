@@ -13,7 +13,7 @@ import { Breadcrumbs, Icon } from "areia";
 const homeIcon = Icon({ icon: House });
 const folderIcon = Icon({ icon: Folder });
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
@@ -27,6 +27,8 @@ export default ilha.render(
       ],
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -51,7 +53,7 @@ Pass an `items` array describing the trail. The **last item** is automatically t
 import ilha, { html } from "ilha";
 import { Breadcrumbs } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
@@ -61,6 +63,8 @@ export default ilha.render(
       ],
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -73,7 +77,7 @@ A simple three-level breadcrumb trail.
 import ilha, { html } from "ilha";
 import { Breadcrumbs } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
@@ -83,6 +87,8 @@ export default ilha.render(
       ],
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
@@ -93,7 +99,7 @@ Two sizes are available: `sm` for compact UIs and `base` for the default appeara
 import ilha, { html } from "ilha";
 import { Breadcrumbs } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-col gap-8">
       ${Breadcrumbs({
@@ -115,6 +121,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Icons
@@ -129,7 +137,7 @@ import { Breadcrumbs, Icon } from "areia";
 const homeIcon = Icon({ icon: House });
 const folderIcon = Icon({ icon: Folder });
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
@@ -143,6 +151,8 @@ export default ilha.render(
       ],
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Loading
@@ -156,7 +166,7 @@ import { Breadcrumbs, Icon } from "areia";
 
 const homeIcon = Icon({ icon: House });
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       loading: true,
@@ -167,6 +177,8 @@ export default ilha.render(
       ],
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Clipboard
@@ -177,7 +189,7 @@ Provide a `copyUrl` to show a copy-to-clipboard button that appears on hover. Af
 import ilha, { html } from "ilha";
 import { Breadcrumbs } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
@@ -188,6 +200,8 @@ export default ilha.render(
       copyUrl: "https://example.com/docs/current-page",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Compound Composition
@@ -202,7 +216,7 @@ import {
   BreadcrumbsCurrent,
 } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`<nav
       class="flex items-center gap-1 text-base"
@@ -215,6 +229,8 @@ export default ilha.render(
       ${BreadcrumbsCurrent({ label: "Current Page" })}
     </nav>`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

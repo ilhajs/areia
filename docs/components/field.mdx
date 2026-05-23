@@ -1,0 +1,217 @@
+---
+title: Field
+description: Groups a label, form control, description, and validation message.
+---
+
+Groups a label, form control, description, and validation message. `Field` wires accessible relationships and tracks focused, filled, dirty, touched, valid, and invalid states.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Field, Input } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Field({
+      label: "Email",
+      description: "Use your work email.",
+      children: Input({
+        "data-slot": "field-control",
+        type: "email",
+        name: "email",
+        placeholder: "you@example.com",
+      }),
+    })}`,
+);
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
+```
+
+## Installation
+
+### Barrel
+
+```ts twoslash
+import { Field } from "areia";
+```
+
+### Granular
+
+```ts twoslash
+import { Field } from "areia/components/field";
+```
+
+## Usage
+
+Render a control with `data-slot="field-control"` inside `Field`. The controller associates `Field.Label`, `Field.Description`, and `Field.Error` with the control.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Field, Input } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Field({
+      label: "Username",
+      description: "This will be visible on your profile.",
+      children: Input({
+        "data-slot": "field-control",
+        name: "username",
+        placeholder: "ryuz",
+      }),
+    })}`,
+);
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
+```
+
+## Examples
+
+### Required Field
+
+Native constraint validation is read from the field control.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Field, Input } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Field({
+      label: "Project name",
+      error: "Project name is required.",
+      children: Input({
+        "data-slot": "field-control",
+        name: "project",
+        required: true,
+        placeholder: "My app",
+      }),
+    })}`,
+);
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
+```
+
+### Custom Validation
+
+Return a string from `validate` to mark the field invalid.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Field, Input } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Field({
+      label: "Email",
+      error: "Enter a valid email address.",
+      validationMode: "onBlur",
+      validate: (value) =>
+        value.includes("@")
+          ? null
+          : "Enter a valid email address.",
+      children: Input({
+        "data-slot": "field-control",
+        type: "email",
+        name: "email",
+        placeholder: "you@example.com",
+      }),
+    })}`,
+);
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
+```
+
+### Invalid State
+
+Use `invalid` when validity is controlled by server state or another external source.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Field, Input } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Field({
+      label: "Workspace slug",
+      invalid: true,
+      error: "This slug is already taken.",
+      children: Input({
+        "data-slot": "field-control",
+        name: "slug",
+        value: "areia",
+      }),
+    })}`,
+);
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
+```
+
+### Composed Parts
+
+Use the part helpers when you need a custom layout.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Field, Textarea } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Field.Root({
+      children: html`
+        ${Field.Label({ label: "Description" })}
+        ${Textarea({
+          "data-slot": "field-control",
+          name: "description",
+          placeholder: "Describe your project...",
+        })}
+        <div class="flex items-center justify-between gap-3">
+          ${Field.Description({
+            description: "Keep it concise.",
+          })}
+          ${Field.Error({ error: "Description is required." })}
+        </div>
+      `,
+    })}
+  `,
+);
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
+```
+
+## API
+
+### `Field(input)`
+
+| Prop             | Type                                             | Default      | Description                                 |
+| ---------------- | ------------------------------------------------ | ------------ | ------------------------------------------- |
+| `label`          | `unknown`                                        | —            | Label content.                              |
+| `description`    | `unknown`                                        | —            | Help text associated with the control.      |
+| `error`          | `unknown`                                        | —            | Error text shown when the field is invalid. |
+| `children`       | `unknown`                                        | —            | Field control and custom content.           |
+| `name`           | `string`                                         | control name | Field name.                                 |
+| `disabled`       | `boolean`                                        | `false`      | Disables the field.                         |
+| `invalid`        | `boolean`                                        | `false`      | Forces invalid state.                       |
+| `validationMode` | `"onBlur" \| "onChange" \| "onSubmit"`           | `"onBlur"`   | When validation runs.                       |
+| `validate`       | `(value, control) => string \| string[] \| null` | —            | Custom validator.                           |
+
+## Slots
+
+`Field` uses these data slots:
+
+- `field`
+- `field-label`
+- `field-control`
+- `field-description`
+- `field-error`
+- `field-validity`
+- `field-item`
+
+State attributes are applied to the root and parts:
+
+- `data-disabled`
+- `data-focused`
+- `data-filled`
+- `data-dirty`
+- `data-touched`
+- `data-valid`
+- `data-invalid`

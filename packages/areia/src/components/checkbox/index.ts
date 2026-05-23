@@ -1,0 +1,317 @@
+import ilha, { html, raw } from "ilha";
+import { createCheckbox, type CheckboxOptions } from "../../../../slots/src/checkbox";
+import { cn, safeRandomId } from "$lib/cn";
+import { toAttrs } from "$lib/input";
+import type { HTMLElementProps } from "$lib/types";
+import { Label } from "$components/label";
+
+/** Checkbox variant definitions mapping variant names to their Tailwind classes. */
+export const CHECKBOX_VARIANTS = {
+  variant: {
+    default: {
+      classes: "ring-areia-control-border",
+      description: "Default checkbox appearance",
+    },
+    error: {
+      classes: "ring-areia-destructive",
+      description: "Error state for validation failures",
+    },
+  },
+} as const;
+
+export const CHECKBOX_DEFAULT_VARIANTS = {
+  variant: "default",
+} as const;
+
+export type CheckboxVariant = keyof typeof CHECKBOX_VARIANTS.variant;
+
+export interface CheckboxVariantsProps {
+  /**
+   * Visual variant.
+   * - `"default"` — Standard checkbox appearance
+   * - `"error"` — Error state for validation failures
+   * @default "default"
+   */
+  variant?: CheckboxVariant;
+}
+
+type VariantConfig = Record<string, { classes: string }>;
+type Renderable = unknown;
+
+function render(value: Renderable): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(render).join("");
+  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
+    return value.value;
+  }
+  return String(value);
+}
+
+function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
+  variants: TVariants,
+  value: TKey | undefined,
+  fallback: TKey,
+) {
+  return variants[value ?? fallback] ?? variants[fallback];
+}
+
+export function checkboxVariants({
+  variant = CHECKBOX_DEFAULT_VARIANTS.variant,
+}: CheckboxVariantsProps = {}) {
+  return cn(
+    resolveVariant(CHECKBOX_VARIANTS.variant, variant, CHECKBOX_DEFAULT_VARIANTS.variant).classes,
+  );
+}
+
+function checkIcon() {
+  return html`<svg
+    aria-hidden="true"
+    class="size-3"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M20 6 9 17l-5-5"></path>
+  </svg>`;
+}
+
+function minusIcon() {
+  return html`<svg
+    aria-hidden="true"
+    class="size-3"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M5 12h14"></path>
+  </svg>`;
+}
+
+type InputProps = Omit<HTMLElementProps<HTMLInputElement>, "className" | "type">;
+
+export type CheckboxInput = InputProps &
+  CheckboxVariantsProps &
+  Record<string, unknown> & {
+    /** Label content for the checkbox. */
+    label?: unknown;
+    /** Tooltip text rendered as a native title on the label text. */
+    labelTooltip?: string;
+    /** When true, checkbox appears before label. When false, label appears before checkbox. */
+    controlFirst?: boolean;
+    /** Whether the checkbox is checked. */
+    checked?: boolean;
+    /** Whether the checkbox is in an indeterminate visual state. */
+    indeterminate?: boolean;
+    /** Additional CSS classes applied to the checkbox control. */
+    class?: string;
+    className?: string;
+  };
+
+function checkboxDataAttrs(
+  input: Pick<
+    CheckboxInput,
+    "checked" | "disabled" | "indeterminate" | "required" | "name" | "value"
+  > & { defaultChecked?: boolean; readOnly?: boolean; uncheckedValue?: string },
+) {
+  return toAttrs({
+    "data-default-checked": input.checked ?? input.defaultChecked,
+    "data-disabled": input.disabled,
+    "data-indeterminate": input.indeterminate,
+    "data-required": input.required,
+    "data-read-only": input.readOnly,
+    "data-name": input.name,
+    "data-value": input.value,
+    "data-unchecked-value": input.uncheckedValue,
+  });
+}
+
+function checkboxControl(input: CheckboxInput) {
+  const {
+    class: className,
+    className: aliasedClassName,
+    checked,
+    disabled,
+    indeterminate,
+    variant = CHECKBOX_DEFAULT_VARIANTS.variant,
+    ...rest
+  } = input;
+
+  return html`<span
+    data-slot="checkbox"
+    class="${cn(
+      "relative inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-sm border-0 bg-areia-control-background ring outline-none",
+      "data-checked:bg-areia-foreground data-checked:ring-areia-foreground data-indeterminate:bg-areia-foreground data-indeterminate:ring-areia-foreground",
+      "focus-visible:ring-2 focus-visible:ring-areia-ring",
+      "data-disabled:cursor-not-allowed data-disabled:opacity-50 data-readonly:cursor-default",
+      checkboxVariants({ variant }),
+      className,
+      aliasedClassName,
+    )}"
+    ${raw(checkboxDataAttrs({ ...rest, checked, disabled, indeterminate }))}
+    ${raw(
+      toAttrs({
+        ...rest,
+        role: rest.role ?? "checkbox",
+        tabindex: rest.tabindex ?? rest.tabIndex ?? 0,
+        "aria-checked": indeterminate ? "mixed" : checked ? "true" : "false",
+        "aria-disabled": disabled ? "true" : undefined,
+      }),
+    )}
+  >
+    <span
+      data-slot="checkbox-indicator"
+      class="pointer-events-none absolute inset-0 flex items-center justify-center text-areia-inverse"
+    >
+      ${indeterminate ? minusIcon() : checkIcon()}
+    </span>
+  </span>`;
+}
+
+/** Single checkbox with an optional built-in label wrapper. */
+function renderCheckbox(input: CheckboxInput = {}) {
+  const { label, labelTooltip, controlFirst = true, required, disabled, ...rest } = input;
+  const controlId = typeof rest.id === "string" ? rest.id : safeRandomId();
+  const control = checkboxControl({ ...rest, id: controlId, disabled, required });
+
+  if (label == null) return control;
+
+  return html`<span
+    class="${cn(
+      "inline-flex items-center gap-2 text-base text-areia-default",
+      controlFirst ? "flex-row" : "flex-row-reverse justify-end",
+      disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+    )}"
+  >
+    ${control}
+    ${Label({
+      for: controlId,
+      label,
+      showOptional: required === false,
+      tooltip: labelTooltip,
+      class: disabled ? "cursor-not-allowed" : "cursor-pointer",
+    })}
+  </span>`;
+}
+
+export type CheckboxItemInput = CheckboxInput & {
+  /** Value of the checkbox when used in a group. */
+  value?: string;
+};
+
+/** Individual checkbox item intended for use inside a checkbox group. */
+export function CheckboxItem(input: CheckboxItemInput = {}) {
+  return Checkbox(input);
+}
+
+export interface CheckboxLegendInput {
+  label: unknown;
+  class?: string;
+  className?: string;
+}
+
+/** Styled legend for checkbox groups. */
+export function CheckboxLegend({
+  label,
+  class: className,
+  className: aliasedClassName,
+}: CheckboxLegendInput) {
+  return html`<legend
+    class="${cn("text-base font-medium text-areia-default", className, aliasedClassName)}"
+  >
+    ${label}
+  </legend>`;
+}
+
+export type CheckboxGroupInput = Omit<
+  HTMLElementProps<HTMLFieldSetElement>,
+  "children" | "className"
+> &
+  Record<string, unknown> & {
+    /** Legend text for the group. */
+    legend?: unknown;
+    /** Checkbox item markup. Prefer passing children as the second `Checkbox.Group` argument. */
+    children?: unknown;
+    /** Error message for the group. */
+    error?: unknown;
+    /** Helper text for the group. */
+    description?: unknown;
+    /** Whether all checkboxes in the group are disabled. */
+    disabled?: boolean;
+    /** Additional CSS classes. */
+    class?: string;
+    className?: string;
+  };
+
+type CheckboxGroupChild = unknown;
+
+/** Fieldset wrapper for related checkbox controls. */
+export function CheckboxGroup(children: CheckboxGroupChild[]): ReturnType<typeof html>;
+export function CheckboxGroup(
+  input?: CheckboxGroupInput,
+  children?: CheckboxGroupChild[],
+): ReturnType<typeof html>;
+export function CheckboxGroup(
+  inputOrChildren: CheckboxGroupInput | CheckboxGroupChild[] = {},
+  children?: CheckboxGroupChild[],
+) {
+  const input = Array.isArray(inputOrChildren) ? {} : inputOrChildren;
+  const {
+    legend,
+    children: inputChildren,
+    error,
+    description,
+    disabled,
+    class: className,
+    className: aliasedClassName,
+    ...rest
+  } = input;
+  const content = Array.isArray(inputOrChildren) ? inputOrChildren : (children ?? inputChildren);
+
+  return html`<fieldset
+    class="${cn("flex flex-col gap-4", className, aliasedClassName)}"
+    ${raw(toAttrs({ ...rest, disabled }))}
+  >
+    ${legend != null ? CheckboxLegend({ label: legend }) : ""}
+    <div class="flex flex-col gap-2">${raw(render(content))}</div>
+    ${error != null
+      ? html`<p class="text-sm text-areia-destructive-soft-foreground">${error}</p>`
+      : ""}
+    ${description != null ? html`<p class="text-sm text-areia-subtle">${description}</p>` : ""}
+  </fieldset>`;
+}
+
+export const CheckboxRoot = ilha
+  .input<CheckboxInput>()
+  .onMount(({ host, input }) => {
+    const root = host.matches('[data-slot="checkbox"]')
+      ? host
+      : host.querySelector('[data-slot="checkbox"]');
+    if (!root) return;
+
+    const controller = createCheckbox(root, {
+      defaultChecked: typeof input.checked === "boolean" ? input.checked : undefined,
+      indeterminate: typeof input.indeterminate === "boolean" ? input.indeterminate : undefined,
+      disabled: typeof input.disabled === "boolean" ? input.disabled : undefined,
+      required: typeof input.required === "boolean" ? input.required : undefined,
+      name: typeof input.name === "string" ? input.name : undefined,
+      value: typeof input.value === "string" ? input.value : undefined,
+    } satisfies CheckboxOptions);
+
+    return () => controller.destroy();
+  })
+  .render(({ input }) => renderCheckbox(input));
+
+export const Checkbox = Object.assign(CheckboxRoot, {
+  Root: CheckboxRoot,
+  Static: renderCheckbox,
+  Control: checkboxControl,
+  Item: CheckboxItem,
+  Group: CheckboxGroup,
+  Legend: CheckboxLegend,
+});

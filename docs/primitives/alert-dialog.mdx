@@ -1,0 +1,231 @@
+---
+title: Alert Dialog
+description: A modal dialog that interrupts the user with an urgent message and expects acknowledgment.
+---
+
+A modal that overlays the page and traps focus within a confirmation flow. It's semantically distinct from a regular dialog — use it for destructive actions, critical confirmations, or any flow that demands explicit user acknowledgment before proceeding.
+
+```ts preview twoslash
+import { AlertDialog } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <div data-slot="alert-dialog">
+    <button data-slot="alert-dialog-trigger" class="win95-button">
+      Delete project
+    </button>
+    <div data-slot="alert-dialog-portal">
+      <div
+        data-slot="alert-dialog-overlay"
+        class="fixed inset-0 bg-black/40"
+      ></div>
+      <div
+        data-slot="alert-dialog-content"
+        class="win95-window fixed left-1/2 top-1/2 w-96 -translate-x-1/2 -translate-y-1/2"
+      >
+        <div data-slot="alert-dialog-header">
+          <h2 data-slot="alert-dialog-title" class="win95-titlebar">
+            Delete project?
+          </h2>
+          <p data-slot="alert-dialog-description" class="mb-3">
+            This action cannot be undone. The project and all related data will be
+            permanently deleted.
+          </p>
+        </div>
+        <div data-slot="alert-dialog-footer" class="flex justify-end gap-2">
+          <button data-slot="alert-dialog-cancel" class="win95-button">
+            Cancel
+          </button>
+          <button data-slot="alert-dialog-action" class="win95-button">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+const root = document.querySelector(
+  '[data-slot="alert-dialog"]',
+)!;
+const controller = AlertDialog.createAlertDialog(root, {
+  closeOnEscape: true,
+  lockScroll: true,
+});
+controller.open();
+```
+
+## Installation
+
+### Package
+
+```ts twoslash
+import { AlertDialog } from "@areia/slots";
+```
+
+## Usage
+
+```ts
+import { AlertDialog } from "@areia/slots";
+
+// Auto-bind a single root
+const root = document.querySelector(
+  '[data-slot="alert-dialog"]',
+)!;
+const dialog = AlertDialog.createAlertDialog(root, {
+  lockScroll: true,
+});
+
+// Listen for state changes
+root.addEventListener("alert-dialog:change", (e) => {
+  console.log(e.detail.open);
+});
+
+// Open imperatively from application code
+dialog.open();
+
+// Auto-bind all unbound roots in scope
+const controllers = AlertDialog.create();
+```
+
+## Expected Markup
+
+The alert dialog requires both `alert-dialog-overlay` and `alert-dialog-content` slots. Optional structural slots (`alert-dialog-header`, `alert-dialog-media`, `alert-dialog-footer`) help organize the layout. Cancel and action buttons are wired through click delegation on their respective `data-slot` attributes.
+
+```html
+<div data-slot="alert-dialog">
+  <button data-slot="alert-dialog-trigger">
+    Delete project
+  </button>
+
+  <div data-slot="alert-dialog-portal">
+    <div data-slot="alert-dialog-overlay"></div>
+
+    <div data-slot="alert-dialog-content">
+      <div data-slot="alert-dialog-header">
+        <div data-slot="alert-dialog-media">!</div>
+        <h2 data-slot="alert-dialog-title">Delete project?</h2>
+        <p data-slot="alert-dialog-description">
+          This action cannot be undone. The project and all
+          related data will be permanently deleted.
+        </p>
+      </div>
+
+      <div data-slot="alert-dialog-footer">
+        <button data-slot="alert-dialog-cancel">Cancel</button>
+        <button data-slot="alert-dialog-action">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### Data Slots
+
+| Slot                       | Required | Description                                                                              |
+| -------------------------- | -------- | ---------------------------------------------------------------------------------------- |
+| `alert-dialog`             | Yes      | Root container.                                                                          |
+| `alert-dialog-trigger`     | No       | Element that opens the dialog on click.                                                  |
+| `alert-dialog-portal`      | No       | Container moved to `document.body` when open. Without it, overlay/content stay in place. |
+| `alert-dialog-overlay`     | **Yes**  | Backdrop behind the content. Throws if missing.                                          |
+| `alert-dialog-content`     | **Yes**  | The dialog panel itself. Throws if missing.                                              |
+| `alert-dialog-title`       | No       | Heading element linked via `aria-labelledby`.                                            |
+| `alert-dialog-description` | No       | Body text linked via `aria-describedby`.                                                 |
+| `alert-dialog-header`      | No       | Groups media, title, and description.                                                    |
+| `alert-dialog-media`       | No       | Icon or illustration at the top of the header.                                           |
+| `alert-dialog-footer`      | No       | Groups action buttons.                                                                   |
+| `alert-dialog-cancel`      | No       | Button that closes the dialog when clicked. Click is delegated on content.               |
+| `alert-dialog-action`      | No       | Button for the primary action (does NOT close the dialog automatically).                 |
+
+### Generated Attributes
+
+| Attribute          | Element(s)                                                                          | Description                                |
+| ------------------ | ----------------------------------------------------------------------------------- | ------------------------------------------ |
+| `data-state`       | Root, portal, overlay, content                                                      | `"open"` or `"closed"`.                    |
+| `data-open`        | Root, portal, overlay, content                                                      | Present when the dialog is open.           |
+| `data-closed`      | Root, portal, overlay, content                                                      | Present when the dialog is closed.         |
+| `data-stack-index` | `alert-dialog-content`                                                              | Stack order when multiple modals are open. |
+| `role`             | `alert-dialog-content` (`"alertdialog"`), `alert-dialog-overlay` (`"presentation"`) | ARIA roles.                                |
+
+## Events
+
+### Outbound
+
+| Event                 | Detail              | Description                                    |
+| --------------------- | ------------------- | ---------------------------------------------- |
+| `alert-dialog:change` | `{ open: boolean }` | Fired on the root when the open state changes. |
+
+### Inbound
+
+| Event              | Detail              | Description                                       |
+| ------------------ | ------------------- | ------------------------------------------------- |
+| `alert-dialog:set` | `{ open: boolean }` | Dispatch on the root to open or close the dialog. |
+
+## API Reference
+
+### Options
+
+| Option                | Type                      | Default | Description                                                                         |
+| --------------------- | ------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `defaultOpen`         | `boolean`                 | `false` | Initial open state.                                                                 |
+| `onOpenChange`        | `(open: boolean) => void` | —       | Called when the open state changes.                                                 |
+| `closeOnClickOutside` | `boolean`                 | `false` | Close when clicking the overlay. Unlike a regular dialog, this defaults to `false`. |
+| `closeOnEscape`       | `boolean`                 | `true`  | Close when pressing Escape.                                                         |
+| `lockScroll`          | `boolean`                 | `true`  | Lock body scroll while the dialog is open.                                          |
+
+### Controller
+
+| Member      | Type               | Description                                                |
+| ----------- | ------------------ | ---------------------------------------------------------- |
+| `open()`    | `() => void`       | Open the alert dialog.                                     |
+| `close()`   | `() => void`       | Close the alert dialog.                                    |
+| `toggle()`  | `() => void`       | Toggle between open and closed.                            |
+| `isOpen`    | `boolean` (getter) | Current open state.                                        |
+| `destroy()` | `() => void`       | Remove all listeners, restore scroll, and clean up portal. |
+
+## Controller
+
+The controller is returned by `AlertDialog.createAlertDialog()` and provides imperative open/close control.
+
+```ts
+const dialog = AlertDialog.createAlertDialog(root, {
+  lockScroll: true,
+});
+
+// Open programmatically
+dialog.open();
+
+// Check if open
+console.log(dialog.isOpen); // true
+
+// Close programmatically
+dialog.close();
+
+// Toggle
+dialog.toggle();
+
+// Clean up
+dialog.destroy();
+```
+
+### Cancel and Action Buttons
+
+The controller delegates click handling on the content slot:
+
+- Clicking any element with `data-slot="alert-dialog-cancel"` inside the content closes the dialog.
+- Clicking any element with `data-slot="alert-dialog-action"` does **not** close the dialog — the application is responsible for handling the action and calling `dialog.close()` when done.
+
+### Focus Management
+
+On open, focus moves to the first focusable element inside the content (respecting `autofocus`). Tab is trapped within the content. On close, focus returns to the previously active element or the trigger.
+
+### Modal Stack
+
+Multiple alert dialogs (and regular dialogs) share a modal stack. The top-most dialog receives focus, and `data-stack-index` reflects the z-order so that overlays and panels can be styled accordingly.
+
+```css
+[data-slot="alert-dialog-overlay"] {
+  z-index: calc(
+    50 + var(--alert-dialog-overlay-stack-index, 0)
+  );
+}
+```

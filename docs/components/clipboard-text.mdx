@@ -9,15 +9,17 @@ Displays read-only text with a one-click copy action.
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${ClipboardText.Root({
+    ${ClipboardText({
       text: "npm install areia",
       tooltip: true,
       class: "w-80",
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -36,20 +38,22 @@ import { ClipboardText } from "areia/components/clipboard-text";
 
 ## Usage
 
-Use `ClipboardText.Root` when the copy button should be interactive.
+Use `ClipboardText` when the copy button should be interactive.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${ClipboardText.Root({
+    ${ClipboardText({
       text: "0c239dd2-92b4-4b68-bf35-8d6e1c5c12fd",
       class: "w-96",
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -62,9 +66,9 @@ Display a shortened value while copying the full value with `textToCopy`.
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${ClipboardText.Root({
+    ${ClipboardText({
       text: "sk_live_••••••••••••abc123",
       textToCopy: "sk_live_abc123-full-secret-value",
       class: "w-80",
@@ -75,6 +79,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
@@ -83,24 +89,26 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="grid w-96 gap-3">
-      ${ClipboardText.Root({
+      ${ClipboardText({
         text: "Small clipboard text",
         size: "sm",
       })}
-      ${ClipboardText.Root({
+      ${ClipboardText({
         text: "Default clipboard text",
         size: "base",
       })}
-      ${ClipboardText.Root({
+      ${ClipboardText({
         text: "Large clipboard text",
         size: "lg",
       })}
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Tooltip
@@ -111,9 +119,9 @@ Pass `tooltip: true` for the default tooltip, or configure the tooltip text, cop
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${ClipboardText.Root({
+    ${ClipboardText({
       text: "https://example.com/invite/areia",
       class: "w-96",
       tooltip: {
@@ -124,6 +132,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Labels
@@ -134,9 +144,9 @@ Customize the copy button label for localization.
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${ClipboardText.Root({
+    ${ClipboardText({
       text: "areia-token-123",
       labels: {
         copyAction: "Copiar para a área de transferência",
@@ -144,11 +154,13 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference
 
-### `ClipboardText.Root`
+### `ClipboardText`
 
 | Prop                | Type                              | Default               | Description                                 |
 | ------------------- | --------------------------------- | --------------------- | ------------------------------------------- |
@@ -161,4 +173,4 @@ export default ilha.render(
 
 ### Static render
 
-`ClipboardText(...)` renders the same markup without mounting the clipboard behavior. Prefer `ClipboardText.Root(...)` for interactive usage.
+`ClipboardText.Static(...)` renders the same markup without mounting clipboard behavior. Prefer `ClipboardText(...)` for interactive usage.

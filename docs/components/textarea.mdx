@@ -3,13 +3,13 @@ title: Textarea
 description: A multi-line text input for longer content with built-in label, description, and error support.
 ---
 
-A multi-line text input for longer content with built-in label, description, and error support. Supports vertical resizing by default.
+A styled multi-line text input for longer content. When you pass `label`, `description`, or `error`, `Textarea` delegates to `Field` for accessible labeling, descriptions, validation messaging, and field state attributes. Supports vertical resizing by default.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       label: "Bio",
@@ -19,6 +19,8 @@ export default ilha.render(
       rows: 4,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -39,13 +41,13 @@ import { Textarea } from "areia/components/textarea";
 
 ### With Built-in Field
 
-Use the `label` prop to enable the built-in field wrapper with label, description, and error support.
+Use the `label` prop to enable the `Field` wrapper with label, description, and error support.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       id: "notes",
@@ -56,17 +58,19 @@ export default ilha.render(
       rows: 3,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Bare Textarea
 
-For custom form layouts, use `Textarea` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility.
+For custom form layouts, use `Textarea` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility. Use `Textarea.Static(...)` when composing a raw textarea inside `Field` manually.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       "aria-label": "Message",
@@ -74,19 +78,21 @@ export default ilha.render(
       rows: 4,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
 
 ### With Label and Description
 
-The `label` prop enables the built-in field wrapper with automatic vertical layout.
+The `label` prop enables the `Field` wrapper with automatic vertical layout.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       id: "bio",
@@ -97,6 +103,8 @@ export default ilha.render(
       rows: 4,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Error
@@ -107,7 +115,7 @@ Pass `error` as a string for simple error messages. Error styling is automatical
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       id: "message-error",
@@ -118,6 +126,8 @@ export default ilha.render(
       error: "Message must be less than 500 characters.",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Validation Object
@@ -128,7 +138,7 @@ Pass `error` as an object with a `message` property when you want to keep valida
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       id: "comment",
@@ -141,6 +151,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
@@ -151,7 +163,7 @@ Four sizes are available: `xs`, `sm`, `base`, and `lg`. Sizes control text size,
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-3">
       ${Textarea({
@@ -181,6 +193,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Row Count
@@ -191,7 +205,7 @@ Use the `rows` prop to control the initial visible height before the content gro
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-3">
       ${Textarea({
@@ -207,6 +221,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
@@ -215,7 +231,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       label: "Notes",
@@ -223,6 +239,8 @@ export default ilha.render(
       disabled: true,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Optional Field
@@ -233,7 +251,7 @@ Set `required: false` to show optional text after the label.
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       id: "comments",
@@ -243,6 +261,8 @@ export default ilha.render(
       rows: 3,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Label Tooltip
@@ -253,7 +273,7 @@ Use `labelTooltip` to add additional context via a native `title` attribute on t
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       id: "release-notes",
@@ -264,6 +284,8 @@ export default ilha.render(
       rows: 4,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Rich Label
@@ -274,7 +296,7 @@ The `label` prop accepts Ilha markup for richer formatting.
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       id: "review-notes",
@@ -284,6 +306,8 @@ export default ilha.render(
       rows: 3,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Bare Textarea with Error
@@ -294,7 +318,7 @@ Error messages and descriptions can render without a visible label. Use `aria-la
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Textarea({
       id: "feedback-error",
@@ -305,6 +329,8 @@ export default ilha.render(
       error: "Feedback is currently unavailable.",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Resize Behavior
@@ -315,7 +341,7 @@ The textarea defaults to vertical-only resize (`resize-vertical`). Override it b
 import ilha, { html } from "ilha";
 import { Textarea } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-3">
       ${Textarea({
@@ -338,6 +364,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

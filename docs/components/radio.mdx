@@ -11,7 +11,7 @@ Areia's `Radio` uses DOM primitives: native radio inputs, labels, fieldsets, and
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -39,6 +39,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -61,7 +63,7 @@ import { Radio } from "areia/components/radio";
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -84,6 +86,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -96,7 +100,7 @@ Radio groups display vertically by default. Each radio has a label displayed to 
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -124,6 +128,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Horizontal
@@ -134,7 +140,7 @@ Use `orientation: "horizontal"` for inline layouts. Items wrap when there is not
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -163,6 +169,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Description
@@ -173,7 +181,7 @@ Add helper text below the radio items using the `description` prop.
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -198,6 +206,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Control Position
@@ -208,7 +218,7 @@ Use `controlPosition: "end"` to place labels before radio buttons.
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -234,6 +244,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Radio Card
@@ -244,7 +256,7 @@ Use `appearance: "card"` on the group and items to display each option as a sele
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -281,6 +293,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Radio Card Control on the Left
@@ -291,7 +305,7 @@ Use `controlPosition: "start"` on card radio items to place the radio control on
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -322,6 +336,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Rich Label Content
@@ -332,7 +348,7 @@ The `label` prop on `Radio.Item` accepts Ilha markup, so you can embed badges or
 import ilha, { html } from "ilha";
 import { Badge, Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -372,6 +388,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Radio Card Horizontal
@@ -382,7 +400,7 @@ Combine `appearance: "card"` with `orientation: "horizontal"` for a side-by-side
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -415,6 +433,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Error
@@ -425,7 +445,7 @@ Show validation errors at the group level using the `error` prop.
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group(
       {
@@ -449,6 +469,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
@@ -459,7 +481,7 @@ Disable the entire group or individual items.
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-col gap-6">
       ${Radio.Group(
@@ -509,6 +531,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Visually Hidden Legend
@@ -519,7 +543,7 @@ Use `Radio.Legend` with `class: "sr-only"` to keep the legend accessible to scre
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex flex-col gap-3">
       <p class="text-base font-medium text-areia-default">
@@ -542,6 +566,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Legend Styling
@@ -552,7 +578,7 @@ Use `Radio.Legend` when you need custom typography, colors, or layout instead of
 import ilha, { html } from "ilha";
 import { Radio } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Radio.Group([
       Radio.Legend({
@@ -573,6 +599,8 @@ export default ilha.render(
       }),
     ])}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

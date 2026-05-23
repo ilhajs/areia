@@ -11,7 +11,7 @@ Areia's `Select` uses the platform `<select>` primitive, so it keeps native keyb
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       id: "fruit",
@@ -24,6 +24,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -46,7 +48,7 @@ import { Select } from "areia/components/select";
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       id: "plan",
@@ -59,6 +61,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -71,7 +75,7 @@ A select with a visible label. When you provide the `label` prop, the select ren
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       id: "basic-fruit",
@@ -84,6 +88,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
@@ -100,7 +106,7 @@ const items = {
   cherry: "Cherry",
 };
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-3">
       ${Select({
@@ -130,6 +136,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Without Visible Label
@@ -140,7 +148,7 @@ When a visible label is not needed, use `aria-label` for accessibility.
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       "aria-label": "Select fruit",
@@ -152,6 +160,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Description and Error
@@ -162,7 +172,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       id: "issue-type",
@@ -178,6 +188,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Placeholder
@@ -188,7 +200,7 @@ Use the `placeholder` prop to render a placeholder option before the selectable 
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       id: "priority",
@@ -202,6 +214,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Label with Tooltip
@@ -212,7 +226,7 @@ Use `labelTooltip` to add additional context via a native `title` attribute on t
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       id: "severity",
@@ -228,6 +242,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
@@ -236,7 +252,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       label: "Fruit",
@@ -249,6 +265,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Multiple Selection
@@ -259,7 +277,7 @@ Enable native multiple selection with the `multiple` prop. The select becomes a 
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       id: "columns",
@@ -277,6 +295,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled Options
@@ -287,7 +307,7 @@ Options can be disabled with descriptor objects in the `items` prop.
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       id: "plan-disabled",
@@ -301,6 +321,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Options as Children
@@ -311,7 +333,7 @@ Use `Select.Option` when you want explicit control over individual option markup
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select(
       {
@@ -326,6 +348,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Grouped Options
@@ -336,7 +360,7 @@ Use `Select.Group` to organize related options under native `optgroup` labels.
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select(
       {
@@ -356,6 +380,8 @@ export default ilha.render(
       ],
     )}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Ghost Variant
@@ -366,7 +392,7 @@ Use `variant: "ghost"` for compact UIs where the select should blend into the su
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Select({
       variant: "ghost",
@@ -379,6 +405,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

@@ -1,0 +1,946 @@
+import { describe, expect, it } from "bun:test";
+import { createTabs, create } from "./index";
+import { clearRootBinding, setRootBinding } from "../core";
+
+describe("Tabs", () => {
+  const ROOT_BINDING_KEY = "@areia/slots:Tabs";
+
+  const waitForFrame = () =>
+    new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+
+  const setup = (defaultValue?: string) => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+          <button data-slot="tabs-trigger" data-value="two">Tab Two</button>
+          <button data-slot="tabs-trigger" data-value="three">Tab Three</button>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+        <div data-slot="tabs-content" data-value="two">Content Two</div>
+        <div data-slot="tabs-content" data-value="three">Content Three</div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    const list = document.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+    const triggers = [...document.querySelectorAll('[data-slot="tabs-trigger"]')] as HTMLElement[];
+    const panels = [...document.querySelectorAll('[data-slot="tabs-content"]')] as HTMLElement[];
+    const controller = createTabs(root, { defaultValue });
+
+    return { root, list, triggers, panels, controller };
+  };
+
+  it("initializes with first tab selected by default", () => {
+    const { triggers, panels, controller } = setup();
+
+    expect(controller.value).toBe("one");
+    expect(triggers[0]?.getAttribute("aria-selected")).toBe("true");
+    expect(triggers[1]?.getAttribute("aria-selected")).toBe("false");
+    expect(panels[0]?.hidden).toBe(false);
+    expect(panels[1]?.hidden).toBe(true);
+
+    controller.destroy();
+  });
+
+  it("initializes with specified defaultValue", () => {
+    const { triggers, panels, controller } = setup("two");
+
+    expect(controller.value).toBe("two");
+    expect(triggers[0]?.getAttribute("aria-selected")).toBe("false");
+    expect(triggers[1]?.getAttribute("aria-selected")).toBe("true");
+    expect(panels[0]?.hidden).toBe(true);
+    expect(panels[1]?.hidden).toBe(false);
+
+    controller.destroy();
+  });
+
+  it("reads defaultValue from data-default-value attribute", () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root" data-default-value="two">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+          <button data-slot="tabs-trigger" data-value="two">Tab Two</button>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+        <div data-slot="tabs-content" data-value="two">Content Two</div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    const controller = createTabs(root);
+
+    expect(controller.value).toBe("two");
+
+    const panels = document.querySelectorAll('[data-slot="tabs-content"]');
+    expect((panels[0] as HTMLElement).hidden).toBe(true);
+    expect((panels[1] as HTMLElement).hidden).toBe(false);
+
+    controller.destroy();
+  });
+
+  it("selects tab on trigger click", () => {
+    const { triggers, panels, controller } = setup();
+
+    triggers[1]?.click();
+    expect(controller.value).toBe("two");
+    expect(panels[0]?.hidden).toBe(true);
+    expect(panels[1]?.hidden).toBe(false);
+
+    controller.destroy();
+  });
+
+  it("sets correct ARIA roles", () => {
+    const { list, triggers, panels, controller } = setup();
+
+    expect(list.getAttribute("role")).toBe("tablist");
+    expect(triggers[0]?.getAttribute("role")).toBe("tab");
+    expect(panels[0]?.getAttribute("role")).toBe("tabpanel");
+
+    controller.destroy();
+  });
+
+  it("keeps indicator position stable when list scrolls", () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+          <button data-slot="tabs-trigger" data-value="two">Tab Two</button>
+          <div data-slot="tabs-indicator"></div>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+        <div data-slot="tabs-content" data-value="two">Content Two</div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+    const trigger = root.querySelector('[data-slot="tabs-trigger"]') as HTMLElement;
+    const indicator = root.querySelector('[data-slot="tabs-indicator"]') as HTMLElement;
+
+    let listLeft = 100;
+    let triggerLeft = 130;
+    list.getBoundingClientRect = () =>
+      ({
+        left: listLeft,
+        top: 0,
+        width: 300,
+        height: 40,
+        right: 0,
+        bottom: 0,
+        x: 0,
+        y: 0,
+        toJSON() {},
+      }) as DOMRect;
+    trigger.getBoundingClientRect = () =>
+      ({
+        left: triggerLeft,
+        top: 0,
+        width: 60,
+        height: 32,
+        right: 0,
+        bottom: 0,
+        x: 0,
+        y: 0,
+        toJSON() {},
+      }) as DOMRect;
+
+    Object.defineProperty(list, "clientLeft", { value: 0 });
+    Object.defineProperty(list, "clientTop", { value: 0 });
+
+    const controller = createTabs(root);
+
+    list.scrollLeft = 0;
+    controller.updateIndicator();
+    const initialLeft = indicator.style.getPropertyValue("--active-tab-left");
+
+    list.scrollLeft = 20;
+    triggerLeft = 110;
+    controller.updateIndicator();
+    const scrolledLeft = indicator.style.getPropertyValue("--active-tab-left");
+
+    expect(scrolledLeft).toBe(initialLeft);
+
+    controller.destroy();
+  });
+
+  it("does not throw when indicator geometry is unavailable and resets indicator vars", async () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+          <div data-slot="tabs-indicator"></div>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+    const trigger = root.querySelector('[data-slot="tabs-trigger"]') as HTMLElement;
+    const indicator = root.querySelector('[data-slot="tabs-indicator"]') as HTMLElement;
+
+    list.getBoundingClientRect = () =>
+      ({
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        right: 0,
+        bottom: 0,
+        x: 0,
+        y: 0,
+        toJSON() {},
+      }) as DOMRect;
+    trigger.getBoundingClientRect = () =>
+      ({
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        right: 0,
+        bottom: 0,
+        x: 0,
+        y: 0,
+        toJSON() {},
+      }) as DOMRect;
+
+    Object.defineProperty(trigger, "offsetParent", {
+      configurable: true,
+      get: () => null,
+    });
+    Object.defineProperty(trigger, "offsetWidth", {
+      configurable: true,
+      get: () => 0,
+    });
+    Object.defineProperty(trigger, "offsetHeight", {
+      configurable: true,
+      get: () => 0,
+    });
+
+    const controller = createTabs(root);
+
+    expect(() => controller.updateIndicator()).not.toThrow();
+    await waitForFrame();
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("0px");
+    expect(indicator.style.getPropertyValue("--active-tab-top")).toBe("0px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("0px");
+    expect(indicator.style.getPropertyValue("--active-tab-height")).toBe("0px");
+
+    controller.destroy();
+  });
+
+  it("recovers indicator position once geometry becomes available", () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+          <div data-slot="tabs-indicator"></div>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+    const trigger = root.querySelector('[data-slot="tabs-trigger"]') as HTMLElement;
+    const indicator = root.querySelector('[data-slot="tabs-indicator"]') as HTMLElement;
+
+    let geometryAvailable = false;
+    list.getBoundingClientRect = () =>
+      geometryAvailable
+        ? ({
+            left: 100,
+            top: 40,
+            width: 300,
+            height: 80,
+            right: 400,
+            bottom: 120,
+            x: 100,
+            y: 40,
+            toJSON() {},
+          } as DOMRect)
+        : ({
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0,
+            right: 0,
+            bottom: 0,
+            x: 0,
+            y: 0,
+            toJSON() {},
+          } as DOMRect);
+    trigger.getBoundingClientRect = () =>
+      geometryAvailable
+        ? ({
+            left: 160,
+            top: 52,
+            width: 120,
+            height: 64,
+            right: 280,
+            bottom: 116,
+            x: 160,
+            y: 52,
+            toJSON() {},
+          } as DOMRect)
+        : ({
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0,
+            right: 0,
+            bottom: 0,
+            x: 0,
+            y: 0,
+            toJSON() {},
+          } as DOMRect);
+
+    Object.defineProperty(trigger, "offsetParent", {
+      configurable: true,
+      get: () => (geometryAvailable ? list : null),
+    });
+    Object.defineProperty(trigger, "offsetLeft", {
+      configurable: true,
+      get: () => 30,
+    });
+    Object.defineProperty(trigger, "offsetTop", {
+      configurable: true,
+      get: () => 6,
+    });
+    Object.defineProperty(trigger, "offsetWidth", {
+      configurable: true,
+      get: () => (geometryAvailable ? 60 : 0),
+    });
+    Object.defineProperty(trigger, "offsetHeight", {
+      configurable: true,
+      get: () => (geometryAvailable ? 32 : 0),
+    });
+
+    const controller = createTabs(root);
+    controller.updateIndicator();
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("0px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("0px");
+
+    geometryAvailable = true;
+    controller.updateIndicator();
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("30px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("60px");
+    expect(indicator.style.getPropertyValue("--active-tab-top")).toBe("6px");
+    expect(indicator.style.getPropertyValue("--active-tab-height")).toBe("32px");
+
+    controller.destroy();
+  });
+
+  it("defers automatic indicator updates until the next animation frame", async () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+          <button data-slot="tabs-trigger" data-value="two">Tab Two</button>
+          <div data-slot="tabs-indicator"></div>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+        <div data-slot="tabs-content" data-value="two">Content Two</div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+    const triggers = [...root.querySelectorAll('[data-slot="tabs-trigger"]')] as HTMLElement[];
+    const indicator = root.querySelector('[data-slot="tabs-indicator"]') as HTMLElement;
+
+    const setTriggerBox = (el: HTMLElement, left: number, width: number) => {
+      Object.defineProperty(el, "offsetParent", {
+        configurable: true,
+        get: () => list,
+      });
+      Object.defineProperty(el, "offsetLeft", {
+        configurable: true,
+        get: () => left,
+      });
+      Object.defineProperty(el, "offsetTop", {
+        configurable: true,
+        get: () => 4,
+      });
+      Object.defineProperty(el, "offsetWidth", {
+        configurable: true,
+        get: () => width,
+      });
+      Object.defineProperty(el, "offsetHeight", {
+        configurable: true,
+        get: () => 28,
+      });
+    };
+
+    setTriggerBox(triggers[0]!, 12, 48);
+    setTriggerBox(triggers[1]!, 80, 60);
+
+    const controller = createTabs(root);
+    controller.updateIndicator();
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("12px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("48px");
+
+    controller.select("two");
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("12px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("48px");
+
+    await waitForFrame();
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("80px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("60px");
+
+    controller.destroy();
+  });
+
+  it("uses list-relative layout geometry for the indicator inside transformed containers", () => {
+    document.body.innerHTML = `
+      <div data-slot="dialog-content" id="dialog">
+        <div data-slot="tabs" id="root">
+          <div data-slot="tabs-list">
+            <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+            <button data-slot="tabs-trigger" data-value="two">Tab Two</button>
+            <div data-slot="tabs-indicator"></div>
+          </div>
+          <div data-slot="tabs-content" data-value="one">Content One</div>
+          <div data-slot="tabs-content" data-value="two">Content Two</div>
+        </div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+    const trigger = root.querySelector('[data-slot="tabs-trigger"]') as HTMLElement;
+    const indicator = root.querySelector('[data-slot="tabs-indicator"]') as HTMLElement;
+
+    list.getBoundingClientRect = () =>
+      ({
+        left: 100,
+        top: 40,
+        width: 300,
+        height: 80,
+        right: 400,
+        bottom: 120,
+        x: 100,
+        y: 40,
+        toJSON() {},
+      }) as DOMRect;
+    trigger.getBoundingClientRect = () =>
+      ({
+        left: 160,
+        top: 52,
+        width: 120,
+        height: 64,
+        right: 280,
+        bottom: 116,
+        x: 160,
+        y: 52,
+        toJSON() {},
+      }) as DOMRect;
+
+    Object.defineProperty(trigger, "offsetParent", {
+      configurable: true,
+      get: () => list,
+    });
+    Object.defineProperty(trigger, "offsetLeft", {
+      configurable: true,
+      get: () => 30,
+    });
+    Object.defineProperty(trigger, "offsetTop", {
+      configurable: true,
+      get: () => 6,
+    });
+    Object.defineProperty(trigger, "offsetWidth", {
+      configurable: true,
+      get: () => 60,
+    });
+    Object.defineProperty(trigger, "offsetHeight", {
+      configurable: true,
+      get: () => 32,
+    });
+
+    const controller = createTabs(root);
+    controller.updateIndicator();
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("30px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("60px");
+    expect(indicator.style.getPropertyValue("--active-tab-top")).toBe("6px");
+    expect(indicator.style.getPropertyValue("--active-tab-height")).toBe("32px");
+
+    controller.destroy();
+  });
+
+  it("positions the indicator relative to the list padding box in the offset path", () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+          <div data-slot="tabs-indicator"></div>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+      </div>
+    `;
+
+    const root = document.getElementById("root")!;
+    const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+    const trigger = root.querySelector('[data-slot="tabs-trigger"]') as HTMLElement;
+    const indicator = root.querySelector('[data-slot="tabs-indicator"]') as HTMLElement;
+
+    Object.defineProperty(trigger, "offsetParent", {
+      configurable: true,
+      get: () => list,
+    });
+    Object.defineProperty(trigger, "offsetLeft", {
+      configurable: true,
+      get: () => 13,
+    });
+    Object.defineProperty(trigger, "offsetTop", {
+      configurable: true,
+      get: () => 4,
+    });
+    Object.defineProperty(trigger, "offsetWidth", {
+      configurable: true,
+      get: () => 60,
+    });
+    Object.defineProperty(trigger, "offsetHeight", {
+      configurable: true,
+      get: () => 29,
+    });
+    Object.defineProperty(list, "clientLeft", {
+      configurable: true,
+      get: () => 1,
+    });
+    Object.defineProperty(list, "clientTop", {
+      configurable: true,
+      get: () => 1,
+    });
+
+    const controller = createTabs(root);
+    controller.updateIndicator();
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("12px");
+    expect(indicator.style.getPropertyValue("--active-tab-top")).toBe("3px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("60px");
+    expect(indicator.style.getPropertyValue("--active-tab-height")).toBe("29px");
+
+    controller.destroy();
+  });
+
+  it("uses rect geometry for horizontal indicator top when offsetTop rounds up", () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">Tab One</button>
+          <div data-slot="tabs-indicator"></div>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+      </div>
+    `;
+
+    const root = document.getElementById("root")!;
+    const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+    const trigger = root.querySelector('[data-slot="tabs-trigger"]') as HTMLElement;
+    const indicator = root.querySelector('[data-slot="tabs-indicator"]') as HTMLElement;
+
+    list.getBoundingClientRect = () =>
+      ({
+        left: 100,
+        top: 200,
+        width: 160,
+        height: 32,
+        right: 260,
+        bottom: 232,
+        x: 100,
+        y: 200,
+        toJSON() {},
+      }) as DOMRect;
+    trigger.getBoundingClientRect = () =>
+      ({
+        left: 103,
+        top: 203.5,
+        width: 65,
+        height: 25,
+        right: 168,
+        bottom: 228.5,
+        x: 103,
+        y: 203.5,
+        toJSON() {},
+      }) as DOMRect;
+
+    Object.defineProperty(trigger, "offsetParent", {
+      configurable: true,
+      get: () => list,
+    });
+    Object.defineProperty(trigger, "offsetLeft", {
+      configurable: true,
+      get: () => 3,
+    });
+    Object.defineProperty(trigger, "offsetTop", {
+      configurable: true,
+      get: () => 4,
+    });
+    Object.defineProperty(trigger, "offsetWidth", {
+      configurable: true,
+      get: () => 65,
+    });
+    Object.defineProperty(trigger, "offsetHeight", {
+      configurable: true,
+      get: () => 25,
+    });
+    Object.defineProperty(list, "clientLeft", {
+      configurable: true,
+      get: () => 0,
+    });
+    Object.defineProperty(list, "clientTop", {
+      configurable: true,
+      get: () => 0,
+    });
+
+    const controller = createTabs(root);
+    controller.updateIndicator();
+
+    expect(indicator.style.getPropertyValue("--active-tab-left")).toBe("3px");
+    expect(indicator.style.getPropertyValue("--active-tab-top")).toBe("3px");
+    expect(indicator.style.getPropertyValue("--active-tab-width")).toBe("65px");
+    expect(indicator.style.getPropertyValue("--active-tab-height")).toBe("25px");
+
+    controller.destroy();
+  });
+
+  it("links tabs to panels via aria-controls", () => {
+    const { triggers, panels, controller } = setup();
+
+    const panelId = panels[0]?.id;
+    expect(triggers[0]?.getAttribute("aria-controls")).toBe(panelId);
+    expect(panels[0]?.getAttribute("aria-labelledby")).toBe(triggers[0]?.id);
+
+    controller.destroy();
+  });
+
+  it("sets tabindex correctly for roving focus", () => {
+    const { triggers, controller } = setup();
+
+    expect(triggers[0]?.tabIndex).toBe(0);
+    expect(triggers[1]?.tabIndex).toBe(-1);
+    expect(triggers[2]?.tabIndex).toBe(-1);
+
+    controller.select("two");
+    expect(triggers[0]?.tabIndex).toBe(-1);
+    expect(triggers[1]?.tabIndex).toBe(0);
+
+    controller.destroy();
+  });
+
+  it("navigates with arrow keys", () => {
+    const { triggers, controller } = setup();
+
+    triggers[0]?.focus();
+
+    // Arrow right - dispatch from the focused trigger so event.target is correct
+    triggers[0]?.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(controller.value).toBe("two");
+
+    // Arrow right again - now trigger[1] should be focused
+    triggers[1]?.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(controller.value).toBe("three");
+
+    // Arrow right wraps to first
+    triggers[2]?.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(controller.value).toBe("one");
+
+    // Arrow left wraps to last
+    triggers[0]?.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+    expect(controller.value).toBe("three");
+
+    controller.destroy();
+  });
+
+  it("navigates with Home and End keys", () => {
+    const { triggers, controller } = setup("two");
+
+    triggers[1]?.focus();
+
+    triggers[1]?.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    expect(controller.value).toBe("one");
+
+    triggers[0]?.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    expect(controller.value).toBe("three");
+
+    controller.destroy();
+  });
+
+  it("sets data-state on triggers and panels", () => {
+    const { triggers, panels, controller } = setup();
+
+    expect(triggers[0]?.getAttribute("data-state")).toBe("active");
+    expect(triggers[1]?.getAttribute("data-state")).toBe("inactive");
+    expect(panels[0]?.getAttribute("data-state")).toBe("active");
+    expect(panels[1]?.getAttribute("data-state")).toBe("inactive");
+
+    controller.select("two");
+    expect(triggers[0]?.getAttribute("data-state")).toBe("inactive");
+    expect(triggers[1]?.getAttribute("data-state")).toBe("active");
+
+    controller.destroy();
+  });
+
+  it("does not set data-activation-direction on init", () => {
+    const { panels, controller } = setup("two");
+
+    panels.forEach((panel) => {
+      expect(panel.hasAttribute("data-activation-direction")).toBe(false);
+    });
+
+    controller.destroy();
+  });
+
+  it("sets horizontal data-activation-direction on panel changes", () => {
+    const { panels, controller } = setup("one");
+
+    controller.select("three");
+    panels.forEach((panel) => {
+      expect(panel.getAttribute("data-activation-direction")).toBe("right");
+    });
+
+    controller.select("one");
+    panels.forEach((panel) => {
+      expect(panel.getAttribute("data-activation-direction")).toBe("left");
+    });
+
+    controller.destroy();
+  });
+
+  it("sets vertical data-activation-direction on panel changes", () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root" data-orientation="vertical">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="one">One</button>
+          <button data-slot="tabs-trigger" data-value="two">Two</button>
+          <button data-slot="tabs-trigger" data-value="three">Three</button>
+        </div>
+        <div data-slot="tabs-content" data-value="one">Content One</div>
+        <div data-slot="tabs-content" data-value="two">Content Two</div>
+        <div data-slot="tabs-content" data-value="three">Content Three</div>
+      </div>
+    `;
+
+    const root = document.getElementById("root")!;
+    const panels = [...root.querySelectorAll('[data-slot="tabs-content"]')] as HTMLElement[];
+    const controller = createTabs(root);
+
+    controller.select("three");
+    panels.forEach((panel) => {
+      expect(panel.getAttribute("data-activation-direction")).toBe("down");
+    });
+
+    controller.select("one");
+    panels.forEach((panel) => {
+      expect(panel.getAttribute("data-activation-direction")).toBe("up");
+    });
+
+    controller.destroy();
+  });
+
+  it("does not set data-activation-direction when selecting the same tab", () => {
+    const { panels, controller } = setup("two");
+
+    controller.select("two");
+    panels.forEach((panel) => {
+      expect(panel.hasAttribute("data-activation-direction")).toBe(false);
+    });
+
+    controller.destroy();
+  });
+
+  it("emits tabs:change event", () => {
+    const { root, controller } = setup();
+
+    let lastValue: string | undefined;
+    root.addEventListener("tabs:change", (e) => {
+      lastValue = (e as CustomEvent).detail.value;
+    });
+
+    controller.select("two");
+    expect(lastValue).toBe("two");
+
+    controller.destroy();
+  });
+
+  it("calls onValueChange callback", () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs" id="root">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="a">A</button>
+          <button data-slot="tabs-trigger" data-value="b">B</button>
+        </div>
+        <div data-slot="tabs-content" data-value="a">A</div>
+        <div data-slot="tabs-content" data-value="b">B</div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    let lastValue: string | undefined;
+
+    const controller = createTabs(root, {
+      onValueChange: (value) => {
+        lastValue = value;
+      },
+    });
+
+    controller.select("b");
+    expect(lastValue).toBe("b");
+
+    controller.destroy();
+  });
+
+  it("create binds all tabs components and returns controllers", () => {
+    document.body.innerHTML = `
+      <div data-slot="tabs">
+        <div data-slot="tabs-list">
+          <button data-slot="tabs-trigger" data-value="x">X</button>
+          <button data-slot="tabs-trigger" data-value="y">Y</button>
+        </div>
+        <div data-slot="tabs-content" data-value="x">X Content</div>
+        <div data-slot="tabs-content" data-value="y">Y Content</div>
+      </div>
+    `;
+
+    const controllers = create();
+    expect(controllers).toHaveLength(1);
+
+    const triggers = document.querySelectorAll('[data-slot="tabs-trigger"]');
+    const panels = document.querySelectorAll('[data-slot="tabs-content"]');
+
+    expect((panels[0] as HTMLElement).hidden).toBe(false);
+    expect((panels[1] as HTMLElement).hidden).toBe(true);
+
+    (triggers[1] as HTMLElement).click();
+    expect((panels[0] as HTMLElement).hidden).toBe(true);
+    expect((panels[1] as HTMLElement).hidden).toBe(false);
+
+    // Can control programmatically
+    controllers[0]?.select("x");
+    expect((panels[0] as HTMLElement).hidden).toBe(false);
+
+    controllers.forEach((c) => c.destroy());
+  });
+
+  // Data attribute tests
+  describe("data attributes", () => {
+    it("data-orientation='vertical' sets vertical orientation", () => {
+      document.body.innerHTML = `
+        <div data-slot="tabs" id="root" data-orientation="vertical">
+          <div data-slot="tabs-list">
+            <button data-slot="tabs-trigger" data-value="one">One</button>
+            <button data-slot="tabs-trigger" data-value="two">Two</button>
+          </div>
+          <div data-slot="tabs-content" data-value="one">Content One</div>
+          <div data-slot="tabs-content" data-value="two">Content Two</div>
+        </div>
+      `;
+      const root = document.getElementById("root")!;
+      const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+      const controller = createTabs(root);
+
+      expect(list.getAttribute("aria-orientation")).toBe("vertical");
+
+      controller.destroy();
+    });
+
+    it("data-activation-mode='manual' requires Enter to activate", () => {
+      document.body.innerHTML = `
+        <div data-slot="tabs" id="root" data-activation-mode="manual">
+          <div data-slot="tabs-list">
+            <button data-slot="tabs-trigger" data-value="one">One</button>
+            <button data-slot="tabs-trigger" data-value="two">Two</button>
+          </div>
+          <div data-slot="tabs-content" data-value="one">Content One</div>
+          <div data-slot="tabs-content" data-value="two">Content Two</div>
+        </div>
+      `;
+      const root = document.getElementById("root")!;
+      const triggers = root.querySelectorAll('[data-slot="tabs-trigger"]');
+      const controller = createTabs(root);
+
+      // Focus first trigger and press ArrowRight
+      (triggers[0] as HTMLElement).focus();
+      triggers[0]!.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }),
+      );
+
+      // In manual mode, ArrowRight just moves focus, doesn't change value
+      expect(controller.value).toBe("one");
+      expect(document.activeElement).toBe(triggers[1]);
+
+      // Press Enter to activate
+      triggers[1]!.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      expect(controller.value).toBe("two");
+
+      controller.destroy();
+    });
+
+    it("JS option overrides data attribute", () => {
+      document.body.innerHTML = `
+        <div data-slot="tabs" id="root" data-orientation="vertical">
+          <div data-slot="tabs-list">
+            <button data-slot="tabs-trigger" data-value="one">One</button>
+            <button data-slot="tabs-trigger" data-value="two">Two</button>
+          </div>
+          <div data-slot="tabs-content" data-value="one">Content One</div>
+          <div data-slot="tabs-content" data-value="two">Content Two</div>
+        </div>
+      `;
+      const root = document.getElementById("root")!;
+      const list = root.querySelector('[data-slot="tabs-list"]') as HTMLElement;
+      // JS option says horizontal, data attribute says vertical - JS wins
+      const controller = createTabs(root, { orientation: "horizontal" });
+
+      expect(list.hasAttribute("aria-orientation")).toBe(false);
+
+      controller.destroy();
+    });
+  });
+
+  describe("root binding", () => {
+    it("reuses the existing controller for duplicate direct binds", () => {
+      const { root, controller } = setup();
+
+      expect(createTabs(root)).toBe(controller);
+
+      controller.destroy();
+    });
+
+    it("reuses a controller bound by another module copy", () => {
+      const { root, controller } = setup();
+      controller.destroy();
+
+      const foreignController = { destroy() {} } as ReturnType<typeof createTabs>;
+      setRootBinding(root, ROOT_BINDING_KEY, foreignController);
+
+      expect(createTabs(root)).toBe(foreignController);
+
+      clearRootBinding(root, ROOT_BINDING_KEY, foreignController);
+    });
+
+    it("create() skips roots bound by another module copy", () => {
+      const { root, controller } = setup();
+      controller.destroy();
+
+      const foreignController = { destroy() {} } as ReturnType<typeof createTabs>;
+      setRootBinding(root, ROOT_BINDING_KEY, foreignController);
+
+      expect(create()).toHaveLength(0);
+
+      clearRootBinding(root, ROOT_BINDING_KEY, foreignController);
+    });
+
+    it("allows rebinding after destroy", () => {
+      const { root, controller } = setup();
+      controller.destroy();
+
+      const rebound = createTabs(root);
+      expect(rebound).not.toBe(controller);
+
+      rebound.destroy();
+    });
+  });
+});

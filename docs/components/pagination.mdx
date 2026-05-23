@@ -5,20 +5,22 @@ description: Page navigation controls for paginated content.
 
 Page navigation controls for paginated content.
 
-Areia's `Pagination` renders page information, navigation controls, optional page-size selectors, and emits page-change events when used as an Ilha island with `Pagination.Root`.
+Areia's `Pagination` renders page information, navigation controls, optional page-size selectors, and emits page-change events when used as an Ilha island with `Pagination`.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Pagination } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Pagination.Root({
+    html`${Pagination({
       page: 1,
       perPage: 25,
       totalCount: 100,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -37,23 +39,25 @@ import { Pagination } from "areia/components/pagination";
 
 ## Usage
 
-Use `Pagination.Root` when you want interactive controls. It dispatches `pagination:page-change` and calls `setPage` / `onPageChange` when controls are used.
+Call `Pagination(...)` when you want interactive controls. It dispatches `pagination:page-change` and calls `setPage` / `onPageChange` when controls are used.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Pagination } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Pagination.Root({
+    html`${Pagination({
       page: 2,
       perPage: 25,
       totalCount: 250,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
-Use `Pagination(...)` for static markup or when you want to wire events yourself.
+Use `Pagination.Static(...)` for static markup or when you want to wire events yourself. For most application usage, call `Pagination(...)`.
 
 ## Examples
 
@@ -65,14 +69,16 @@ The default pagination includes first, previous, page input, next, and last butt
 import ilha, { html } from "ilha";
 import { Pagination } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Pagination.Root({
+    html`${Pagination({
       page: 1,
       perPage: 25,
       totalCount: 100,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Simple Controls
@@ -83,15 +89,17 @@ Use `controls: "simple"` for previous and next buttons only.
 import ilha, { html } from "ilha";
 import { Pagination } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Pagination.Root({
+    html`${Pagination({
       controls: "simple",
       page: 5,
       perPage: 25,
       totalCount: 250,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Mid-Page State
@@ -102,14 +110,16 @@ Pagination in the middle of a dataset with all navigation buttons enabled.
 import ilha, { html } from "ilha";
 import { Pagination } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Pagination.Root({
+    html`${Pagination({
       page: 5,
       perPage: 25,
       totalCount: 250,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Large Dataset
@@ -120,14 +130,16 @@ Pagination handles large datasets. Use the input page selector for large page co
 import ilha, { html } from "ilha";
 import { Pagination } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
-    html`${Pagination.Root({
+    html`${Pagination({
       page: 1,
       perPage: 25,
       totalCount: 10000,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Info Text
@@ -143,9 +155,9 @@ const perPage = 25;
 const totalCount = 100;
 const maxPage = Math.ceil(totalCount / perPage);
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Pagination.Root({
+    ${Pagination({
       page,
       perPage,
       totalCount,
@@ -158,6 +170,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Compound Components
@@ -166,7 +180,7 @@ Use the compound helpers when you need custom layout or page-size controls.
 
 ### Page Size Selector
 
-`Pagination.PageSize` renders a native select for choosing page size. In island mode, changing it emits `pagination:page-size-change` and calls `onPageSizeChange` on `Pagination.Root` when provided.
+`Pagination.PageSize` renders a native select for choosing page size. In island mode, changing it emits `pagination:page-size-change` and calls `onPageSizeChange` on `Pagination` when provided.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
@@ -176,9 +190,9 @@ const page = 1;
 const perPage = 25;
 const totalCount = 500;
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Pagination.Root({
+    ${Pagination({
       page,
       perPage,
       totalCount,
@@ -191,6 +205,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Page Size Options
@@ -205,9 +221,9 @@ const page = 1;
 const perPage = 10;
 const totalCount = 100;
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Pagination.Root({
+    ${Pagination({
       page,
       perPage,
       totalCount,
@@ -222,6 +238,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Custom Layout
@@ -236,9 +254,9 @@ const page = 2;
 const perPage = 50;
 const totalCount = 400;
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Pagination.Root({
+    ${Pagination({
       page,
       perPage,
       totalCount,
@@ -251,6 +269,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Dropdown Page Selector
@@ -265,9 +285,9 @@ const page = 2;
 const perPage = 25;
 const totalCount = 100;
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Pagination.Root({
+    ${Pagination({
       page,
       perPage,
       totalCount,
@@ -283,6 +303,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Internationalization
@@ -306,9 +328,9 @@ const labels = {
   pageSize: "Taille de page",
 };
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
-    ${Pagination.Root({
+    ${Pagination({
       page,
       perPage,
       totalCount,
@@ -334,11 +356,13 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Listening for Changes
 
-`Pagination.Root` dispatches DOM events when controls are used. Use these when you are not passing callback functions.
+`Pagination` dispatches DOM events when controls are used. Use these when you are not passing callback functions.
 
 ```ts twoslash
 const root = document.querySelector('[data-slot="pagination"]');
@@ -362,9 +386,9 @@ root?.addEventListener(
 
 ## API Reference
 
-### Pagination.Root
+### Pagination
 
-`Pagination.Root` is an Ilha island. It accepts standard HTML `div` attributes plus the following props.
+`Pagination` is an Ilha island. It accepts standard HTML `div` attributes plus the following props.
 
 | Prop               | Type                     | Default   | Description                              |
 | ------------------ | ------------------------ | --------- | ---------------------------------------- |

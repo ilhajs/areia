@@ -3,13 +3,13 @@ title: Input
 description: A text input field for user input with built-in label, description, and error support.
 ---
 
-A text input field for user input with built-in label, description, and error support.
+A styled text input control. When you pass `label`, `description`, or `error`, `Input` delegates to `Field` for accessible labeling, descriptions, validation messaging, and field state attributes.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       label: "Email",
@@ -17,6 +17,8 @@ export default ilha.render(
       type: "email",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -37,13 +39,13 @@ import { Input } from "areia/components/input";
 
 ### With Built-in Field
 
-Use the `label` prop to enable the built-in field wrapper with label, description, and error support.
+Use the `label` prop to enable the `Field` wrapper with label, description, and error support.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       id: "email",
@@ -54,17 +56,19 @@ export default ilha.render(
       type: "email",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Bare Input
 
-For custom form layouts, use `Input` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility.
+For custom form layouts, use `Input` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility. Use `Input.Static(...)` when composing a raw input inside `Field` manually.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       "aria-label": "Search",
@@ -72,19 +76,21 @@ export default ilha.render(
       type: "search",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
 
 ### With Label and Description
 
-The `label` prop enables the built-in field wrapper with automatic vertical layout.
+The `label` prop enables the `Field` wrapper with automatic vertical layout.
 
 ```ts preview twoslash
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       id: "project-name",
@@ -93,6 +99,8 @@ export default ilha.render(
       placeholder: "My Ilha app",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Error
@@ -103,7 +111,7 @@ Pass `error` as a string for simple error messages. Error styling is automatical
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       id: "email-error",
@@ -114,6 +122,8 @@ export default ilha.render(
       error: "Enter a valid email address.",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Validation Object
@@ -124,7 +134,7 @@ Pass `error` as an object with a `message` property when you want to keep valida
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       id: "username",
@@ -137,6 +147,8 @@ export default ilha.render(
       },
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Input Sizes
@@ -147,7 +159,7 @@ Four sizes are available: `xs`, `sm`, `base`, and `lg`.
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-3">
       ${Input({
@@ -173,6 +185,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
@@ -181,7 +195,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       label: "Email",
@@ -189,6 +203,8 @@ export default ilha.render(
       disabled: true,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Optional Field
@@ -199,7 +215,7 @@ Set `required: false` to show optional text after the label.
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       id: "website",
@@ -209,6 +225,8 @@ export default ilha.render(
       type: "url",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### With Label Tooltip
@@ -219,7 +237,7 @@ Use `labelTooltip` to add additional context via a native `title` attribute on t
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       id: "team-name",
@@ -229,6 +247,8 @@ export default ilha.render(
       placeholder: "Design systems",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Rich Label
@@ -239,7 +259,7 @@ The `label` prop accepts Ilha markup for richer formatting.
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       id: "billing-email",
@@ -249,6 +269,8 @@ export default ilha.render(
       type: "email",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Bare Input with Error
@@ -259,7 +281,7 @@ Error messages and descriptions can render without a visible label. Use `aria-la
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       id: "search-error",
@@ -269,6 +291,8 @@ export default ilha.render(
       error: "Search is currently unavailable.",
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Input Types
@@ -279,7 +303,7 @@ Supports standard HTML input types such as `text`, `email`, `password`, `number`
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="flex w-full max-w-sm flex-col gap-3">
       ${Input({
@@ -305,6 +329,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Password Manager Overlays
@@ -315,7 +341,7 @@ Set `passwordManagerIgnore` on non-credential inputs that password managers migh
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () =>
     html`${Input({
       label: "Project slug",
@@ -323,6 +349,8 @@ export default ilha.render(
       passwordManagerIgnore: true,
     })}`,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

@@ -12,7 +12,7 @@ import { Button, Icon, LayerCard } from "areia";
 
 const arrowIcon = Icon({ icon: ArrowRight });
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-md">
       ${LayerCard({
@@ -46,6 +46,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -70,7 +72,7 @@ Use `LayerCard.Secondary` for the elevated header row and `LayerCard.Primary` fo
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-md">
       ${LayerCard({
@@ -89,6 +91,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 `LayerCard` also supports a simple surface-style mode. Render content directly inside `LayerCard` when you do not need a secondary header row.
@@ -97,7 +101,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-md">
       ${LayerCard({
@@ -112,6 +116,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -122,7 +128,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-md">
       ${LayerCard({
@@ -141,6 +147,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Surface-style Card
@@ -151,7 +159,7 @@ For simple card containers, render content directly inside `LayerCard` without `
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-md">
       ${LayerCard({
@@ -167,6 +175,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Multiple Cards
@@ -179,7 +189,7 @@ import { Icon, LayerCard } from "areia";
 const boxesIcon = Icon({ icon: Boxes, class: "size-4" });
 const codeIcon = Icon({ icon: Code2, class: "size-4" });
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="grid w-full max-w-2xl gap-3 sm:grid-cols-2">
       ${LayerCard({
@@ -215,6 +225,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Toolbar Card
@@ -225,7 +237,7 @@ Layer cards work well for compact toolbars and summaries.
 import ilha, { html } from "ilha";
 import { Badge, Input, LayerCard } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-2xl">
       ${LayerCard({
@@ -272,6 +284,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Test Attributes
@@ -282,7 +296,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full max-w-md">
       ${LayerCard({
@@ -305,6 +319,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference

@@ -29,7 +29,7 @@ const rows = [
   },
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Table({
       children: [
@@ -57,6 +57,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Installation
@@ -79,7 +81,7 @@ import { Table } from "areia/components/table";
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Table({
       children: [
@@ -105,6 +107,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## Examples
@@ -140,7 +144,7 @@ const rows = [
 
 const selectedIds = new Set(["2"]);
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Table({
       children: [
@@ -183,6 +187,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Compact Header
@@ -211,7 +217,7 @@ const rows = [
   },
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Table({
       children: [
@@ -240,6 +246,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Selected Row
@@ -271,7 +279,7 @@ const rows = [
   },
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Table({
       children: [
@@ -300,6 +308,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Fixed Layout with Column Sizes
@@ -328,7 +338,7 @@ const rows = [
   },
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Table({
       layout: "fixed",
@@ -362,6 +372,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sticky Column
@@ -393,7 +405,7 @@ const rows = [
   },
 ];
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="w-full overflow-x-auto">
       ${Table({
@@ -447,6 +459,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Sticky Header
@@ -462,7 +476,7 @@ const rows = Array.from({ length: 12 }, (_, index) => ({
   status: index % 2 === 0 ? "Active" : "Idle",
 }));
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     <div class="max-h-64 overflow-y-auto">
       ${Table({
@@ -491,6 +505,8 @@ export default ilha.render(
     </div>
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ### Resize Handle
@@ -501,7 +517,7 @@ export default ilha.render(
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
-export default ilha.render(
+const Example = ilha.render(
   () => html`
     ${Table({
       children: Table.Header({
@@ -518,6 +534,8 @@ export default ilha.render(
     })}
   `,
 );
+// ---cut-after---
+Example.mount(document.getElementById("root")!);
 ```
 
 ## API Reference
