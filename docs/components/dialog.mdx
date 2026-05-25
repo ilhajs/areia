@@ -12,7 +12,7 @@ import { Button, Dialog } from "areia";
 const Example = ilha.render(
   () => html`
     ${Dialog({
-      trigger: Button({ label: "Open dialog" }),
+      trigger: Button({ children: "Open dialog" }),
       contentClass: "grid gap-4 p-6",
       content: html`
         <div class="grid gap-2">
@@ -26,13 +26,13 @@ const Example = ilha.render(
           ${Dialog.Close({
             children: Button({
               variant: "secondary",
-              label: "Cancel",
+              children: "Cancel",
             }),
           })}
           ${Dialog.Close({
             children: Button({
               variant: "primary",
-              label: "Save",
+              children: "Save",
             }),
           })}
         </div>
@@ -40,36 +40,27 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Dialog } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Dialog } from "areia/components/dialog";
 ```
 
 ## Usage
 
 Use `Dialog` for an interactive dialog. The component renders the required `dialog`, `dialog-trigger`, `dialog-portal`, `dialog-overlay`, and `dialog-content` slots for `@data-slot/dialog`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
 const Example = ilha.render(
   () => html`
     ${Dialog({
-      trigger: Button({ label: "Open" }),
+      trigger: Button({ children: "Open" }),
       contentClass: "grid gap-4 p-6",
       content: html`
         ${Dialog.Title({ children: "Dialog title" })}
@@ -77,13 +68,12 @@ const Example = ilha.render(
           children: "Helpful supporting text for the dialog.",
         })}
         ${Dialog.Close({
-          children: Button({ label: "Close" }),
+          children: Button({ children: "Close" }),
         })}
       `,
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -93,7 +83,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `role: "alertdialog"` for confirmation flows that require explicit acknowledgment. Alert dialogs do not close on outside click by default.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
@@ -103,7 +93,7 @@ const Example = ilha.render(
       role: "alertdialog",
       trigger: Button({
         variant: "destructive",
-        label: "Delete project",
+        children: "Delete project",
       }),
       contentClass: "grid gap-4 p-6",
       content: html`
@@ -118,13 +108,13 @@ const Example = ilha.render(
           ${Dialog.Close({
             children: Button({
               variant: "secondary",
-              label: "Cancel",
+              children: "Cancel",
             }),
           })}
           ${Dialog.Close({
             children: Button({
               variant: "destructive",
-              label: "Delete",
+              children: "Delete",
             }),
           })}
         </div>
@@ -132,13 +122,12 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
@@ -153,7 +142,7 @@ const Example = ilha.render(
             size,
             trigger: Button({
               variant: "secondary",
-              label: size,
+              children: size,
             }),
             contentClass: "grid gap-4 p-6",
             content: html`
@@ -163,7 +152,7 @@ const Example = ilha.render(
                   "Dialogs constrain their minimum width by size.",
               })}
               ${Dialog.Close({
-                children: Button({ label: "Close" }),
+                children: Button({ children: "Close" }),
               })}
             `,
           })}
@@ -172,7 +161,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -180,7 +168,7 @@ Example.mount(document.getElementById("root")!);
 
 Configure outside-click, Escape, initial open state, and scroll locking through root options.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
@@ -190,7 +178,7 @@ const Example = ilha.render(
       closeOnClickOutside: false,
       closeOnEscape: true,
       lockScroll: true,
-      trigger: Button({ label: "Open locked dialog" }),
+      trigger: Button({ children: "Open locked dialog" }),
       contentClass: "grid gap-4 p-6",
       content: html`
         ${Dialog.Title({ children: "Explicit close" })}
@@ -199,13 +187,12 @@ const Example = ilha.render(
             "Clicking outside this dialog will not close it.",
         })}
         ${Dialog.Close({
-          children: Button({ label: "Close" }),
+          children: Button({ children: "Close" }),
         })}
       `,
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -213,14 +200,14 @@ Example.mount(document.getElementById("root")!);
 
 You can compose slots manually when you need lower-level control. Use `Dialog` at the top so the primitive is mounted.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Dialog } from "areia";
 
 const Example = ilha.render(
   () => html`
     ${Dialog({
-      children: Button({ label: "Manual trigger" }),
+      children: Button({ children: "Manual trigger" }),
       contentClass: "p-6",
       content: html`
         <div class="grid gap-4">
@@ -230,14 +217,13 @@ const Example = ilha.render(
               "Trigger, title, description, and close are slot helpers.",
           })}
           ${Dialog.Close({
-            children: Button({ label: "Done" }),
+            children: Button({ children: "Done" }),
           })}
         </div>
       `,
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

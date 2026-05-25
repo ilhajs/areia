@@ -20,39 +20,26 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { DatePicker, type DateRange } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import {
-  DatePicker,
-  type DateRange,
-} from "areia/components/date-picker";
 ```
 
 ## Usage
 
 DatePicker supports three selection modes: `single`, `multiple`, and `range`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
 const Example = ilha.render(
   () => html`${DatePicker({ mode: "single" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -66,7 +53,7 @@ Use `DatePicker.Static(...)` for static markup or when you want to initialize/wi
 
 Select a single date. This is the most common use case for date pickers.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
@@ -84,7 +71,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -92,7 +78,7 @@ Example.mount(document.getElementById("root")!);
 
 Select multiple individual dates. Use `maxSelected` to limit the number of selections.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
@@ -115,7 +101,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -123,7 +108,7 @@ Example.mount(document.getElementById("root")!);
 
 Select a continuous date range. Range selection works well with `numberOfMonths: 2` for a side-by-side view.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { DatePicker, type DateRange } from "areia";
 
@@ -142,7 +127,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -150,7 +134,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `min` and `max` to disable dates before or after an allowed range.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
@@ -169,7 +153,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -177,7 +160,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `disabled` to make specific dates unavailable.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
@@ -196,7 +179,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -204,7 +186,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `weekStartsOn` to choose the first day of the week. `0` is Sunday and `1` is Monday.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
@@ -217,7 +199,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -225,7 +206,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `showOutsideDays: false` to hide adjacent-month dates in the calendar grid.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { DatePicker } from "areia";
 
@@ -238,7 +219,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -246,7 +226,7 @@ Example.mount(document.getElementById("root")!);
 
 Compose with [Popover](/components/popover) to create a dropdown date picker.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Calendar } from "lucide";
 import { Button, DatePicker, Icon, Popover } from "areia";
@@ -268,7 +248,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -276,7 +255,7 @@ Example.mount(document.getElementById("root")!);
 
 Render two months inside a popover for a compact date-range picker.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Calendar } from "lucide";
 import {
@@ -310,7 +289,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -318,7 +296,7 @@ Example.mount(document.getElementById("root")!);
 
 `DatePicker` emits bubbling custom events so you can integrate it with application state.
 
-```ts twoslash
+```ts
 const picker = document.querySelector(
   '[data-slot="date-picker"]',
 );
@@ -374,7 +352,7 @@ It emits:
 
 ### DateRange
 
-```ts twoslash
+```ts
 import type { DateRange } from "areia";
 
 const range: DateRange = {

@@ -22,29 +22,20 @@ const Example = ilha.render(
       }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Field } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Field } from "areia/components/field";
 ```
 
 ## Usage
 
 Render a control with `data-slot="field-control"` inside `Field`. The controller associates `Field.Label`, `Field.Description`, and `Field.Error` with the control.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Field, Input } from "areia";
 
@@ -60,7 +51,6 @@ const Example = ilha.render(
       }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -70,7 +60,7 @@ Example.mount(document.getElementById("root")!);
 
 Native constraint validation is read from the field control.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Field, Input } from "areia";
 
@@ -87,7 +77,6 @@ const Example = ilha.render(
       }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -95,7 +84,7 @@ Example.mount(document.getElementById("root")!);
 
 Return a string from `validate` to mark the field invalid.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Field, Input } from "areia";
 
@@ -117,7 +106,6 @@ const Example = ilha.render(
       }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -125,7 +113,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `invalid` when validity is controlled by server state or another external source.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Field, Input } from "areia";
 
@@ -142,7 +130,6 @@ const Example = ilha.render(
       }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -150,7 +137,7 @@ Example.mount(document.getElementById("root")!);
 
 Use the part helpers when you need a custom layout.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Field, Textarea } from "areia";
 
@@ -174,7 +161,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

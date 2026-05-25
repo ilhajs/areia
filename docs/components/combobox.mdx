@@ -26,29 +26,20 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Combobox } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Combobox } from "areia/components/combobox";
 ```
 
 ## Usage
 
 Call `Combobox(...)` for an interactive island. The root renders the combobox markup and initializes the `@data-slot/combobox` controller after mount.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -67,7 +58,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -79,7 +69,7 @@ For static server-rendered markup without mounting behavior, use `Combobox.Stati
 
 A combobox with a visible label and searchable options.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -98,7 +88,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -106,7 +95,7 @@ Example.mount(document.getElementById("root")!);
 
 Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -142,7 +131,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -150,7 +138,7 @@ Example.mount(document.getElementById("root")!);
 
 The `label`, `description`, and `error` props enable the built-in field wrapper.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -170,7 +158,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -178,7 +165,7 @@ Example.mount(document.getElementById("root")!);
 
 Pass `error` as a string for simple validation messages. Error styling is automatically applied when `error` is truthy.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -198,7 +185,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -206,7 +192,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `disabled` to prevent interaction.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -223,7 +209,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -231,7 +216,7 @@ Example.mount(document.getElementById("root")!);
 
 Use item descriptor objects to disable individual options. Disabled rows are skipped during keyboard navigation and cannot be selected.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -249,7 +234,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -257,7 +241,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `defaultValue` with the option value string to preselect an item.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -275,7 +259,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -283,7 +266,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `name` to create a hidden input that submits the selected value with a native form.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Combobox } from "areia";
 
@@ -302,11 +285,10 @@ const Example = ilha.render(
           cherry: "Cherry",
         },
       })}
-      ${Button({ type: "submit", label: "Submit" })}
+      ${Button({ type: "submit", children: "Submit" })}
     </form>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -314,7 +296,7 @@ Example.mount(document.getElementById("root")!);
 
 Use explicit child markup when you need custom labels, grouping, separators, or item attributes.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -354,7 +336,6 @@ const Example = ilha.render(
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -362,7 +343,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `Combobox.Group` and `Combobox.GroupLabel` to organize related options.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -399,7 +380,6 @@ const Example = ilha.render(
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -407,7 +387,7 @@ Example.mount(document.getElementById("root")!);
 
 Use the low-level parts to render a select-like trigger with a separate search input inside the popup. This composition returns static markup; initialize it with `createCombobox` yourself if you are not using `Combobox`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -454,7 +434,6 @@ const Example = ilha.render(
       ],
     )}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -462,7 +441,7 @@ Example.mount(document.getElementById("root")!);
 
 `openOnFocus` opens the popup when the input receives intentional focus. `autoHighlight` highlights the first matching item after typing.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -482,7 +461,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -490,7 +468,7 @@ Example.mount(document.getElementById("root")!);
 
 `Combobox.Content` defaults to `24rem` or the available viewport height, whichever is smaller. Pass `class` or `className` when composing the low-level content yourself.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Combobox } from "areia";
 
@@ -526,7 +504,6 @@ const Example = ilha.render(
       ],
     )}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

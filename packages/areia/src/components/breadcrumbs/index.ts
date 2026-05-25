@@ -102,9 +102,9 @@ export function BreadcrumbsMobileEllipsis() {
 export interface BreadcrumbsLinkInput {
   /** Link target URL. */
   href: string;
-  /** Accessible label for the link text. */
-  label?: unknown;
-  /** Icon rendered before the label. Use the `Icon` component or raw SVG markup. */
+  /** Content rendered inside the link. */
+  children?: unknown;
+  /** Icon rendered before the content. Use the `Icon` component or raw SVG markup. */
   icon?: unknown;
   /** Additional CSS classes. */
   class?: string;
@@ -112,7 +112,7 @@ export interface BreadcrumbsLinkInput {
 }
 
 export function BreadcrumbsLink(input: BreadcrumbsLinkInput) {
-  const { href, label, icon, class: className, className: aliasedClassName } = input;
+  const { href, children, icon, class: className, className: aliasedClassName } = input;
 
   return html`<a
     href="${href}"
@@ -123,17 +123,17 @@ export function BreadcrumbsLink(input: BreadcrumbsLinkInput) {
     )}"
   >
     ${icon != null ? html`<span class="flex shrink-0 items-center">${icon}</span>` : ""}
-    <span class="truncate">${label}</span>
+    <span class="truncate">${children}</span>
   </a>`;
 }
 
 /** The current page in the breadcrumb trail. */
 export interface BreadcrumbsCurrentInput {
-  /** Label for the current page. */
-  label?: unknown;
-  /** Icon rendered before the label. */
+  /** Content for the current page. */
+  children?: unknown;
+  /** Icon rendered before the content. */
   icon?: unknown;
-  /** When true, shows a loading skeleton instead of the label. */
+  /** When true, shows a loading skeleton instead of the content. */
   loading?: boolean;
   /** Additional CSS classes. */
   class?: string;
@@ -141,7 +141,7 @@ export interface BreadcrumbsCurrentInput {
 }
 
 export function BreadcrumbsCurrent(input: BreadcrumbsCurrentInput = {}) {
-  const { label, icon, loading, class: className, className: aliasedClassName } = input;
+  const { children, icon, loading, class: className, className: aliasedClassName } = input;
 
   if (loading) {
     return html`<div
@@ -161,7 +161,7 @@ export function BreadcrumbsCurrent(input: BreadcrumbsCurrentInput = {}) {
     aria-current="page"
   >
     ${icon != null ? html`<span class="flex shrink-0 items-center">${icon}</span>` : ""}
-    <span class="truncate">${label}</span>
+    <span class="truncate">${children}</span>
   </div>`;
 }
 
@@ -214,9 +214,9 @@ export function BreadcrumbsClipboard(input: BreadcrumbsClipboardInput) {
 export interface BreadcrumbItem {
   /** Link target URL. Omit for the current (last) item. */
   href?: string;
-  /** Display label for the breadcrumb item. */
-  label: unknown;
-  /** Icon rendered before the label. */
+  /** Display content for the breadcrumb item. */
+  children: unknown;
+  /** Icon rendered before the content. */
   icon?: unknown;
 }
 
@@ -237,7 +237,7 @@ function buildFullTrail(items: BreadcrumbItem[], loading?: boolean): unknown[] {
     if (isLast) {
       trail.push(
         BreadcrumbsCurrent({
-          label: item.label,
+          children: item.children,
           icon: item.icon,
           loading,
         }),
@@ -246,7 +246,7 @@ function buildFullTrail(items: BreadcrumbItem[], loading?: boolean): unknown[] {
       trail.push(
         BreadcrumbsLink({
           href: item.href ?? "#",
-          label: item.label,
+          children: item.children,
           icon: item.icon,
         }),
       );
@@ -267,12 +267,12 @@ function buildMobileTrail(items: BreadcrumbItem[], loading?: boolean): unknown[]
     BreadcrumbsSeparator(),
     BreadcrumbsLink({
       href: parent.href ?? "#",
-      label: parent.label,
+      children: parent.children,
       icon: parent.icon,
     }),
     BreadcrumbsSeparator(),
     BreadcrumbsCurrent({
-      label: current.label,
+      children: current.children,
       icon: current.icon,
       loading,
     }),
@@ -292,9 +292,9 @@ export interface BreadcrumbsInput extends BreadcrumbsVariantsProps {
    * ```ts
    * Breadcrumbs({
    *   items: [
-   *     { href: "/", label: "Home" },
-   *     { href: "/docs", label: "Docs" },
-   *     { label: "Current Page" },
+   *     { href: "/", children: "Home" },
+   *     { href: "/docs", children: "Docs" },
+   *     { children: "Current Page" },
    *   ],
    * })
    * ```
@@ -326,9 +326,9 @@ export interface BreadcrumbsInput extends BreadcrumbsVariantsProps {
  * ```ts
  * Breadcrumbs({
  *   items: [
- *     { href: "/", label: "Home" },
- *     { href: "/docs", label: "Docs", icon: Icon({ icon: FileText }) },
- *     { label: "Current Page" },
+ *     { href: "/", children: "Home" },
+ *     { href: "/docs", children: "Docs", icon: Icon({ icon: FileText }) },
+ *     { children: "Current Page" },
  *   ],
  *   size: "base",
  *   copyUrl: "https://example.com/docs/current-page",

@@ -24,27 +24,18 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Select } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Select } from "areia/components/select";
 ```
 
 ## Usage
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -61,7 +52,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -71,7 +61,7 @@ Example.mount(document.getElementById("root")!);
 
 A select with a visible label. When you provide the `label` prop, the select renders with a field wrapper and label above it.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -88,7 +78,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -96,7 +85,7 @@ Example.mount(document.getElementById("root")!);
 
 Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -136,7 +125,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -144,7 +132,7 @@ Example.mount(document.getElementById("root")!);
 
 When a visible label is not needed, use `aria-label` for accessibility.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -160,7 +148,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -168,7 +155,7 @@ Example.mount(document.getElementById("root")!);
 
 `Select` can show description text and validation errors. Error styling is automatically applied when the `error` prop is truthy.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -188,7 +175,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -196,7 +182,7 @@ Example.mount(document.getElementById("root")!);
 
 Use the `placeholder` prop to render a placeholder option before the selectable items.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -214,7 +200,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -222,7 +207,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `labelTooltip` to add additional context via a native `title` attribute on the label.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -242,13 +227,12 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -265,7 +249,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -273,7 +256,7 @@ Example.mount(document.getElementById("root")!);
 
 Enable native multiple selection with the `multiple` prop. The select becomes a multi-row native control.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -295,7 +278,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -303,7 +285,7 @@ Example.mount(document.getElementById("root")!);
 
 Options can be disabled with descriptor objects in the `items` prop.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -321,7 +303,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -329,7 +310,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `Select.Option` when you want explicit control over individual option markup.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -348,7 +329,6 @@ const Example = ilha.render(
       ],
     )}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -356,7 +336,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `Select.Group` to organize related options under native `optgroup` labels.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -380,7 +360,6 @@ const Example = ilha.render(
       ],
     )}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -388,7 +367,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `variant: "ghost"` for compact UIs where the select should blend into the surrounding surface.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Select } from "areia";
 
@@ -405,7 +384,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

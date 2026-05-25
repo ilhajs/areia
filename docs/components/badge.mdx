@@ -12,45 +12,35 @@ import { Badge } from "areia";
 const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-2">
-      ${Badge({ variant: "primary", label: "Primary" })}
-      ${Badge({ variant: "secondary", label: "Secondary" })}
-      ${Badge({ variant: "error", label: "Error" })}
-      ${Badge({ variant: "success", label: "Success" })}
-      ${Badge({ variant: "warning", label: "Warning" })}
-      ${Badge({ variant: "info", label: "Info" })}
-      ${Badge({ variant: "outline", label: "Outline" })}
-      ${Badge({ variant: "beta", label: "Beta" })}
+      ${Badge({ variant: "primary", children: "Primary" })}
+      ${Badge({ variant: "secondary", children: "Secondary" })}
+      ${Badge({ variant: "error", children: "Error" })}
+      ${Badge({ variant: "success", children: "Success" })}
+      ${Badge({ variant: "warning", children: "Warning" })}
+      ${Badge({ variant: "info", children: "Info" })}
+      ${Badge({ variant: "outline", children: "Outline" })}
+      ${Badge({ variant: "beta", children: "Beta" })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Badge } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Badge } from "areia/components/badge";
 ```
 
 ## Usage
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
 const Example = ilha.render(
-  () => html`${Badge({ label: "New" })}`,
+  () => html`${Badge({ children: "New" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -60,25 +50,24 @@ Example.mount(document.getElementById("root")!);
 
 Use semantic variants for common status and categorization states.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
 const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-2">
-      ${Badge({ variant: "primary", label: "Primary" })}
-      ${Badge({ variant: "secondary", label: "Secondary" })}
-      ${Badge({ variant: "error", label: "Error" })}
-      ${Badge({ variant: "success", label: "Success" })}
-      ${Badge({ variant: "warning", label: "Warning" })}
-      ${Badge({ variant: "info", label: "Info" })}
-      ${Badge({ variant: "outline", label: "Outline" })}
-      ${Badge({ variant: "beta", label: "Beta" })}
+      ${Badge({ variant: "primary", children: "Primary" })}
+      ${Badge({ variant: "secondary", children: "Secondary" })}
+      ${Badge({ variant: "error", children: "Error" })}
+      ${Badge({ variant: "success", children: "Success" })}
+      ${Badge({ variant: "warning", children: "Warning" })}
+      ${Badge({ variant: "info", children: "Info" })}
+      ${Badge({ variant: "outline", children: "Outline" })}
+      ${Badge({ variant: "beta", children: "Beta" })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -86,25 +75,27 @@ Example.mount(document.getElementById("root")!);
 
 Use color variants for product-specific labels where semantic badges are not enough to convey the intended meaning or status.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
 const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-2">
-      ${Badge({ variant: "neutral", label: "Neutral" })}
-      ${Badge({ variant: "red", label: "Red" })}
-      ${Badge({ variant: "orange", label: "Orange" })}
-      ${Badge({ variant: "green", label: "Green" })}
-      ${Badge({ variant: "teal", label: "Teal" })}
-      ${Badge({ variant: "teal-subtle", label: "Teal Subtle" })}
-      ${Badge({ variant: "blue", label: "Blue" })}
-      ${Badge({ variant: "purple", label: "Purple" })}
+      ${Badge({ variant: "neutral", children: "Neutral" })}
+      ${Badge({ variant: "red", children: "Red" })}
+      ${Badge({ variant: "orange", children: "Orange" })}
+      ${Badge({ variant: "green", children: "Green" })}
+      ${Badge({ variant: "teal", children: "Teal" })}
+      ${Badge({
+        variant: "teal-subtle",
+        children: "Teal Subtle",
+      })}
+      ${Badge({ variant: "blue", children: "Blue" })}
+      ${Badge({ variant: "purple", children: "Purple" })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -112,7 +103,7 @@ Example.mount(document.getElementById("root")!);
 
 Badges can be used inline with nearby text to call attention to lightweight metadata.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Badge } from "areia";
 
@@ -120,11 +111,10 @@ const Example = ilha.render(
   () => html`
     <p class="flex items-center gap-2 text-areia-default">
       Ilha Islands
-      ${Badge({ variant: "success", label: "Stable" })}
+      ${Badge({ variant: "success", children: "Stable" })}
     </p>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -133,6 +123,6 @@ Example.mount(document.getElementById("root")!);
 | Prop        | Type                                                                                                                                                                                                            | Default     | Description                                               |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | --------------------------------------------------------- |
 | `variant`   | `"primary" \| "secondary" \| "error" \| "warning" \| "success" \| "destructive" \| "info" \| "beta" \| "outline" \| "red" \| "green" \| "neutral" \| "orange" \| "purple" \| "teal" \| "teal-subtle" \| "blue"` | `"primary"` | Color variant of the badge.                               |
-| `label`     | `unknown`                                                                                                                                                                                                       | -           | Content rendered inside the badge.                        |
+| `children`  | `unknown`                                                                                                                                                                                                       | -           | Content rendered inside the badge.                        |
 | `class`     | `string`                                                                                                                                                                                                        | -           | Additional CSS classes merged with the generated classes. |
 | `className` | `string`                                                                                                                                                                                                        | -           | Alias for `class`.                                        |

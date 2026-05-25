@@ -319,7 +319,7 @@ describe("Resizable", () => {
     controller.destroy();
   });
 
-  it("drags a handle with pointer events", () => {
+  it("drags a handle with mouse events", () => {
     const { root, handles, controller } = setup({
       panes: [{ "data-default-size": "50" }, { "data-default-size": "50" }],
     });
@@ -332,6 +332,38 @@ describe("Resizable", () => {
     expect(controller.layout[1]).toBeCloseTo(40);
 
     window.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+    controller.destroy();
+  });
+
+  it("drags a handle with pointer events", () => {
+    const { root, handles, controller } = setup({
+      panes: [{ "data-default-size": "50" }, { "data-default-size": "50" }],
+    });
+    mockGroupSize(root as HTMLElement, 1000, true);
+
+    handles[0].dispatchEvent(
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        clientX: 500,
+        pointerId: 1,
+        pointerType: "mouse",
+      }),
+    );
+    document.body.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: 600,
+        pointerId: 1,
+        pointerType: "mouse",
+      }),
+    );
+    // Moved +100px of 1000px == +10%.
+    expect(controller.layout[0]).toBeCloseTo(60);
+    expect(controller.layout[1]).toBeCloseTo(40);
+
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true, pointerId: 1, pointerType: "mouse" }),
+    );
     controller.destroy();
   });
 

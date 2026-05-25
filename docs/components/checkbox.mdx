@@ -13,34 +13,24 @@ const Example = ilha.render(
   () =>
     html`${Checkbox({ label: "Accept terms and conditions" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Checkbox } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Checkbox } from "areia/components/checkbox";
 ```
 
 ## Usage
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
 const Example = ilha.render(
   () => html`${Checkbox({ label: "Remember me" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -50,7 +40,7 @@ Example.mount(document.getElementById("root")!);
 
 Checkbox with a built-in label. The label automatically displays in a horizontal layout with the checkbox before the label.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -58,13 +48,12 @@ const Example = ilha.render(
   () =>
     html`${Checkbox({ label: "Accept terms and conditions" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Checked
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -75,7 +64,6 @@ const Example = ilha.render(
       checked: true,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -83,7 +71,7 @@ Example.mount(document.getElementById("root")!);
 
 Used for “select all” patterns when some but not all items are selected.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -94,7 +82,6 @@ const Example = ilha.render(
       indeterminate: true,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -102,7 +89,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `controlFirst: false` to place the label before the checkbox.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -113,13 +100,12 @@ const Example = ilha.render(
       controlFirst: false,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -127,7 +113,6 @@ const Example = ilha.render(
   () =>
     html`${Checkbox({ label: "Disabled", disabled: true })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -135,7 +120,7 @@ Example.mount(document.getElementById("root")!);
 
 The error variant provides visual styling. For error messages, use `Checkbox.Group`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -147,7 +132,6 @@ const Example = ilha.render(
       required: true,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -155,14 +139,13 @@ Example.mount(document.getElementById("root")!);
 
 When a checkbox does not have visible label text, provide an accessible name with `aria-label`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
 const Example = ilha.render(
   () => html`${Checkbox({ "aria-label": "Select row" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -170,7 +153,7 @@ Example.mount(document.getElementById("root")!);
 
 Group multiple checkboxes with a legend and description. Use `Checkbox.Group` and `Checkbox.Item`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -198,7 +181,6 @@ const Example = ilha.render(
       ],
     )}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -206,7 +188,7 @@ Example.mount(document.getElementById("root")!);
 
 Show validation errors at the group level.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -231,7 +213,6 @@ const Example = ilha.render(
       ],
     )}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -239,7 +220,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `Checkbox.Legend` with `class: "sr-only"` to keep the legend accessible to screen readers while hiding it visually. This is useful when the group is already labeled by nearby visible text.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -267,7 +248,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -275,7 +255,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `Checkbox.Legend` when you need custom typography, colors, or layout instead of the `legend` string prop.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Checkbox } from "areia";
 
@@ -298,7 +278,6 @@ const Example = ilha.render(
       }),
     ])}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

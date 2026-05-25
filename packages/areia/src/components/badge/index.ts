@@ -110,11 +110,11 @@ export function badgeVariants({
   );
 }
 
-export type BadgeInput = Omit<HTMLElementProps<HTMLSpanElement>, "className"> &
+export type BadgeInput = Omit<HTMLElementProps<HTMLSpanElement>, "className" | "children"> &
   BadgeVariantsProps &
   Record<string, unknown> & {
-    /** Label rendered inside the badge. */
-    label?: unknown;
+    /** Content rendered inside the badge. */
+    children?: unknown;
     /** Additional CSS classes merged with the generated variant classes. */
     class?: string;
     className?: string;
@@ -123,7 +123,7 @@ export type BadgeInput = Omit<HTMLElementProps<HTMLSpanElement>, "className"> &
 /** Small status label for categorizing or highlighting content. */
 export function Badge(input: BadgeInput = {}) {
   const {
-    label,
+    children,
     class: className,
     className: aliasedClassName,
     variant = BADGE_DEFAULT_VARIANTS.variant,
@@ -133,6 +133,6 @@ export function Badge(input: BadgeInput = {}) {
   return html`<span
     class="${cn(badgeVariants({ variant }), className, aliasedClassName)}"
     ${raw(toAttrs(rest))}
-    >${label}</span
+    >${children}</span
   >`;
 }

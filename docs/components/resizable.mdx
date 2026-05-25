@@ -1,0 +1,303 @@
+---
+title: Resizable
+description: Accessible resizable panel groups and layouts with keyboard support.
+---
+
+Accessible resizable panel groups with keyboard support. Built on the `@areia/slots` resizable primitive.
+
+`Resizable` wires panel sizing, drag handles, keyboard navigation, and layout change events.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Resizable } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Resizable({
+      direction: "horizontal",
+      class: "max-w-md rounded-lg border border-areia-border",
+      children: [
+        Resizable.Panel({
+          defaultSize: 50,
+          minSize: 10,
+          collapsible: true,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">Left</span>
+          </div>`,
+        }),
+        Resizable.Handle({ withHandle: true }),
+        Resizable.Panel({
+          defaultSize: 50,
+          minSize: 10,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">Right</span>
+          </div>`,
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## Import
+
+```ts
+import { Resizable } from "areia";
+```
+
+## Usage
+
+Compose panels and handles within a root group. The root must be a direct parent of alternating panels and handles.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Resizable } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Resizable({
+      direction: "horizontal",
+      class: "max-w-md rounded-lg border border-areia-border",
+      children: [
+        Resizable.Panel({
+          defaultSize: 50,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">Left</span>
+          </div>`,
+        }),
+        Resizable.Handle(),
+        Resizable.Panel({
+          defaultSize: 50,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">Right</span>
+          </div>`,
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## Composition
+
+Use the following composition to build a resizable panel group:
+
+```text
+Resizable (root)
+├── Resizable.Panel
+├── Resizable.Handle
+└── Resizable.Panel
+```
+
+## Examples
+
+### Vertical
+
+Use `direction="vertical"` for vertical resizing.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Resizable } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Resizable({
+      direction: "vertical",
+      class: "max-w-md rounded-lg border border-areia-border",
+      children: [
+        Resizable.Panel({
+          defaultSize: 25,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">Header</span>
+          </div>`,
+        }),
+        Resizable.Handle(),
+        Resizable.Panel({
+          defaultSize: 75,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">Content</span>
+          </div>`,
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### With Handle
+
+Use `withHandle` on `Resizable.Handle` to show a visible grip indicator.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Resizable } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Resizable({
+      direction: "horizontal",
+      class: "max-w-md rounded-lg border border-areia-border",
+      children: [
+        Resizable.Panel({
+          defaultSize: 25,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">Sidebar</span>
+          </div>`,
+        }),
+        Resizable.Handle({ withHandle: true }),
+        Resizable.Panel({
+          defaultSize: 75,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">Content</span>
+          </div>`,
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Nested Panels
+
+Resizable panels can be nested for complex layouts.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Resizable } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Resizable({
+      direction: "horizontal",
+      class: "max-w-md rounded-lg border border-areia-border",
+      children: [
+        Resizable.Panel({
+          defaultSize: 50,
+          children: html`<div
+            class="flex items-center justify-center p-4"
+          >
+            <span class="font-semibold">One</span>
+          </div>`,
+        }),
+        Resizable.Handle({ withHandle: true }),
+        Resizable.Panel({
+          defaultSize: 50,
+          children: [
+            Resizable({
+              direction: "vertical",
+              children: [
+                Resizable.Panel({
+                  defaultSize: 25,
+                  children: html`<div
+                    class="flex items-center justify-center p-4"
+                  >
+                    <span class="font-semibold">Two</span>
+                  </div>`,
+                }),
+                Resizable.Handle({ withHandle: true }),
+                Resizable.Panel({
+                  defaultSize: 75,
+                  children: html`<div
+                    class="flex items-center justify-center p-4"
+                  >
+                    <span class="font-semibold">Three</span>
+                  </div>`,
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## API Reference
+
+### Resizable (ResizablePanelGroup)
+
+Root component that manages the resizable group state.
+
+| Prop               | Type                         | Default        | Description                                                    |
+| ------------------ | ---------------------------- | -------------- | -------------------------------------------------------------- |
+| `children`         | `unknown`                    | —              | Alternating panels and handles.                                |
+| `direction`        | `"horizontal" \| "vertical"` | `"horizontal"` | Layout axis.                                                   |
+| `keyboardResizeBy` | `number`                     | `10`           | Amount (in %) to resize by per keyboard arrow press.           |
+| `onLayoutChange`   | `(layout: number[]) => void` | —              | Called whenever the layout changes, with sizes as percentages. |
+
+### Resizable.Panel
+
+Individual panel within a resizable group.
+
+| Prop            | Type      | Default | Description                          |
+| --------------- | --------- | ------- | ------------------------------------ |
+| `children`      | `unknown` | —       | Panel content.                       |
+| `defaultSize`   | `number`  | —       | Initial size as a percentage.        |
+| `minSize`       | `number`  | `0`     | Minimum size as a percentage.        |
+| `maxSize`       | `number`  | `100`   | Maximum size as a percentage.        |
+| `collapsible`   | `boolean` | `false` | Whether the panel can be collapsed.  |
+| `collapsedSize` | `number`  | `0`     | Size when collapsed as a percentage. |
+
+### Resizable.Handle
+
+Resize handle between two panels.
+
+| Prop         | Type      | Default | Description                               |
+| ------------ | --------- | ------- | ----------------------------------------- |
+| `withHandle` | `boolean` | `false` | Whether to show a visible grip indicator. |
+| `children`   | `unknown` | —       | Custom handle content.                    |
+
+## Slots
+
+`Resizable` renders these data slots:
+
+- `resizable`
+- `resizable-panel`
+- `resizable-handle`
+
+The library sets state attributes on parts:
+
+| Attribute        | Element   | Description                                         |
+| ---------------- | --------- | --------------------------------------------------- |
+| `data-direction` | all parts | `"horizontal"` or `"vertical"`.                     |
+| `data-state`     | panel     | `"expanded"` or `"collapsed"`.                      |
+| `data-collapsed` | panel     | Present when panel is collapsed.                    |
+| `data-expanded`  | panel     | Present when panel is expanded.                     |
+| `data-active`    | handle    | `"pointer"` during drag, `"keyboard"` when focused. |
+
+## Events
+
+### Outbound
+
+| Event                | Detail                  | Description                         |
+| -------------------- | ----------------------- | ----------------------------------- |
+| `resizable:change`   | `{ layout: number[] }`  | Fired when the layout changes.      |
+| `resizable:dragging` | `{ dragging: boolean }` | Fired when dragging starts or ends. |
+
+### Inbound
+
+| Event           | Detail                 | Description                      |
+| --------------- | ---------------------- | -------------------------------- |
+| `resizable:set` | `{ layout: number[] }` | Set the layout programmatically. |

@@ -17,39 +17,30 @@ const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
-        { href: "/", label: "Home", icon: homeIcon },
+        { href: "/", children: "Home", icon: homeIcon },
         {
           href: "/projects",
-          label: "Projects",
+          children: "Projects",
           icon: folderIcon,
         },
-        { label: "Current Project" },
+        { children: "Current Project" },
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Breadcrumbs } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Breadcrumbs } from "areia/components/breadcrumbs";
 ```
 
 ## Usage
 
 Pass an `items` array describing the trail. The **last item** is automatically treated as the current page — it renders without a link and receives `aria-current="page"`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Breadcrumbs } from "areia";
 
@@ -57,13 +48,12 @@ const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
-        { href: "/", label: "Home" },
-        { href: "/docs", label: "Docs" },
-        { label: "Breadcrumbs" },
+        { href: "/", children: "Home" },
+        { href: "/docs", children: "Docs" },
+        { children: "Breadcrumbs" },
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -73,7 +63,7 @@ Example.mount(document.getElementById("root")!);
 
 A simple three-level breadcrumb trail.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Breadcrumbs } from "areia";
 
@@ -81,13 +71,12 @@ const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
-        { href: "/", label: "Home" },
-        { href: "/docs", label: "Docs" },
-        { label: "Breadcrumbs" },
+        { href: "/", children: "Home" },
+        { href: "/docs", children: "Docs" },
+        { children: "Breadcrumbs" },
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -95,7 +84,7 @@ Example.mount(document.getElementById("root")!);
 
 Two sizes are available: `sm` for compact UIs and `base` for the default appearance.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Breadcrumbs } from "areia";
 
@@ -105,23 +94,22 @@ const Example = ilha.render(
       ${Breadcrumbs({
         size: "sm",
         items: [
-          { href: "/", label: "Home" },
-          { href: "/docs", label: "Docs" },
-          { label: "Small Breadcrumbs" },
+          { href: "/", children: "Home" },
+          { href: "/docs", children: "Docs" },
+          { children: "Small Breadcrumbs" },
         ],
       })}
       ${Breadcrumbs({
         size: "base",
         items: [
-          { href: "/", label: "Home" },
-          { href: "/docs", label: "Docs" },
-          { label: "Base Breadcrumbs" },
+          { href: "/", children: "Home" },
+          { href: "/docs", children: "Docs" },
+          { children: "Base Breadcrumbs" },
         ],
       })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -129,7 +117,7 @@ Example.mount(document.getElementById("root")!);
 
 Each item accepts an optional `icon` prop. Use the `Icon` component with any Lucide icon to add context to the trail.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { House, Folder } from "lucide";
 import { Breadcrumbs, Icon } from "areia";
@@ -141,17 +129,16 @@ const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
-        { href: "/", label: "Home", icon: homeIcon },
+        { href: "/", children: "Home", icon: homeIcon },
         {
           href: "/projects",
-          label: "Projects",
+          children: "Projects",
           icon: folderIcon,
         },
-        { label: "Current Project" },
+        { children: "Current Project" },
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -159,7 +146,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `loading` to `true` to replace the current page label with a pulsing skeleton placeholder while data is being fetched.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { House } from "lucide";
 import { Breadcrumbs, Icon } from "areia";
@@ -171,13 +158,12 @@ const Example = ilha.render(
     html`${Breadcrumbs({
       loading: true,
       items: [
-        { href: "/", label: "Home", icon: homeIcon },
-        { href: "/docs", label: "Docs" },
-        { label: "Loading..." },
+        { href: "/", children: "Home", icon: homeIcon },
+        { href: "/docs", children: "Docs" },
+        { children: "Loading..." },
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -185,7 +171,7 @@ Example.mount(document.getElementById("root")!);
 
 Provide a `copyUrl` to show a copy-to-clipboard button that appears on hover. After copying, a checkmark is displayed for two seconds.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Breadcrumbs } from "areia";
 
@@ -193,14 +179,13 @@ const Example = ilha.render(
   () =>
     html`${Breadcrumbs({
       items: [
-        { href: "/", label: "Home" },
-        { href: "/docs", label: "Docs" },
-        { label: "Current Page" },
+        { href: "/", children: "Home" },
+        { href: "/docs", children: "Docs" },
+        { children: "Current Page" },
       ],
       copyUrl: "https://example.com/docs/current-page",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -208,7 +193,7 @@ Example.mount(document.getElementById("root")!);
 
 When you need full control over the markup, use the sub-components directly. This bypasses the automatic mobile ellipsis and clipboard behavior, so you must handle those yourself.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import {
   BreadcrumbsLink,
@@ -222,14 +207,13 @@ const Example = ilha.render(
       class="flex items-center gap-1 text-base"
       aria-label="breadcrumb"
     >
-      ${BreadcrumbsLink({ href: "/", label: "Home" })}
+      ${BreadcrumbsLink({ href: "/", children: "Home" })}
       ${BreadcrumbsSeparator()}
-      ${BreadcrumbsLink({ href: "/docs", label: "Docs" })}
+      ${BreadcrumbsLink({ href: "/docs", children: "Docs" })}
       ${BreadcrumbsSeparator()}
-      ${BreadcrumbsCurrent({ label: "Current Page" })}
+      ${BreadcrumbsCurrent({ children: "Current Page" })}
     </nav>`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -248,18 +232,18 @@ Example.mount(document.getElementById("root")!);
 
 ### BreadcrumbItem
 
-| Prop    | Type      | Default | Description                                        |
-| ------- | --------- | ------- | -------------------------------------------------- |
-| `href`  | `string`  | —       | Link target URL. Omit for the current (last) item. |
-| `label` | `unknown` | —       | Display label for the breadcrumb item.             |
-| `icon`  | `unknown` | —       | Icon rendered before the label.                    |
+| Prop       | Type      | Default | Description                                        |
+| ---------- | --------- | ------- | -------------------------------------------------- |
+| `href`     | `string`  | —       | Link target URL. Omit for the current (last) item. |
+| `children` | `unknown` | —       | Display content for the breadcrumb item.           |
+| `icon`     | `unknown` | —       | Icon rendered before the label.                    |
 
 ### Breadcrumbs.Link
 
 | Prop        | Type      | Default | Description                       |
 | ----------- | --------- | ------- | --------------------------------- |
 | `href`      | `string`  | —       | Link target URL.                  |
-| `label`     | `unknown` | —       | Content rendered inside the link. |
+| `children`  | `unknown` | —       | Content rendered inside the link. |
 | `icon`      | `unknown` | —       | Icon rendered before the label.   |
 | `class`     | `string`  | —       | Additional CSS classes.           |
 | `className` | `string`  | —       | Alias for `class`.                |
@@ -268,7 +252,7 @@ Example.mount(document.getElementById("root")!);
 
 | Prop        | Type      | Default | Description                                               |
 | ----------- | --------- | ------- | --------------------------------------------------------- |
-| `label`     | `unknown` | —       | Label for the current page.                               |
+| `children`  | `unknown` | —       | Label for the current page.                               |
 | `icon`      | `unknown` | —       | Icon rendered before the label.                           |
 | `loading`   | `boolean` | —       | When true, shows a loading skeleton instead of the label. |
 | `class`     | `string`  | —       | Additional CSS classes.                                   |

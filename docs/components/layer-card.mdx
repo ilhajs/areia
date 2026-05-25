@@ -46,29 +46,20 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { LayerCard } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { LayerCard } from "areia/components/layer-card";
 ```
 
 ## Usage
 
 Use `LayerCard.Secondary` for the elevated header row and `LayerCard.Primary` for the main surface.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
@@ -91,13 +82,12 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 `LayerCard` also supports a simple surface-style mode. Render content directly inside `LayerCard` when you do not need a secondary header row.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
@@ -116,7 +106,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -124,7 +113,7 @@ Example.mount(document.getElementById("root")!);
 
 ### Basic Card
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
@@ -147,7 +136,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -155,7 +143,7 @@ Example.mount(document.getElementById("root")!);
 
 For simple card containers, render content directly inside `LayerCard` without `LayerCard.Primary`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
@@ -175,13 +163,12 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Multiple Cards
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Boxes, Code2 } from "lucide";
 import { Icon, LayerCard } from "areia";
@@ -225,7 +212,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -233,7 +219,7 @@ Example.mount(document.getElementById("root")!);
 
 Layer cards work well for compact toolbars and summaries.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Badge, Input, LayerCard } from "areia";
 
@@ -245,7 +231,7 @@ const Example = ilha.render(
           LayerCard.Secondary({
             children: html`
               <span>Subrequests</span>
-              ${Badge({ variant: "neutral", label: "128" })}
+              ${Badge({ variant: "neutral", children: "128" })}
             `,
           }),
           LayerCard.Primary({
@@ -258,8 +244,14 @@ const Example = ilha.render(
                     "aria-label": "Search origins",
                     class: "min-w-0 flex-1",
                   })}
-                  ${Badge({ variant: "success", label: "2xx" })}
-                  ${Badge({ variant: "warning", label: "4xx" })}
+                  ${Badge({
+                    variant: "success",
+                    children: "2xx",
+                  })}
+                  ${Badge({
+                    variant: "warning",
+                    children: "4xx",
+                  })}
                 </div>
                 <div class="grid grid-cols-3 gap-2 text-sm">
                   <span class="font-medium">Origin</span>
@@ -284,7 +276,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -292,7 +283,7 @@ Example.mount(document.getElementById("root")!);
 
 `LayerCard.Primary` and `LayerCard.Secondary` accept standard HTML attributes, including `data-testid`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { LayerCard } from "areia";
 
@@ -319,7 +310,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

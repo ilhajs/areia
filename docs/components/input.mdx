@@ -17,22 +17,13 @@ const Example = ilha.render(
       type: "email",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Input } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Input } from "areia/components/input";
 ```
 
 ## Usage
@@ -41,7 +32,7 @@ import { Input } from "areia/components/input";
 
 Use the `label` prop to enable the `Field` wrapper with label, description, and error support.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -56,7 +47,6 @@ const Example = ilha.render(
       type: "email",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -64,7 +54,7 @@ Example.mount(document.getElementById("root")!);
 
 For custom form layouts, use `Input` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility. Use `Input.Static(...)` when composing a raw input inside `Field` manually.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -76,7 +66,6 @@ const Example = ilha.render(
       type: "search",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -86,7 +75,7 @@ Example.mount(document.getElementById("root")!);
 
 The `label` prop enables the `Field` wrapper with automatic vertical layout.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -99,7 +88,6 @@ const Example = ilha.render(
       placeholder: "My Ilha app",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -107,7 +95,7 @@ Example.mount(document.getElementById("root")!);
 
 Pass `error` as a string for simple error messages. Error styling is automatically applied when the `error` prop is truthy.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -122,7 +110,6 @@ const Example = ilha.render(
       error: "Enter a valid email address.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -130,7 +117,7 @@ Example.mount(document.getElementById("root")!);
 
 Pass `error` as an object with a `message` property when you want to keep validation metadata near the field.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -147,7 +134,6 @@ const Example = ilha.render(
       },
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -155,7 +141,7 @@ Example.mount(document.getElementById("root")!);
 
 Four sizes are available: `xs`, `sm`, `base`, and `lg`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -185,13 +171,12 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -203,7 +188,6 @@ const Example = ilha.render(
       disabled: true,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -211,7 +195,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `required: false` to show optional text after the label.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -225,7 +209,6 @@ const Example = ilha.render(
       type: "url",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -233,7 +216,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `labelTooltip` to add additional context via a native `title` attribute on the label.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -247,7 +230,6 @@ const Example = ilha.render(
       placeholder: "Design systems",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -255,7 +237,7 @@ Example.mount(document.getElementById("root")!);
 
 The `label` prop accepts Ilha markup for richer formatting.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -269,7 +251,6 @@ const Example = ilha.render(
       type: "email",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -277,7 +258,7 @@ Example.mount(document.getElementById("root")!);
 
 Error messages and descriptions can render without a visible label. Use `aria-label` to keep the input accessible.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -291,7 +272,6 @@ const Example = ilha.render(
       error: "Search is currently unavailable.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -299,7 +279,7 @@ Example.mount(document.getElementById("root")!);
 
 Supports standard HTML input types such as `text`, `email`, `password`, `number`, `tel`, and `url`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -329,7 +309,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -337,7 +316,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `passwordManagerIgnore` on non-credential inputs that password managers might incorrectly classify as login fields.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Input } from "areia";
 
@@ -349,7 +328,6 @@ const Example = ilha.render(
       passwordManagerIgnore: true,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

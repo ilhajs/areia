@@ -147,11 +147,11 @@ function loaderIcon(size: ButtonSize) {
   </svg>`;
 }
 
-export type ButtonInput = Omit<HTMLElementProps<HTMLButtonElement>, "className"> &
+export type ButtonInput = Omit<HTMLElementProps<HTMLButtonElement>, "className" | "children"> &
   ButtonVariantsProps &
   Record<string, unknown> & {
-    /** Label rendered inside the button. */
-    label?: unknown;
+    /** Content rendered inside the button. */
+    children?: unknown;
     /** Additional CSS classes merged with the generated variant classes. */
     class?: string;
     className?: string;
@@ -163,7 +163,7 @@ export type ButtonInput = Omit<HTMLElementProps<HTMLButtonElement>, "className">
 
 export function Button(input: ButtonInput = {}) {
   const {
-    label,
+    children,
     class: className,
     className: aliasedClassName,
     disabled,
@@ -190,7 +190,7 @@ export function Button(input: ButtonInput = {}) {
     ${raw(toAttrs({ ...rest, disabled: Boolean(loading || disabled) }))}
   >
     ${loading ? loaderIcon(size) : icon}
-    ${label != null ? html`<span class="contents">${label}</span>` : ""}
+    ${children != null ? html`<span class="contents">${children}</span>` : ""}
   </button>`;
 
   if (title == null || title === "") return button;
@@ -203,10 +203,10 @@ export function Button(input: ButtonInput = {}) {
   });
 }
 
-export type LinkButtonInput = Omit<HTMLElementProps<HTMLAnchorElement>, "className"> &
+export type LinkButtonInput = Omit<HTMLElementProps<HTMLAnchorElement>, "className" | "children"> &
   ButtonVariantsProps &
   Record<string, unknown> & {
-    label?: unknown;
+    children?: unknown;
     class?: string;
     className?: string;
     external?: boolean;
@@ -215,7 +215,7 @@ export type LinkButtonInput = Omit<HTMLElementProps<HTMLAnchorElement>, "classNa
 
 export function LinkButton(input: LinkButtonInput = {}) {
   const {
-    label,
+    children,
     class: className,
     className: aliasedClassName,
     external,
@@ -241,7 +241,7 @@ export function LinkButton(input: LinkButtonInput = {}) {
       }),
     )}
   >
-    ${icon}${label}
+    ${icon}${children}
   </a>`;
 }
 

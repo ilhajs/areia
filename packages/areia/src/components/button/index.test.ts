@@ -37,20 +37,20 @@ describe("buttonVariants", () => {
 
 describe("Button", () => {
   it("defaults type to button", () => {
-    expect(markup(Button({ label: "Click" }))).toContain('type="button"');
+    expect(markup(Button({ children: "Click" }))).toContain('type="button"');
   });
 
   it("allows overriding type", () => {
-    expect(markup(Button({ type: "submit", label: "Save" }))).toContain('type="submit"');
+    expect(markup(Button({ type: "submit", children: "Save" }))).toContain('type="submit"');
   });
 
-  it("wraps label in a span with class contents", () => {
-    const output = markup(Button({ label: "Save" }));
+  it("wraps children in a span with class contents", () => {
+    const output = markup(Button({ children: "Save" }));
 
     expect(output).toContain('<span class="contents">Save</span>');
   });
 
-  it("does not render label wrapper for icon-only buttons", () => {
+  it("does not render children wrapper for icon-only buttons", () => {
     const output = markup(
       Button({
         shape: "square",
@@ -67,7 +67,7 @@ describe("Button", () => {
     const output = markup(
       Button({
         icon: html`<svg data-testid="plus-icon"></svg>`,
-        label: "Add item",
+        children: "Add item",
       }),
     );
 
@@ -81,7 +81,7 @@ describe("Button", () => {
       Button({
         icon: html`<svg data-testid="plus-icon"></svg>`,
         loading: true,
-        label: "Add item",
+        children: "Add item",
       }),
     );
 
@@ -91,11 +91,11 @@ describe("Button", () => {
   });
 
   it("loading sets disabled attribute", () => {
-    expect(markup(Button({ loading: true, label: "Save" }))).toContain(" disabled");
+    expect(markup(Button({ loading: true, children: "Save" }))).toContain(" disabled");
   });
 
   it("disabled prop sets disabled attribute and disabled classes", () => {
-    const output = markup(Button({ disabled: true, label: "Save" }));
+    const output = markup(Button({ disabled: true, children: "Save" }));
 
     expect(output).toContain(" disabled");
     expect(output).toContain("cursor-not-allowed");
@@ -105,7 +105,7 @@ describe("Button", () => {
   it("passes through attributes without escaping the attribute string", () => {
     const output = markup(
       Button({
-        label: "Save",
+        children: "Save",
         id: "save-button",
         "data-testid": "save",
       }),
@@ -117,7 +117,7 @@ describe("Button", () => {
   });
 
   it("renders title as tooltip content instead of a native title attribute", () => {
-    const output = markup(Button({ label: "Save", title: "Save changes" }));
+    const output = markup(Button({ children: "Save", title: "Save changes" }));
 
     expect(output).toContain('data-slot="tooltip"');
     expect(output).toContain('data-slot="tooltip-trigger"');
@@ -129,7 +129,7 @@ describe("Button", () => {
   it("merges class and className", () => {
     const output = markup(
       Button({
-        label: "Save",
+        children: "Save",
         class: "custom-class",
         className: "another-class",
       }),
@@ -165,7 +165,7 @@ describe("RefreshButton", () => {
 
 describe("LinkButton", () => {
   it("renders as an anchor", () => {
-    const output = markup(LinkButton({ href: "/home", label: "Home" }));
+    const output = markup(LinkButton({ href: "/home", children: "Home" }));
 
     expect(output).toContain("<a");
     expect(output).toContain('href="/home"');
@@ -177,7 +177,7 @@ describe("LinkButton", () => {
       LinkButton({
         href: "https://example.com",
         external: true,
-        label: "Docs",
+        children: "Docs",
       }),
     );
 
@@ -191,7 +191,7 @@ describe("LinkButton", () => {
         href: "/docs",
         target: "_self",
         rel: "prefetch",
-        label: "Docs",
+        children: "Docs",
       }),
     );
 
@@ -199,12 +199,12 @@ describe("LinkButton", () => {
     expect(output).toContain('rel="prefetch"');
   });
 
-  it("renders icon before label", () => {
+  it("renders icon before children", () => {
     const output = markup(
       LinkButton({
         href: "/new",
         icon: html`<svg data-testid="external-icon"></svg>`,
-        label: "Open",
+        children: "Open",
       }),
     );
 

@@ -48,6 +48,11 @@ export default defineConfig({
     }),
     pluginTwoslash({
       twoslashOptions: {
+        filterNode(node) {
+          if (node.type !== "hover") return true;
+          if (["document", "getElementById"].includes(node.target)) return false;
+          return true;
+        },
         compilerOptions: {
           strict: true,
           baseUrl: __dirname,

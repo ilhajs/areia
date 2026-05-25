@@ -55,11 +55,9 @@ if (root) {
 }
 ```
 
-## Installation
+## Import
 
-### Package
-
-```ts twoslash
+```ts
 import { DropdownMenu } from "@areia/slots";
 ```
 
@@ -67,7 +65,7 @@ import { DropdownMenu } from "@areia/slots";
 
 Call `createDropdownMenu` with the root element and optional configuration. The primitive reads slot attributes from the DOM and manages open/close, item highlight, typeahead, keyboard navigation, radio and checkbox selection, and positioning.
 
-```ts twoslash
+```ts
 import { DropdownMenu } from "@areia/slots";
 
 const el = document.querySelector<HTMLElement>(
@@ -97,7 +95,7 @@ controller.open();
 
 Use the `create` helper to discover and bind every unattached root in a scope.
 
-```ts twoslash
+```ts
 import { DropdownMenu } from "@areia/slots";
 
 const controllers = DropdownMenu.create(document);
@@ -230,7 +228,7 @@ All events bubble from the root element (`data-slot="dropdown-menu"`).
 
 #### `dropdown-menu:open-change`
 
-```ts twoslash
+```ts
 interface DropdownMenuOpenChangeDetail {
   open: boolean;
   previousOpen: boolean;
@@ -248,7 +246,7 @@ interface DropdownMenuOpenChangeDetail {
 
 #### `dropdown-menu:select`
 
-```ts twoslash
+```ts
 interface DropdownMenuSelectDetail {
   value: string;
   item: HTMLElement;
@@ -262,7 +260,7 @@ This event is **cancelable**. Call `event.preventDefault()` to prevent the selec
 
 #### `dropdown-menu:value-change`
 
-```ts twoslash
+```ts
 interface DropdownMenuValueChangeDetail {
   value: string | null;
   previousValue: string | null;
@@ -274,7 +272,7 @@ interface DropdownMenuValueChangeDetail {
 
 #### `dropdown-menu:values-change`
 
-```ts twoslash
+```ts
 interface DropdownMenuValuesChangeDetail {
   values: string[];
   previousValues: string[];
@@ -287,7 +285,7 @@ interface DropdownMenuValuesChangeDetail {
 
 #### `dropdown-menu:highlight-change`
 
-```ts twoslash
+```ts
 interface DropdownMenuHighlightChangeDetail {
   value: string | null;
   previousValue: string | null;
@@ -344,7 +342,7 @@ Options can also be set via `data-*` attributes on the root element, using kebab
 
 The controller is the imperative handle returned by `createDropdownMenu`. Use it for programmatic control and reading selection state.
 
-```ts twoslash
+```ts
 import { DropdownMenu } from "@areia/slots";
 
 const el = document.querySelector<HTMLElement>(

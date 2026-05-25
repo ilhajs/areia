@@ -18,6 +18,14 @@
   --rp-c-brand-tint: rgba(122, 122, 122, 0.15);
 }
 
+[data-ilha-slot] {
+  display: contents;
+}
+
+.rp-preview-operations {
+  @apply hidden!;
+}
+
 .rp-preview--iframe-follow {
   @apply flex-col-reverse! overflow-hidden;
 }
@@ -31,7 +39,7 @@
 }
 
 #root {
-  @apply h-screen flex flex-col items-center justify-center p-4;
+  @apply h-screen flex flex-col items-center justify-center p-4 bg-areia-background;
 }
 
 :root {

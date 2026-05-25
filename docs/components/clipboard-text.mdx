@@ -18,29 +18,20 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { ClipboardText } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { ClipboardText } from "areia/components/clipboard-text";
 ```
 
 ## Usage
 
 Use `ClipboardText` when the copy button should be interactive.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
@@ -52,7 +43,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -62,7 +52,7 @@ Example.mount(document.getElementById("root")!);
 
 Display a shortened value while copying the full value with `textToCopy`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
@@ -79,13 +69,12 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
@@ -107,7 +96,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -115,7 +103,7 @@ Example.mount(document.getElementById("root")!);
 
 Pass `tooltip: true` for the default tooltip, or configure the tooltip text, copied announcement, and side.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
@@ -132,7 +120,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -140,7 +127,7 @@ Example.mount(document.getElementById("root")!);
 
 Customize the copy button label for localization.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ClipboardText } from "areia";
 
@@ -154,7 +141,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

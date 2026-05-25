@@ -88,12 +88,13 @@ export interface ResizableController {
   destroy(): void;
 }
 
-type ResizeEvent = KeyboardEvent | MouseEvent | TouchEvent;
+type ResizeEvent = KeyboardEvent | MouseEvent | PointerEvent | TouchEvent;
 
 interface DragState {
   handleIndex: number;
   initialCursorPosition: number;
   initialLayout: number[];
+  pointerId?: number;
 }
 
 /* -------------------------------------------------------------------------------------------------
@@ -457,18 +458,21 @@ const resetGlobalCursor = (): void => {
 
 const cursorPosition = (dir: ResizableDirection, e: ResizeEvent): number => {
   const horizontal = dir === "horizontal";
-  if (e.type.startsWith("mouse")) {
-    const me = e as MouseEvent;
-    return horizontal ? me.clientX : me.clientY;
+  if (e.type.startsWith("mouse") || e.type.startsWith("pointer")) {
+    const pe = e as MouseEvent | PointerEvent;
+    return horizontal ? pe.clientX : pe.clientY;
   }
   if (e.type.startsWith("touch")) {
     const te = e as TouchEvent;
     const t = te.touches[0];
     assert(t, "Expected a touch point");
-    return horizontal ? t.screenX : t.screenY;
+    return horizontal ? t.clientX : t.clientY;
   }
   throw new Error(`[@data-slot/resizable] Unsupported event type "${e.type}"`);
 };
+
+const isPointerResizeEvent = (e: Event): e is PointerEvent =>
+  typeof PointerEvent !== "undefined" && e instanceof PointerEvent;
 
 /* -------------------------------------------------------------------------------------------------
  * createResizable
@@ -680,7 +684,11 @@ export function createResizable(
     );
     const changed = !arraysEqual(prevLayout, next);
 
-    if (event.type.startsWith("mouse") || event.type.startsWith("touch")) {
+    if (
+      event.type.startsWith("mouse") ||
+      event.type.startsWith("pointer") ||
+      event.type.startsWith("touch")
+    ) {
       if (prevDelta !== delta) {
         prevDelta = delta;
         if (!changed) {
@@ -702,6 +710,13 @@ export function createResizable(
 
   const onMove = (e: Event): void => {
     if (dragState == null) return;
+    if (
+      isPointerResizeEvent(e) &&
+      dragState.pointerId != null &&
+      e.pointerId !== dragState.pointerId
+    ) {
+      return;
+    }
     e.preventDefault();
     runResize(dragState.handleIndex, e as ResizeEvent);
   };
@@ -710,6 +725,9 @@ export function createResizable(
     resetGlobalCursor();
     if (dragState != null) {
       const handle = handles[dragState.handleIndex];
+      if (dragState.pointerId != null && handle.hasPointerCapture?.(dragState.pointerId)) {
+        handle.releasePointerCapture(dragState.pointerId);
+      }
       handle.removeAttribute("data-active");
       handle.blur();
     }
@@ -720,12 +738,18 @@ export function createResizable(
 
   const startDragging = (handleIndex: number, e: ResizeEvent): void => {
     e.preventDefault();
+    if (dragState != null) return;
     const handle = handles[handleIndex];
     if (handle.getAttribute("data-disabled") === "true") return;
+    const pointerId = isPointerResizeEvent(e) ? e.pointerId : undefined;
+    if (pointerId != null) {
+      handle.setPointerCapture?.(pointerId);
+    }
     dragState = {
       handleIndex,
       initialCursorPosition: cursorPosition(direction, e),
       initialLayout: [...layout],
+      pointerId,
     };
     handle.setAttribute("data-active", "pointer");
     applyLayout();
@@ -735,6 +759,10 @@ export function createResizable(
   // ---- Listeners --------------------------------------------------------------
 
   handles.forEach((handle, handleIndex) => {
+    cleanups.push(on(handle, "pointerdown", (e) => startDragging(handleIndex, e as PointerEvent)));
+    cleanups.push(on(handle, "pointermove", onMove));
+    cleanups.push(on(handle, "pointerup", stopDragging));
+    cleanups.push(on(handle, "pointercancel", stopDragging));
     cleanups.push(on(handle, "mousedown", (e) => startDragging(handleIndex, e as MouseEvent)));
     cleanups.push(
       on(handle, "touchstart", (e) => startDragging(handleIndex, e as TouchEvent), {
@@ -794,10 +822,13 @@ export function createResizable(
   });
 
   const body = doc.body;
+  cleanups.push(on(body, "pointermove", onMove));
   cleanups.push(on(body, "mousemove", onMove));
   cleanups.push(on(body, "touchmove", onMove, { passive: false }));
   cleanups.push(on(body, "mouseleave", onMove));
   cleanups.push(on(body, "contextmenu", stopDragging));
+  cleanups.push(on(win, "pointerup", stopDragging));
+  cleanups.push(on(win, "pointercancel", stopDragging));
   cleanups.push(on(win, "mouseup", stopDragging));
   cleanups.push(on(win, "touchend", stopDragging));
 

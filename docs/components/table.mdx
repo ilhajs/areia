@@ -57,27 +57,18 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Table } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Table } from "areia/components/table";
 ```
 
 ## Usage
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
@@ -107,7 +98,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -117,7 +107,7 @@ Example.mount(document.getElementById("root")!);
 
 Add selection columns with `Table.CheckHead` and `Table.CheckCell`. They render Areia checkboxes with larger cell hit targets.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
@@ -187,7 +177,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -195,7 +184,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `variant: "compact"` on `Table.Header` for a more condensed header style.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
@@ -246,7 +235,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -254,7 +242,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `variant: "selected"` on `Table.Row` to highlight selected rows.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
@@ -308,7 +296,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -316,7 +303,7 @@ Example.mount(document.getElementById("root")!);
 
 For precise control over column widths, set `layout: "fixed"` and provide a `colgroup`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
@@ -372,7 +359,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -380,7 +366,7 @@ Example.mount(document.getElementById("root")!);
 
 Pin a column to the left or right edge of a horizontal scroll container with `sticky: "left"` or `sticky: "right"` on `Table.Head` and `Table.Cell`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Badge, Table } from "areia";
 
@@ -459,7 +445,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -467,7 +452,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `sticky: true` on `Table.Header` and put the table in a height-constrained vertical scroll container.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
@@ -505,7 +490,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -513,7 +497,7 @@ Example.mount(document.getElementById("root")!);
 
 `Table.ResizeHandle` resizes its containing `th` or `td` by updating the cell width while you drag it. Place it inside a relatively positioned cell.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Table } from "areia";
 
@@ -534,7 +518,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -627,7 +610,7 @@ Handle for column resizing. Dragging it updates the containing `th` or `td` widt
 
 For advanced features like sorting, filtering, and resizable columns, integrate with [TanStack Table](https://tanstack.com/table). Areia's `Table` is semantic and unopinionated, so you can render TanStack header groups, rows, and cells through the same compound helpers.
 
-```ts twoslash
+```ts
 import { Table } from "areia";
 
 // Pseudo-code: use your TanStack table instance to render headers and cells.

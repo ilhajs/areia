@@ -30,42 +30,20 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Autocomplete } from "areia";
 ```
-
-### Granular
-
-```ts twoslash
-import { Autocomplete } from "areia/components/autocomplete";
-```
-
-## When to Use
-
-Use `Autocomplete` when the input value can be free-form text and suggestions are optional hints. Use `Combobox` when the final value must come from a predefined list.
-
-| Scenario                                      | Use            |
-| --------------------------------------------- | -------------- |
-| Search box, product finder, address lookup    | `Autocomplete` |
-| Country picker, font selector, role selector  | `Combobox`     |
-| Large or dynamic dataset with API suggestions | `Autocomplete` |
-| Small static list that must enforce validity  | `Combobox`     |
-| User can type anything and free text is valid | `Autocomplete` |
-| User should browse all options on demand      | `Combobox`     |
 
 ## Usage
 
 Call `Autocomplete(...)` for an interactive Ilha island. The root wires input events, suggestion filtering, keyboard navigation, and suggestion selection.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Autocomplete } from "areia";
 
@@ -88,7 +66,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -100,7 +77,7 @@ Use `Autocomplete.Static(...)` for static markup or when you want to wire behavi
 
 A basic free-form input with a flat list of string suggestions.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Autocomplete } from "areia";
 
@@ -124,7 +101,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -132,7 +108,7 @@ Example.mount(document.getElementById("root")!);
 
 Add `label`, `description`, and `required` to enable the built-in field wrapper.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Autocomplete } from "areia";
 
@@ -160,7 +136,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -168,7 +143,7 @@ Example.mount(document.getElementById("root")!);
 
 Display validation errors with the `error` prop. The typed value is still free-form; validation belongs to your application.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Autocomplete } from "areia";
 
@@ -194,7 +169,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -202,7 +176,7 @@ Example.mount(document.getElementById("root")!);
 
 Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Autocomplete } from "areia";
 
@@ -234,7 +208,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -242,7 +215,7 @@ Example.mount(document.getElementById("root")!);
 
 Pass a custom `filter` function for advanced logic such as filtering on object labels. Set `filter: false` when suggestions are already filtered by an API.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Autocomplete } from "areia";
 
@@ -272,7 +245,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -280,7 +252,7 @@ Example.mount(document.getElementById("root")!);
 
 For fully custom layouts, compose the subcomponents manually. Suggestions remain optional helpers; the input value is still free-form.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Autocomplete } from "areia";
 
@@ -336,7 +308,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -344,7 +315,7 @@ Example.mount(document.getElementById("root")!);
 
 `Autocomplete` emits bubbling custom events so you can integrate it with application state without constraining the input to a list value.
 
-```ts twoslash
+```ts
 const autocomplete = document.querySelector(
   '[data-slot="autocomplete"]',
 );

@@ -1,0 +1,478 @@
+---
+title: Dropdown
+description: A menu of actions or choices triggered by a button.
+---
+
+A dropdown menu for actions, navigation, and compact option controls.
+
+`Dropdown` is backed by `@areia/slots` and wires open state, positioning, keyboard navigation, typeahead, item selection, checkbox items, and radio items.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Button, Dropdown } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Dropdown({
+      trigger: Button({ children: "Add" }),
+      children: [
+        Dropdown.Item({ value: "worker", children: "Worker" }),
+        Dropdown.Item({ value: "pages", children: "Pages" }),
+        Dropdown.Item({
+          value: "kv",
+          children: "KV Namespace",
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## Import
+
+```ts
+import { Dropdown } from "areia";
+```
+
+## Usage
+
+Use `trigger` with menu item helpers for common menus.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Button, Dropdown } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Dropdown({
+      trigger: Button({ children: "Menu" }),
+      children: [
+        Dropdown.Item({ value: "edit", children: "Edit" }),
+        Dropdown.Item({
+          value: "duplicate",
+          children: "Duplicate",
+        }),
+        Dropdown.Separator(),
+        Dropdown.Item({
+          value: "delete",
+          children: "Delete",
+          variant: "danger",
+        }),
+      ],
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+Use compound helpers when you need custom structure. `DropdownMenu` is available as an alias if that reads better in your code.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Button, DropdownMenu } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${DropdownMenu({
+      trigger: Button({ children: "Actions" }),
+      children: [
+        DropdownMenu.Group({
+          children: [
+            DropdownMenu.Label({ children: "Project" }),
+            DropdownMenu.Item({
+              value: "rename",
+              children: "Rename",
+            }),
+            DropdownMenu.Item({
+              value: "duplicate",
+              children: "Duplicate",
+            }),
+          ],
+        }),
+        DropdownMenu.Separator(),
+        DropdownMenu.Item({
+          value: "delete",
+          variant: "danger",
+          children: "Delete",
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+Use `Dropdown.Static(...)` for static markup or when you want to initialize behavior yourself. For most application usage, call `Dropdown(...)`.
+
+## Examples
+
+### Basic
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Button, Dropdown } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Dropdown({
+      trigger: Button({ children: "Add" }),
+      children: [
+        Dropdown.Item({ value: "worker", children: "Worker" }),
+        Dropdown.Item({ value: "pages", children: "Pages" }),
+        Dropdown.Item({
+          value: "kv",
+          children: "KV Namespace",
+        }),
+      ],
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Inset Items
+
+Use `inset` on items without an icon to align their text with selection indicators or icon-bearing items.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Button, Dropdown } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Dropdown({
+      trigger: Button({ children: "Edit" }),
+      children: [
+        Dropdown.Item({ value: "rename", children: "Rename" }),
+        Dropdown.Item({
+          value: "duplicate",
+          children: "Duplicate",
+        }),
+        Dropdown.Separator(),
+        Dropdown.Item({
+          value: "move",
+          children: "Move to folder",
+          inset: true,
+        }),
+        Dropdown.Item({
+          value: "favorite",
+          children: "Add to favorites",
+          inset: true,
+        }),
+        Dropdown.Separator(),
+        Dropdown.Item({
+          value: "delete",
+          children: "Delete",
+          variant: "danger",
+        }),
+      ],
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Change Events
+
+Use `onSelect` on the root to respond to accepted item selections.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Button, Dropdown } from "areia";
+
+const Example = ilha.state("lastAction", "").render(
+  ({ state }) => html`
+    <div class="flex flex-col items-start gap-3">
+      ${Dropdown({
+        trigger: Button({ children: "Actions" }),
+        onSelect(value) {
+          state.lastAction(value);
+        },
+        children: [
+          Dropdown.Item({
+            value: "duplicate",
+            children: "Duplicate",
+          }),
+          Dropdown.Item({
+            value: "rename",
+            children: "Rename",
+          }),
+          Dropdown.Separator(),
+          Dropdown.Item({
+            value: "delete",
+            children: "Delete",
+            variant: "danger",
+          }),
+        ],
+      })}
+      <p class="text-sm text-areia-subtle">
+        Last action:
+        <span class="text-areia-default"
+          >${state.lastAction() || "None"}</span
+        >
+      </p>
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Checkbox Items
+
+Use checkbox items for independently toggleable options.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Button, Dropdown } from "areia";
+
+const Example = ilha
+  .state("visible", ["sidebar", "wrap"])
+  .render(
+    ({ state }) => html`
+      ${Dropdown({
+        trigger: Button({ children: "View Options" }),
+        defaultValues: state.visible(),
+        closeOnSelect: false,
+        onValuesChange(values) {
+          state.visible(values);
+        },
+        children: [
+          Dropdown.Group({
+            children: [
+              Dropdown.Label({ children: "Display" }),
+              Dropdown.CheckboxItem({
+                value: "sidebar",
+                checked: state.visible().includes("sidebar"),
+                children: "Show sidebar",
+              }),
+              Dropdown.CheckboxItem({
+                value: "lines",
+                checked: state.visible().includes("lines"),
+                children: "Show line numbers",
+              }),
+              Dropdown.CheckboxItem({
+                value: "wrap",
+                checked: state.visible().includes("wrap"),
+                children: "Word wrap",
+              }),
+            ],
+          }),
+        ],
+      })}
+    `,
+  );
+Example.mount(document.getElementById("root")!);
+```
+
+### Radio Items
+
+Use radio items for a single selected value.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Button, Dropdown } from "areia";
+
+const Example = ilha.state("density", "comfortable").render(
+  ({ state }) => html`
+    ${Dropdown({
+      trigger: Button({ children: "Density" }),
+      defaultValue: state.density(),
+      closeOnSelect: false,
+      onValueChange(value) {
+        state.density(value ?? "comfortable");
+      },
+      children: [
+        Dropdown.Label({ children: "Table density" }),
+        Dropdown.RadioItem({
+          value: "compact",
+          checked: state.density() === "compact",
+          children: "Compact",
+        }),
+        Dropdown.RadioItem({
+          value: "comfortable",
+          checked: state.density() === "comfortable",
+          children: "Comfortable",
+        }),
+        Dropdown.RadioItem({
+          value: "spacious",
+          checked: state.density() === "spacious",
+          children: "Spacious",
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Custom Trigger
+
+Pass any Areia or Ilha-rendered content as the trigger.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Dropdown } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Dropdown({
+      trigger: html`
+        <span
+          class="flex size-8 items-center justify-center rounded-full bg-areia-accent text-sm font-medium text-white"
+        >
+          AR
+        </span>
+      `,
+      triggerClass: "rounded-full",
+      children: [
+        Dropdown.Item({
+          value: "profile",
+          children: "Profile",
+        }),
+        Dropdown.Item({
+          value: "settings",
+          children: "Settings",
+        }),
+        Dropdown.Separator(),
+        Dropdown.Item({
+          value: "logout",
+          children: "Log out",
+          variant: "danger",
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Navigation Links
+
+Use `Dropdown.LinkItem` for semantic links.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Button, Dropdown } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Dropdown({
+      trigger: Button({ children: "Resources" }),
+      children: [
+        Dropdown.LinkItem({
+          href: "/settings",
+          value: "settings",
+          children: "Settings",
+        }),
+        Dropdown.LinkItem({
+          href: "/docs",
+          value: "docs",
+          children: "Documentation",
+        }),
+        Dropdown.Separator(),
+        Dropdown.LinkItem({
+          href: "https://developers.cloudflare.com",
+          external: true,
+          value: "developer-docs",
+          children: "Developer Docs",
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## API Reference
+
+### Dropdown
+
+Root component that manages the dropdown state.
+
+| Prop             | Type                                     | Default    | Description                                                        |
+| ---------------- | ---------------------------------------- | ---------- | ------------------------------------------------------------------ |
+| `trigger`        | `unknown`                                | -          | Content rendered inside the trigger button.                        |
+| `children`       | `unknown`                                | -          | Menu content. Use compound helpers for custom structure.           |
+| `items`          | `DropdownItemInput[]`                    | -          | Convenience item descriptors. Ignored when `children` is provided. |
+| `defaultOpen`    | `boolean`                                | `false`    | Initial open state.                                                |
+| `defaultValue`   | `string \| null`                         | `null`     | Initial radio item value.                                          |
+| `defaultValues`  | `string[]`                               | `[]`       | Initial checkbox item values.                                      |
+| `closeOnSelect`  | `boolean`                                | `true`     | Whether selecting an item closes the menu.                         |
+| `side`           | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side for the popup.                                      |
+| `align`          | `"start" \| "center" \| "end"`           | `"start"`  | Preferred alignment relative to the trigger.                       |
+| `onSelect`       | `(value: string) => void`                | -          | Fires when a user selects an item.                                 |
+| `onValueChange`  | `(value: string \| null) => void`        | -          | Fires when the radio value changes.                                |
+| `onValuesChange` | `(values: string[]) => void`             | -          | Fires when checkbox values change.                                 |
+
+### Dropdown.Trigger
+
+Button that opens the dropdown.
+
+Accepts standard button attributes plus `class` and `className`.
+
+### Dropdown.Content
+
+Popup container for menu content.
+
+Accepts standard div attributes plus `class` and `className`.
+
+### Dropdown.Item
+
+Individual menu item for actions.
+
+| Prop       | Type                    | Default     | Description                                    |
+| ---------- | ----------------------- | ----------- | ---------------------------------------------- |
+| `value`    | `string`                | -           | Selection value emitted by events.             |
+| `children` | `unknown`               | -           | Item content.                                  |
+| `label`    | `unknown`               | -           | Convenience label when using item descriptors. |
+| `icon`     | `unknown`               | -           | Content displayed before the label.            |
+| `shortcut` | `unknown`               | -           | Content displayed at the end of the item.      |
+| `variant`  | `"default" \| "danger"` | `"default"` | Visual style of the item.                      |
+| `selected` | `boolean`               | `false`     | Shows the selection indicator initially.       |
+| `inset`    | `boolean`               | `false`     | Adds left padding to align text.               |
+| `disabled` | `boolean`               | `false`     | Disables interaction.                          |
+
+### Dropdown.LinkItem
+
+A menu item rendered as an anchor.
+
+| Prop       | Type                    | Default     | Description                                    |
+| ---------- | ----------------------- | ----------- | ---------------------------------------------- |
+| `href`     | `string`                | -           | URL to navigate to.                            |
+| `external` | `boolean`               | `false`     | Adds `target="_blank"` and `rel="noreferrer"`. |
+| `variant`  | `"default" \| "danger"` | `"default"` | Visual style of the item.                      |
+| `inset`    | `boolean`               | `false`     | Adds left padding to align text.               |
+
+### Dropdown.CheckboxItem
+
+A menu item that toggles membership in the root `values` array.
+
+| Prop       | Type      | Default | Description                                         |
+| ---------- | --------- | ------- | --------------------------------------------------- |
+| `value`    | `string`  | -       | Checkbox value.                                     |
+| `checked`  | `boolean` | `false` | Initial checked state and rendered indicator state. |
+| `disabled` | `boolean` | `false` | Disables interaction.                               |
+
+### Dropdown.RadioItem
+
+A menu item that sets the root `value`.
+
+| Prop       | Type      | Default | Description                                         |
+| ---------- | --------- | ------- | --------------------------------------------------- |
+| `value`    | `string`  | -       | Radio value.                                        |
+| `checked`  | `boolean` | `false` | Initial checked state and rendered indicator state. |
+| `disabled` | `boolean` | `false` | Disables interaction.                               |
+
+### Dropdown.Label
+
+Non-interactive label for a group of items.
+
+### Dropdown.Group
+
+Wrapper for grouping related labels and items.
+
+### Dropdown.Separator
+
+Visual divider between menu sections.
+
+### Dropdown.Shortcut
+
+Trailing shortcut hint for an item.

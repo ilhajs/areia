@@ -12,29 +12,20 @@ import { Switch } from "areia";
 const Example = ilha.render(
   () => html`${Switch({ label: "Enable notifications" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Switch } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Switch } from "areia/components/switch";
 ```
 
 ## Usage
 
 Call `Switch(...)` for interactive behavior. It initializes `@data-slot/switch`, syncs ARIA/state attributes, creates form inputs, and emits change events.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -49,7 +40,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -59,33 +49,31 @@ Use `Switch.Static(...)` for static markup or when you want to initialize behavi
 
 ### Off State
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
 const Example = ilha.render(
   () => html`${Switch({ label: "Dark mode" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### On State
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
 const Example = ilha.render(
   () => html`${Switch({ label: "Dark mode", checked: true })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -101,7 +89,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -109,7 +96,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `readOnly` to prevent user changes while keeping the field enabled for form submission.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -121,7 +108,6 @@ const Example = ilha.render(
       readOnly: true,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -129,7 +115,7 @@ Example.mount(document.getElementById("root")!);
 
 The Switch supports two variants: `default` for brand-colored toggles and `neutral` for monochrome toggles.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -151,7 +137,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -159,7 +144,7 @@ Example.mount(document.getElementById("root")!);
 
 The neutral variant is useful for subtle, lower-emphasis settings.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -170,7 +155,6 @@ const Example = ilha.render(
       variant: "neutral",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -178,7 +162,7 @@ Example.mount(document.getElementById("root")!);
 
 Three sizes are available: `sm`, `base`, and `lg`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -191,7 +175,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -199,7 +182,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `controlFirst: false` to place the label before the switch.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -210,7 +193,6 @@ const Example = ilha.render(
       controlFirst: false,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -218,7 +200,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `labelTooltip` for contextual help. Set `required: false` to show the optional indicator.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -232,7 +214,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -240,7 +221,7 @@ Example.mount(document.getElementById("root")!);
 
 When a custom `id` is provided, clicking the label toggles the switch.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -252,7 +233,6 @@ const Example = ilha.render(
     })}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -260,14 +240,13 @@ Example.mount(document.getElementById("root")!);
 
 When a switch does not have visible label text, provide an accessible name with `aria-label`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
 const Example = ilha.render(
   () => html`${Switch({ "aria-label": "Enable setting" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -275,7 +254,7 @@ Example.mount(document.getElementById("root")!);
 
 Group related switches with `Switch.Group`. It provides a shared legend, description, and error message for the group.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -307,7 +286,6 @@ const Example = ilha.render(
     )}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -315,7 +293,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `controlFirst: false` on the group to place labels before all switches in the group.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -339,7 +317,6 @@ const Example = ilha.render(
     )}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -347,7 +324,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `Switch.Legend` with `class: "sr-only"` to keep the legend accessible to screen readers while hiding it visually.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -363,7 +340,6 @@ const Example = ilha.render(
     ])}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -371,7 +347,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `Switch.Legend` directly when you need custom legend styling.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Switch } from "areia";
 
@@ -395,7 +371,6 @@ const Example = ilha.render(
     ])}
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -403,7 +378,7 @@ Example.mount(document.getElementById("root")!);
 
 `Switch` emits a bubbling `switch:change` event. You can also dispatch the inbound `switch:set` event supported by `@data-slot/switch`.
 
-```ts twoslash
+```ts
 const switchRoot = document.querySelector(
   '[data-slot="switch"]',
 );

@@ -136,7 +136,7 @@ function copyButton(input: {
     "data-slot": "clipboard-text-button",
     "data-copy-text": textToCopy,
     "data-copied-text": copiedText,
-    label: html`<span
+    children: html`<span
         data-slot="clipboard-text-copied-icon"
         class="pointer-events-none absolute inset-0 flex translate-y-full items-center justify-center opacity-0 transition-all duration-200"
         >${copiedIcon}</span

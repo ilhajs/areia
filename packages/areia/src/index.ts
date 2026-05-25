@@ -80,6 +80,30 @@ export type {
   ClipboardTextVariantsProps,
 } from "$components/clipboard-text";
 export {
+  Collapsible,
+  CollapsibleAccordion,
+  CollapsibleAccordionItem,
+  CollapsibleAccordionPanel,
+  CollapsibleAccordionTrigger,
+  CollapsibleDefaultPanel,
+  CollapsibleDefaultTrigger,
+  CollapsiblePanel,
+  CollapsibleRoot,
+  CollapsibleRootIsland,
+  CollapsibleTrigger,
+  collapsibleVariants,
+} from "$components/collapsible";
+export type {
+  CollapsibleAccordionInput,
+  CollapsibleAccordionItemInput,
+  CollapsibleInput,
+  CollapsibleItem,
+  CollapsiblePanelInput,
+  CollapsibleRootInput,
+  CollapsibleTriggerInput,
+  CollapsibleVariantsProps,
+} from "$components/collapsible";
+export {
   ContextMenu,
   ContextMenuCheckboxItem,
   ContextMenuContent,
@@ -122,6 +146,48 @@ export type {
   DialogTriggerInput,
   DialogVariantsProps,
 } from "$components/dialog";
+export {
+  Dropdown,
+  DropdownCheckboxItem,
+  DropdownContent,
+  DropdownGroup,
+  DropdownItem,
+  DropdownLabel,
+  DropdownLinkItem,
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuLinkItem,
+  DropdownMenuRadioItem,
+  DropdownMenuRoot,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+  DropdownRadioItem,
+  DropdownRoot,
+  DropdownSeparator,
+  DropdownShortcut,
+  DropdownTrigger,
+  dropdownVariants,
+} from "$components/dropdown";
+export type {
+  DropdownAlign,
+  DropdownContentInput,
+  DropdownGroupInput,
+  DropdownInput,
+  DropdownItemInput,
+  DropdownItemKind,
+  DropdownLabelInput,
+  DropdownSeparatorInput,
+  DropdownShortcutInput,
+  DropdownSide,
+  DropdownTriggerInput,
+  DropdownVariant,
+  DropdownVariantsProps,
+} from "$components/dropdown";
 export {
   Field,
   FieldDescription,
@@ -249,6 +315,14 @@ export {
   ProgressValue,
 } from "$components/progress";
 export type { ProgressInput } from "$components/progress";
+export { Slider, SliderRange, SliderRoot, SliderThumb, SliderTrack } from "$components/slider";
+export type {
+  SliderInput,
+  SliderRangeInput,
+  SliderThumbInput,
+  SliderTrackInput,
+  SliderValue,
+} from "$components/slider";
 export {
   Pagination,
   PaginationControls,
@@ -289,6 +363,46 @@ export {
   TableRow,
   tableVariants,
 } from "$components/table";
+export {
+  TabBar,
+  TabBarContent,
+  TabBarIndicator,
+  TabBarList,
+  TabBarRoot,
+  TabBarScrollFade,
+  TabBarTrigger,
+  Tabs,
+  TabsContent,
+  TabsIndicator,
+  TabsList,
+  TabsRoot,
+  TabsScrollFade,
+  TabsTrigger,
+  tabBarVariants,
+  tabsVariants,
+} from "$components/tabs";
+export type {
+  TabBarContentInput,
+  TabBarIndicatorInput,
+  TabBarInput,
+  TabBarItem,
+  TabBarListInput,
+  TabBarScrollFadeInput,
+  TabBarSize,
+  TabBarTriggerInput,
+  TabBarVariant,
+  TabBarVariantsProps,
+  TabsContentInput,
+  TabsIndicatorInput,
+  TabsInput,
+  TabsItem,
+  TabsListInput,
+  TabsScrollFadeInput,
+  TabsSize,
+  TabsTriggerInput,
+  TabsVariant,
+  TabsVariantsProps,
+} from "$components/tabs";
 export { Textarea, textareaVariants } from "$components/textarea";
 export type {
   TextareaError,
@@ -297,6 +411,25 @@ export type {
   TextareaVariant,
   TextareaVariantsProps,
 } from "$components/textarea";
+export { Toggle, ToggleRoot, toggleVariants as toggleButtonVariants } from "$components/toggle";
+export type {
+  ToggleInput,
+  ToggleSize,
+  ToggleVariant,
+  ToggleVariantsProps,
+} from "$components/toggle";
+export {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  ResizablePanelGroupRoot,
+} from "$components/resizable";
+export type {
+  ResizableHandleInput,
+  ResizableInput,
+  ResizablePanelInput,
+} from "$components/resizable";
 export type {
   RadioAppearance,
   RadioControlPosition,

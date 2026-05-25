@@ -60,7 +60,10 @@ const Example = ilha
   .render(
     () => html`
       <div class="flex flex-col gap-4">
-        ${Button({ label: "Save project", variant: "primary" })}
+        ${Button({
+          children: "Save project",
+          variant: "primary",
+        })}
         <ol
           id="sonner-toast-container"
           position="bottom-right"
@@ -73,7 +76,6 @@ const Example = ilha
       </div>
     `,
   );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

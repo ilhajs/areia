@@ -36,11 +36,9 @@ if (root) {
 }
 ```
 
-## Installation
+## Import
 
-### Package
-
-```ts twoslash
+```ts
 import { Dialog } from "@areia/slots";
 ```
 
@@ -48,7 +46,7 @@ import { Dialog } from "@areia/slots";
 
 Call `createDialog` with the root element and optional configuration. The primitive reads slot attributes from the DOM and manages open/close, focus trapping, scroll locking, and dismiss behavior.
 
-```ts twoslash
+```ts
 import { Dialog } from "@areia/slots";
 
 const el = document.querySelector<HTMLElement>(
@@ -73,7 +71,7 @@ controller.open();
 
 Use the `create` helper to discover and bind every unattached root in a scope.
 
-```ts twoslash
+```ts
 import { Dialog } from "@areia/slots";
 
 const controllers = Dialog.create(document);
@@ -141,7 +139,7 @@ All events are dispatched from the root element (`data-slot="dialog"`).
 
 #### `dialog:change`
 
-```ts twoslash
+```ts
 interface DialogChangeDetail {
   open: boolean;
 }
@@ -159,7 +157,7 @@ interface DialogChangeDetail {
 
 Send `dialog:set` on the root element to open or close the dialog programmatically without a controller reference.
 
-```ts twoslash
+```ts
 const root = document.querySelector<HTMLElement>(
   '[data-slot="dialog"]',
 )!;
@@ -202,7 +200,7 @@ Options can also be set via `data-*` attributes on the root element, using kebab
 
 The controller is the imperative handle returned by `createDialog`. Use it for programmatic control when you need to open or close the dialog from application logic.
 
-```ts twoslash
+```ts
 import { Dialog } from "@areia/slots";
 
 const el = document.querySelector<HTMLElement>(

@@ -1,0 +1,369 @@
+---
+title: Collapsible
+description: A disclosure component for showing and hiding content, with optional accordion behavior.
+---
+
+A composable disclosure component for showing and hiding content.
+
+`Collapsible` is backed by `@areia/slots`. Single disclosure mode uses the collapsible primitive, while accordion mode uses the accordion primitive for grouped items, keyboard navigation, and single or multiple expanded panels.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    <div class="w-full max-w-md">
+      ${Collapsible({
+        defaultOpen: true,
+        trigger: "What is Areia?",
+        panel:
+          "Areia is a vanilla TypeScript component library for building application interfaces.",
+      })}
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## Import
+
+```ts
+import { Collapsible } from "areia";
+```
+
+## Usage
+
+Use the high-level `trigger` and `panel` props for a single disclosure.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Collapsible({
+      trigger: "Show details",
+      panel: "Content revealed when the trigger is activated.",
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+Use `items` for accordion behavior.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Collapsible({
+      defaultValue: "overview",
+      items: [
+        {
+          value: "overview",
+          label: "Overview",
+          content: "A quick summary of the project.",
+        },
+        {
+          value: "settings",
+          label: "Settings",
+          content:
+            "Controls and preferences for this workspace.",
+        },
+      ],
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+Use `Collapsible.Static(...)` for static markup or when you want to initialize behavior yourself. For most application usage, call `Collapsible(...)`.
+
+## Examples
+
+### Basic
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Collapsible({
+      trigger: "What is Areia?",
+      panel:
+        "Areia provides accessible primitives and styled components for application UIs.",
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Default Open
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Collapsible({
+      defaultOpen: true,
+      trigger: "Deployment details",
+      panel: "The latest deployment completed successfully.",
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Multiple Independent Items
+
+Render multiple single disclosures when each item should manage its own open state.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    <div class="w-full max-w-md space-y-3">
+      ${Collapsible({
+        trigger: "What is Areia?",
+        panel:
+          "A component library for application interfaces.",
+      })}
+      ${Collapsible({
+        trigger: "How do I use it?",
+        panel:
+          "Install the package and import the components you need.",
+      })}
+      ${Collapsible({
+        trigger: "Does it include primitives?",
+        panel:
+          "Yes. Interactive components are backed by @areia/slots.",
+      })}
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Custom Trigger And Panel
+
+Use the compound helpers when you need custom layout.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    ${Collapsible({
+      children: [
+        Collapsible.Trigger({
+          class:
+            "rounded-md bg-areia-control-background px-3 py-2 text-sm font-medium ring ring-areia-control-border",
+          children: "Show release notes",
+        }),
+        Collapsible.Panel({
+          class:
+            "mt-3 rounded-lg bg-areia-surface-muted p-4 text-sm text-areia-default",
+          children:
+            "This panel uses custom styling instead of the default border-left accent.",
+        }),
+      ],
+    })}
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Accordion
+
+Pass `items` to render an accordion where one item is open at a time by default.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const items = [
+  {
+    value: "project",
+    label: "Project",
+    content: "Configure project metadata and visibility.",
+  },
+  {
+    value: "team",
+    label: "Team",
+    content: "Invite teammates and manage roles.",
+  },
+  {
+    value: "billing",
+    label: "Billing",
+    content: "Update payment method and invoices.",
+  },
+];
+
+const Example = ilha.render(
+  () => html`
+    <div class="w-full max-w-md">
+      ${Collapsible({
+        defaultValue: "project",
+        items,
+      })}
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Multiple Accordion Items
+
+Use `multiple: true` when more than one item can be open.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Collapsible({
+      multiple: true,
+      defaultValue: ["filters", "columns"],
+      items: [
+        {
+          value: "filters",
+          label: "Filters",
+          content:
+            "Status, owner, and date range filters are active.",
+        },
+        {
+          value: "columns",
+          label: "Columns",
+          content: "Choose which table columns are visible.",
+        },
+        {
+          value: "exports",
+          label: "Exports",
+          content: "Download visible rows as CSV.",
+        },
+      ],
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Change Events
+
+Use Ilha state to respond to accordion value changes.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Collapsible } from "areia";
+
+const Example = ilha.state("openItem", "account").render(
+  ({ state }) => html`
+    <div class="space-y-4">
+      ${Collapsible({
+        defaultValue: state.openItem(),
+        items: [
+          {
+            value: "account",
+            label: "Account",
+            content: "Account settings are expanded.",
+          },
+          {
+            value: "security",
+            label: "Security",
+            content: "Security settings are expanded.",
+          },
+        ],
+        onValueChange(value) {
+          state.openItem(value[0] ?? "");
+        },
+      })}
+      <p class="text-sm text-areia-subtle">
+        Open item: <code>${state.openItem}</code>
+      </p>
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## Compound Components
+
+Use compound helpers when the high-level props are not enough.
+
+| Component                      | Description                              |
+| ------------------------------ | ---------------------------------------- |
+| `Collapsible.Root`             | Static single disclosure root markup.    |
+| `Collapsible.Trigger`          | Unstyled trigger slot.                   |
+| `Collapsible.Panel`            | Unstyled content slot.                   |
+| `Collapsible.DefaultTrigger`   | Styled trigger with an animated chevron. |
+| `Collapsible.DefaultPanel`     | Styled panel with a left border accent.  |
+| `Collapsible.Accordion`        | Static accordion root markup.            |
+| `Collapsible.AccordionItem`    | Accordion item wrapper.                  |
+| `Collapsible.AccordionTrigger` | Accordion trigger slot.                  |
+| `Collapsible.AccordionPanel`   | Accordion content slot.                  |
+
+## API
+
+### `Collapsible(input)`
+
+| Prop               | Type                      | Default | Description                                        |
+| ------------------ | ------------------------- | ------- | -------------------------------------------------- |
+| `trigger`          | `unknown`                 | —       | Trigger content for single disclosure mode.        |
+| `panel`            | `unknown`                 | —       | Panel content for single disclosure mode.          |
+| `children`         | `unknown`                 | —       | Custom compound markup.                            |
+| `open`             | `boolean`                 | —       | Initial open state for single disclosure mode.     |
+| `defaultOpen`      | `boolean`                 | `false` | Initial open state for single disclosure mode.     |
+| `hiddenUntilFound` | `boolean`                 | `false` | Use `hidden="until-found"` when content is closed. |
+| `class`            | `string`                  | —       | Additional classes for the root.                   |
+| `className`        | `string`                  | —       | Alias for `class`.                                 |
+| `onOpenChange`     | `(open: boolean) => void` | —       | Called when single disclosure state changes.       |
+
+### Accordion Props
+
+These props apply when `items` are provided or `accordion: true` is set.
+
+| Prop            | Type                         | Default      | Description                                          |
+| --------------- | ---------------------------- | ------------ | ---------------------------------------------------- |
+| `items`         | `CollapsibleItem[]`          | `[]`         | Items rendered as accordion sections.                |
+| `accordion`     | `boolean`                    | `false`      | Forces accordion mode for custom accordion children. |
+| `multiple`      | `boolean`                    | `false`      | Allows multiple items to be open.                    |
+| `value`         | `string \| string[]`         | —            | Initial expanded item value or values.               |
+| `defaultValue`  | `string \| string[]`         | —            | Initial expanded item value or values.               |
+| `disabled`      | `boolean`                    | `false`      | Disables the accordion.                              |
+| `orientation`   | `"vertical" \| "horizontal"` | `"vertical"` | Keyboard navigation orientation.                     |
+| `loopFocus`     | `boolean`                    | `true`       | Whether arrow-key focus wraps at the ends.           |
+| `onValueChange` | `(value: string[]) => void`  | —            | Called when expanded accordion items change.         |
+
+### `CollapsibleItem`
+
+| Property       | Type      | Required | Description                         |
+| -------------- | --------- | -------- | ----------------------------------- |
+| `value`        | `string`  | Yes      | Unique item value.                  |
+| `label`        | `unknown` | No       | Trigger label.                      |
+| `trigger`      | `unknown` | No       | Custom trigger content.             |
+| `content`      | `unknown` | No       | Panel content.                      |
+| `children`     | `unknown` | No       | Alias for panel content.            |
+| `disabled`     | `boolean` | No       | Disables the item.                  |
+| `class`        | `string`  | No       | Additional classes for the item.    |
+| `triggerClass` | `string`  | No       | Additional classes for the trigger. |
+| `panelClass`   | `string`  | No       | Additional classes for the panel.   |
+
+## Slots
+
+Single disclosure mode renders:
+
+- `collapsible`
+- `collapsible-trigger`
+- `collapsible-content`
+
+Accordion mode renders:
+
+- `accordion`
+- `accordion-item`
+- `accordion-trigger`
+- `accordion-content`

@@ -1,0 +1,224 @@
+---
+title: Toggle
+description: A two-state button that can be either on or off.
+---
+
+A pressable button that toggles between pressed and unpressed states.
+
+`Toggle` is backed by `@areia/slots` and wires `aria-pressed`, `data-state`, and toggle change events.
+
+```ts preview twoslash
+import ilha, { html } from "ilha";
+import { Toggle } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Toggle({ children: "Bold", variant: "outline" })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## Import
+
+```ts
+import { Toggle } from "areia";
+```
+
+## Usage
+
+Use `Toggle` with optional `variant`, `size`, and `defaultPressed`. It is a single-element primitive — a `<button>` with `data-slot="toggle"`.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Toggle } from "areia";
+
+const Example = ilha.render(
+  () =>
+    html`${Toggle({
+      children: "Italic",
+      variant: "outline",
+    })}`,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## Examples
+
+### Variants
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Toggle } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    <div class="flex items-center gap-2">
+      ${Toggle({ children: "Default" })}
+      ${Toggle({ children: "Outline", variant: "outline" })}
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Sizes
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Toggle } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    <div class="flex items-center gap-2">
+      ${Toggle({
+        children: "Small",
+        size: "sm",
+        variant: "outline",
+      })}
+      ${Toggle({
+        children: "Default",
+        size: "default",
+        variant: "outline",
+      })}
+      ${Toggle({
+        children: "Large",
+        size: "lg",
+        variant: "outline",
+      })}
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Disabled
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Toggle } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    <div class="flex items-center gap-2">
+      ${Toggle({ children: "Disabled", disabled: true })}
+      ${Toggle({
+        children: "Disabled",
+        variant: "outline",
+        disabled: true,
+      })}
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Pressed State
+
+Use `defaultPressed` to set the initial pressed state.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Toggle } from "areia";
+
+const Example = ilha.render(
+  () => html`
+    <div class="flex items-center gap-2">
+      ${Toggle({ children: "Pressed", defaultPressed: true })}
+      ${Toggle({
+        children: "Pressed",
+        variant: "outline",
+        defaultPressed: true,
+      })}
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+### Change Events
+
+Use `onPressedChange` to respond to state changes.
+
+```ts preview
+import ilha, { html } from "ilha";
+import { Toggle } from "areia";
+
+const Example = ilha.state("bold", false).render(
+  ({ state }) => html`
+    <div class="flex flex-col items-start gap-3">
+      ${Toggle({
+        children: "Bold",
+        variant: "outline",
+        onPressedChange(pressed) {
+          state.bold(pressed);
+        },
+      })}
+      <p class="text-sm text-areia-subtle">
+        Bold is:
+        <span class="font-medium text-areia-default"
+          >${state.bold() ? "On" : "Off"}</span
+        >
+      </p>
+    </div>
+  `,
+);
+Example.mount(document.getElementById("root")!);
+```
+
+## API Reference
+
+### Toggle
+
+Root component that manages the toggle state.
+
+| Prop              | Type                         | Default     | Description                                                 |
+| ----------------- | ---------------------------- | ----------- | ----------------------------------------------------------- |
+| `children`        | `unknown`                    | —           | Content rendered inside the toggle button.                  |
+| `variant`         | `"default" \| "outline"`     | `"default"` | Visual variant. `default` is filled, `outline` is bordered. |
+| `size`            | `"sm" \| "default" \| "lg"`  | `"default"` | Size of the toggle.                                         |
+| `defaultPressed`  | `boolean`                    | `false`     | Initial pressed state.                                      |
+| `disabled`        | `boolean`                    | `false`     | Disables interaction and applies muted styling.             |
+| `onPressedChange` | `(pressed: boolean) => void` | —           | Called when the pressed state changes.                      |
+
+## Slots
+
+`Toggle` renders a single data slot:
+
+- `toggle`
+
+The root receives state attributes from the slot controller:
+
+| Attribute       | Element | Description                                    |
+| --------------- | ------- | ---------------------------------------------- |
+| `data-state`    | toggle  | `"on"` when pressed, `"off"` when not pressed. |
+| `data-disabled` | toggle  | Present when toggle is disabled.               |
+| `aria-pressed`  | toggle  | `"true"` or `"false"`.                         |
+
+## Events
+
+The toggle emits custom DOM events from the root element.
+
+### Outbound
+
+| Event           | Detail                 | Description                           |
+| --------------- | ---------------------- | ------------------------------------- |
+| `toggle:change` | `{ pressed: boolean }` | Fired when the pressed state changes. |
+
+### Inbound
+
+| Event        | Detail               | Description                             |
+| ------------ | -------------------- | --------------------------------------- |
+| `toggle:set` | `{ value: boolean }` | Set the pressed state programmatically. |
+
+```ts
+const toggle = document.querySelector('[data-slot="toggle"]')!;
+
+toggle.addEventListener("toggle:change", (e) => {
+  console.log("Pressed:", e.detail.pressed);
+});
+
+// Set pressed state programmatically
+toggle.dispatchEvent(
+  new CustomEvent("toggle:set", { detail: { value: true } }),
+);
+```

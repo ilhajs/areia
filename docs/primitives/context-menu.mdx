@@ -43,11 +43,9 @@ if (root) {
 }
 ```
 
-## Installation
+## Import
 
-### Package
-
-```ts twoslash
+```ts
 import { ContextMenu } from "@areia/slots";
 ```
 
@@ -55,7 +53,7 @@ import { ContextMenu } from "@areia/slots";
 
 Call `createContextMenu` with the root element and optional configuration. The primitive reads slot attributes from the DOM and manages open/close, item highlight, keyboard navigation, and selection.
 
-```ts twoslash
+```ts
 import { ContextMenu } from "@areia/slots";
 
 const el = document.querySelector<HTMLElement>(
@@ -78,7 +76,7 @@ controller.open({ x: 200, y: 100 });
 
 Use the `create` helper to discover and bind every unattached root in a scope.
 
-```ts twoslash
+```ts
 import { ContextMenu } from "@areia/slots";
 
 const controllers = ContextMenu.create(document);
@@ -189,7 +187,7 @@ All events bubble from the root element (`data-slot="context-menu"`).
 
 #### `context-menu:open-change`
 
-```ts twoslash
+```ts
 interface ContextMenuOpenChangeDetail {
   open: boolean;
   previousOpen: boolean;
@@ -213,7 +211,7 @@ interface ContextMenuOpenChangeDetail {
 
 #### `context-menu:select`
 
-```ts twoslash
+```ts
 interface ContextMenuSelectDetail {
   value: string;
   item: HTMLElement;
@@ -267,7 +265,7 @@ Options can also be set via `data-*` attributes on the root element, using kebab
 
 The controller is the imperative handle returned by `createContextMenu`. Use it for programmatic control in response to application state changes, or when you need to open the menu outside of a right-click interaction.
 
-```ts twoslash
+```ts
 import { ContextMenu } from "@areia/slots";
 
 const el = document.querySelector<HTMLElement>(

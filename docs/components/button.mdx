@@ -15,7 +15,7 @@ const plusIcon = Icon({ icon: Plus });
 const Example = ilha.render(
   () => html`
     <div class="flex flex-wrap items-center gap-2">
-      ${Button({ variant: "secondary", label: "Button" })}
+      ${Button({ variant: "secondary", children: "Button" })}
       ${Button({
         variant: "secondary",
         shape: "square",
@@ -25,35 +25,28 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Button } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Button } from "areia/components/button";
 ```
 
 ## Usage
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
 const Example = ilha.render(
   () =>
-    html`${Button({ variant: "secondary", label: "Click me" })}`,
+    html`${Button({
+      variant: "secondary",
+      children: "Click me",
+    })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -63,48 +56,49 @@ Example.mount(document.getElementById("root")!);
 
 #### Primary
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
 const Example = ilha.render(
   () =>
-    html`${Button({ variant: "primary", label: "Primary" })}`,
+    html`${Button({ variant: "primary", children: "Primary" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 #### Secondary
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
 const Example = ilha.render(
   () =>
-    html`${Button({ variant: "secondary", label: "Secondary" })}`,
+    html`${Button({
+      variant: "secondary",
+      children: "Secondary",
+    })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 #### Ghost
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
 const Example = ilha.render(
-  () => html`${Button({ variant: "ghost", label: "Ghost" })}`,
+  () =>
+    html`${Button({ variant: "ghost", children: "Ghost" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 #### Destructive
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
@@ -112,30 +106,28 @@ const Example = ilha.render(
   () =>
     html`${Button({
       variant: "destructive",
-      label: "Destructive",
+      children: "Destructive",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 #### Outline
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
 const Example = ilha.render(
   () =>
-    html`${Button({ variant: "outline", label: "Outline" })}`,
+    html`${Button({ variant: "outline", children: "Outline" })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 #### Secondary Destructive
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
@@ -143,16 +135,15 @@ const Example = ilha.render(
   () =>
     html`${Button({
       variant: "secondary-destructive",
-      label: "Secondary Destructive",
+      children: "Secondary Destructive",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Sizes
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
@@ -162,33 +153,32 @@ const Example = ilha.render(
       ${Button({
         size: "xs",
         variant: "secondary",
-        label: "Extra Small",
+        children: "Extra Small",
       })}
       ${Button({
         size: "sm",
         variant: "secondary",
-        label: "Small",
+        children: "Small",
       })}
       ${Button({
         size: "base",
         variant: "secondary",
-        label: "Base",
+        children: "Base",
       })}
       ${Button({
         size: "lg",
         variant: "secondary",
-        label: "Large",
+        children: "Large",
       })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### With Icon
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
@@ -200,10 +190,9 @@ const Example = ilha.render(
     html`${Button({
       variant: "secondary",
       icon: plusIcon,
-      label: "Create Ilha app",
+      children: "Create Ilha app",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -211,7 +200,7 @@ Example.mount(document.getElementById("root")!);
 
 For icon-only buttons, use `shape="square"` or `shape="circle"` with the `icon` prop. Always include `aria-label` for accessibility — without visible text, screen readers need the label to convey the button’s purpose.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
@@ -236,13 +225,12 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Loading State
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
@@ -251,16 +239,15 @@ const Example = ilha.render(
     html`${Button({
       variant: "primary",
       loading: true,
-      label: "Loading...",
+      children: "Loading...",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled State
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
@@ -269,10 +256,9 @@ const Example = ilha.render(
     html`${Button({
       variant: "secondary",
       disabled: true,
-      label: "Disabled",
+      children: "Disabled",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -280,7 +266,7 @@ Example.mount(document.getElementById("root")!);
 
 Use the native `title` attribute when additional context helps the user understand the action.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
@@ -293,7 +279,7 @@ const Example = ilha.render(
       ${Button({
         variant: "secondary",
         title: "Create a new Ilha app",
-        label: "Create Ilha app",
+        children: "Create Ilha app",
       })}
       ${Button({
         variant: "secondary",
@@ -305,7 +291,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -313,7 +298,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `LinkButton` when the interaction should navigate somewhere but still look like a button. Use `Button` for in-place actions like submitting, opening, or toggling UI.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ExternalLink } from "lucide";
 import { LinkButton, Icon } from "areia";
@@ -326,19 +311,18 @@ const Example = ilha.render(
       ${LinkButton({
         href: "/components/link",
         variant: "secondary",
-        label: "Read Link docs",
+        children: "Read Link docs",
       })}
       ${LinkButton({
         href: "https://ilha.build/",
         variant: "ghost",
         icon: externalIcon,
         external: true,
-        label: "Ilha Docs",
+        children: "Ilha Docs",
       })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -349,7 +333,7 @@ Example.mount(document.getElementById("root")!);
 | `shape`     | `"base" \| "square" \| "circle"`                                                               | `"base"`      | Controls the button shape.                                |
 | `size`      | `"xs" \| "sm" \| "base" \| "lg"`                                                               | `"base"`      | Controls button height, padding, gap, and text size.      |
 | `variant`   | `"primary" \| "secondary" \| "ghost" \| "destructive" \| "secondary-destructive" \| "outline"` | `"secondary"` | Controls the visual style.                                |
-| `label`     | `unknown`                                                                                      | -             | Content rendered inside the button.                       |
+| `children`  | `unknown`                                                                                      | -             | Content rendered inside the button.                       |
 | `class`     | `string`                                                                                       | -             | Additional CSS classes merged with the generated classes. |
 | `className` | `string`                                                                                       | -             | Alias for `class`.                                        |
 | `icon`      | `unknown`                                                                                      | -             | Markup rendered before the label.                         |

@@ -27,13 +27,13 @@ export const SWITCH_VARIANTS = {
   variant: {
     default: {
       classes:
-        "data-checked:bg-areia-primary data-checked:ring-areia-primary data-unchecked:bg-areia-control-background data-unchecked:ring-areia-control-border",
+        "data-checked:bg-areia-primary data-checked:ring-areia-primary data-unchecked:bg-areia-surface-muted data-unchecked:ring-areia-surface-muted bg-areia-surface-muted ring-areia-surface-muted",
       thumbClasses: "bg-areia-background data-checked:bg-areia-primary-foreground",
       description: "Default switch with brand color",
     },
     neutral: {
       classes:
-        "data-checked:bg-areia-foreground data-checked:ring-areia-foreground data-unchecked:bg-areia-control-background data-unchecked:ring-areia-control-border",
+        "data-checked:bg-areia-foreground data-checked:ring-areia-foreground data-unchecked:bg-areia-surface-muted data-unchecked:ring-areia-surface-muted bg-areia-surface-muted ring-areia-surface-muted",
       thumbClasses: "bg-areia-background data-checked:bg-areia-background",
       description: "Monochrome switch for subtle toggles",
     },

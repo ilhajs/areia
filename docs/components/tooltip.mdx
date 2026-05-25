@@ -25,29 +25,20 @@ const Example = ilha.render(
       }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Tooltip } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Tooltip } from "areia/components/tooltip";
 ```
 
 ## Usage
 
 Call `Tooltip(...)` for an interactive island. The root renders the tooltip markup and initializes the `@data-slot/tooltip` controller after mount.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
@@ -55,10 +46,9 @@ const Example = ilha.render(
   () =>
     html`${Tooltip({
       content: "Helpful contextual information",
-      children: Button({ label: "Hover me" }),
+      children: Button({ children: "Hover me" }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -70,7 +60,7 @@ For static server-rendered markup or custom initialization, use `Tooltip.Static(
 
 Use `content` for the popup and `children` for the trigger content.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Info } from "lucide";
 import { Button, Icon, Tooltip } from "areia";
@@ -89,7 +79,6 @@ const Example = ilha.render(
       }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -97,7 +86,7 @@ Example.mount(document.getElementById("root")!);
 
 When the trigger is not an action, render it as a `span`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Tooltip } from "areia";
 
@@ -112,7 +101,6 @@ const Example = ilha.render(
       children: "Areia",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -120,7 +108,7 @@ Example.mount(document.getElementById("root")!);
 
 Tooltips share `@data-slot/tooltip` warm-up behavior automatically. After one tooltip closes, hovering another tooltip within `skipDelayDuration` opens it without the normal delay.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Languages, Plus, Settings } from "lucide";
 import { Button, Icon, Tooltip } from "areia";
@@ -159,7 +147,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -167,7 +154,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `side` to choose the preferred side of the trigger. Collision handling may flip the tooltip at runtime when there is not enough space.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
@@ -177,27 +164,26 @@ const Example = ilha.render(
       ${Tooltip({
         side: "top",
         content: "Top tooltip",
-        children: Button({ label: "Top" }),
+        children: Button({ children: "Top" }),
       })}
       ${Tooltip({
         side: "bottom",
         content: "Bottom tooltip",
-        children: Button({ label: "Bottom" }),
+        children: Button({ children: "Bottom" }),
       })}
       ${Tooltip({
         side: "left",
         content: "Left tooltip",
-        children: Button({ label: "Left" }),
+        children: Button({ children: "Left" }),
       })}
       ${Tooltip({
         side: "right",
         content: "Right tooltip",
-        children: Button({ label: "Right" }),
+        children: Button({ children: "Right" }),
       })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -205,7 +191,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `align` to align the tooltip along the selected side.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
@@ -215,22 +201,21 @@ const Example = ilha.render(
       ${Tooltip({
         align: "start",
         content: "Start aligned",
-        children: Button({ label: "Start" }),
+        children: Button({ children: "Start" }),
       })}
       ${Tooltip({
         align: "center",
         content: "Center aligned",
-        children: Button({ label: "Center" }),
+        children: Button({ children: "Center" }),
       })}
       ${Tooltip({
         align: "end",
         content: "End aligned",
-        children: Button({ label: "End" }),
+        children: Button({ children: "End" }),
       })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -238,7 +223,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `delay` to control how long to wait before opening. Use `skipDelayDuration` to control the warm-up window after a tooltip closes.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
@@ -248,18 +233,17 @@ const Example = ilha.render(
       ${Tooltip({
         delay: 1000,
         content: "Opens after one second",
-        children: Button({ label: "1s delay" }),
+        children: Button({ children: "1s delay" }),
       })}
       ${Tooltip({
         delay: 0,
         skipDelayDuration: 0,
         content: "Opens instantly with no warm-up window",
-        children: Button({ label: "Instant" }),
+        children: Button({ children: "Instant" }),
       })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -267,7 +251,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `arrow: false` to hide the decorative arrow.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
@@ -276,10 +260,9 @@ const Example = ilha.render(
     html`${Tooltip({
       arrow: false,
       content: "No arrow",
-      children: Button({ label: "Hover me" }),
+      children: Button({ children: "Hover me" }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -287,7 +270,7 @@ Example.mount(document.getElementById("root")!);
 
 The `content` prop accepts Ilha markup.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Tooltip } from "areia";
 
@@ -302,10 +285,9 @@ const Example = ilha.render(
           >
         </div>
       `,
-      children: Button({ label: "Deploy" }),
+      children: Button({ children: "Deploy" }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -313,7 +295,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `trigger` when you need complete control over the trigger markup. The custom trigger must include `data-slot="tooltip-trigger"`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Tooltip } from "areia";
 
@@ -330,7 +312,6 @@ const Example = ilha.render(
       </span>`,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -338,7 +319,7 @@ Example.mount(document.getElementById("root")!);
 
 Use low-level parts for static markup or when you want to call `createTooltip` yourself.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Tooltip } from "areia";
 
@@ -350,7 +331,6 @@ const Example = ilha.render(
       triggerAs: "span",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

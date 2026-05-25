@@ -23,27 +23,18 @@ const Example = ilha.render(
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { ContextMenu } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { ContextMenu } from "areia/components/context-menu";
 ```
 
 ## Usage
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ContextMenu } from "areia";
 
@@ -65,7 +56,6 @@ const Example = ilha.render(
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -73,7 +63,7 @@ Example.mount(document.getElementById("root")!);
 
 ### Basic Menu
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ContextMenu } from "areia";
 
@@ -98,7 +88,6 @@ const Example = ilha.render(
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -106,7 +95,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `closeOnSelect: false` when menu items should toggle without closing immediately.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ContextMenu } from "areia";
 
@@ -132,13 +121,12 @@ const Example = ilha.render(
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Disabled Item
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ContextMenu } from "areia";
 
@@ -160,13 +148,12 @@ const Example = ilha.render(
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### Selection Callback
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { ContextMenu } from "areia";
 
@@ -185,7 +172,6 @@ const Example = ilha.render(
       ],
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

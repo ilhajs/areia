@@ -3,6 +3,10 @@
   "configVersion": 1,
   "workspaces": {
     "": {
+      "dependencies": {
+        "@areia/slots": "workspace:*",
+        "areia": "workspace:*",
+      },
       "devDependencies": {
         "@fontsource-variable/geist": "^5.2.9",
         "@fontsource-variable/geist-mono": "^5.2.8",

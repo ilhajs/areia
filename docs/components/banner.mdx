@@ -41,27 +41,18 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Banner } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Banner } from "areia/components/banner";
 ```
 
 ## Usage
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Info } from "lucide";
 import { Banner, Icon } from "areia";
@@ -76,7 +67,6 @@ const Example = ilha.render(
       description: "A new version is ready to install.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -86,7 +76,7 @@ Example.mount(document.getElementById("root")!);
 
 #### Default
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Info } from "lucide";
 import { Banner, Icon } from "areia";
@@ -101,13 +91,12 @@ const Example = ilha.render(
       description: "A new version is ready to install.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 #### Alert
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { TriangleAlert } from "lucide";
 import { Banner, Icon } from "areia";
@@ -126,13 +115,12 @@ const Example = ilha.render(
       description: "Your session will expire in 5 minutes.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 #### Error
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { TriangleAlert } from "lucide";
 import { Banner, Icon } from "areia";
@@ -152,13 +140,12 @@ const Example = ilha.render(
         "We couldn't save your changes. Please try again.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### With Icon
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { TriangleAlert } from "lucide";
 import { Banner, Icon } from "areia";
@@ -178,13 +165,12 @@ const Example = ilha.render(
         "Please review your project settings before proceeding.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### With Action
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Info } from "lucide";
 import { Banner, Button, Icon } from "areia";
@@ -204,13 +190,12 @@ const Example = ilha.render(
       }),
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
 ### With Multiple Actions
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { TriangleAlert } from "lucide";
 import { Banner, Button, Icon } from "areia";
@@ -241,7 +226,6 @@ const Example = ilha.render(
       `,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -249,7 +233,7 @@ Example.mount(document.getElementById("root")!);
 
 Use markup in `description` when the message needs links, emphasis, or other inline content.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Info } from "lucide";
 import { Banner, Icon } from "areia";
@@ -265,7 +249,6 @@ const Example = ilha.render(
         <strong>custom content</strong> with Ilha markup.`,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 

@@ -30,36 +30,27 @@ const Example = ilha.render(
       `,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
-## Installation
+## Import
 
-### Barrel
-
-```ts twoslash
+```ts
 import { Popover } from "areia";
-```
-
-### Granular
-
-```ts twoslash
-import { Popover } from "areia/components/popover";
 ```
 
 ## Usage
 
 Call `Popover(...)` for an interactive island. The root renders the popover markup and initializes the `@data-slot/popover` controller after mount.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
 const Example = ilha.render(
   () =>
     html`${Popover({
-      children: Button({ label: "Open" }),
+      children: Button({ children: "Open" }),
       content: html`
         ${Popover.Title({ children: "Popover Title" })}
         ${Popover.Description({
@@ -68,7 +59,6 @@ const Example = ilha.render(
       `,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -90,14 +80,14 @@ Use `Tooltip` to label an icon button or add a short explanation. Use `Popover` 
 
 ### Basic Popover
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
 const Example = ilha.render(
   () =>
     html`${Popover({
-      children: Button({ label: "Open Popover" }),
+      children: Button({ children: "Open Popover" }),
       content: html`
         ${Popover.Title({ children: "Popover Title" })}
         ${Popover.Description({
@@ -107,7 +97,6 @@ const Example = ilha.render(
       `,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -115,14 +104,14 @@ Example.mount(document.getElementById("root")!);
 
 Use `Popover.Close` inside the content to close the popup.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
 const Example = ilha.render(
   () =>
     html`${Popover({
-      children: Button({ label: "Open Settings" }),
+      children: Button({ children: "Open Settings" }),
       content: html`
         <div class="flex flex-col gap-3">
           <div>
@@ -140,7 +129,6 @@ const Example = ilha.render(
       `,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -148,7 +136,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `side` to control where the popover appears relative to the trigger.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
@@ -157,7 +145,7 @@ const Example = ilha.render(
     <div class="grid grid-cols-2 gap-3">
       ${Popover({
         side: "bottom",
-        children: Button({ label: "Bottom" }),
+        children: Button({ children: "Bottom" }),
         content: html`${Popover.Title({ children: "Bottom" })}
         ${Popover.Description({
           children: "Popover on bottom.",
@@ -165,19 +153,19 @@ const Example = ilha.render(
       })}
       ${Popover({
         side: "top",
-        children: Button({ label: "Top" }),
+        children: Button({ children: "Top" }),
         content: html`${Popover.Title({ children: "Top" })}
         ${Popover.Description({ children: "Popover on top." })}`,
       })}
       ${Popover({
         side: "left",
-        children: Button({ label: "Left" }),
+        children: Button({ children: "Left" }),
         content: html`${Popover.Title({ children: "Left" })}
         ${Popover.Description({ children: "Popover on left." })}`,
       })}
       ${Popover({
         side: "right",
-        children: Button({ label: "Right" }),
+        children: Button({ children: "Right" }),
         content: html`${Popover.Title({ children: "Right" })}
         ${Popover.Description({
           children: "Popover on right.",
@@ -186,7 +174,6 @@ const Example = ilha.render(
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -194,7 +181,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `align` to align the popover along the selected side.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
@@ -203,23 +190,22 @@ const Example = ilha.render(
     <div class="flex items-center gap-3">
       ${Popover({
         align: "start",
-        children: Button({ label: "Start" }),
+        children: Button({ children: "Start" }),
         content: "Start aligned",
       })}
       ${Popover({
         align: "center",
-        children: Button({ label: "Center" }),
+        children: Button({ children: "Center" }),
         content: "Center aligned",
       })}
       ${Popover({
         align: "end",
-        children: Button({ label: "End" }),
+        children: Button({ children: "End" }),
         content: "End aligned",
       })}
     </div>
   `,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -227,14 +213,14 @@ Example.mount(document.getElementById("root")!);
 
 Popovers can contain rich content including avatars, buttons, links, and forms.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
 const Example = ilha.render(
   () =>
     html`${Popover({
-      children: Button({ label: "User Profile" }),
+      children: Button({ children: "User Profile" }),
       content: html`
         <div class="flex min-w-56 flex-col gap-4">
           <div class="flex items-center gap-3">
@@ -251,7 +237,7 @@ const Example = ilha.render(
             </div>
           </div>
           <div class="flex gap-2">
-            ${Button({ size: "sm", label: "Profile" })}
+            ${Button({ size: "sm", children: "Profile" })}
             ${Popover.Close({
               class:
                 "rounded-md px-2 text-sm text-areia-subtle hover:bg-areia-control-hover",
@@ -262,7 +248,6 @@ const Example = ilha.render(
       `,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -270,7 +255,7 @@ Example.mount(document.getElementById("root")!);
 
 Set `arrow: false` to hide the decorative arrow.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
@@ -278,11 +263,10 @@ const Example = ilha.render(
   () =>
     html`${Popover({
       arrow: false,
-      children: Button({ label: "Open" }),
+      children: Button({ children: "Open" }),
       content: "This popover has no arrow.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -290,7 +274,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `defaultOpen` to render the popover open on mount.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
@@ -298,12 +282,11 @@ const Example = ilha.render(
   () =>
     html`${Popover({
       defaultOpen: true,
-      children: Button({ label: "Open by default" }),
+      children: Button({ children: "Open by default" }),
       content: html`${Popover.Title({ children: "Hello" })}
       ${Popover.Description({ children: "This starts open." })}`,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -311,7 +294,7 @@ Example.mount(document.getElementById("root")!);
 
 Disable outside-click dismissal with `closeOnClickOutside: false`. Escape dismissal can be controlled with `closeOnEscape`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Button, Popover } from "areia";
 
@@ -319,7 +302,7 @@ const Example = ilha.render(
   () =>
     html`${Popover({
       closeOnClickOutside: false,
-      children: Button({ label: "Persistent" }),
+      children: Button({ children: "Persistent" }),
       content: html`
         ${Popover.Title({ children: "Persistent popover" })}
         ${Popover.Description({
@@ -334,7 +317,6 @@ const Example = ilha.render(
       `,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -342,7 +324,7 @@ Example.mount(document.getElementById("root")!);
 
 Use `trigger` when you need complete control over the trigger markup. The custom trigger must include `data-slot="popover-trigger"`.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Popover } from "areia";
 
@@ -359,7 +341,6 @@ const Example = ilha.render(
       content: "This feature is currently in beta.",
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
@@ -367,7 +348,7 @@ Example.mount(document.getElementById("root")!);
 
 Use low-level parts for static markup or when you want to call `createPopover` yourself.
 
-```ts preview twoslash
+```ts preview
 import ilha, { html } from "ilha";
 import { Popover } from "areia";
 
@@ -384,7 +365,6 @@ const Example = ilha.render(
       `,
     })}`,
 );
-// ---cut-after---
 Example.mount(document.getElementById("root")!);
 ```
 
