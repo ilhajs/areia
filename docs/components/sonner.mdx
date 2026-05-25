@@ -1,0 +1,104 @@
+---
+title: Sonner
+description: Opinionated toast notifications for short-lived feedback.
+---
+
+Sonner provides non-blocking toast notifications using Areia's Ilha component API.
+Render Areia's `Toaster` once in your app shell, then call `toast` from [`sonner`](https://sonner.emilkowal.ski/) anywhere in client code.
+
+## Import
+
+```ts
+import { Toaster } from "areia";
+import { toast } from "sonner";
+```
+
+## Setup
+
+Add the toaster once near the root of your app.
+
+```ts
+import { html } from "ilha";
+import { Toaster } from "areia";
+
+html`${Toaster({
+  position: "bottom-right",
+  closeButton: true,
+  theme: "system",
+})}`;
+```
+
+## Usage
+
+```ts
+import { toast } from "sonner";
+
+toast.success("Project saved");
+toast.error("Something went wrong");
+toast.message("Invite sent", {
+  description: "Your teammate will receive an email shortly.",
+});
+```
+
+## Example
+
+```ts preview twoslash
+// @ts-nocheck
+// ---cut---
+import ilha, { html } from "ilha";
+import { Button, Toaster } from "areia";
+import { toast } from "sonner";
+
+const Example = ilha
+  .on("button@click", () => {
+    toast.success("Project saved", {
+      description: "Your changes are now live.",
+    });
+  })
+  .render(
+    () => html`
+      <div class="flex flex-col gap-4">
+        ${Button({
+          children: "Save project",
+          variant: "primary",
+        })}
+        ${Toaster({
+          position: "bottom-right",
+          closeButton: true,
+          richColors: true,
+          theme: "system",
+        })}
+      </div>
+    `,
+  );
+
+Example.mount(document.getElementById("root")!);
+```
+
+## API
+
+### Toaster
+
+```ts
+Toaster({
+  position: "bottom-right",
+  theme: "system",
+  closeButton: true,
+  duration: 4000,
+  visibleToasts: 3,
+});
+```
+
+### toast
+
+```ts
+toast("Default toast");
+toast.success("Success");
+toast.info("Info");
+toast.warning("Warning");
+toast.error("Error");
+toast.loading("Loading");
+toast.dismiss();
+```
+
+Use toasts for short-lived, non-blocking feedback. For confirmations or required decisions, use `Dialog` instead.
