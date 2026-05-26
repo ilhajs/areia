@@ -31,7 +31,7 @@ export default defineConfig({
   plugins: [
     pluginPreview({
       defaultPreviewMode: "iframe-follow",
-      previewLanguages: ["tsx"],
+      previewLanguages: ["tsx", "ts"],
       previewCodeTransform: ({ language, code }) => {
         if (language !== "tsx") return code;
         return `/** @jsxImportSource ilha */\n${code}`;
