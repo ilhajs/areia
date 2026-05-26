@@ -7,8 +7,9 @@ A semantic table component for displaying tabular data with row variants, select
 
 Areia's `Table` renders platform table elements (`table`, `thead`, `tbody`, `tr`, `th`, `td`) with Areia styling and compound helpers for headers, cells, sticky columns, resize handles, and checkbox selection cells.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Table } from "areia";
 
 const rows = [
@@ -29,35 +30,26 @@ const rows = [
   },
 ];
 
-const Example = ilha.render(
-  () => html`
-    ${Table({
-      children: [
-        Table.Header({
-          children: Table.Row({
-            children: [
-              Table.Head({ children: "Subject" }),
-              Table.Head({ children: "From" }),
-              Table.Head({ children: "Date" }),
-            ],
-          }),
-        }),
-        Table.Body({
-          children: rows.map((row) =>
-            Table.Row({
-              children: [
-                Table.Cell({ children: row.subject }),
-                Table.Cell({ children: row.from }),
-                Table.Cell({ children: row.date }),
-              ],
-            }),
-          ),
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Table>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head>Subject</Table.Head>
+        <Table.Head>From</Table.Head>
+        <Table.Head>Date</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      {rows.map((row) => (
+        <Table.Row>
+          <Table.Cell>{row.subject}</Table.Cell>
+          <Table.Cell>{row.from}</Table.Cell>
+          <Table.Cell>{row.date}</Table.Cell>
+        </Table.Row>
+      ))}
+    </Table.Body>
+  </Table>
+));
 ```
 
 ## Import
@@ -68,37 +60,28 @@ import { Table } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Table } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Table({
-      children: [
-        Table.Header({
-          children: Table.Row({
-            children: [
-              Table.Head({ children: "Name" }),
-              Table.Head({ children: "Email" }),
-              Table.Head({ children: "Role" }),
-            ],
-          }),
-        }),
-        Table.Body({
-          children: Table.Row({
-            children: [
-              Table.Cell({ children: "John Doe" }),
-              Table.Cell({ children: "john@example.com" }),
-              Table.Cell({ children: "Admin" }),
-            ],
-          }),
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Table>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head>Name</Table.Head>
+        <Table.Head>Email</Table.Head>
+        <Table.Head>Role</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      <Table.Row>
+        <Table.Cell>John Doe</Table.Cell>
+        <Table.Cell>john@example.com</Table.Cell>
+        <Table.Cell>Admin</Table.Cell>
+      </Table.Row>
+    </Table.Body>
+  </Table>
+));
 ```
 
 ## Examples
@@ -107,8 +90,8 @@ Example.mount(document.getElementById("root")!);
 
 Add selection columns with `Table.CheckHead` and `Table.CheckCell`. They render Areia checkboxes with larger cell hit targets.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Table } from "areia";
 
 const rows = [
@@ -134,58 +117,51 @@ const rows = [
 
 const selectedIds = new Set(["2"]);
 
-const Example = ilha.render(
-  () => html`
-    ${Table({
-      children: [
-        Table.Header({
-          children: Table.Row({
-            children: [
-              Table.CheckHead({
-                checked: selectedIds.size === rows.length,
-                indeterminate:
-                  selectedIds.size > 0 &&
-                  selectedIds.size < rows.length,
-                label: "Select all rows",
-              }),
-              Table.Head({ children: "Subject" }),
-              Table.Head({ children: "From" }),
-              Table.Head({ children: "Date" }),
-            ],
-          }),
-        }),
-        Table.Body({
-          children: rows.map((row) =>
-            Table.Row({
-              variant: selectedIds.has(row.id)
-                ? "selected"
-                : "default",
-              children: [
-                Table.CheckCell({
-                  checked: selectedIds.has(row.id),
-                  label: `Select ${row.subject}`,
-                  value: row.id,
-                }),
-                Table.Cell({ children: row.subject }),
-                Table.Cell({ children: row.from }),
-                Table.Cell({ children: row.date }),
-              ],
-            }),
-          ),
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Table>
+    <Table.Header>
+      <Table.Row>
+        <Table.CheckHead
+          checked={selectedIds.size === rows.length}
+          indeterminate={
+            selectedIds.size > 0 &&
+            selectedIds.size < rows.length
+          }
+          label="Select all rows"
+        />
+        <Table.Head>Subject</Table.Head>
+        <Table.Head>From</Table.Head>
+        <Table.Head>Date</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      {rows.map((row) => (
+        <Table.Row
+          variant={
+            selectedIds.has(row.id) ? "selected" : "default"
+          }
+        >
+          <Table.CheckCell
+            checked={selectedIds.has(row.id)}
+            label={`Select ${row.subject}`}
+            value={row.id}
+          />
+          <Table.Cell>{row.subject}</Table.Cell>
+          <Table.Cell>{row.from}</Table.Cell>
+          <Table.Cell>{row.date}</Table.Cell>
+        </Table.Row>
+      ))}
+    </Table.Body>
+  </Table>
+));
 ```
 
 ### Compact Header
 
-Use `variant: "compact"` on `Table.Header` for a more condensed header style.
+Use `variant="compact"` on `Table.Header` for a more condensed header style.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Table } from "areia";
 
 const rows = [
@@ -206,44 +182,34 @@ const rows = [
   },
 ];
 
-const Example = ilha.render(
-  () => html`
-    ${Table({
-      children: [
-        Table.Header({
-          variant: "compact",
-          children: Table.Row({
-            children: [
-              Table.Head({ children: "Subject" }),
-              Table.Head({ children: "From" }),
-              Table.Head({ children: "Date" }),
-            ],
-          }),
-        }),
-        Table.Body({
-          children: rows.map((row) =>
-            Table.Row({
-              children: [
-                Table.Cell({ children: row.subject }),
-                Table.Cell({ children: row.from }),
-                Table.Cell({ children: row.date }),
-              ],
-            }),
-          ),
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Table>
+    <Table.Header variant="compact">
+      <Table.Row>
+        <Table.Head>Subject</Table.Head>
+        <Table.Head>From</Table.Head>
+        <Table.Head>Date</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      {rows.map((row) => (
+        <Table.Row>
+          <Table.Cell>{row.subject}</Table.Cell>
+          <Table.Cell>{row.from}</Table.Cell>
+          <Table.Cell>{row.date}</Table.Cell>
+        </Table.Row>
+      ))}
+    </Table.Body>
+  </Table>
+));
 ```
 
 ### Selected Row
 
-Use `variant: "selected"` on `Table.Row` to highlight selected rows.
+Use `variant="selected"` on `Table.Row` to highlight selected rows.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Table } from "areia";
 
 const rows = [
@@ -267,44 +233,36 @@ const rows = [
   },
 ];
 
-const Example = ilha.render(
-  () => html`
-    ${Table({
-      children: [
-        Table.Header({
-          children: Table.Row({
-            children: [
-              Table.Head({ children: "Subject" }),
-              Table.Head({ children: "From" }),
-              Table.Head({ children: "Date" }),
-            ],
-          }),
-        }),
-        Table.Body({
-          children: rows.map((row) =>
-            Table.Row({
-              variant: row.id === "2" ? "selected" : "default",
-              children: [
-                Table.Cell({ children: row.subject }),
-                Table.Cell({ children: row.from }),
-                Table.Cell({ children: row.date }),
-              ],
-            }),
-          ),
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Table>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head>Subject</Table.Head>
+        <Table.Head>From</Table.Head>
+        <Table.Head>Date</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      {rows.map((row) => (
+        <Table.Row
+          variant={row.id === "2" ? "selected" : "default"}
+        >
+          <Table.Cell>{row.subject}</Table.Cell>
+          <Table.Cell>{row.from}</Table.Cell>
+          <Table.Cell>{row.date}</Table.Cell>
+        </Table.Row>
+      ))}
+    </Table.Body>
+  </Table>
+));
 ```
 
 ### Fixed Layout with Column Sizes
 
-For precise control over column widths, set `layout: "fixed"` and provide a `colgroup`.
+For precise control over column widths, set `layout="fixed"` and provide a `colgroup`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Table } from "areia";
 
 const rows = [
@@ -325,49 +283,39 @@ const rows = [
   },
 ];
 
-const Example = ilha.render(
-  () => html`
-    ${Table({
-      layout: "fixed",
-      children: [
-        html`<colgroup>
-          <col class="w-1/2" />
-          <col class="w-1/4" />
-          <col class="w-1/4" />
-        </colgroup>`,
-        Table.Header({
-          children: Table.Row({
-            children: [
-              Table.Head({ children: "Subject" }),
-              Table.Head({ children: "From" }),
-              Table.Head({ children: "Date" }),
-            ],
-          }),
-        }),
-        Table.Body({
-          children: rows.map((row) =>
-            Table.Row({
-              children: [
-                Table.Cell({ children: row.subject }),
-                Table.Cell({ children: row.from }),
-                Table.Cell({ children: row.date }),
-              ],
-            }),
-          ),
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Table layout="fixed">
+    <colgroup>
+      <col class="w-1/2" />
+      <col class="w-1/4" />
+      <col class="w-1/4" />
+    </colgroup>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head>Subject</Table.Head>
+        <Table.Head>From</Table.Head>
+        <Table.Head>Date</Table.Head>
+      </Table.Row>
+    </Table.Header>
+    <Table.Body>
+      {rows.map((row) => (
+        <Table.Row>
+          <Table.Cell>{row.subject}</Table.Cell>
+          <Table.Cell>{row.from}</Table.Cell>
+          <Table.Cell>{row.date}</Table.Cell>
+        </Table.Row>
+      ))}
+    </Table.Body>
+  </Table>
+));
 ```
 
 ### Sticky Column
 
-Pin a column to the left or right edge of a horizontal scroll container with `sticky: "left"` or `sticky: "right"` on `Table.Head` and `Table.Cell`.
+Pin a column to the left or right edge of a horizontal scroll container with `sticky="left"` or `sticky="right"` on `Table.Head` and `Table.Cell`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Badge, Table } from "areia";
 
 const rows = [
@@ -391,69 +339,48 @@ const rows = [
   },
 ];
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full overflow-x-auto">
-      ${Table({
-        class: "min-w-[720px]",
-        children: [
-          Table.Header({
-            children: Table.Row({
-              children: [
-                Table.Head({ children: "Subject" }),
-                Table.Head({ children: "From" }),
-                Table.Head({ children: "Date" }),
-                Table.Head({ children: "Tags" }),
-                Table.Head({
-                  sticky: "right",
-                  children: "Actions",
-                }),
-              ],
-            }),
-          }),
-          Table.Body({
-            children: rows.map((row) =>
-              Table.Row({
-                children: [
-                  Table.Cell({ children: row.subject }),
-                  Table.Cell({ children: row.from }),
-                  Table.Cell({ children: row.date }),
-                  Table.Cell({
-                    children: html`<div class="flex gap-1">
-                      ${row.tags.map((tag) =>
-                        Badge({
-                          variant: "neutral",
-                          label: tag,
-                        }),
-                      )}
-                    </div>`,
-                  }),
-                  Table.Cell({
-                    sticky: "right",
-                    children: html`<button
-                      class="text-sm underline"
-                    >
-                      View
-                    </button>`,
-                  }),
-                ],
-              }),
-            ),
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full overflow-x-auto">
+    <Table class="min-w-[720px]">
+      <Table.Header>
+        <Table.Row>
+          <Table.Head>Subject</Table.Head>
+          <Table.Head>From</Table.Head>
+          <Table.Head>Date</Table.Head>
+          <Table.Head>Tags</Table.Head>
+          <Table.Head sticky="right">Actions</Table.Head>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {rows.map((row) => (
+          <Table.Row>
+            <Table.Cell>{row.subject}</Table.Cell>
+            <Table.Cell>{row.from}</Table.Cell>
+            <Table.Cell>{row.date}</Table.Cell>
+            <Table.Cell>
+              <div class="flex gap-1">
+                {row.tags.map((tag) => (
+                  <Badge variant="neutral">{tag}</Badge>
+                ))}
+              </div>
+            </Table.Cell>
+            <Table.Cell sticky="right">
+              <button class="text-sm underline">View</button>
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
+  </div>
+));
 ```
 
 ### Sticky Header
 
-Set `sticky: true` on `Table.Header` and put the table in a height-constrained vertical scroll container.
+Set `sticky` on `Table.Header` and put the table in a height-constrained vertical scroll container.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Table } from "areia";
 
 const rows = Array.from({ length: 12 }, (_, index) => ({
@@ -461,64 +388,49 @@ const rows = Array.from({ length: 12 }, (_, index) => ({
   status: index % 2 === 0 ? "Active" : "Idle",
 }));
 
-const Example = ilha.render(
-  () => html`
-    <div class="max-h-64 overflow-y-auto">
-      ${Table({
-        children: [
-          Table.Header({
-            sticky: true,
-            children: Table.Row({
-              children: [
-                Table.Head({ children: "Name" }),
-                Table.Head({ children: "Status" }),
-              ],
-            }),
-          }),
-          Table.Body({
-            children: rows.map((row) =>
-              Table.Row({
-                children: [
-                  Table.Cell({ children: row.name }),
-                  Table.Cell({ children: row.status }),
-                ],
-              }),
-            ),
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="max-h-64 overflow-y-auto">
+    <Table>
+      <Table.Header sticky>
+        <Table.Row>
+          <Table.Head>Name</Table.Head>
+          <Table.Head>Status</Table.Head>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {rows.map((row) => (
+          <Table.Row>
+            <Table.Cell>{row.name}</Table.Cell>
+            <Table.Cell>{row.status}</Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
+  </div>
+));
 ```
 
 ### Resize Handle
 
 `Table.ResizeHandle` resizes its containing `th` or `td` by updating the cell width while you drag it. Place it inside a relatively positioned cell.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Table } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Table({
-      children: Table.Header({
-        children: Table.Row({
-          children: [
-            Table.Head({
-              class: "relative",
-              children: ["Name", Table.ResizeHandle()],
-            }),
-            Table.Head({ children: "Role" }),
-          ],
-        }),
-      }),
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Table>
+    <Table.Header>
+      <Table.Row>
+        <Table.Head class="relative">
+          Name
+          <Table.ResizeHandle />
+        </Table.Head>
+        <Table.Head>Role</Table.Head>
+      </Table.Row>
+    </Table.Header>
+  </Table>
+));
 ```
 
 ## API Reference

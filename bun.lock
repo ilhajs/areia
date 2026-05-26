@@ -16,7 +16,7 @@
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
         "husky": "^9.1.7",
-        "ilha": "^0.5.0",
+        "ilha": "0.6.0",
         "lucide": "^1.16.0",
         "oxfmt": "^0.51.0",
         "oxlint": "^1.66.0",
@@ -37,7 +37,7 @@
         "@areia/slots": "workspace:*",
         "clsx": "2.1.1",
         "date-fns": "4.2.1",
-        "ilha": "0.5.0",
+        "ilha": "0.6.0",
         "tailwind-merge": "3.6.0",
       },
       "devDependencies": {
@@ -557,7 +557,7 @@
 
     "husky": ["husky@9.1.7", "", { "bin": { "husky": "bin.js" } }, "sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA=="],
 
-    "ilha": ["ilha@0.5.0", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-NhUEC6YMKV4pdzVx7eXORpxEDyPm/MJ0yLBhJVxOdv3ckFhhzY7Ff0sWRqMOQjRQxipwK8qFFZpavNzepkxVHw=="],
+    "ilha": ["ilha@0.6.0", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-a/BkM/1+zXlrFnl12lK1ULOsroy+dmQaS3FeMk+kGld33PXeFYIa29h4UVMNpXVFIqCgVt66upyrJsz/SKylyA=="],
 
     "import-without-cache": ["import-without-cache@0.4.0", "", {}, "sha512-NkJQA7oZ4YHQhd2+H3BoRFKF3d/XNsiKpHZCQEMH9pDX27hQQLsTyOocyRgaIVtf8gHX3Nt3LPkR4e5EdtPAGQ=="],
 

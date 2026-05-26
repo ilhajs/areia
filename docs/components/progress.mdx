@@ -7,14 +7,14 @@ Displays task completion progress with accessible `progressbar` semantics.
 
 `Progress` is backed by `@areia/slots` and automatically wires the label, value, track, and indicator slots after mount.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { Progress } from "areia";
 
-const Example = ilha.render(
-  () => html`${Progress({ label: "Uploading", value: 45 })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Progress label="Uploading" value={45} />
+));
 ```
 
 ## Import
@@ -25,15 +25,13 @@ import { Progress } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Progress } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Progress({ label: "Loading project", value: 60 })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Progress label="Loading project" value={60} />
+));
 ```
 
 ## Examples
@@ -42,85 +40,72 @@ Example.mount(document.getElementById("root")!);
 
 Pass a numeric `value` to render determinate progress. The indicator width is computed from `min`, `max`, and `value`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Progress } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Progress({ label: "Importing data", value: 72 })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Progress label="Importing data" value={72} />
+));
 ```
 
 ### Indeterminate
 
 Use `value: null` when the total amount of work is unknown.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Progress } from "areia";
 
-const Example = ilha.render(
-  () => html`${Progress({ label: "Syncing", value: null })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Progress label="Syncing" value={null} />
+));
 ```
 
 ### Custom Range
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Progress } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Progress({
-      label: "Storage used",
-      min: 0,
-      max: 500,
-      value: 125,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Progress
+    label="Storage used"
+    min={0}
+    max={500}
+    value={125}
+  />
+));
 ```
 
 ### Without Value Text
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Progress } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Progress({
-      label: "Processing",
-      value: 35,
-      showValue: false,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Progress label="Processing" value={35} showValue={false} />
+));
 ```
 
 ### Custom Styling
 
 Use `trackClass`, `indicatorClass`, and `valueClass` to style internal parts.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Progress } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Progress({
-      label: "Deployment",
-      value: 80,
-      trackClass: "h-3 bg-areia-surface-muted",
-      indicatorClass: "bg-emerald-500",
-      valueClass: "text-emerald-600",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Progress
+    label="Deployment"
+    value={80}
+    trackClass="h-3 bg-areia-surface-muted"
+    indicatorClass="bg-emerald-500"
+    valueClass="text-emerald-600"
+  />
+));
 ```
 
 ## API

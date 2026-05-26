@@ -5,31 +5,26 @@ description: Displays a form label with optional indicator and tooltip support.
 
 Displays a form label with support for optional indicators and contextual tooltips.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Label } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-col gap-3">
-      ${Label({
-        for: "default-label-demo",
-        label: "Default Label",
-      })}
-      ${Label({
-        for: "optional-label-demo",
-        label: "Optional Label",
-        showOptional: true,
-      })}
-      ${Label({
-        for: "tooltip-label-demo",
-        label: "Label with Tooltip",
-        tooltip: "Helpful context about this field.",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-col gap-3">
+    <Label for="default-label-demo" label="Default Label" />
+    <Label
+      for="optional-label-demo"
+      label="Optional Label"
+      showOptional
+    />
+    <Label
+      for="tooltip-label-demo"
+      label="Label with Tooltip"
+      tooltip="Helpful context about this field."
+    />
+  </div>
+));
 ```
 
 ## Import
@@ -44,50 +39,43 @@ import { Label } from "areia";
 
 Some form components include built-in label support. Use their `label`, `required`, `description`, `error`, or tooltip-related props when you want the standard field layout.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-4">
-      ${Input({
-        id: "middle-name",
-        label: "Middle name",
-        required: false,
-        placeholder: "Ada",
-      })}
-      ${Input({
-        id: "email-updates",
-        label: "Email",
-        labelTooltip:
-          "We'll only use this for account notifications.",
-        placeholder: "you@example.com",
-        type: "email",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-4">
+    <Input
+      id="middle-name"
+      label="Middle name"
+      required={false}
+      placeholder="Ada"
+    />
+    <Input
+      id="email-updates"
+      label="Email"
+      labelTooltip="We'll only use this for account notifications."
+      placeholder="you@example.com"
+      type="email"
+    />
+  </div>
+));
 ```
 
 ### Standalone Label
 
 For custom form layouts, use `Label` directly and associate it with a control using `for` or `htmlFor`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input, Label } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-1.5">
-      ${Label({ for: "username", label: "Username" })}
-      ${Input({ id: "username", placeholder: "areia-user" })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-1.5">
+    <Label for="username" label="Username" />
+    <Input id="username" placeholder="areia-user" />
+  </div>
+));
 ```
 
 ## Examples
@@ -96,141 +84,116 @@ Example.mount(document.getElementById("root")!);
 
 Use `showOptional` to display subtle “(optional)” text after the label.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input, Label } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-1.5">
-      ${Label({
-        for: "nickname",
-        label: "Nickname",
-        showOptional: true,
-      })}
-      ${Input({ id: "nickname", placeholder: "Ryuz" })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-1.5">
+    <Label for="nickname" label="Nickname" showOptional />
+    <Input id="nickname" placeholder="Ryuz" />
+  </div>
+));
 ```
 
 ### With Tooltip
 
 Use `tooltip` to show an info icon with additional context.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input, Label } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-1.5">
-      ${Label({
-        for: "email",
-        label: "Email",
-        tooltip:
-          "We'll use this to send you product and account updates.",
-      })}
-      ${Input({
-        id: "email",
-        type: "email",
-        placeholder: "you@example.com",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-1.5">
+    <Label
+      for="email"
+      label="Email"
+      tooltip="We'll use this to send you product and account updates."
+    />
+    <Input
+      id="email"
+      type="email"
+      placeholder="you@example.com"
+    />
+  </div>
+));
 ```
 
 ### Rich Label Content
 
 `children` accepts markup, so labels can include richer inline formatting when needed.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { CheckboxItem, Label } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${CheckboxItem({
-      value: "terms",
-      label: Label({
-        asContent: true,
-        children: html`I agree to the
-          <strong>Terms of Service</strong>`,
-      }),
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <CheckboxItem
+    value="terms"
+    label={
+      <Label asContent>
+        I agree to the <strong>Terms of Service</strong>
+      </Label>
+    }
+  />
+));
 ```
 
 ### Form with Mixed Fields
 
 Use optional indicators only where they help users understand which fields are required.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input, Label, Select } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <form class="flex w-full max-w-sm flex-col gap-4">
-      ${Input({
-        id: "full-name",
-        label: "Full name",
-        required: true,
-        placeholder: "Ada Lovelace",
-      })}
+export default ilha.render(() => (
+  <form class="flex w-full max-w-sm flex-col gap-4">
+    <Input
+      id="full-name"
+      label="Full name"
+      required
+      placeholder="Ada Lovelace"
+    />
 
-      <div class="flex flex-col gap-1.5">
-        ${Label({
-          for: "company",
-          label: "Company",
-          showOptional: true,
-        })}
-        ${Input({ id: "company", placeholder: "Areia Labs" })}
-      </div>
+    <div class="flex flex-col gap-1.5">
+      <Label for="company" label="Company" showOptional />
+      <Input id="company" placeholder="Areia Labs" />
+    </div>
 
-      ${Select({
-        id: "country",
-        label: "Country",
-        placeholder: "Select a country",
-        items: {
-          us: "United States",
-          uk: "United Kingdom",
-          ca: "Canada",
-        },
-      })}
-    </form>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+    <Select
+      id="country"
+      label="Country"
+      placeholder="Select a country"
+      items={{
+        us: "United States",
+        uk: "United Kingdom",
+        ca: "Canada",
+      }}
+    />
+  </form>
+));
 ```
 
 ### As Content
 
 Use `asContent` when another component already renders the outer label element and you only need Label’s inline optional/tooltip content.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Label } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <label class="text-base font-medium text-areia-default">
-      ${Label({
-        asContent: true,
-        label: "Project slug",
-        showOptional: true,
-        tooltip:
-          "Used in generated URLs. You can change it later.",
-      })}
-    </label>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <label class="text-base font-medium text-areia-default">
+    <Label
+      asContent
+      label="Project slug"
+      showOptional
+      tooltip="Used in generated URLs. You can change it later."
+    />
+  </label>
+));
 ```
 
 ## API Reference

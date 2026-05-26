@@ -17,15 +17,10 @@ import { toast } from "sonner";
 
 Add the toaster once near the root of your app.
 
-```ts
-import { html } from "ilha";
+```tsx
 import { Toaster } from "areia";
 
-html`${Toaster({
-  position: "bottom-right",
-  closeButton: true,
-  theme: "system",
-})}`;
+<Toaster position="bottom-right" closeButton theme="system" />;
 ```
 
 ## Usage
@@ -42,37 +37,31 @@ toast.message("Invite sent", {
 
 ## Example
 
-```ts preview twoslash
+```tsx preview twoslash
+// @errors: 2322 2686
 // @ts-nocheck
 // ---cut---
-import ilha, { html } from "ilha";
+import ilha from "ilha";
 import { Button, Toaster } from "areia";
 import { toast } from "sonner";
 
-const Example = ilha
+export default ilha
   .on("button@click", () => {
     toast.success("Project saved", {
       description: "Your changes are now live.",
     });
   })
-  .render(
-    () => html`
-      <div class="flex flex-col gap-4">
-        ${Button({
-          children: "Save project",
-          variant: "primary",
-        })}
-        ${Toaster({
-          position: "bottom-right",
-          closeButton: true,
-          richColors: true,
-          theme: "system",
-        })}
-      </div>
-    `,
-  );
-
-Example.mount(document.getElementById("root")!);
+  .render(() => (
+    <div class="flex flex-col gap-4">
+      <Button variant="primary">Save project</Button>
+      <Toaster
+        position="bottom-right"
+        closeButton
+        richColors
+        theme="system"
+      />
+    </div>
+  ));
 ```
 
 ## API

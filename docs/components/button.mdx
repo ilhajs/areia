@@ -5,27 +5,22 @@ description: Displays a button or a component that looks like a button.
 
 Displays a button or a component that looks like a button.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+import ilha from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
 
-const plusIcon = Icon({ icon: Plus });
-
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-2">
-      ${Button({ variant: "secondary", children: "Button" })}
-      ${Button({
-        variant: "secondary",
-        shape: "square",
-        icon: plusIcon,
-        "aria-label": "Add",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-2">
+    <Button variant="secondary">Button</Button>
+    <Button
+      variant="secondary"
+      shape="square"
+      icon={<Icon icon={Plus} />}
+      aria-label="Add"
+    />
+  </div>
+));
 ```
 
 ## Import
@@ -36,18 +31,13 @@ import { Button } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "secondary",
-      children: "Click me",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="secondary">Click me</Button>
+));
 ```
 
 ## Examples
@@ -56,274 +46,212 @@ Example.mount(document.getElementById("root")!);
 
 #### Primary
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({ variant: "primary", children: "Primary" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="primary">Primary</Button>
+));
 ```
 
 #### Secondary
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "secondary",
-      children: "Secondary",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="secondary">Secondary</Button>
+));
 ```
 
 #### Ghost
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({ variant: "ghost", children: "Ghost" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="ghost">Ghost</Button>
+));
 ```
 
 #### Destructive
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "destructive",
-      children: "Destructive",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="destructive">Destructive</Button>
+));
 ```
 
 #### Outline
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({ variant: "outline", children: "Outline" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="outline">Outline</Button>
+));
 ```
 
 #### Secondary Destructive
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "secondary-destructive",
-      children: "Secondary Destructive",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="secondary-destructive">
+    Secondary Destructive
+  </Button>
+));
 ```
 
 ### Sizes
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-3">
-      ${Button({
-        size: "xs",
-        variant: "secondary",
-        children: "Extra Small",
-      })}
-      ${Button({
-        size: "sm",
-        variant: "secondary",
-        children: "Small",
-      })}
-      ${Button({
-        size: "base",
-        variant: "secondary",
-        children: "Base",
-      })}
-      ${Button({
-        size: "lg",
-        variant: "secondary",
-        children: "Large",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-3">
+    <Button size="xs" variant="secondary">
+      Extra Small
+    </Button>
+    <Button size="sm" variant="secondary">
+      Small
+    </Button>
+    <Button size="base" variant="secondary">
+      Base
+    </Button>
+    <Button size="lg" variant="secondary">
+      Large
+    </Button>
+  </div>
+));
 ```
 
 ### With Icon
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
 
-const plusIcon = Icon({ icon: Plus });
-
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "secondary",
-      icon: plusIcon,
-      children: "Create Ilha app",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="secondary" icon={<Icon icon={Plus} />}>
+    Create Ilha app
+  </Button>
+));
 ```
 
 ### Icon Only
 
 For icon-only buttons, use `shape="square"` or `shape="circle"` with the `icon` prop. Always include `aria-label` for accessibility — without visible text, screen readers need the label to convey the button’s purpose.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
 
-const plusIcon = Icon({ icon: Plus });
-
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-3">
-      ${Button({
-        variant: "secondary",
-        shape: "square",
-        icon: plusIcon,
-        "aria-label": "Add item",
-      })}
-      ${Button({
-        variant: "secondary",
-        shape: "circle",
-        icon: plusIcon,
-        "aria-label": "Add item",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-3">
+    <Button
+      variant="secondary"
+      shape="square"
+      icon={<Icon icon={Plus} />}
+      aria-label="Add item"
+    />
+    <Button
+      variant="secondary"
+      shape="circle"
+      icon={<Icon icon={Plus} />}
+      aria-label="Add item"
+    />
+  </div>
+));
 ```
 
 ### Loading State
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "primary",
-      loading: true,
-      children: "Loading...",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="primary" loading>
+    Loading...
+  </Button>
+));
 ```
 
 ### Disabled State
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "secondary",
-      disabled: true,
-      children: "Disabled",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="secondary" disabled>
+    Disabled
+  </Button>
+));
 ```
 
 ### Title
 
 Use the native `title` attribute when additional context helps the user understand the action.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
 
-const plusIcon = Icon({ icon: Plus });
-
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-3">
-      ${Button({
-        variant: "secondary",
-        title: "Create a new Ilha app",
-        children: "Create Ilha app",
-      })}
-      ${Button({
-        variant: "secondary",
-        shape: "square",
-        icon: plusIcon,
-        "aria-label": "Add item",
-        title: "Add item",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-3">
+    <Button variant="secondary" title="Create a new Ilha app">
+      Create Ilha app
+    </Button>
+    <Button
+      variant="secondary"
+      shape="square"
+      icon={<Icon icon={Plus} />}
+      aria-label="Add item"
+      title="Add item"
+    />
+  </div>
+));
 ```
 
 ### Link as Button
 
 Use `LinkButton` when the interaction should navigate somewhere but still look like a button. Use `Button` for in-place actions like submitting, opening, or toggling UI.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ExternalLink } from "lucide";
 import { LinkButton, Icon } from "areia";
 
-const externalIcon = Icon({ icon: ExternalLink });
-
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-3">
-      ${LinkButton({
-        href: "/components/link",
-        variant: "secondary",
-        children: "Read Link docs",
-      })}
-      ${LinkButton({
-        href: "https://ilha.build/",
-        variant: "ghost",
-        icon: externalIcon,
-        external: true,
-        children: "Ilha Docs",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-3">
+    <LinkButton href="/components/link" variant="secondary">
+      Read Link docs
+    </LinkButton>
+    <LinkButton
+      href="https://ilha.build/"
+      variant="ghost"
+      icon={<Icon icon={ExternalLink} />}
+      external
+    >
+      Ilha Docs
+    </LinkButton>
+  </div>
+));
 ```
 
 ## API Reference

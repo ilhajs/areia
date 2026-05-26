@@ -7,20 +7,18 @@ A date selection calendar supporting single, multiple, and range selection modes
 
 Areia's `DatePicker` uses `date-fns` for month generation and renders a vanilla Tailwind calendar. Use `DatePicker` when you want an interactive Ilha island; it updates its own calendar UI and emits date-picker events.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { DatePicker } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${DatePicker({
-      mode: "single",
-      selected: new Date(2026, 4, 21),
-      defaultMonth: new Date(2026, 4, 1),
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <DatePicker
+    mode="single"
+    selected={new Date(2026, 4, 21)}
+    defaultMonth={new Date(2026, 4, 1)}
+  />
+));
 ```
 
 ## Import
@@ -33,14 +31,11 @@ import { DatePicker, type DateRange } from "areia";
 
 DatePicker supports three selection modes: `single`, `multiple`, and `range`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { DatePicker } from "areia";
 
-const Example = ilha.render(
-  () => html`${DatePicker({ mode: "single" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => <DatePicker mode="single" />);
 ```
 
 Call `DatePicker(...)` for interactive behavior. It dispatches `date-picker:change` when selection changes and `date-picker:month-change` when users navigate months.
@@ -53,63 +48,57 @@ Use `DatePicker.Static(...)` for static markup or when you want to initialize/wi
 
 Select a single date. This is the most common use case for date pickers.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { DatePicker } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-col gap-3">
-      ${DatePicker({
-        mode: "single",
-        selected: new Date(2026, 4, 21),
-        defaultMonth: new Date(2026, 4, 1),
-      })}
-      <p class="text-sm text-areia-subtle">
-        Selected: May 21, 2026
-      </p>
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-col gap-3">
+    <DatePicker
+      mode="single"
+      selected={new Date(2026, 4, 21)}
+      defaultMonth={new Date(2026, 4, 1)}
+    />
+    <p class="text-sm text-areia-subtle">
+      Selected: May 21, 2026
+    </p>
+  </div>
+));
 ```
 
 ### Multiple Date Selection
 
 Select multiple individual dates. Use `maxSelected` to limit the number of selections.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { DatePicker } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-col gap-3">
-      ${DatePicker({
-        mode: "multiple",
-        selected: [
-          new Date(2026, 4, 7),
-          new Date(2026, 4, 14),
-          new Date(2026, 4, 21),
-        ],
-        defaultMonth: new Date(2026, 4, 1),
-        maxSelected: 5,
-      })}
-      <p class="text-sm text-areia-subtle">
-        Select up to 5 dates.
-      </p>
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-col gap-3">
+    <DatePicker
+      mode="multiple"
+      selected={[
+        new Date(2026, 4, 7),
+        new Date(2026, 4, 14),
+        new Date(2026, 4, 21),
+      ]}
+      defaultMonth={new Date(2026, 4, 1)}
+      maxSelected={5}
+    />
+    <p class="text-sm text-areia-subtle">
+      Select up to 5 dates.
+    </p>
+  </div>
+));
 ```
 
 ### Date Range Selection
 
 Select a continuous date range. Range selection works well with `numberOfMonths: 2` for a side-by-side view.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { DatePicker, type DateRange } from "areia";
 
 const range: DateRange = {
@@ -117,146 +106,129 @@ const range: DateRange = {
   to: new Date(2026, 4, 18),
 };
 
-const Example = ilha.render(
-  () => html`
-    ${DatePicker({
-      mode: "range",
-      selected: range,
-      defaultMonth: new Date(2026, 4, 1),
-      numberOfMonths: 2,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <DatePicker
+    mode="range"
+    selected={range}
+    defaultMonth={new Date(2026, 4, 1)}
+    numberOfMonths={2}
+  />
+));
 ```
 
 ### Min and Max Dates
 
 Use `min` and `max` to disable dates before or after an allowed range.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { DatePicker } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-col gap-3">
-      ${DatePicker({
-        mode: "single",
-        defaultMonth: new Date(2026, 4, 1),
-        min: new Date(2026, 4, 5),
-        max: new Date(2026, 4, 25),
-      })}
-      <p class="text-sm text-areia-subtle">
-        Only dates from May 5–25 are selectable.
-      </p>
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-col gap-3">
+    <DatePicker
+      mode="single"
+      defaultMonth={new Date(2026, 4, 1)}
+      min={new Date(2026, 4, 5)}
+      max={new Date(2026, 4, 25)}
+    />
+    <p class="text-sm text-areia-subtle">
+      Only dates from May 5–25 are selectable.
+    </p>
+  </div>
+));
 ```
 
 ### Disabled Dates
 
 Use `disabled` to make specific dates unavailable.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { DatePicker } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${DatePicker({
-      mode: "multiple",
-      defaultMonth: new Date(2026, 4, 1),
-      disabled: [
-        new Date(2026, 4, 5),
-        new Date(2026, 4, 12),
-        new Date(2026, 4, 18),
-        new Date(2026, 4, 25),
-      ],
-      maxSelected: 5,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <DatePicker
+    mode="multiple"
+    defaultMonth={new Date(2026, 4, 1)}
+    disabled={[
+      new Date(2026, 4, 5),
+      new Date(2026, 4, 12),
+      new Date(2026, 4, 18),
+      new Date(2026, 4, 25),
+    ]}
+    maxSelected={5}
+  />
+));
 ```
 
 ### Custom Week Start
 
 Use `weekStartsOn` to choose the first day of the week. `0` is Sunday and `1` is Monday.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { DatePicker } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${DatePicker({
-      mode: "single",
-      defaultMonth: new Date(2026, 4, 1),
-      weekStartsOn: 1,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <DatePicker
+    mode="single"
+    defaultMonth={new Date(2026, 4, 1)}
+    weekStartsOn={1}
+  />
+));
 ```
 
 ### Without Outside Days
 
 Set `showOutsideDays: false` to hide adjacent-month dates in the calendar grid.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { DatePicker } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${DatePicker({
-      mode: "single",
-      defaultMonth: new Date(2026, 4, 1),
-      showOutsideDays: false,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <DatePicker
+    mode="single"
+    defaultMonth={new Date(2026, 4, 1)}
+    showOutsideDays={false}
+  />
+));
 ```
 
 ### With Popover
 
 Compose with [Popover](/components/popover) to create a dropdown date picker.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Calendar } from "lucide";
 import { Button, DatePicker, Icon, Popover } from "areia";
 
-const calendarIcon = Icon({ icon: Calendar });
-
-const Example = ilha.render(
-  () => html`
-    ${Popover({
-      trigger: Button({
-        icon: calendarIcon,
-        label: "Pick a date",
-      }),
-      content: DatePicker({
-        mode: "single",
-        defaultMonth: new Date(2026, 4, 1),
-      }),
-      contentClass: "p-0",
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Popover
+    trigger={
+      <Button icon={<Icon icon={Calendar} />}>
+        Pick a date
+      </Button>
+    }
+    content={
+      <DatePicker
+        mode="single"
+        defaultMonth={new Date(2026, 4, 1)}
+      />
+    }
+    contentClass="p-0"
+  />
+));
 ```
 
 ### Range with Popover
 
 Render two months inside a popover for a compact date-range picker.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Calendar } from "lucide";
 import {
   Button,
@@ -266,30 +238,29 @@ import {
   type DateRange,
 } from "areia";
 
-const calendarIcon = Icon({ icon: Calendar });
 const range: DateRange = {
   from: new Date(2026, 4, 12),
   to: new Date(2026, 4, 18),
 };
 
-const Example = ilha.render(
-  () => html`
-    ${Popover({
-      trigger: Button({
-        icon: calendarIcon,
-        label: "May 12 – May 18",
-      }),
-      content: DatePicker({
-        mode: "range",
-        selected: range,
-        defaultMonth: new Date(2026, 4, 1),
-        numberOfMonths: 2,
-      }),
-      contentClass: "p-0",
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Popover
+    trigger={
+      <Button icon={<Icon icon={Calendar} />}>
+        May 12 – May 18
+      </Button>
+    }
+    content={
+      <DatePicker
+        mode="range"
+        selected={range}
+        defaultMonth={new Date(2026, 4, 1)}
+        numberOfMonths={2}
+      />
+    }
+    contentClass="p-0"
+  />
+));
 ```
 
 ### Listening for Changes

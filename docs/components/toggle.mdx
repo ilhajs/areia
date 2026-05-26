@@ -7,15 +7,14 @@ A pressable button that toggles between pressed and unpressed states.
 
 `Toggle` is backed by `@areia/slots` and wires `aria-pressed`, `data-state`, and toggle change events.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { Toggle } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Toggle({ children: "Bold", variant: "outline" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Toggle variant="outline">Bold</Toggle>
+));
 ```
 
 ## Import
@@ -28,141 +27,112 @@ import { Toggle } from "areia";
 
 Use `Toggle` with optional `variant`, `size`, and `defaultPressed`. It is a single-element primitive — a `<button>` with `data-slot="toggle"`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Toggle } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Toggle({
-      children: "Italic",
-      variant: "outline",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Toggle variant="outline">Italic</Toggle>
+));
 ```
 
 ## Examples
 
 ### Variants
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Toggle } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-2">
-      ${Toggle({ children: "Default" })}
-      ${Toggle({ children: "Outline", variant: "outline" })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-2">
+    <Toggle>Default</Toggle>
+    <Toggle variant="outline">Outline</Toggle>
+  </div>
+));
 ```
 
 ### Sizes
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Toggle } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-2">
-      ${Toggle({
-        children: "Small",
-        size: "sm",
-        variant: "outline",
-      })}
-      ${Toggle({
-        children: "Default",
-        size: "default",
-        variant: "outline",
-      })}
-      ${Toggle({
-        children: "Large",
-        size: "lg",
-        variant: "outline",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-2">
+    <Toggle size="sm" variant="outline">
+      Small
+    </Toggle>
+    <Toggle size="default" variant="outline">
+      Default
+    </Toggle>
+    <Toggle size="lg" variant="outline">
+      Large
+    </Toggle>
+  </div>
+));
 ```
 
 ### Disabled
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Toggle } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-2">
-      ${Toggle({ children: "Disabled", disabled: true })}
-      ${Toggle({
-        children: "Disabled",
-        variant: "outline",
-        disabled: true,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-2">
+    <Toggle disabled>Disabled</Toggle>
+    <Toggle variant="outline" disabled>
+      Disabled
+    </Toggle>
+  </div>
+));
 ```
 
 ### Pressed State
 
 Use `defaultPressed` to set the initial pressed state.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Toggle } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-2">
-      ${Toggle({ children: "Pressed", defaultPressed: true })}
-      ${Toggle({
-        children: "Pressed",
-        variant: "outline",
-        defaultPressed: true,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-2">
+    <Toggle defaultPressed>Pressed</Toggle>
+    <Toggle variant="outline" defaultPressed>
+      Pressed
+    </Toggle>
+  </div>
+));
 ```
 
 ### Change Events
 
 Use `onPressedChange` to respond to state changes.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Toggle } from "areia";
 
-const Example = ilha.state("bold", false).render(
-  ({ state }) => html`
-    <div class="flex flex-col items-start gap-3">
-      ${Toggle({
-        children: "Bold",
-        variant: "outline",
-        onPressedChange(pressed) {
-          state.bold(pressed);
-        },
-      })}
-      <p class="text-sm text-areia-subtle">
-        Bold is:
-        <span class="font-medium text-areia-default"
-          >${state.bold() ? "On" : "Off"}</span
-        >
-      </p>
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.state("bold", false).render(({ state }) => (
+  <div class="flex flex-col items-start gap-3">
+    <Toggle
+      variant="outline"
+      onPressedChange={(pressed) => {
+        state.bold(pressed);
+      }}
+    >
+      Bold
+    </Toggle>
+    <p class="text-sm text-areia-subtle">
+      Bold is:{" "}
+      <span class="font-medium text-areia-default">
+        {state.bold() ? "On" : "Off"}
+      </span>
+    </p>
+  </div>
+));
 ```
 
 ## API Reference

@@ -7,19 +7,14 @@ Page navigation controls for paginated content.
 
 Areia's `Pagination` renders page information, navigation controls, optional page-size selectors, and emits page-change events when used as an Ilha island with `Pagination`.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { Pagination } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Pagination({
-      page: 1,
-      perPage: 25,
-      totalCount: 100,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination page={1} perPage={25} totalCount={100} />
+));
 ```
 
 ## Import
@@ -32,19 +27,13 @@ import { Pagination } from "areia";
 
 Call `Pagination(...)` when you want interactive controls. It dispatches `pagination:page-change` and calls `setPage` / `onPageChange` when controls are used.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Pagination({
-      page: 2,
-      perPage: 25,
-      totalCount: 250,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination page={2} perPage={25} totalCount={250} />
+));
 ```
 
 Use `Pagination.Static(...)` for static markup or when you want to wire events yourself. For most application usage, call `Pagination(...)`.
@@ -55,85 +44,65 @@ Use `Pagination.Static(...)` for static markup or when you want to wire events y
 
 The default pagination includes first, previous, page input, next, and last buttons.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Pagination({
-      page: 1,
-      perPage: 25,
-      totalCount: 100,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination page={1} perPage={25} totalCount={100} />
+));
 ```
 
 ### Simple Controls
 
 Use `controls: "simple"` for previous and next buttons only.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Pagination({
-      controls: "simple",
-      page: 5,
-      perPage: 25,
-      totalCount: 250,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination
+    controls="simple"
+    page={5}
+    perPage={25}
+    totalCount={250}
+  />
+));
 ```
 
 ### Mid-Page State
 
 Pagination in the middle of a dataset with all navigation buttons enabled.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Pagination({
-      page: 5,
-      perPage: 25,
-      totalCount: 250,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination page={5} perPage={25} totalCount={250} />
+));
 ```
 
 ### Large Dataset
 
 Pagination handles large datasets. Use the input page selector for large page counts to avoid rendering many options.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Pagination({
-      page: 1,
-      perPage: 25,
-      totalCount: 10000,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination page={1} perPage={25} totalCount={10000} />
+));
 ```
 
 ### Custom Info Text
 
 Use `Pagination.Info` with explicit children to customize the visible text.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
 const page = 3;
@@ -141,22 +110,22 @@ const perPage = 25;
 const totalCount = 100;
 const maxPage = Math.ceil(totalCount / perPage);
 
-const Example = ilha.render(
-  () => html`
-    ${Pagination({
-      page,
-      perPage,
-      totalCount,
-      children: [
-        Pagination.Info({
-          children: `Page ${page} of ${maxPage}`,
-        }),
-        Pagination.Controls({ page, perPage, totalCount }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination
+    page={page}
+    perPage={perPage}
+    totalCount={totalCount}
+  >
+    <Pagination.Info>
+      Page {page} of {maxPage}
+    </Pagination.Info>
+    <Pagination.Controls
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+    />
+  </Pagination>
+));
 ```
 
 ## Compound Components
@@ -167,133 +136,145 @@ Use the compound helpers when you need custom layout or page-size controls.
 
 `Pagination.PageSize` renders a native select for choosing page size. In island mode, changing it emits `pagination:page-size-change` and calls `onPageSizeChange` on `Pagination` when provided.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
 const page = 1;
 const perPage = 25;
 const totalCount = 500;
 
-const Example = ilha.render(
-  () => html`
-    ${Pagination({
-      page,
-      perPage,
-      totalCount,
-      children: [
-        Pagination.Info({ page, perPage, totalCount }),
-        Pagination.Separator(),
-        Pagination.PageSize({ value: perPage }),
-        Pagination.Controls({ page, perPage, totalCount }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination
+    page={page}
+    perPage={perPage}
+    totalCount={totalCount}
+  >
+    <Pagination.Info
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+    />
+    <Pagination.Separator />
+    <Pagination.PageSize value={perPage} />
+    <Pagination.Controls
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+    />
+  </Pagination>
+));
 ```
 
 ### Custom Page Size Options
 
 Customize page-size options with the `options` prop. Defaults to `[25, 50, 100, 250]`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
 const page = 1;
 const perPage = 10;
 const totalCount = 100;
 
-const Example = ilha.render(
-  () => html`
-    ${Pagination({
-      page,
-      perPage,
-      totalCount,
-      children: [
-        Pagination.Info({ page, perPage, totalCount }),
-        Pagination.PageSize({
-          value: perPage,
-          options: [10, 20, 50],
-        }),
-        Pagination.Controls({ page, perPage, totalCount }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination
+    page={page}
+    perPage={perPage}
+    totalCount={totalCount}
+  >
+    <Pagination.Info
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+    />
+    <Pagination.PageSize
+      value={perPage}
+      options={[10, 20, 50]}
+    />
+    <Pagination.Controls
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+    />
+  </Pagination>
+));
 ```
 
 ### Custom Layout
 
 Arrange the helpers in any order.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
 const page = 2;
 const perPage = 50;
 const totalCount = 400;
 
-const Example = ilha.render(
-  () => html`
-    ${Pagination({
-      page,
-      perPage,
-      totalCount,
-      children: [
-        Pagination.Controls({ page, perPage, totalCount }),
-        html`<div class="grow"></div>`,
-        Pagination.PageSize({ value: perPage }),
-        Pagination.Info({ page, perPage, totalCount }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination
+    page={page}
+    perPage={perPage}
+    totalCount={totalCount}
+  >
+    <Pagination.Controls
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+    />
+    <div class="grow"></div>
+    <Pagination.PageSize value={perPage} />
+    <Pagination.Info
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+    />
+  </Pagination>
+));
 ```
 
 ### Dropdown Page Selector
 
 Use `pageSelector: "dropdown"` to render a select with one option per page. This is best for small page counts.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
 const page = 2;
 const perPage = 25;
 const totalCount = 100;
 
-const Example = ilha.render(
-  () => html`
-    ${Pagination({
-      page,
-      perPage,
-      totalCount,
-      children: [
-        Pagination.Info({ page, perPage, totalCount }),
-        Pagination.Controls({
-          page,
-          perPage,
-          totalCount,
-          pageSelector: "dropdown",
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination
+    page={page}
+    perPage={perPage}
+    totalCount={totalCount}
+  >
+    <Pagination.Info
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+    />
+    <Pagination.Controls
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+      pageSelector="dropdown"
+    />
+  </Pagination>
+));
 ```
 
 ### Internationalization
 
 Use `labels` to customize ARIA labels. Visible text can be customized with `Pagination.Info` children and the `label` prop on `Pagination.PageSize`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Pagination } from "areia";
 
 const page = 1;
@@ -309,35 +290,30 @@ const labels = {
   pageSize: "Taille de page",
 };
 
-const Example = ilha.render(
-  () => html`
-    ${Pagination({
-      page,
-      perPage,
-      totalCount,
-      labels,
-      children: [
-        Pagination.Info({
-          children: html`Affichage de
-            <span class="tabular-nums">1-25</span> sur
-            <span class="tabular-nums">100</span>`,
-        }),
-        Pagination.PageSize({
-          value: perPage,
-          label: "Par page :",
-          labels,
-        }),
-        Pagination.Controls({
-          page,
-          perPage,
-          totalCount,
-          labels,
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Pagination
+    page={page}
+    perPage={perPage}
+    totalCount={totalCount}
+    labels={labels}
+  >
+    <Pagination.Info>
+      Affichage de <span class="tabular-nums">1-25</span> sur{" "}
+      <span class="tabular-nums">100</span>
+    </Pagination.Info>
+    <Pagination.PageSize
+      value={perPage}
+      label="Par page :"
+      labels={labels}
+    />
+    <Pagination.Controls
+      page={page}
+      perPage={perPage}
+      totalCount={totalCount}
+      labels={labels}
+    />
+  </Pagination>
+));
 ```
 
 ### Listening for Changes

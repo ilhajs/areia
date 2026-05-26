@@ -5,20 +5,18 @@ description: Displays read-only text with a one-click copy action.
 
 Displays read-only text with a one-click copy action.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { ClipboardText } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${ClipboardText({
-      text: "npm install areia",
-      tooltip: true,
-      class: "w-80",
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <ClipboardText
+    text="npm install areia"
+    tooltip
+    class="w-80"
+  />
+));
 ```
 
 ## Import
@@ -31,19 +29,16 @@ import { ClipboardText } from "areia";
 
 Use `ClipboardText` when the copy button should be interactive.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ClipboardText } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${ClipboardText({
-      text: "0c239dd2-92b4-4b68-bf35-8d6e1c5c12fd",
-      class: "w-96",
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <ClipboardText
+    text="0c239dd2-92b4-4b68-bf35-8d6e1c5c12fd"
+    class="w-96"
+  />
+));
 ```
 
 ## Examples
@@ -52,96 +47,75 @@ Example.mount(document.getElementById("root")!);
 
 Display a shortened value while copying the full value with `textToCopy`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ClipboardText } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${ClipboardText({
-      text: "sk_live_••••••••••••abc123",
-      textToCopy: "sk_live_abc123-full-secret-value",
-      class: "w-80",
-      tooltip: {
-        text: "Copy secret",
-        copiedText: "Copied secret",
-      },
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <ClipboardText
+    text="sk_live_••••••••••••abc123"
+    textToCopy="sk_live_abc123-full-secret-value"
+    class="w-80"
+    tooltip={{
+      text: "Copy secret",
+      copiedText: "Copied secret",
+    }}
+  />
+));
 ```
 
 ### Sizes
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ClipboardText } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="grid w-96 gap-3">
-      ${ClipboardText({
-        text: "Small clipboard text",
-        size: "sm",
-      })}
-      ${ClipboardText({
-        text: "Default clipboard text",
-        size: "base",
-      })}
-      ${ClipboardText({
-        text: "Large clipboard text",
-        size: "lg",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="grid w-96 gap-3">
+    <ClipboardText text="Small clipboard text" size="sm" />
+    <ClipboardText text="Default clipboard text" size="base" />
+    <ClipboardText text="Large clipboard text" size="lg" />
+  </div>
+));
 ```
 
 ### Tooltip
 
 Pass `tooltip: true` for the default tooltip, or configure the tooltip text, copied announcement, and side.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ClipboardText } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${ClipboardText({
-      text: "https://example.com/invite/areia",
-      class: "w-96",
-      tooltip: {
-        text: "Copy invite link",
-        copiedText: "Invite link copied",
-        side: "bottom",
-      },
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <ClipboardText
+    text="https://example.com/invite/areia"
+    class="w-96"
+    tooltip={{
+      text: "Copy invite link",
+      copiedText: "Invite link copied",
+      side: "bottom",
+    }}
+  />
+));
 ```
 
 ### Labels
 
 Customize the copy button label for localization.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ClipboardText } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${ClipboardText({
-      text: "areia-token-123",
-      labels: {
-        copyAction: "Copiar para a área de transferência",
-      },
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <ClipboardText
+    text="areia-token-123"
+    labels={{
+      copyAction: "Copiar para a área de transferência",
+    }}
+  />
+));
 ```
 
 ## API Reference

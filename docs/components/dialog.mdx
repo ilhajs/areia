@@ -5,42 +5,36 @@ description: Displays modal content over the page.
 
 Displays modal content over the page.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Button, Dialog } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Dialog({
-      trigger: Button({ children: "Open dialog" }),
-      contentClass: "grid gap-4 p-6",
-      content: html`
+export default ilha.render(() => (
+  <Dialog
+    trigger={<Button>Open dialog</Button>}
+    contentClass="grid gap-4 p-6"
+    content={
+      <>
         <div class="grid gap-2">
-          ${Dialog.Title({ children: "Edit profile" })}
-          ${Dialog.Description({
-            children:
-              "Make changes to your profile. Close the dialog when you are done.",
-          })}
+          <Dialog.Title>Edit profile</Dialog.Title>
+          <Dialog.Description>
+            Make changes to your profile. Close the dialog when
+            you are done.
+          </Dialog.Description>
         </div>
         <div class="flex justify-end gap-2">
-          ${Dialog.Close({
-            children: Button({
-              variant: "secondary",
-              children: "Cancel",
-            }),
-          })}
-          ${Dialog.Close({
-            children: Button({
-              variant: "primary",
-              children: "Save",
-            }),
-          })}
+          <Dialog.Close>
+            <Button variant="secondary">Cancel</Button>
+          </Dialog.Close>
+          <Dialog.Close>
+            <Button variant="primary">Save</Button>
+          </Dialog.Close>
         </div>
-      `,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+      </>
+    }
+  />
+));
 ```
 
 ## Import
@@ -53,28 +47,27 @@ import { Dialog } from "areia";
 
 Use `Dialog` for an interactive dialog. The component renders the required `dialog`, `dialog-trigger`, `dialog-portal`, `dialog-overlay`, and `dialog-content` slots for `@data-slot/dialog`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dialog } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Dialog({
-      trigger: Button({ children: "Open" }),
-      contentClass: "grid gap-4 p-6",
-      content: html`
-        ${Dialog.Title({ children: "Dialog title" })}
-        ${Dialog.Description({
-          children: "Helpful supporting text for the dialog.",
-        })}
-        ${Dialog.Close({
-          children: Button({ children: "Close" }),
-        })}
-      `,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dialog
+    trigger={<Button>Open</Button>}
+    contentClass="grid gap-4 p-6"
+    content={
+      <>
+        <Dialog.Title>Dialog title</Dialog.Title>
+        <Dialog.Description>
+          Helpful supporting text for the dialog.
+        </Dialog.Description>
+        <Dialog.Close>
+          <Button>Close</Button>
+        </Dialog.Close>
+      </>
+    }
+  />
+));
 ```
 
 ## Examples
@@ -83,148 +76,128 @@ Example.mount(document.getElementById("root")!);
 
 Use `role: "alertdialog"` for confirmation flows that require explicit acknowledgment. Alert dialogs do not close on outside click by default.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dialog } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Dialog({
-      role: "alertdialog",
-      trigger: Button({
-        variant: "destructive",
-        children: "Delete project",
-      }),
-      contentClass: "grid gap-4 p-6",
-      content: html`
+export default ilha.render(() => (
+  <Dialog
+    role="alertdialog"
+    trigger={
+      <Button variant="destructive">Delete project</Button>
+    }
+    contentClass="grid gap-4 p-6"
+    content={
+      <>
         <div class="grid gap-2">
-          ${Dialog.Title({ children: "Delete project?" })}
-          ${Dialog.Description({
-            children:
-              "This action cannot be undone. The project and all related data will be permanently deleted.",
-          })}
+          <Dialog.Title>Delete project?</Dialog.Title>
+          <Dialog.Description>
+            This action cannot be undone. The project and all
+            related data will be permanently deleted.
+          </Dialog.Description>
         </div>
         <div class="flex justify-end gap-2">
-          ${Dialog.Close({
-            children: Button({
-              variant: "secondary",
-              children: "Cancel",
-            }),
-          })}
-          ${Dialog.Close({
-            children: Button({
-              variant: "destructive",
-              children: "Delete",
-            }),
-          })}
+          <Dialog.Close>
+            <Button variant="secondary">Cancel</Button>
+          </Dialog.Close>
+          <Dialog.Close>
+            <Button variant="destructive">Delete</Button>
+          </Dialog.Close>
         </div>
-      `,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+      </>
+    }
+  />
+));
 ```
 
 ### Sizes
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dialog } from "areia";
 
 const sizes = ["sm", "base", "lg", "xl"] as const;
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap gap-2">
-      ${sizes.map(
-        (size) => html`
-          ${Dialog({
-            size,
-            trigger: Button({
-              variant: "secondary",
-              children: size,
-            }),
-            contentClass: "grid gap-4 p-6",
-            content: html`
-              ${Dialog.Title({ children: `${size} dialog` })}
-              ${Dialog.Description({
-                children:
-                  "Dialogs constrain their minimum width by size.",
-              })}
-              ${Dialog.Close({
-                children: Button({ children: "Close" }),
-              })}
-            `,
-          })}
-        `,
-      )}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap gap-2">
+    {sizes.map((size) => (
+      <Dialog
+        size={size}
+        trigger={<Button variant="secondary">{size}</Button>}
+        contentClass="grid gap-4 p-6"
+        content={
+          <>
+            <Dialog.Title>{size} dialog</Dialog.Title>
+            <Dialog.Description>
+              Dialogs constrain their minimum width by size.
+            </Dialog.Description>
+            <Dialog.Close>
+              <Button>Close</Button>
+            </Dialog.Close>
+          </>
+        }
+      />
+    ))}
+  </div>
+));
 ```
 
 ### Close behavior
 
 Configure outside-click, Escape, initial open state, and scroll locking through root options.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dialog } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Dialog({
-      closeOnClickOutside: false,
-      closeOnEscape: true,
-      lockScroll: true,
-      trigger: Button({ children: "Open locked dialog" }),
-      contentClass: "grid gap-4 p-6",
-      content: html`
-        ${Dialog.Title({ children: "Explicit close" })}
-        ${Dialog.Description({
-          children:
-            "Clicking outside this dialog will not close it.",
-        })}
-        ${Dialog.Close({
-          children: Button({ children: "Close" }),
-        })}
-      `,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dialog
+    closeOnClickOutside={false}
+    closeOnEscape
+    lockScroll
+    trigger={<Button>Open locked dialog</Button>}
+    contentClass="grid gap-4 p-6"
+    content={
+      <>
+        <Dialog.Title>Explicit close</Dialog.Title>
+        <Dialog.Description>
+          Clicking outside this dialog will not close it.
+        </Dialog.Description>
+        <Dialog.Close>
+          <Button>Close</Button>
+        </Dialog.Close>
+      </>
+    }
+  />
+));
 ```
 
 ### Compound helpers
 
 You can compose slots manually when you need lower-level control. Use `Dialog` at the top so the primitive is mounted.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dialog } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Dialog({
-      children: Button({ children: "Manual trigger" }),
-      contentClass: "p-6",
-      content: html`
-        <div class="grid gap-4">
-          ${Dialog.Title({ children: "Manual composition" })}
-          ${Dialog.Description({
-            children:
-              "Trigger, title, description, and close are slot helpers.",
-          })}
-          ${Dialog.Close({
-            children: Button({ children: "Done" }),
-          })}
-        </div>
-      `,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dialog
+    trigger={<Button>Manual trigger</Button>}
+    contentClass="p-6"
+    content={
+      <div class="grid gap-4">
+        <Dialog.Title>Manual composition</Dialog.Title>
+        <Dialog.Description>
+          Trigger, title, description, and close are slot
+          helpers.
+        </Dialog.Description>
+        <Dialog.Close>
+          <Button>Done</Button>
+        </Dialog.Close>
+      </div>
+    }
+  />
+));
 ```
 
 ## API Reference

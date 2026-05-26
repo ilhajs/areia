@@ -5,48 +5,36 @@ description: Displays a card with a layered visual treatment for navigation, sum
 
 Displays a card with a layered visual treatment for navigation, summaries, or feature highlights.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { ArrowRight } from "lucide";
 import { Button, Icon, LayerCard } from "areia";
 
-const arrowIcon = Icon({ icon: ArrowRight });
-
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-md">
-      ${LayerCard({
-        children: [
-          LayerCard.Secondary({ children: "Next Steps" }),
-          LayerCard.Primary({
-            children: html`
-              <div
-                class="flex items-center justify-between gap-4"
-              >
-                <div class="flex flex-col gap-1">
-                  <h3 class="font-medium">
-                    Get started with Areia
-                  </h3>
-                  <p class="text-sm text-areia-subtle">
-                    Learn how to install and use the component
-                    library.
-                  </p>
-                </div>
-                ${Button({
-                  variant: "ghost",
-                  shape: "square",
-                  icon: arrowIcon,
-                  "aria-label": "Open guide",
-                })}
-              </div>
-            `,
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-md">
+    <LayerCard>
+      <LayerCard.Secondary>Next Steps</LayerCard.Secondary>
+      <LayerCard.Primary>
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex flex-col gap-1">
+            <h3 class="font-medium">Get started with Areia</h3>
+            <p class="text-sm text-areia-subtle">
+              Learn how to install and use the component
+              library.
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            shape="square"
+            icon={<Icon icon={ArrowRight} />}
+            aria-label="Open guide"
+          />
+        </div>
+      </LayerCard.Primary>
+    </LayerCard>
+  </div>
+));
 ```
 
 ## Import
@@ -59,258 +47,195 @@ import { LayerCard } from "areia";
 
 Use `LayerCard.Secondary` for the elevated header row and `LayerCard.Primary` for the main surface.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { LayerCard } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-md">
-      ${LayerCard({
-        children: [
-          LayerCard.Secondary({ children: "Documentation" }),
-          LayerCard.Primary({
-            children: html`
-              <h3 class="font-medium">Component guide</h3>
-              <p class="text-sm text-areia-subtle">
-                Learn how to use Areia components.
-              </p>
-            `,
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-md">
+    <LayerCard>
+      <LayerCard.Secondary>Documentation</LayerCard.Secondary>
+      <LayerCard.Primary>
+        <h3 class="font-medium">Component guide</h3>
+        <p class="text-sm text-areia-subtle">
+          Learn how to use Areia components.
+        </p>
+      </LayerCard.Primary>
+    </LayerCard>
+  </div>
+));
 ```
 
 `LayerCard` also supports a simple surface-style mode. Render content directly inside `LayerCard` when you do not need a secondary header row.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { LayerCard } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-md">
-      ${LayerCard({
-        class: "p-4",
-        children: html`
-          <h3 class="font-medium">Quick start guide</h3>
-          <p class="text-sm text-areia-subtle">
-            Learn how to install and configure Areia.
-          </p>
-        `,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-md">
+    <LayerCard class="p-4">
+      <h3 class="font-medium">Quick start guide</h3>
+      <p class="text-sm text-areia-subtle">
+        Learn how to install and configure Areia.
+      </p>
+    </LayerCard>
+  </div>
+));
 ```
 
 ## Examples
 
 ### Basic Card
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { LayerCard } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-md">
-      ${LayerCard({
-        children: [
-          LayerCard.Secondary({ children: "Getting Started" }),
-          LayerCard.Primary({
-            children: html`
-              <h3 class="font-medium">Quick start guide</h3>
-              <p class="text-sm text-areia-subtle">
-                A short walkthrough for new users.
-              </p>
-            `,
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-md">
+    <LayerCard>
+      <LayerCard.Secondary>Getting Started</LayerCard.Secondary>
+      <LayerCard.Primary>
+        <h3 class="font-medium">Quick start guide</h3>
+        <p class="text-sm text-areia-subtle">
+          A short walkthrough for new users.
+        </p>
+      </LayerCard.Primary>
+    </LayerCard>
+  </div>
+));
 ```
 
 ### Surface-style Card
 
 For simple card containers, render content directly inside `LayerCard` without `LayerCard.Primary`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { LayerCard } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-md">
-      ${LayerCard({
-        class: "p-4",
-        children: html`
-          <h3 class="font-medium">Quick start guide</h3>
-          <p class="text-sm text-areia-subtle">
-            Build consistent interfaces with reusable
-            primitives.
-          </p>
-        `,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-md">
+    <LayerCard class="p-4">
+      <h3 class="font-medium">Quick start guide</h3>
+      <p class="text-sm text-areia-subtle">
+        Build consistent interfaces with reusable primitives.
+      </p>
+    </LayerCard>
+  </div>
+));
 ```
 
 ### Multiple Cards
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Boxes, Code2 } from "lucide";
 import { Icon, LayerCard } from "areia";
 
-const boxesIcon = Icon({ icon: Boxes, class: "size-4" });
-const codeIcon = Icon({ icon: Code2, class: "size-4" });
-
-const Example = ilha.render(
-  () => html`
-    <div class="grid w-full max-w-2xl gap-3 sm:grid-cols-2">
-      ${LayerCard({
-        children: [
-          LayerCard.Secondary({
-            children: html`${boxesIcon}<span>Components</span>`,
-          }),
-          LayerCard.Primary({
-            children: html`
-              <h3 class="font-medium">Browse components</h3>
-              <p class="text-sm text-areia-subtle">
-                Explore every available UI primitive.
-              </p>
-            `,
-          }),
-        ],
-      })}
-      ${LayerCard({
-        children: [
-          LayerCard.Secondary({
-            children: html`${codeIcon}<span>Examples</span>`,
-          }),
-          LayerCard.Primary({
-            children: html`
-              <h3 class="font-medium">View examples</h3>
-              <p class="text-sm text-areia-subtle">
-                Copy patterns for common product screens.
-              </p>
-            `,
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="grid w-full max-w-2xl gap-3 sm:grid-cols-2">
+    <LayerCard>
+      <LayerCard.Secondary>
+        <Icon icon={Boxes} class="size-4" />
+        <span>Components</span>
+      </LayerCard.Secondary>
+      <LayerCard.Primary>
+        <h3 class="font-medium">Browse components</h3>
+        <p class="text-sm text-areia-subtle">
+          Explore every available UI primitive.
+        </p>
+      </LayerCard.Primary>
+    </LayerCard>
+    <LayerCard>
+      <LayerCard.Secondary>
+        <Icon icon={Code2} class="size-4" />
+        <span>Examples</span>
+      </LayerCard.Secondary>
+      <LayerCard.Primary>
+        <h3 class="font-medium">View examples</h3>
+        <p class="text-sm text-areia-subtle">
+          Copy patterns for common product screens.
+        </p>
+      </LayerCard.Primary>
+    </LayerCard>
+  </div>
+));
 ```
 
 ### Toolbar Card
 
 Layer cards work well for compact toolbars and summaries.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Badge, Input, LayerCard } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-2xl">
-      ${LayerCard({
-        children: [
-          LayerCard.Secondary({
-            children: html`
-              <span>Subrequests</span>
-              ${Badge({ variant: "neutral", children: "128" })}
-            `,
-          }),
-          LayerCard.Primary({
-            children: html`
-              <div class="flex flex-col gap-3">
-                <div class="flex items-center gap-2">
-                  ${Input({
-                    size: "sm",
-                    placeholder: "Search origins...",
-                    "aria-label": "Search origins",
-                    class: "min-w-0 flex-1",
-                  })}
-                  ${Badge({
-                    variant: "success",
-                    children: "2xx",
-                  })}
-                  ${Badge({
-                    variant: "warning",
-                    children: "4xx",
-                  })}
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-sm">
-                  <span class="font-medium">Origin</span>
-                  <span class="font-medium">Requests</span>
-                  <span class="font-medium">Duration</span>
-                  <span class="text-areia-subtle"
-                    >api.example.com</span
-                  >
-                  <span>82</span>
-                  <span>120ms</span>
-                  <span class="text-areia-subtle"
-                    >cdn.example.com</span
-                  >
-                  <span>46</span>
-                  <span>48ms</span>
-                </div>
-              </div>
-            `,
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-2xl">
+    <LayerCard>
+      <LayerCard.Secondary>
+        <span>Subrequests</span>
+        <Badge variant="neutral">128</Badge>
+      </LayerCard.Secondary>
+      <LayerCard.Primary>
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-2">
+            <Input
+              size="sm"
+              placeholder="Search origins..."
+              aria-label="Search origins"
+              class="min-w-0 flex-1"
+            />
+            <Badge variant="success">2xx</Badge>
+            <Badge variant="warning">4xx</Badge>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-sm">
+            <span class="font-medium">Origin</span>
+            <span class="font-medium">Requests</span>
+            <span class="font-medium">Duration</span>
+            <span class="text-areia-subtle">
+              api.example.com
+            </span>
+            <span>82</span>
+            <span>120ms</span>
+            <span class="text-areia-subtle">
+              cdn.example.com
+            </span>
+            <span>46</span>
+            <span>48ms</span>
+          </div>
+        </div>
+      </LayerCard.Primary>
+    </LayerCard>
+  </div>
+));
 ```
 
 ### Test Attributes
 
 `LayerCard.Primary` and `LayerCard.Secondary` accept standard HTML attributes, including `data-testid`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { LayerCard } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-md">
-      ${LayerCard({
-        children: [
-          LayerCard.Secondary({
-            "data-testid": "layer-card-secondary",
-            children: "Getting Started",
-          }),
-          LayerCard.Primary({
-            "data-testid": "layer-card-primary",
-            children: html`
-              <h3 class="font-medium">Quick start guide</h3>
-              <p class="text-sm text-areia-subtle">
-                A short walkthrough for new users.
-              </p>
-            `,
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-md">
+    <LayerCard>
+      <LayerCard.Secondary data-testid="layer-card-secondary">
+        Getting Started
+      </LayerCard.Secondary>
+      <LayerCard.Primary data-testid="layer-card-primary">
+        <h3 class="font-medium">Quick start guide</h3>
+        <p class="text-sm text-areia-subtle">
+          A short walkthrough for new users.
+        </p>
+      </LayerCard.Primary>
+    </LayerCard>
+  </div>
+));
 ```
 
 ## API Reference

@@ -7,26 +7,25 @@ A searchable select component for filtering and choosing from a list of options.
 
 Areia's `Combobox` is built on `@data-slot/combobox` and rendered as an Ilha island when you use `Combobox`. It supports keyboard navigation, filtering, form integration, disabled options, grouped items, and field helpers for labels, descriptions, and errors.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "fruit",
-      label: "Fruit",
-      placeholder: "Search fruit...",
-      items: {
-        apple: "Apple",
-        banana: "Banana",
-        cherry: "Cherry",
-        date: "Date",
-        elderberry: "Elderberry",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="fruit"
+    label="Fruit"
+    placeholder="Search fruit..."
+    items={{
+      apple: "Apple",
+      banana: "Banana",
+      cherry: "Cherry",
+      date: "Date",
+      elderberry: "Elderberry",
+    }}
+  />
+));
 ```
 
 ## Import
@@ -39,26 +38,24 @@ import { Combobox } from "areia";
 
 Call `Combobox(...)` for an interactive island. The root renders the combobox markup and initializes the `@data-slot/combobox` controller after mount.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "database",
-      label: "Database",
-      placeholder: "Search databases...",
-      items: {
-        postgres: "PostgreSQL",
-        mysql: "MySQL",
-        mongodb: "MongoDB",
-        redis: "Redis",
-        d1: "Cloudflare D1",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="database"
+    label="Database"
+    placeholder="Search databases..."
+    items={{
+      postgres: "PostgreSQL",
+      mysql: "MySQL",
+      mongodb: "MongoDB",
+      redis: "Redis",
+      d1: "Cloudflare D1",
+    }}
+  />
+));
 ```
 
 For static server-rendered markup without mounting behavior, use `Combobox.Static(...)`. For most application usage, call `Combobox(...)`.
@@ -69,34 +66,32 @@ For static server-rendered markup without mounting behavior, use `Combobox.Stati
 
 A combobox with a visible label and searchable options.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "basic-fruit",
-      label: "Fruit",
-      placeholder: "Choose a fruit",
-      items: {
-        apple: "Apple",
-        banana: "Banana",
-        cherry: "Cherry",
-        date: "Date",
-        elderberry: "Elderberry",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="basic-fruit"
+    label="Fruit"
+    placeholder="Choose a fruit"
+    items={{
+      apple: "Apple",
+      banana: "Banana",
+      cherry: "Cherry",
+      date: "Date",
+      elderberry: "Elderberry",
+    }}
+  />
+));
 ```
 
 ### Sizes
 
 Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
 const items = {
@@ -105,371 +100,296 @@ const items = {
   cherry: "Cherry",
 };
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Combobox({
-        size: "xs",
-        placeholder: "Extra small",
-        items,
-      })}
-      ${Combobox({
-        size: "sm",
-        placeholder: "Small",
-        items,
-      })}
-      ${Combobox({
-        size: "base",
-        placeholder: "Base",
-        items,
-      })}
-      ${Combobox({
-        size: "lg",
-        placeholder: "Large",
-        items,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <Combobox
+      size="xs"
+      placeholder="Extra small"
+      items={items}
+    />
+    <Combobox size="sm" placeholder="Small" items={items} />
+    <Combobox size="base" placeholder="Base" items={items} />
+    <Combobox size="lg" placeholder="Large" items={items} />
+  </div>
+));
 ```
 
 ### With Description
 
 The `label`, `description`, and `error` props enable the built-in field wrapper.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "region",
-      label: "Region",
-      description: "Choose the region closest to your users.",
-      placeholder: "Search regions...",
-      items: {
-        iad: "Washington, D.C.",
-        sfo: "San Francisco",
-        lhr: "London",
-        fra: "Frankfurt",
-        nrt: "Tokyo",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="region"
+    label="Region"
+    description="Choose the region closest to your users."
+    placeholder="Search regions..."
+    items={{
+      iad: "Washington, D.C.",
+      sfo: "San Francisco",
+      lhr: "London",
+      fra: "Frankfurt",
+      nrt: "Tokyo",
+    }}
+  />
+));
 ```
 
 ### With Error
 
 Pass `error` as a string for simple validation messages. Error styling is automatically applied when `error` is truthy.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "database-error",
-      label: "Database",
-      required: true,
-      error: "Select a database before continuing.",
-      placeholder: "Search databases...",
-      items: {
-        postgres: "PostgreSQL",
-        mysql: "MySQL",
-        mongodb: "MongoDB",
-        redis: "Redis",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="database-error"
+    label="Database"
+    required
+    error="Select a database before continuing."
+    placeholder="Search databases..."
+    items={{
+      postgres: "PostgreSQL",
+      mysql: "MySQL",
+      mongodb: "MongoDB",
+      redis: "Redis",
+    }}
+  />
+));
 ```
 
 ### Disabled
 
 Set `disabled` to prevent interaction.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      label: "Fruit",
-      placeholder: "Search fruit...",
-      disabled: true,
-      items: {
-        apple: "Apple",
-        banana: "Banana",
-        cherry: "Cherry",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    label="Fruit"
+    placeholder="Search fruit..."
+    disabled
+    items={{
+      apple: "Apple",
+      banana: "Banana",
+      cherry: "Cherry",
+    }}
+  />
+));
 ```
 
 ### Disabled Items
 
 Use item descriptor objects to disable individual options. Disabled rows are skipped during keyboard navigation and cannot be selected.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "plans",
-      label: "Plan",
-      placeholder: "Search plans...",
-      items: {
-        free: "Free",
-        pro: "Pro",
-        business: { label: "Business", disabled: true },
-        enterprise: { label: "Enterprise", disabled: true },
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="plans"
+    label="Plan"
+    placeholder="Search plans..."
+    items={{
+      free: "Free",
+      pro: "Pro",
+      business: { label: "Business", disabled: true },
+      enterprise: { label: "Enterprise", disabled: true },
+    }}
+  />
+));
 ```
 
 ### Default Value
 
 Use `defaultValue` with the option value string to preselect an item.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "default-database",
-      label: "Database",
-      defaultValue: "postgres",
-      items: {
-        postgres: "PostgreSQL",
-        mysql: "MySQL",
-        mongodb: "MongoDB",
-        redis: "Redis",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="default-database"
+    label="Database"
+    defaultValue="postgres"
+    items={{
+      postgres: "PostgreSQL",
+      mysql: "MySQL",
+      mongodb: "MongoDB",
+      redis: "Redis",
+    }}
+  />
+));
 ```
 
 ### Form Integration
 
 Set `name` to create a hidden input that submits the selected value with a native form.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Combobox } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <form class="flex w-full max-w-sm flex-col gap-3">
-      ${Combobox({
-        id: "form-fruit",
-        name: "fruit",
-        label: "Fruit",
-        required: true,
-        placeholder: "Search fruit...",
-        items: {
-          apple: "Apple",
-          banana: "Banana",
-          cherry: "Cherry",
-        },
-      })}
-      ${Button({ type: "submit", children: "Submit" })}
-    </form>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <form class="flex w-full max-w-sm flex-col gap-3">
+    <Combobox
+      id="form-fruit"
+      name="fruit"
+      label="Fruit"
+      required
+      placeholder="Search fruit..."
+      items={{
+        apple: "Apple",
+        banana: "Banana",
+        cherry: "Cherry",
+      }}
+    />
+    <Button type="submit">Submit</Button>
+  </form>
+));
 ```
 
 ### Custom Items
 
 Use explicit child markup when you need custom labels, grouping, separators, or item attributes.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "custom-items",
-      label: "Runtime",
-      placeholder: "Search runtimes...",
-      children: [
-        Combobox.Item({
-          value: "bun",
-          label: "Bun",
-          children: html`<span class="font-medium">Bun</span>
-            <span class="text-areia-subtle">
-              JavaScript runtime</span
-            >`,
-        }),
-        Combobox.Item({
-          value: "node",
-          label: "Node.js",
-          children: html`<span class="font-medium"
-              >Node.js</span
-            >
-            <span class="text-areia-subtle">
-              JavaScript runtime</span
-            >`,
-        }),
-        Combobox.Item({
-          value: "deno",
-          label: "Deno",
-          children: html`<span class="font-medium">Deno</span>
-            <span class="text-areia-subtle">
-              TypeScript runtime</span
-            >`,
-        }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="custom-items"
+    label="Runtime"
+    placeholder="Search runtimes..."
+  >
+    <Combobox.Item value="bun" label="Bun">
+      <span class="font-medium">Bun</span>
+      <span class="text-areia-subtle"> JavaScript runtime</span>
+    </Combobox.Item>
+    <Combobox.Item value="node" label="Node.js">
+      <span class="font-medium">Node.js</span>
+      <span class="text-areia-subtle"> JavaScript runtime</span>
+    </Combobox.Item>
+    <Combobox.Item value="deno" label="Deno">
+      <span class="font-medium">Deno</span>
+      <span class="text-areia-subtle"> TypeScript runtime</span>
+    </Combobox.Item>
+  </Combobox>
+));
 ```
 
 ### Grouped Items
 
 Use `Combobox.Group` and `Combobox.GroupLabel` to organize related options.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "grouped-location",
-      label: "Location",
-      placeholder: "Search locations...",
-      children: [
-        Combobox.Group({
-          children: [
-            Combobox.GroupLabel({ children: "North America" }),
-            Combobox.Item({
-              value: "iad",
-              children: "Washington, D.C.",
-            }),
-            Combobox.Item({
-              value: "sfo",
-              children: "San Francisco",
-            }),
-          ],
-        }),
-        Combobox.Group({
-          children: [
-            Combobox.GroupLabel({ children: "Europe" }),
-            Combobox.Item({ value: "lhr", children: "London" }),
-            Combobox.Item({
-              value: "fra",
-              children: "Frankfurt",
-            }),
-          ],
-        }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="grouped-location"
+    label="Location"
+    placeholder="Search locations..."
+  >
+    <Combobox.Group>
+      <Combobox.GroupLabel>North America</Combobox.GroupLabel>
+      <Combobox.Item value="iad">
+        Washington, D.C.
+      </Combobox.Item>
+      <Combobox.Item value="sfo">San Francisco</Combobox.Item>
+    </Combobox.Group>
+    <Combobox.Group>
+      <Combobox.GroupLabel>Europe</Combobox.GroupLabel>
+      <Combobox.Item value="lhr">London</Combobox.Item>
+      <Combobox.Item value="fra">Frankfurt</Combobox.Item>
+    </Combobox.Group>
+  </Combobox>
+));
 ```
 
 ### Search Input Inside Popup
 
 Use the low-level parts to render a select-like trigger with a separate search input inside the popup. This composition returns static markup; initialize it with `createCombobox` yourself if you are not using `Combobox`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
 const items = [
-  Combobox.Item({
-    value: "go",
-    label: "Go",
-    children: "🐹 Go",
-  }),
-  Combobox.Item({
-    value: "rust",
-    label: "Rust",
-    children: "🦀 Rust",
-  }),
-  Combobox.Item({
-    value: "ts",
-    label: "TypeScript",
-    children: "🔷 TypeScript",
-  }),
+  <Combobox.Item value="go" label="Go" children="🐹 Go" />,
+  <Combobox.Item
+    value="rust"
+    label="Rust"
+    children="🦀 Rust"
+  />,
+  <Combobox.Item
+    value="ts"
+    label="TypeScript"
+    children="🔷 TypeScript"
+  />,
 ];
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox(
-      {
-        id: "language-inside",
-        label: "Language",
-        placeholder: "Select language",
-      },
-      [
-        Combobox.TriggerValue({
-          placeholder: "Select language",
-        }),
-        Combobox.Content({
-          children: [
-            Combobox.Input({
-              placeholder: "Search languages...",
-            }),
-            Combobox.List({
-              children: [Combobox.Empty(), items],
-            }),
-          ],
-        }),
-      ],
-    )}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="language-inside"
+    label="Language"
+    placeholder="Select language"
+  >
+    <Combobox.TriggerValue placeholder="Select language" />
+    <Combobox.Content>
+      <Combobox.Input placeholder="Search languages..." />
+      <Combobox.List>
+        <Combobox.Empty />
+        {items}
+      </Combobox.List>
+    </Combobox.Content>
+  </Combobox>
+));
 ```
 
 ### Open on Focus and Auto Highlight
 
 `openOnFocus` opens the popup when the input receives intentional focus. `autoHighlight` highlights the first matching item after typing.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox({
-      id: "quick-search",
-      label: "Quick search",
-      placeholder: "Start typing...",
-      openOnFocus: true,
-      autoHighlight: true,
-      items: {
-        dashboard: "Dashboard",
-        settings: "Settings",
-        billing: "Billing",
-        support: "Support",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="quick-search"
+    label="Quick search"
+    placeholder="Start typing..."
+    openOnFocus
+    autoHighlight
+    items={{
+      dashboard: "Dashboard",
+      settings: "Settings",
+      billing: "Billing",
+      support: "Support",
+    }}
+  />
+));
 ```
 
 ### Dropdown Height
 
 `Combobox.Content` defaults to `24rem` or the available viewport height, whichever is smaller. Pass `class` or `className` when composing the low-level content yourself.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Combobox } from "areia";
 
 const items = {
@@ -480,31 +400,23 @@ const items = {
   five: "Five",
 };
 
-const Example = ilha.render(
-  () =>
-    html`${Combobox(
-      {
-        id: "short-dropdown",
-        label: "Short dropdown",
-        placeholder: "Search...",
-      },
-      [
-        Combobox.TriggerInput({ placeholder: "Search..." }),
-        Combobox.Content({
-          class: "max-h-40",
-          children: Combobox.List({
-            children: [
-              Combobox.Empty(),
-              Object.entries(items).map(([value, label]) =>
-                Combobox.Item({ value, children: label }),
-              ),
-            ],
-          }),
-        }),
-      ],
-    )}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Combobox
+    id="short-dropdown"
+    label="Short dropdown"
+    placeholder="Search..."
+  >
+    <Combobox.TriggerInput placeholder="Search..." />
+    <Combobox.Content class="max-h-40">
+      <Combobox.List>
+        <Combobox.Empty />
+        {Object.entries(items).map(([value, label]) => (
+          <Combobox.Item value={value}>{label}</Combobox.Item>
+        ))}
+      </Combobox.List>
+    </Combobox.Content>
+  </Combobox>
+));
 ```
 
 ## API Reference

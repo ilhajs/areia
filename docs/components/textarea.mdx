@@ -5,21 +5,19 @@ description: A multi-line text input for longer content with built-in label, des
 
 A styled multi-line text input for longer content. When you pass `label`, `description`, or `error`, `Textarea` delegates to `Field` for accessible labeling, descriptions, validation messaging, and field state attributes. Supports vertical resizing by default.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      label: "Bio",
-      description:
-        "Tell us a little about yourself. Max 500 characters.",
-      placeholder: "I design and build design systems...",
-      rows: 4,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    label="Bio"
+    description="Tell us a little about yourself. Max 500 characters."
+    placeholder="I design and build design systems..."
+    rows={4}
+  />
+));
 ```
 
 ## Import
@@ -34,41 +32,36 @@ import { Textarea } from "areia";
 
 Use the `label` prop to enable the `Field` wrapper with label, description, and error support.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      id: "notes",
-      label: "Notes",
-      description:
-        "Add any additional context for the reviewer.",
-      placeholder: "Write your notes here...",
-      rows: 3,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    id="notes"
+    label="Notes"
+    description="Add any additional context for the reviewer."
+    placeholder="Write your notes here..."
+    rows={3}
+  />
+));
 ```
 
 ### Bare Textarea
 
 For custom form layouts, use `Textarea` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility. Use `Textarea.Static(...)` when composing a raw textarea inside `Field` manually.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      "aria-label": "Message",
-      placeholder: "Type your message...",
-      rows: 4,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    aria-label="Message"
+    placeholder="Type your message..."
+    rows={4}
+  />
+));
 ```
 
 ## Examples
@@ -77,273 +70,248 @@ Example.mount(document.getElementById("root")!);
 
 The `label` prop enables the `Field` wrapper with automatic vertical layout.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      id: "bio",
-      label: "Bio",
-      description:
-        "A short description that appears on your public profile.",
-      placeholder: "I design and build design systems...",
-      rows: 4,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    id="bio"
+    label="Bio"
+    description="A short description that appears on your public profile."
+    placeholder="I design and build design systems..."
+    rows={4}
+  />
+));
 ```
 
 ### With Error
 
 Pass `error` as a string for simple error messages. Error styling is automatically applied when the `error` prop is truthy.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      id: "message-error",
-      label: "Message",
-      placeholder: "Type your message...",
-      value:
-        "This message is way too long for the field limit...",
-      error: "Message must be less than 500 characters.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    id="message-error"
+    label="Message"
+    placeholder="Type your message..."
+    value="This message is way too long for the field limit..."
+    error="Message must be less than 500 characters."
+  />
+));
 ```
 
 ### With Validation Object
 
 Pass `error` as an object with a `message` property when you want to keep validation metadata near the field.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      id: "comment",
-      label: "Comment",
-      required: true,
-      placeholder: "Share your thoughts...",
-      error: {
-        message: "Comment is required.",
-        match: "valueMissing",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    id="comment"
+    label="Comment"
+    required
+    placeholder="Share your thoughts..."
+    error={{
+      message: "Comment is required.",
+      match: "valueMissing",
+    }}
+  />
+));
 ```
 
 ### Sizes
 
 Four sizes are available: `xs`, `sm`, `base`, and `lg`. Sizes control text size, padding, and border radius — the height is determined by `rows` and content.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Textarea({
-        size: "xs",
-        "aria-label": "Extra small textarea",
-        placeholder: "Extra small",
-        rows: 2,
-      })}
-      ${Textarea({
-        size: "sm",
-        "aria-label": "Small textarea",
-        placeholder: "Small",
-        rows: 2,
-      })}
-      ${Textarea({
-        size: "base",
-        "aria-label": "Base textarea",
-        placeholder: "Base",
-        rows: 2,
-      })}
-      ${Textarea({
-        size: "lg",
-        "aria-label": "Large textarea",
-        placeholder: "Large",
-        rows: 2,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <Textarea
+      size="xs"
+      aria-label="Extra small textarea"
+      placeholder="Extra small"
+      rows={2}
+    />
+    <Textarea
+      size="sm"
+      aria-label="Small textarea"
+      placeholder="Small"
+      rows={2}
+    />
+    <Textarea
+      size="base"
+      aria-label="Base textarea"
+      placeholder="Base"
+      rows={2}
+    />
+    <Textarea
+      size="lg"
+      aria-label="Large textarea"
+      placeholder="Large"
+      rows={2}
+    />
+  </div>
+));
 ```
 
 ### Custom Row Count
 
 Use the `rows` prop to control the initial visible height before the content grows.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Textarea({
-        label: "Short response",
-        placeholder: "A couple of lines...",
-        rows: 2,
-      })}
-      ${Textarea({
-        label: "Detailed response",
-        placeholder: "Take your time to explain...",
-        rows: 5,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <Textarea
+      label="Short response"
+      placeholder="A couple of lines..."
+      rows={2}
+    />
+    <Textarea
+      label="Detailed response"
+      placeholder="Take your time to explain..."
+      rows={5}
+    />
+  </div>
+));
 ```
 
 ### Disabled
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      label: "Notes",
-      placeholder: "Write your notes here...",
-      disabled: true,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    label="Notes"
+    placeholder="Write your notes here..."
+    disabled
+  />
+));
 ```
 
 ### Optional Field
 
-Set `required: false` to show optional text after the label.
+Set `required={false}` to show optional text after the label.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      id: "comments",
-      label: "Additional comments",
-      required: false,
-      placeholder: "Anything else we should know...",
-      rows: 3,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    id="comments"
+    label="Additional comments"
+    required={false}
+    placeholder="Anything else we should know..."
+    rows={3}
+  />
+));
 ```
 
 ### With Label Tooltip
 
 Use `labelTooltip` to add additional context via a native `title` attribute on the label.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      id: "release-notes",
-      label: "Release notes",
-      labelTooltip:
-        "These notes are published with the release and visible to all users.",
-      placeholder: "What changed in this version?",
-      rows: 4,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    id="release-notes"
+    label="Release notes"
+    labelTooltip="These notes are published with the release and visible to all users."
+    placeholder="What changed in this version?"
+    rows={4}
+  />
+));
 ```
 
 ### Rich Label
 
-The `label` prop accepts Ilha markup for richer formatting.
+The `label` prop accepts markup for richer formatting.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      id: "review-notes",
-      label: html`Notes for <strong>review</strong>`,
-      required: true,
-      placeholder: "Add notes for the reviewer...",
-      rows: 3,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    id="review-notes"
+    label={
+      <>
+        Notes for <strong>review</strong>
+      </>
+    }
+    required
+    placeholder="Add notes for the reviewer..."
+    rows={3}
+  />
+));
 ```
 
 ### Bare Textarea with Error
 
 Error messages and descriptions can render without a visible label. Use `aria-label` to keep the textarea accessible.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Textarea({
-      id: "feedback-error",
-      "aria-label": "Feedback",
-      placeholder: "Share your feedback...",
-      description:
-        "Your feedback helps us improve the product.",
-      error: "Feedback is currently unavailable.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Textarea
+    id="feedback-error"
+    aria-label="Feedback"
+    placeholder="Share your feedback..."
+    description="Your feedback helps us improve the product."
+    error="Feedback is currently unavailable."
+  />
+));
 ```
 
 ### Custom Resize Behavior
 
 The textarea defaults to vertical-only resize (`resize-vertical`). Override it by passing a Tailwind resize utility via `class`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Textarea } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Textarea({
-        label: "Vertical resize",
-        placeholder: "Resize vertically only...",
-        rows: 3,
-      })}
-      ${Textarea({
-        label: "Horizontal resize",
-        placeholder: "Resize horizontally only...",
-        class: "resize-horizontal",
-        rows: 3,
-      })}
-      ${Textarea({
-        label: "No resize",
-        placeholder: "Cannot be resized...",
-        class: "resize-none",
-        rows: 3,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <Textarea
+      label="Vertical resize"
+      placeholder="Resize vertically only..."
+      rows={3}
+    />
+    <Textarea
+      label="Horizontal resize"
+      placeholder="Resize horizontally only..."
+      class="resize-horizontal"
+      rows={3}
+    />
+    <Textarea
+      label="No resize"
+      placeholder="Cannot be resized..."
+      class="resize-none"
+      rows={3}
+    />
+  </div>
+));
 ```
 
 ## API Reference

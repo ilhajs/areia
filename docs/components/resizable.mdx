@@ -7,41 +7,29 @@ Accessible resizable panel groups with keyboard support. Built on the `@areia/sl
 
 `Resizable` wires panel sizing, drag handles, keyboard navigation, and layout change events.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Resizable } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Resizable({
-      direction: "horizontal",
-      class: "max-w-md rounded-lg border border-areia-border",
-      children: [
-        Resizable.Panel({
-          defaultSize: 50,
-          minSize: 10,
-          collapsible: true,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">Left</span>
-          </div>`,
-        }),
-        Resizable.Handle({ withHandle: true }),
-        Resizable.Panel({
-          defaultSize: 50,
-          minSize: 10,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">Right</span>
-          </div>`,
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Resizable
+    direction="horizontal"
+    class="max-w-md rounded-lg border border-areia-border"
+  >
+    <Resizable.Panel defaultSize={50} minSize={10} collapsible>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">Left</span>
+      </div>
+    </Resizable.Panel>
+    <Resizable.Handle withHandle />
+    <Resizable.Panel defaultSize={50} minSize={10}>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">Right</span>
+      </div>
+    </Resizable.Panel>
+  </Resizable>
+));
 ```
 
 ## Import
@@ -54,38 +42,28 @@ import { Resizable } from "areia";
 
 Compose panels and handles within a root group. The root must be a direct parent of alternating panels and handles.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Resizable } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Resizable({
-      direction: "horizontal",
-      class: "max-w-md rounded-lg border border-areia-border",
-      children: [
-        Resizable.Panel({
-          defaultSize: 50,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">Left</span>
-          </div>`,
-        }),
-        Resizable.Handle(),
-        Resizable.Panel({
-          defaultSize: 50,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">Right</span>
-          </div>`,
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Resizable
+    direction="horizontal"
+    class="max-w-md rounded-lg border border-areia-border"
+  >
+    <Resizable.Panel defaultSize={50}>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">Left</span>
+      </div>
+    </Resizable.Panel>
+    <Resizable.Handle />
+    <Resizable.Panel defaultSize={50}>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">Right</span>
+      </div>
+    </Resizable.Panel>
+  </Resizable>
+));
 ```
 
 ## Composition
@@ -105,133 +83,94 @@ Resizable (root)
 
 Use `direction="vertical"` for vertical resizing.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Resizable } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Resizable({
-      direction: "vertical",
-      class: "max-w-md rounded-lg border border-areia-border",
-      children: [
-        Resizable.Panel({
-          defaultSize: 25,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">Header</span>
-          </div>`,
-        }),
-        Resizable.Handle(),
-        Resizable.Panel({
-          defaultSize: 75,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">Content</span>
-          </div>`,
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Resizable
+    direction="vertical"
+    class="max-w-md rounded-lg border border-areia-border"
+  >
+    <Resizable.Panel defaultSize={25}>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">Header</span>
+      </div>
+    </Resizable.Panel>
+    <Resizable.Handle />
+    <Resizable.Panel defaultSize={75}>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">Content</span>
+      </div>
+    </Resizable.Panel>
+  </Resizable>
+));
 ```
 
 ### With Handle
 
 Use `withHandle` on `Resizable.Handle` to show a visible grip indicator.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Resizable } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Resizable({
-      direction: "horizontal",
-      class: "max-w-md rounded-lg border border-areia-border",
-      children: [
-        Resizable.Panel({
-          defaultSize: 25,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">Sidebar</span>
-          </div>`,
-        }),
-        Resizable.Handle({ withHandle: true }),
-        Resizable.Panel({
-          defaultSize: 75,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">Content</span>
-          </div>`,
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Resizable
+    direction="horizontal"
+    class="max-w-md rounded-lg border border-areia-border"
+  >
+    <Resizable.Panel defaultSize={25}>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">Sidebar</span>
+      </div>
+    </Resizable.Panel>
+    <Resizable.Handle withHandle />
+    <Resizable.Panel defaultSize={75}>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">Content</span>
+      </div>
+    </Resizable.Panel>
+  </Resizable>
+));
 ```
 
 ### Nested Panels
 
 Resizable panels can be nested for complex layouts.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Resizable } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Resizable({
-      direction: "horizontal",
-      class: "max-w-md rounded-lg border border-areia-border",
-      children: [
-        Resizable.Panel({
-          defaultSize: 50,
-          children: html`<div
-            class="flex items-center justify-center p-4"
-          >
-            <span class="font-semibold">One</span>
-          </div>`,
-        }),
-        Resizable.Handle({ withHandle: true }),
-        Resizable.Panel({
-          defaultSize: 50,
-          children: [
-            Resizable({
-              direction: "vertical",
-              children: [
-                Resizable.Panel({
-                  defaultSize: 25,
-                  children: html`<div
-                    class="flex items-center justify-center p-4"
-                  >
-                    <span class="font-semibold">Two</span>
-                  </div>`,
-                }),
-                Resizable.Handle({ withHandle: true }),
-                Resizable.Panel({
-                  defaultSize: 75,
-                  children: html`<div
-                    class="flex items-center justify-center p-4"
-                  >
-                    <span class="font-semibold">Three</span>
-                  </div>`,
-                }),
-              ],
-            }),
-          ],
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Resizable
+    direction="horizontal"
+    class="max-w-md rounded-lg border border-areia-border"
+  >
+    <Resizable.Panel defaultSize={50}>
+      <div class="flex items-center justify-center p-4">
+        <span class="font-semibold">One</span>
+      </div>
+    </Resizable.Panel>
+    <Resizable.Handle withHandle />
+    <Resizable.Panel defaultSize={50}>
+      <Resizable direction="vertical">
+        <Resizable.Panel defaultSize={25}>
+          <div class="flex items-center justify-center p-4">
+            <span class="font-semibold">Two</span>
+          </div>
+        </Resizable.Panel>
+        <Resizable.Handle withHandle />
+        <Resizable.Panel defaultSize={75}>
+          <div class="flex items-center justify-center p-4">
+            <span class="font-semibold">Three</span>
+          </div>
+        </Resizable.Panel>
+      </Resizable>
+    </Resizable.Panel>
+  </Resizable>
+));
 ```
 
 ## API Reference

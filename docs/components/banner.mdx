@@ -5,43 +5,33 @@ description: Displays contextual inline messages for informational, alert, or er
 
 Displays contextual inline messages for informational, alert, or error states.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Info, TriangleAlert } from "lucide";
 import { Banner, Icon } from "areia";
 
-const infoIcon = Icon({ icon: Info, class: "size-5" });
-
-const warningIcon = Icon({
-  icon: TriangleAlert,
-  class: "size-5",
-});
-
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-2xl flex-col gap-3">
-      ${Banner({
-        icon: infoIcon,
-        title: "Update available",
-        description: "A new version is ready to install.",
-      })}
-      ${Banner({
-        icon: warningIcon,
-        variant: "alert",
-        title: "Session expiring",
-        description: "Your session will expire in 5 minutes.",
-      })}
-      ${Banner({
-        icon: warningIcon,
-        variant: "error",
-        title: "Save failed",
-        description:
-          "We couldn't save your changes. Please try again.",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-2xl flex-col gap-3">
+    <Banner
+      icon={<Icon icon={Info} class="size-5" />}
+      title="Update available"
+      description="A new version is ready to install."
+    />
+    <Banner
+      icon={<Icon icon={TriangleAlert} class="size-5" />}
+      variant="alert"
+      title="Session expiring"
+      description="Your session will expire in 5 minutes."
+    />
+    <Banner
+      icon={<Icon icon={TriangleAlert} class="size-5" />}
+      variant="error"
+      title="Save failed"
+      description="We couldn't save your changes. Please try again."
+    />
+  </div>
+));
 ```
 
 ## Import
@@ -52,22 +42,18 @@ import { Banner } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Info } from "lucide";
 import { Banner, Icon } from "areia";
 
-const infoIcon = Icon({ icon: Info, class: "size-5" });
-
-const Example = ilha.render(
-  () =>
-    html`${Banner({
-      icon: infoIcon,
-      title: "Update available",
-      description: "A new version is ready to install.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Banner
+    icon={<Icon icon={Info} class="size-5" />}
+    title="Update available"
+    description="A new version is ready to install."
+  />
+));
 ```
 
 ## Examples
@@ -76,180 +62,140 @@ Example.mount(document.getElementById("root")!);
 
 #### Default
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Info } from "lucide";
 import { Banner, Icon } from "areia";
 
-const infoIcon = Icon({ icon: Info, class: "size-5" });
-
-const Example = ilha.render(
-  () =>
-    html`${Banner({
-      icon: infoIcon,
-      title: "Update available",
-      description: "A new version is ready to install.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Banner
+    icon={<Icon icon={Info} class="size-5" />}
+    title="Update available"
+    description="A new version is ready to install."
+  />
+));
 ```
 
 #### Alert
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { TriangleAlert } from "lucide";
 import { Banner, Icon } from "areia";
 
-const warningIcon = Icon({
-  icon: TriangleAlert,
-  class: "size-5",
-});
-
-const Example = ilha.render(
-  () =>
-    html`${Banner({
-      icon: warningIcon,
-      variant: "alert",
-      title: "Session expiring",
-      description: "Your session will expire in 5 minutes.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Banner
+    icon={<Icon icon={TriangleAlert} class="size-5" />}
+    variant="alert"
+    title="Session expiring"
+    description="Your session will expire in 5 minutes."
+  />
+));
 ```
 
 #### Error
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { TriangleAlert } from "lucide";
 import { Banner, Icon } from "areia";
 
-const warningIcon = Icon({
-  icon: TriangleAlert,
-  class: "size-5",
-});
-
-const Example = ilha.render(
-  () =>
-    html`${Banner({
-      icon: warningIcon,
-      variant: "error",
-      title: "Save failed",
-      description:
-        "We couldn't save your changes. Please try again.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Banner
+    icon={<Icon icon={TriangleAlert} class="size-5" />}
+    variant="error"
+    title="Save failed"
+    description="We couldn't save your changes. Please try again."
+  />
+));
 ```
 
 ### With Icon
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { TriangleAlert } from "lucide";
 import { Banner, Icon } from "areia";
 
-const warningIcon = Icon({
-  icon: TriangleAlert,
-  class: "size-5",
-});
-
-const Example = ilha.render(
-  () =>
-    html`${Banner({
-      icon: warningIcon,
-      variant: "alert",
-      title: "Review required",
-      description:
-        "Please review your project settings before proceeding.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Banner
+    icon={<Icon icon={TriangleAlert} class="size-5" />}
+    variant="alert"
+    title="Review required"
+    description="Please review your project settings before proceeding."
+  />
+));
 ```
 
 ### With Action
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Info } from "lucide";
 import { Banner, Button, Icon } from "areia";
 
-const infoIcon = Icon({ icon: Info, class: "size-5" });
-
-const Example = ilha.render(
-  () =>
-    html`${Banner({
-      icon: infoIcon,
-      title: "Update available",
-      description: "A new version is ready to install.",
-      action: Button({
-        size: "sm",
-        variant: "primary",
-        label: "Update now",
-      }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Banner
+    icon={<Icon icon={Info} class="size-5" />}
+    title="Update available"
+    description="A new version is ready to install."
+    action={
+      <Button size="sm" variant="primary">
+        Update now
+      </Button>
+    }
+  />
+));
 ```
 
 ### With Multiple Actions
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { TriangleAlert } from "lucide";
 import { Banner, Button, Icon } from "areia";
 
-const warningIcon = Icon({
-  icon: TriangleAlert,
-  class: "size-5",
-});
-
-const Example = ilha.render(
-  () =>
-    html`${Banner({
-      icon: warningIcon,
-      variant: "alert",
-      title: "Session expiring",
-      description: "Your session will expire in 5 minutes.",
-      action: html`
-        ${Button({
-          size: "sm",
-          variant: "ghost",
-          label: "Dismiss",
-        })}
-        ${Button({
-          size: "sm",
-          variant: "secondary",
-          label: "Extend session",
-        })}
-      `,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Banner
+    icon={<Icon icon={TriangleAlert} class="size-5" />}
+    variant="alert"
+    title="Session expiring"
+    description="Your session will expire in 5 minutes."
+    action={
+      <>
+        <Button size="sm" variant="ghost">
+          Dismiss
+        </Button>
+        <Button size="sm" variant="secondary">
+          Extend session
+        </Button>
+      </>
+    }
+  />
+));
 ```
 
 ### Custom Content
 
 Use markup in `description` when the message needs links, emphasis, or other inline content.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Info } from "lucide";
 import { Banner, Icon } from "areia";
 
-const infoIcon = Icon({ icon: Info, class: "size-5" });
-
-const Example = ilha.render(
-  () =>
-    html`${Banner({
-      icon: infoIcon,
-      title: "Custom content supported",
-      description: html`This banner supports
-        <strong>custom content</strong> with Ilha markup.`,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Banner
+    icon={<Icon icon={Info} class="size-5" />}
+    title="Custom content supported"
+    description={
+      <>
+        This banner supports <strong>custom content</strong>{" "}
+        with Ilha markup.
+      </>
+    }
+  />
+));
 ```
 
 ## API Reference

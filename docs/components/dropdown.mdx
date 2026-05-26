@@ -7,26 +7,18 @@ A dropdown menu for actions, navigation, and compact option controls.
 
 `Dropdown` is backed by `@areia/slots` and wires open state, positioning, keyboard navigation, typeahead, item selection, checkbox items, and radio items.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Button, Dropdown } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Dropdown({
-      trigger: Button({ children: "Add" }),
-      children: [
-        Dropdown.Item({ value: "worker", children: "Worker" }),
-        Dropdown.Item({ value: "pages", children: "Pages" }),
-        Dropdown.Item({
-          value: "kv",
-          children: "KV Namespace",
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dropdown trigger={<Button>Add</Button>}>
+    <Dropdown.Item value="worker">Worker</Dropdown.Item>
+    <Dropdown.Item value="pages">Pages</Dropdown.Item>
+    <Dropdown.Item value="kv">KV Namespace</Dropdown.Item>
+  </Dropdown>
+));
 ```
 
 ## Import
@@ -39,67 +31,45 @@ import { Dropdown } from "areia";
 
 Use `trigger` with menu item helpers for common menus.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dropdown } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Dropdown({
-      trigger: Button({ children: "Menu" }),
-      children: [
-        Dropdown.Item({ value: "edit", children: "Edit" }),
-        Dropdown.Item({
-          value: "duplicate",
-          children: "Duplicate",
-        }),
-        Dropdown.Separator(),
-        Dropdown.Item({
-          value: "delete",
-          children: "Delete",
-          variant: "danger",
-        }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dropdown trigger={<Button>Menu</Button>}>
+    <Dropdown.Item value="edit">Edit</Dropdown.Item>
+    <Dropdown.Item value="duplicate">Duplicate</Dropdown.Item>
+    <Dropdown.Separator />
+    <Dropdown.Item value="delete" variant="danger">
+      Delete
+    </Dropdown.Item>
+  </Dropdown>
+));
 ```
 
 Use compound helpers when you need custom structure. `DropdownMenu` is available as an alias if that reads better in your code.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, DropdownMenu } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${DropdownMenu({
-      trigger: Button({ children: "Actions" }),
-      children: [
-        DropdownMenu.Group({
-          children: [
-            DropdownMenu.Label({ children: "Project" }),
-            DropdownMenu.Item({
-              value: "rename",
-              children: "Rename",
-            }),
-            DropdownMenu.Item({
-              value: "duplicate",
-              children: "Duplicate",
-            }),
-          ],
-        }),
-        DropdownMenu.Separator(),
-        DropdownMenu.Item({
-          value: "delete",
-          variant: "danger",
-          children: "Delete",
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <DropdownMenu trigger={<Button>Actions</Button>}>
+    <DropdownMenu.Group>
+      <DropdownMenu.Label>Project</DropdownMenu.Label>
+      <DropdownMenu.Item value="rename">
+        Rename
+      </DropdownMenu.Item>
+      <DropdownMenu.Item value="duplicate">
+        Duplicate
+      </DropdownMenu.Item>
+    </DropdownMenu.Group>
+    <DropdownMenu.Separator />
+    <DropdownMenu.Item value="delete" variant="danger">
+      Delete
+    </DropdownMenu.Item>
+  </DropdownMenu>
+));
 ```
 
 Use `Dropdown.Static(...)` for static markup or when you want to initialize behavior yourself. For most application usage, call `Dropdown(...)`.
@@ -108,277 +78,222 @@ Use `Dropdown.Static(...)` for static markup or when you want to initialize beha
 
 ### Basic
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dropdown } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Dropdown({
-      trigger: Button({ children: "Add" }),
-      children: [
-        Dropdown.Item({ value: "worker", children: "Worker" }),
-        Dropdown.Item({ value: "pages", children: "Pages" }),
-        Dropdown.Item({
-          value: "kv",
-          children: "KV Namespace",
-        }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dropdown trigger={<Button>Add</Button>}>
+    <Dropdown.Item value="worker">Worker</Dropdown.Item>
+    <Dropdown.Item value="pages">Pages</Dropdown.Item>
+    <Dropdown.Item value="kv">KV Namespace</Dropdown.Item>
+  </Dropdown>
+));
 ```
 
 ### Inset Items
 
 Use `inset` on items without an icon to align their text with selection indicators or icon-bearing items.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dropdown } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Dropdown({
-      trigger: Button({ children: "Edit" }),
-      children: [
-        Dropdown.Item({ value: "rename", children: "Rename" }),
-        Dropdown.Item({
-          value: "duplicate",
-          children: "Duplicate",
-        }),
-        Dropdown.Separator(),
-        Dropdown.Item({
-          value: "move",
-          children: "Move to folder",
-          inset: true,
-        }),
-        Dropdown.Item({
-          value: "favorite",
-          children: "Add to favorites",
-          inset: true,
-        }),
-        Dropdown.Separator(),
-        Dropdown.Item({
-          value: "delete",
-          children: "Delete",
-          variant: "danger",
-        }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dropdown trigger={<Button>Edit</Button>}>
+    <Dropdown.Item value="rename">Rename</Dropdown.Item>
+    <Dropdown.Item value="duplicate">Duplicate</Dropdown.Item>
+    <Dropdown.Separator />
+    <Dropdown.Item value="move" inset>
+      Move to folder
+    </Dropdown.Item>
+    <Dropdown.Item value="favorite" inset>
+      Add to favorites
+    </Dropdown.Item>
+    <Dropdown.Separator />
+    <Dropdown.Item value="delete" variant="danger">
+      Delete
+    </Dropdown.Item>
+  </Dropdown>
+));
 ```
 
 ### Change Events
 
 Use `onSelect` on the root to respond to accepted item selections.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dropdown } from "areia";
 
-const Example = ilha.state("lastAction", "").render(
-  ({ state }) => html`
+export default ilha
+  .state("lastAction", "")
+  .render(({ state }) => (
     <div class="flex flex-col items-start gap-3">
-      ${Dropdown({
-        trigger: Button({ children: "Actions" }),
-        onSelect(value) {
+      <Dropdown
+        trigger={<Button>Actions</Button>}
+        onSelect={(value) => {
           state.lastAction(value);
-        },
-        children: [
-          Dropdown.Item({
-            value: "duplicate",
-            children: "Duplicate",
-          }),
-          Dropdown.Item({
-            value: "rename",
-            children: "Rename",
-          }),
-          Dropdown.Separator(),
-          Dropdown.Item({
-            value: "delete",
-            children: "Delete",
-            variant: "danger",
-          }),
-        ],
-      })}
+        }}
+      >
+        <Dropdown.Item value="duplicate">
+          Duplicate
+        </Dropdown.Item>
+        <Dropdown.Item value="rename">Rename</Dropdown.Item>
+        <Dropdown.Separator />
+        <Dropdown.Item value="delete" variant="danger">
+          Delete
+        </Dropdown.Item>
+      </Dropdown>
       <p class="text-sm text-areia-subtle">
-        Last action:
-        <span class="text-areia-default"
-          >${state.lastAction() || "None"}</span
-        >
+        Last action:{" "}
+        <span class="text-areia-default">
+          {state.lastAction() || "None"}
+        </span>
       </p>
     </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+  ));
 ```
 
 ### Checkbox Items
 
 Use checkbox items for independently toggleable options.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dropdown } from "areia";
 
-const Example = ilha
+export default ilha
   .state("visible", ["sidebar", "wrap"])
-  .render(
-    ({ state }) => html`
-      ${Dropdown({
-        trigger: Button({ children: "View Options" }),
-        defaultValues: state.visible(),
-        closeOnSelect: false,
-        onValuesChange(values) {
-          state.visible(values);
-        },
-        children: [
-          Dropdown.Group({
-            children: [
-              Dropdown.Label({ children: "Display" }),
-              Dropdown.CheckboxItem({
-                value: "sidebar",
-                checked: state.visible().includes("sidebar"),
-                children: "Show sidebar",
-              }),
-              Dropdown.CheckboxItem({
-                value: "lines",
-                checked: state.visible().includes("lines"),
-                children: "Show line numbers",
-              }),
-              Dropdown.CheckboxItem({
-                value: "wrap",
-                checked: state.visible().includes("wrap"),
-                children: "Word wrap",
-              }),
-            ],
-          }),
-        ],
-      })}
-    `,
-  );
-Example.mount(document.getElementById("root")!);
+  .render(({ state }) => (
+    <Dropdown
+      trigger={<Button>View Options</Button>}
+      defaultValues={state.visible()}
+      closeOnSelect={false}
+      onValuesChange={(values) => {
+        state.visible(values);
+      }}
+    >
+      <Dropdown.Group>
+        <Dropdown.Label>Display</Dropdown.Label>
+        <Dropdown.CheckboxItem
+          value="sidebar"
+          checked={state.visible().includes("sidebar")}
+        >
+          Show sidebar
+        </Dropdown.CheckboxItem>
+        <Dropdown.CheckboxItem
+          value="lines"
+          checked={state.visible().includes("lines")}
+        >
+          Show line numbers
+        </Dropdown.CheckboxItem>
+        <Dropdown.CheckboxItem
+          value="wrap"
+          checked={state.visible().includes("wrap")}
+        >
+          Word wrap
+        </Dropdown.CheckboxItem>
+      </Dropdown.Group>
+    </Dropdown>
+  ));
 ```
 
 ### Radio Items
 
 Use radio items for a single selected value.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dropdown } from "areia";
 
-const Example = ilha.state("density", "comfortable").render(
-  ({ state }) => html`
-    ${Dropdown({
-      trigger: Button({ children: "Density" }),
-      defaultValue: state.density(),
-      closeOnSelect: false,
-      onValueChange(value) {
+export default ilha
+  .state("density", "comfortable")
+  .render(({ state }) => (
+    <Dropdown
+      trigger={<Button>Density</Button>}
+      defaultValue={state.density()}
+      closeOnSelect={false}
+      onValueChange={(value) => {
         state.density(value ?? "comfortable");
-      },
-      children: [
-        Dropdown.Label({ children: "Table density" }),
-        Dropdown.RadioItem({
-          value: "compact",
-          checked: state.density() === "compact",
-          children: "Compact",
-        }),
-        Dropdown.RadioItem({
-          value: "comfortable",
-          checked: state.density() === "comfortable",
-          children: "Comfortable",
-        }),
-        Dropdown.RadioItem({
-          value: "spacious",
-          checked: state.density() === "spacious",
-          children: "Spacious",
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+      }}
+    >
+      <Dropdown.Label>Table density</Dropdown.Label>
+      <Dropdown.RadioItem
+        value="compact"
+        checked={state.density() === "compact"}
+      >
+        Compact
+      </Dropdown.RadioItem>
+      <Dropdown.RadioItem
+        value="comfortable"
+        checked={state.density() === "comfortable"}
+      >
+        Comfortable
+      </Dropdown.RadioItem>
+      <Dropdown.RadioItem
+        value="spacious"
+        checked={state.density() === "spacious"}
+      >
+        Spacious
+      </Dropdown.RadioItem>
+    </Dropdown>
+  ));
 ```
 
 ### Custom Trigger
 
 Pass any Areia or Ilha-rendered content as the trigger.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Dropdown } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Dropdown({
-      trigger: html`
-        <span
-          class="flex size-8 items-center justify-center rounded-full bg-areia-accent text-sm font-medium text-white"
-        >
-          AR
-        </span>
-      `,
-      triggerClass: "rounded-full",
-      children: [
-        Dropdown.Item({
-          value: "profile",
-          children: "Profile",
-        }),
-        Dropdown.Item({
-          value: "settings",
-          children: "Settings",
-        }),
-        Dropdown.Separator(),
-        Dropdown.Item({
-          value: "logout",
-          children: "Log out",
-          variant: "danger",
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dropdown
+    trigger={
+      <span class="flex size-8 items-center justify-center rounded-full bg-areia-accent text-sm font-medium text-white">
+        AR
+      </span>
+    }
+    triggerClass="rounded-full"
+  >
+    <Dropdown.Item value="profile">Profile</Dropdown.Item>
+    <Dropdown.Item value="settings">Settings</Dropdown.Item>
+    <Dropdown.Separator />
+    <Dropdown.Item value="logout" variant="danger">
+      Log out
+    </Dropdown.Item>
+  </Dropdown>
+));
 ```
 
 ### Navigation Links
 
 Use `Dropdown.LinkItem` for semantic links.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Dropdown } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Dropdown({
-      trigger: Button({ children: "Resources" }),
-      children: [
-        Dropdown.LinkItem({
-          href: "/settings",
-          value: "settings",
-          children: "Settings",
-        }),
-        Dropdown.LinkItem({
-          href: "/docs",
-          value: "docs",
-          children: "Documentation",
-        }),
-        Dropdown.Separator(),
-        Dropdown.LinkItem({
-          href: "https://developers.cloudflare.com",
-          external: true,
-          value: "developer-docs",
-          children: "Developer Docs",
-        }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Dropdown trigger={<Button>Resources</Button>}>
+    <Dropdown.LinkItem href="/settings" value="settings">
+      Settings
+    </Dropdown.LinkItem>
+    <Dropdown.LinkItem href="/docs" value="docs">
+      Documentation
+    </Dropdown.LinkItem>
+    <Dropdown.Separator />
+    <Dropdown.LinkItem
+      href="https://developers.cloudflare.com"
+      external
+      value="developer-docs"
+    >
+      Developer Docs
+    </Dropdown.LinkItem>
+  </Dropdown>
+));
 ```
 
 ## API Reference

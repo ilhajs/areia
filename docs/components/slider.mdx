@@ -7,19 +7,14 @@ An input for selecting a numeric value or range by dragging a thumb along a trac
 
 `Slider` is backed by `@areia/slots` and wires the track, range, and thumb parts after mount.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { Slider } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Slider({
-      class: "w-full max-w-sm",
-      defaultValue: 50,
-      max: 100,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Slider class="w-full max-w-sm" defaultValue={50} max={100} />
+));
 ```
 
 ## Import
@@ -30,19 +25,13 @@ import { Slider } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Slider } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Slider({
-      class: "w-full max-w-sm",
-      defaultValue: 50,
-      max: 100,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Slider class="w-full max-w-sm" defaultValue={50} max={100} />
+));
 ```
 
 ## Examples
@@ -51,115 +40,103 @@ Example.mount(document.getElementById("root")!);
 
 Pass a tuple for `defaultValue` to create a range slider with two thumbs.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Slider } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Slider({
-      class: "w-full max-w-sm",
-      defaultValue: [25, 75],
-      max: 100,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Slider
+    class="w-full max-w-sm"
+    defaultValue={[25, 75]}
+    max={100}
+  />
+));
 ```
 
 ### Vertical
 
 Set `orientation` to `"vertical"` for a vertical slider. Use a fixed height wrapper.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Slider } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="h-48">
-      ${Slider({
-        class: "h-full",
-        orientation: "vertical",
-        defaultValue: 50,
-        max: 100,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="h-48">
+    <Slider
+      class="h-full"
+      orientation="vertical"
+      defaultValue={50}
+      max={100}
+    />
+  </div>
+));
 ```
 
 ### Disabled
 
 Set `disabled` to prevent interaction.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Slider } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Slider({
-      class: "w-full max-w-sm",
-      defaultValue: 50,
-      max: 100,
-      disabled: true,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Slider
+    class="w-full max-w-sm"
+    defaultValue={50}
+    max={100}
+    disabled
+  />
+));
 ```
 
 ### Step
 
 Set a custom `step` increment.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Slider } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Slider({
-      class: "w-full max-w-sm",
-      defaultValue: 50,
-      max: 100,
-      step: 10,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Slider
+    class="w-full max-w-sm"
+    defaultValue={50}
+    max={100}
+    step={10}
+  />
+));
 ```
 
 ### Change Events
 
 Use `onValueChange` and `onValueCommit` to respond to value changes.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Slider } from "areia";
 
-const Example = ilha.state("value", 50).render(
-  ({ state }) => html`
-    <div class="flex flex-col items-start gap-3">
-      ${Slider({
-        class: "w-full max-w-sm",
-        defaultValue: state.value(),
-        max: 100,
-        onValueChange(value) {
-          state.value(
-            typeof value === "number" ? value : value[1],
-          );
-        },
-      })}
-      <p class="text-sm text-areia-subtle">
-        Value:
-        <span class="font-medium text-areia-default"
-          >${state.value()}</span
-        >
-      </p>
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.state("value", 50).render(({ state }) => (
+  <div class="flex flex-col items-start gap-3">
+    <Slider
+      class="w-full max-w-sm"
+      defaultValue={state.value()}
+      max={100}
+      onValueChange={(value) => {
+        state.value(
+          typeof value === "number" ? value : value[1],
+        );
+      }}
+    />
+    <p class="text-sm text-areia-subtle">
+      Value:{" "}
+      <span class="font-medium text-areia-default">
+        {state.value()}
+      </span>
+    </p>
+  </div>
+));
 ```
 
 ## API Reference

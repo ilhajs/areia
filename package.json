@@ -27,7 +27,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "husky": "^9.1.7",
-    "ilha": "^0.5.0",
+    "ilha": "0.6.0",
     "lucide": "^1.16.0",
     "oxfmt": "^0.51.0",
     "oxlint": "^1.66.0",

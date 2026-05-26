@@ -5,30 +5,22 @@ description: Displays a styled anchor for inline text links.
 
 Displays a styled anchor for inline text links with multiple variants and an external-link icon.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Link } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div
-      class="flex flex-wrap items-center gap-4 text-areia-default"
-    >
-      ${Link({ href: "#", label: "Default inline link" })}
-      ${Link({
-        href: "#",
-        variant: "current",
-        label: "Current color link",
-      })}
-      ${Link({
-        href: "#",
-        variant: "plain",
-        label: "Plain inline link",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-4 text-areia-default">
+    <Link href="#">Default inline link</Link>
+    <Link href="#" variant="current">
+      Current color link
+    </Link>
+    <Link href="#" variant="plain">
+      Plain inline link
+    </Link>
+  </div>
+));
 ```
 
 ## Import
@@ -41,20 +33,16 @@ import { Link } from "areia";
 
 The default `Link` renders an underlined anchor with primary color styling.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Link } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <p class="text-areia-default">
-      Read our
-      ${Link({ href: "/docs", label: "documentation" })} for
-      more details.
-    </p>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <p class="text-areia-default">
+    Read our <Link href="/docs">documentation</Link> for more
+    details.
+  </p>
+));
 ```
 
 ## Examples
@@ -63,109 +51,91 @@ Example.mount(document.getElementById("root")!);
 
 Links flow naturally within paragraph text with proper underline offset.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Link } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <p class="max-w-prose text-areia-default">
-      This is a paragraph with an
-      ${Link({ href: "#", label: "inline link" })} that flows
-      naturally with the surrounding text. Links maintain proper
-      underline offset for readability.
-    </p>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <p class="max-w-prose text-areia-default">
+    This is a paragraph with an
+    <Link href="#">inline link</Link> that flows naturally with
+    the surrounding text. Links maintain proper underline offset
+    for readability.
+  </p>
+));
 ```
 
 ### External Link with Icon
 
 Use `Link.ExternalIcon` to visually indicate links that navigate away from your site. Set `external: true` to open the link in a new tab with safe `rel` defaults.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Link } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Link({
-      href: "https://kumo-ui.com",
-      external: true,
-      children: ["Visit Kumo UI", Link.ExternalIcon()],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Link href="https://kumo-ui.com" external>
+    Visit Kumo UI
+    <Link.ExternalIcon />
+  </Link>
+));
 ```
 
 ### Current Variant
 
 The `current` variant inherits color from its parent. Use it for links inside colored contexts like alerts, banners, or error messages.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Link } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <p class="text-areia-destructive-soft-foreground">
-      This error message contains a
-      ${Link({ href: "#", variant: "current", label: "link" })}
-      that inherits the red color from its parent.
-    </p>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <p class="text-areia-destructive-soft-foreground">
+    This error message contains a
+    <Link href="#" variant="current">
+      link
+    </Link>
+    that inherits the red color from its parent.
+  </p>
+));
 ```
 
 ### Plain Variant
 
 Use `plain` when an underline would be distracting, such as navigation, menus, and footers.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Link } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <nav class="flex flex-wrap gap-4">
-      ${Link({
-        href: "#",
-        variant: "plain",
-        label: "Overview",
-      })}
-      ${Link({
-        href: "#",
-        variant: "plain",
-        label: "Components",
-      })}
-      ${Link({ href: "#", variant: "plain", label: "Guides" })}
-    </nav>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <nav class="flex flex-wrap gap-4">
+    <Link href="#" variant="plain">
+      Overview
+    </Link>
+    <Link href="#" variant="plain">
+      Components
+    </Link>
+    <Link href="#" variant="plain">
+      Guides
+    </Link>
+  </nav>
+));
 ```
 
 ### Custom Classes
 
 Pass `class` or `className` to merge additional classes with the generated variant classes.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Link } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Link({
-      href: "#",
-      class: "font-medium decoration-dashed",
-      label: "Custom styled link",
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Link href="#" class="font-medium decoration-dashed">
+    Custom styled link
+  </Link>
+));
 ```
 
 ## API Reference
@@ -196,23 +166,16 @@ Extends native anchor attributes.
 
 SVG icon component to indicate external links. It accepts arbitrary SVG attributes plus `class` and `className`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Link } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Link({
-      href: "https://example.com",
-      external: true,
-      children: [
-        "External Site",
-        Link.ExternalIcon({ class: "size-4" }),
-      ],
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Link href="https://example.com" external>
+    External Site
+    <Link.ExternalIcon class="size-4" />
+  </Link>
+));
 ```
 
 ## Design Guidelines

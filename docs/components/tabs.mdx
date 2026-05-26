@@ -7,40 +7,38 @@ Tab navigation for switching between related views or panels.
 
 `Tabs` is backed by `@areia/slots` and wires accessible tab semantics, keyboard navigation, an animated indicator, optional content panels, and horizontal overflow scrolling after mount.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-col gap-6">
-      <div>
-        <p class="mb-2 text-sm text-areia-subtle">Segmented</p>
-        ${Tabs({
-          tabs: [
-            { value: "overview", label: "Overview" },
-            { value: "analytics", label: "Analytics" },
-            { value: "settings", label: "Settings" },
-          ],
-          selectedValue: "overview",
-        })}
-      </div>
-      <div>
-        <p class="mb-2 text-sm text-areia-subtle">Underline</p>
-        ${Tabs({
-          variant: "underline",
-          tabs: [
-            { value: "overview", label: "Overview" },
-            { value: "analytics", label: "Analytics" },
-            { value: "settings", label: "Settings" },
-          ],
-          selectedValue: "overview",
-        })}
-      </div>
+export default ilha.render(() => (
+  <div class="flex flex-col gap-6">
+    <div>
+      <p class="mb-2 text-sm text-areia-subtle">Segmented</p>
+      <Tabs
+        tabs={[
+          { value: "overview", label: "Overview" },
+          { value: "analytics", label: "Analytics" },
+          { value: "settings", label: "Settings" },
+        ]}
+        selectedValue="overview"
+      />
     </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+    <div>
+      <p class="mb-2 text-sm text-areia-subtle">Underline</p>
+      <Tabs
+        variant="underline"
+        tabs={[
+          { value: "overview", label: "Overview" },
+          { value: "analytics", label: "Analytics" },
+          { value: "settings", label: "Settings" },
+        ]}
+        selectedValue="overview"
+      />
+    </div>
+  </div>
+));
 ```
 
 ## Import
@@ -53,21 +51,19 @@ import { Tabs } from "areia";
 
 Call `Tabs(...)` for interactive behavior. It initializes the tabs controller, syncs ARIA and `data-state` attributes, and emits `tabs:change` when the active tab changes.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tabs({
-      tabs: [
-        { value: "overview", label: "Overview" },
-        { value: "settings", label: "Settings" },
-      ],
-      selectedValue: "overview",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tabs
+    tabs={[
+      { value: "overview", label: "Overview" },
+      { value: "settings", label: "Settings" },
+    ]}
+    selectedValue="overview"
+  />
+));
 ```
 
 Use `Tabs.Static(...)` for static markup or when you want to initialize behavior yourself. For most application usage, call `Tabs(...)`.
@@ -78,219 +74,198 @@ Use `Tabs.Static(...)` for static markup or when you want to initialize behavior
 
 A pill-shaped indicator slides between tabs on a subtle background.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tabs({
-      variant: "segmented",
-      tabs: [
-        { value: "tab-1", label: "Tab 1" },
-        { value: "tab-2", label: "Tab 2" },
-        { value: "tab-3", label: "Tab 3" },
-      ],
-      selectedValue: "tab-1",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tabs
+    variant="segmented"
+    tabs={[
+      { value: "tab-1", label: "Tab 1" },
+      { value: "tab-2", label: "Tab 2" },
+      { value: "tab-3", label: "Tab 3" },
+    ]}
+    selectedValue="tab-1"
+  />
+));
 ```
 
 ### Underline
 
 The underline variant uses a bottom border and primary-colored indicator.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tabs({
-      variant: "underline",
-      tabs: [
-        { value: "tab-1", label: "Tab 1" },
-        { value: "tab-2", label: "Tab 2" },
-        { value: "tab-3", label: "Tab 3" },
-      ],
-      selectedValue: "tab-1",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tabs
+    variant="underline"
+    tabs={[
+      { value: "tab-1", label: "Tab 1" },
+      { value: "tab-2", label: "Tab 2" },
+      { value: "tab-3", label: "Tab 3" },
+    ]}
+    selectedValue="tab-1"
+  />
+));
 ```
 
 ### Small Size
 
-Use `size: "sm"` for compact tabs inside toolbars and filter rows.
+Use `size="sm"` for compact tabs inside toolbars and filter rows.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-col gap-6">
-      ${Tabs({
-        size: "sm",
-        tabs: [
-          { value: "open", label: "Open" },
-          { value: "closed", label: "Closed" },
-          { value: "all", label: "All" },
-        ],
-        selectedValue: "open",
-      })}
-      ${Tabs({
-        variant: "underline",
-        size: "sm",
-        tabs: [
-          { value: "daily", label: "Daily" },
-          { value: "weekly", label: "Weekly" },
-          { value: "monthly", label: "Monthly" },
-        ],
-        selectedValue: "daily",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-col gap-6">
+    <Tabs
+      size="sm"
+      tabs={[
+        { value: "open", label: "Open" },
+        { value: "closed", label: "Closed" },
+        { value: "all", label: "All" },
+      ]}
+      selectedValue="open"
+    />
+    <Tabs
+      variant="underline"
+      size="sm"
+      tabs={[
+        { value: "daily", label: "Daily" },
+        { value: "weekly", label: "Weekly" },
+        { value: "monthly", label: "Monthly" },
+      ]}
+      selectedValue="daily"
+    />
+  </div>
+));
 ```
 
 ### Many Tabs
 
 Segmented tabs scroll horizontally when there are more items than available space. Mouse users can drag the tab list to scroll.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-md">
-      ${Tabs({
-        tabs: [
-          { value: "overview", label: "Overview" },
-          { value: "analytics", label: "Analytics" },
-          { value: "reports", label: "Reports" },
-          { value: "notifications", label: "Notifications" },
-          { value: "settings", label: "Settings" },
-          { value: "billing", label: "Billing" },
-          { value: "security", label: "Security" },
-          { value: "integrations", label: "Integrations" },
-        ],
-        selectedValue: "overview",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-md">
+    <Tabs
+      tabs={[
+        { value: "overview", label: "Overview" },
+        { value: "analytics", label: "Analytics" },
+        { value: "reports", label: "Reports" },
+        { value: "notifications", label: "Notifications" },
+        { value: "settings", label: "Settings" },
+        { value: "billing", label: "Billing" },
+        { value: "security", label: "Security" },
+        { value: "integrations", label: "Integrations" },
+      ]}
+      selectedValue="overview"
+    />
+  </div>
+));
 ```
 
 ### Change Events
 
 Use `onValueChange` to respond when the active tab changes.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const Example = ilha.state("activeTab", "overview").render(
-  ({ state }) => html`
+export default ilha
+  .state("activeTab", "overview")
+  .render(({ state }) => (
     <div class="space-y-4">
-      ${Tabs({
-        tabs: [
+      <Tabs
+        tabs={[
           { value: "overview", label: "Overview" },
           { value: "usage", label: "Usage" },
           { value: "settings", label: "Settings" },
-        ],
-        selectedValue: state.activeTab(),
-        onValueChange(value) {
+        ]}
+        selectedValue={state.activeTab()}
+        onValueChange={(value) => {
           state.activeTab(value);
-        },
-      })}
+        }}
+      />
       <p class="text-sm text-areia-subtle">
-        Active tab: <code>${state.activeTab}</code>
+        Active tab: <code>{state.activeTab}</code>
       </p>
     </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+  ));
 ```
 
 ### Content Panels
 
-Pass `content` on each item to render tab panels. Content can be text, `html` markup, or an Ilha island result.
+Pass `content` on each item to render tab panels. Content can be text, markup, or an Ilha island result.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const ActivityPanel = ilha.render(
-  () => html`
-    <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
-      Recent project activity appears here.
-    </div>
-  `,
-);
+const ActivityPanel = ilha.render(() => (
+  <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
+    Recent project activity appears here.
+  </div>
+));
 
-const Example = ilha.render(
-  () =>
-    html`${Tabs({
-      selectedValue: "overview",
-      tabs: [
-        {
-          value: "overview",
-          label: "Overview",
-          content: html`
-            <div
-              class="rounded-lg bg-areia-surface-muted p-4 text-sm"
-            >
-              Project health and key metrics.
-            </div>
-          `,
-        },
-        {
-          value: "activity",
-          label: "Activity",
-          content: ActivityPanel,
-        },
-        {
-          value: "settings",
-          label: "Settings",
-          content: html`
-            <div
-              class="rounded-lg bg-areia-surface-muted p-4 text-sm"
-            >
-              Workspace preferences and access controls.
-            </div>
-          `,
-        },
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tabs
+    selectedValue="overview"
+    tabs={[
+      {
+        value: "overview",
+        label: "Overview",
+        content: (
+          <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
+            Project health and key metrics.
+          </div>
+        ),
+      },
+      {
+        value: "activity",
+        label: "Activity",
+        content: ActivityPanel,
+      },
+      {
+        value: "settings",
+        label: "Settings",
+        content: (
+          <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
+            Workspace preferences and access controls.
+          </div>
+        ),
+      },
+    ]}
+  />
+));
 ```
 
 ### Disabled Item
 
 Disable individual tabs with `disabled: true`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tabs } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tabs({
-      tabs: [
-        { value: "profile", label: "Profile" },
-        { value: "team", label: "Team" },
-        { value: "billing", label: "Billing", disabled: true },
-      ],
-      selectedValue: "profile",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tabs
+    tabs={[
+      { value: "profile", label: "Profile" },
+      { value: "team", label: "Team" },
+      { value: "billing", label: "Billing", disabled: true },
+    ]}
+    selectedValue="profile"
+  />
+));
 ```
 
 ## API

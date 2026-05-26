@@ -5,8 +5,8 @@ description: A free-form text input with an optional filtered suggestion list.
 
 A free-form text input with an optional filtered suggestion list. Unlike `Combobox`, the value is not constrained to the items list.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+import ilha from "ilha";
 import { Autocomplete } from "areia";
 
 const fruits = [
@@ -18,19 +18,16 @@ const fruits = [
   "Date",
 ];
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-sm">
-      ${Autocomplete({
-        label: "Search fruit",
-        placeholder: "Type any fruit...",
-        items: fruits,
-        openOnFocus: true,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-sm">
+    <Autocomplete
+      label="Search fruit"
+      placeholder="Type any fruit..."
+      items={fruits}
+      openOnFocus
+    />
+  </div>
+));
 ```
 
 ## Import
@@ -43,8 +40,8 @@ import { Autocomplete } from "areia";
 
 Call `Autocomplete(...)` for an interactive Ilha island. The root wires input events, suggestion filtering, keyboard navigation, and suggestion selection.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Autocomplete } from "areia";
 
 const products = [
@@ -56,17 +53,14 @@ const products = [
   "Durable Objects",
 ];
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-sm">
-      ${Autocomplete({
-        placeholder: "Search products...",
-        items: products,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-sm">
+    <Autocomplete
+      placeholder="Search products..."
+      items={products}
+    />
+  </div>
+));
 ```
 
 Use `Autocomplete.Static(...)` for static markup or when you want to wire behavior yourself. For most application usage, call `Autocomplete(...)`.
@@ -77,8 +71,8 @@ Use `Autocomplete.Static(...)` for static markup or when you want to wire behavi
 
 A basic free-form input with a flat list of string suggestions.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Autocomplete } from "areia";
 
 const fruits = [
@@ -90,26 +84,23 @@ const fruits = [
   "Date",
 ];
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-sm">
-      ${Autocomplete({
-        placeholder: "Type a fruit...",
-        items: fruits,
-        openOnFocus: true,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-sm">
+    <Autocomplete
+      placeholder="Type a fruit..."
+      items={fruits}
+      openOnFocus
+    />
+  </div>
+));
 ```
 
 ### With Field
 
 Add `label`, `description`, and `required` to enable the built-in field wrapper.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Autocomplete } from "areia";
 
 const countries = [
@@ -120,31 +111,27 @@ const countries = [
   { value: "Japan", label: "Japan" },
 ];
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-sm">
-      ${Autocomplete({
-        id: "shipping-country",
-        label: "Shipping country",
-        description:
-          "Start typing to see suggestions. Custom values are allowed.",
-        placeholder: "Type a country...",
-        required: true,
-        items: countries,
-        openOnFocus: true,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-sm">
+    <Autocomplete
+      id="shipping-country"
+      label="Shipping country"
+      description="Start typing to see suggestions. Custom values are allowed."
+      placeholder="Type a country..."
+      required
+      items={countries}
+      openOnFocus
+    />
+  </div>
+));
 ```
 
 ### Error State
 
 Display validation errors with the `error` prop. The typed value is still free-form; validation belongs to your application.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Autocomplete } from "areia";
 
 const addresses = [
@@ -154,69 +141,54 @@ const addresses = [
   "400 Pine Rd",
 ];
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-sm">
-      ${Autocomplete({
-        id: "address",
-        label: "Address",
-        placeholder: "Search address...",
-        defaultValue: "Unknown place",
-        items: addresses,
-        error:
-          "Choose a serviceable address or enter a full address manually.",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-sm">
+    <Autocomplete
+      id="address"
+      label="Address"
+      placeholder="Search address..."
+      defaultValue="Unknown place"
+      items={addresses}
+      error="Choose a serviceable address or enter a full address manually."
+    />
+  </div>
+));
 ```
 
 ### Sizes
 
 Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Autocomplete } from "areia";
 
 const items = ["Workers", "Pages", "R2", "D1"];
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Autocomplete({
-        size: "xs",
-        placeholder: "Extra small",
-        items,
-      })}
-      ${Autocomplete({
-        size: "sm",
-        placeholder: "Small",
-        items,
-      })}
-      ${Autocomplete({
-        size: "base",
-        placeholder: "Base",
-        items,
-      })}
-      ${Autocomplete({
-        size: "lg",
-        placeholder: "Large",
-        items,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <Autocomplete
+      size="xs"
+      placeholder="Extra small"
+      items={items}
+    />
+    <Autocomplete size="sm" placeholder="Small" items={items} />
+    <Autocomplete
+      size="base"
+      placeholder="Base"
+      items={items}
+    />
+    <Autocomplete size="lg" placeholder="Large" items={items} />
+  </div>
+));
 ```
 
 ### Custom Filtering
 
 Pass a custom `filter` function for advanced logic such as filtering on object labels. Set `filter: false` when suggestions are already filtered by an API.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Autocomplete } from "areia";
 
 const locations = [
@@ -226,89 +198,69 @@ const locations = [
   { value: "nrt", label: "Tokyo (NRT)" },
 ];
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-sm">
-      ${Autocomplete({
-        label: "Edge location",
-        placeholder: "Search by city or airport code...",
-        items: locations,
-        filter: (item, query) =>
-          String(item.label)
-            .toLowerCase()
-            .includes(query.toLowerCase()) ||
-          item.value
-            .toLowerCase()
-            .includes(query.toLowerCase()),
-        openOnFocus: true,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-sm">
+    <Autocomplete
+      label="Edge location"
+      placeholder="Search by city or airport code..."
+      items={locations}
+      filter={(item, query) =>
+        String(item.label)
+          .toLowerCase()
+          .includes(query.toLowerCase()) ||
+        item.value.toLowerCase().includes(query.toLowerCase())
+      }
+      openOnFocus
+    />
+  </div>
+));
 ```
 
 ### Grouped Suggestions
 
 For fully custom layouts, compose the subcomponents manually. Suggestions remain optional helpers; the input value is still free-form.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Autocomplete } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="w-full max-w-sm">
-      ${Autocomplete({
-        label: "Server location",
-        placeholder: "Type a region...",
-        openOnFocus: true,
-        children: [
-          Autocomplete.InputGroup({
-            placeholder: "Type a region...",
-          }),
-          Autocomplete.Content({
-            children: Autocomplete.List({
-              children: [
-                Autocomplete.Group({
-                  children: [
-                    Autocomplete.GroupLabel({
-                      children: "North America",
-                    }),
-                    Autocomplete.Item({
-                      value: "iad",
-                      children: "Washington, D.C. (IAD)",
-                    }),
-                    Autocomplete.Item({
-                      value: "sfo",
-                      children: "San Francisco (SFO)",
-                    }),
-                  ],
-                }),
-                Autocomplete.Group({
-                  children: [
-                    Autocomplete.GroupLabel({
-                      children: "Europe",
-                    }),
-                    Autocomplete.Item({
-                      value: "lhr",
-                      children: "London (LHR)",
-                    }),
-                    Autocomplete.Item({
-                      value: "ams",
-                      children: "Amsterdam (AMS)",
-                    }),
-                  ],
-                }),
-              ],
-            }),
-          }),
-        ],
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="w-full max-w-sm">
+    <Autocomplete
+      label="Server location"
+      placeholder="Type a region..."
+      openOnFocus
+    >
+      <Autocomplete.InputGroup placeholder="Type a region..." />
+      <Autocomplete.Content>
+        <Autocomplete.List>
+          <Autocomplete.Group>
+            <Autocomplete.GroupLabel>
+              North America
+            </Autocomplete.GroupLabel>
+            <Autocomplete.Item value="iad">
+              Washington, D.C. (IAD)
+            </Autocomplete.Item>
+            <Autocomplete.Item value="sfo">
+              San Francisco (SFO)
+            </Autocomplete.Item>
+          </Autocomplete.Group>
+          <Autocomplete.Group>
+            <Autocomplete.GroupLabel>
+              Europe
+            </Autocomplete.GroupLabel>
+            <Autocomplete.Item value="lhr">
+              London (LHR)
+            </Autocomplete.Item>
+            <Autocomplete.Item value="ams">
+              Amsterdam (AMS)
+            </Autocomplete.Item>
+          </Autocomplete.Group>
+        </Autocomplete.List>
+      </Autocomplete.Content>
+    </Autocomplete>
+  </div>
+));
 ```
 
 ### Listening for Changes

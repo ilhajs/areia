@@ -5,15 +5,14 @@ description: A control that allows the user to toggle between checked and not ch
 
 A control that allows the user to toggle between checked and not checked. It uses DOM primitives like native checkbox inputs, labels, fieldsets, and legends.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox({ label: "Accept terms and conditions" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox label="Accept terms and conditions" />
+));
 ```
 
 ## Import
@@ -24,14 +23,13 @@ import { Checkbox } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () => html`${Checkbox({ label: "Remember me" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox label="Remember me" />
+));
 ```
 
 ## Examples
@@ -40,245 +38,191 @@ Example.mount(document.getElementById("root")!);
 
 Checkbox with a built-in label. The label automatically displays in a horizontal layout with the checkbox before the label.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox({ label: "Accept terms and conditions" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox label="Accept terms and conditions" />
+));
 ```
 
 ### Checked
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox({
-      label: "Enable notifications",
-      checked: true,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox label="Enable notifications" checked />
+));
 ```
 
 ### Indeterminate
 
 Used for “select all” patterns when some but not all items are selected.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox({
-      label: "Select all",
-      indeterminate: true,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox label="Select all" indeterminate />
+));
 ```
 
 ### Label First Layout
 
 Use `controlFirst: false` to place the label before the checkbox.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox({
-      label: "Enable notifications",
-      controlFirst: false,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox label="Enable notifications" controlFirst={false} />
+));
 ```
 
 ### Disabled
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox({ label: "Disabled", disabled: true })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox label="Disabled" disabled />
+));
 ```
 
 ### Error
 
 The error variant provides visual styling. For error messages, use `Checkbox.Group`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox({
-      label: "Required field",
-      variant: "error",
-      required: true,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox label="Required field" variant="error" required />
+));
 ```
 
 ### Without Visible Label
 
 When a checkbox does not have visible label text, provide an accessible name with `aria-label`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () => html`${Checkbox({ "aria-label": "Select row" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox aria-label="Select row" />
+));
 ```
 
 ### Checkbox Group
 
 Group multiple checkboxes with a legend and description. Use `Checkbox.Group` and `Checkbox.Item`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox.Group(
-      {
-        legend: "Notification preferences",
-        description: "Choose how you want to receive updates.",
-      },
-      [
-        Checkbox.Item({
-          label: "Email notifications",
-          value: "email",
-          checked: true,
-        }),
-        Checkbox.Item({
-          label: "SMS notifications",
-          value: "sms",
-        }),
-        Checkbox.Item({
-          label: "Product updates",
-          value: "updates",
-        }),
-      ],
-    )}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox.Group
+    legend="Notification preferences"
+    description="Choose how you want to receive updates."
+  >
+    <Checkbox.Item
+      label="Email notifications"
+      value="email"
+      checked
+    />
+    <Checkbox.Item label="SMS notifications" value="sms" />
+    <Checkbox.Item label="Product updates" value="updates" />
+  </Checkbox.Group>
+));
 ```
 
 ### Checkbox Group with Error
 
 Show validation errors at the group level.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox.Group(
-      {
-        legend: "Notification preferences",
-        error: "Select at least one notification method.",
-      },
-      [
-        Checkbox.Item({
-          label: "Email notifications",
-          value: "email",
-          variant: "error",
-        }),
-        Checkbox.Item({
-          label: "SMS notifications",
-          value: "sms",
-          variant: "error",
-        }),
-      ],
-    )}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox.Group
+    legend="Notification preferences"
+    error="Select at least one notification method."
+  >
+    <Checkbox.Item
+      label="Email notifications"
+      value="email"
+      variant="error"
+    />
+    <Checkbox.Item
+      label="SMS notifications"
+      value="sms"
+      variant="error"
+    />
+  </Checkbox.Group>
+));
 ```
 
 ### Visually Hidden Legend
 
 Use `Checkbox.Legend` with `class: "sr-only"` to keep the legend accessible to screen readers while hiding it visually. This is useful when the group is already labeled by nearby visible text.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-col gap-3">
-      <p class="text-base font-medium text-areia-default">
-        Notification preferences
-      </p>
-      ${Checkbox.Group([
-        Checkbox.Legend({
-          label: "Notification preferences",
-          class: "sr-only",
-        }),
-        Checkbox.Item({
-          label: "Email notifications",
-          value: "email",
-          checked: true,
-        }),
-        Checkbox.Item({
-          label: "SMS notifications",
-          value: "sms",
-        }),
-      ])}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-col gap-3">
+    <p class="text-base font-medium text-areia-default">
+      Notification preferences
+    </p>
+    <Checkbox.Group>
+      <Checkbox.Legend
+        label="Notification preferences"
+        class="sr-only"
+      />
+      <Checkbox.Item
+        label="Email notifications"
+        value="email"
+        checked
+      />
+      <Checkbox.Item label="SMS notifications" value="sms" />
+    </Checkbox.Group>
+  </div>
+));
 ```
 
 ### Custom Legend Styling
 
 Use `Checkbox.Legend` when you need custom typography, colors, or layout instead of the `legend` string prop.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Checkbox } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Checkbox.Group([
-      Checkbox.Legend({
-        label: "Notification preferences",
-        class:
-          "text-sm uppercase tracking-wide text-areia-subtle",
-      }),
-      Checkbox.Item({
-        label: "Email notifications",
-        value: "email",
-        checked: true,
-      }),
-      Checkbox.Item({
-        label: "SMS notifications",
-        value: "sms",
-      }),
-    ])}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Checkbox.Group>
+    <Checkbox.Legend
+      label="Notification preferences"
+      class="text-sm uppercase tracking-wide text-areia-subtle"
+    />
+    <Checkbox.Item
+      label="Email notifications"
+      value="email"
+      checked
+    />
+    <Checkbox.Item label="SMS notifications" value="sms" />
+  </Checkbox.Group>
+));
 ```
 
 ## API Reference

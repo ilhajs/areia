@@ -7,25 +7,21 @@ A popup that displays contextual information when an element is hovered or focus
 
 Areia's `Tooltip` is built on `@data-slot/tooltip` and rendered as an Ilha island when you use `Tooltip`. It handles hover/focus interactions, warm-up behavior between nearby tooltips, collision-aware positioning, Escape dismissal, and accessible tooltip attributes.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon, Tooltip } from "areia";
 
-const plusIcon = Icon({ icon: Plus });
-
-const Example = ilha.render(
-  () =>
-    html`${Tooltip({
-      content: "Create project",
-      children: Button({
-        shape: "square",
-        icon: plusIcon,
-        "aria-label": "Create project",
-      }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tooltip content="Create project">
+    <Button
+      shape="square"
+      icon={<Icon icon={Plus} />}
+      aria-label="Create project"
+    />
+  </Tooltip>
+));
 ```
 
 ## Import
@@ -38,18 +34,15 @@ import { Tooltip } from "areia";
 
 Call `Tooltip(...)` for an interactive island. The root renders the tooltip markup and initializes the `@data-slot/tooltip` controller after mount.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Tooltip } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tooltip({
-      content: "Helpful contextual information",
-      children: Button({ children: "Hover me" }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tooltip content="Helpful contextual information">
+    <Button>Hover me</Button>
+  </Tooltip>
+));
 ```
 
 For static server-rendered markup or custom initialization, use `Tooltip.Static(...)`. For most application usage, call `Tooltip(...)`.
@@ -60,278 +53,230 @@ For static server-rendered markup or custom initialization, use `Tooltip.Static(
 
 Use `content` for the popup and `children` for the trigger content.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Info } from "lucide";
 import { Button, Icon, Tooltip } from "areia";
 
-const infoIcon = Icon({ icon: Info });
-
-const Example = ilha.render(
-  () =>
-    html`${Tooltip({
-      content: "This action cannot be undone.",
-      children: Button({
-        variant: "secondary",
-        shape: "square",
-        icon: infoIcon,
-        "aria-label": "More information",
-      }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tooltip content="This action cannot be undone.">
+    <Button
+      variant="secondary"
+      shape="square"
+      icon={<Icon icon={Info} />}
+      aria-label="More information"
+    />
+  </Tooltip>
+));
 ```
 
 ### Text Trigger
 
 When the trigger is not an action, render it as a `span`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tooltip } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tooltip({
-      triggerAs: "span",
-      triggerClass:
-        "underline decoration-dotted underline-offset-4",
-      content:
-        "Areia is a vanilla TypeScript component library.",
-      children: "Areia",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tooltip
+    triggerAs="span"
+    triggerClass="underline decoration-dotted underline-offset-4"
+    content="Areia is a vanilla TypeScript component library."
+  >
+    Areia
+  </Tooltip>
+));
 ```
 
 ### Multiple Tooltips
 
 Tooltips share `@data-slot/tooltip` warm-up behavior automatically. After one tooltip closes, hovering another tooltip within `skipDelayDuration` opens it without the normal delay.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Languages, Plus, Settings } from "lucide";
 import { Button, Icon, Tooltip } from "areia";
 
-const plusIcon = Icon({ icon: Plus });
-const languagesIcon = Icon({ icon: Languages });
-const settingsIcon = Icon({ icon: Settings });
-
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-2">
-      ${Tooltip({
-        content: "Create project",
-        children: Button({
-          shape: "square",
-          icon: plusIcon,
-          "aria-label": "Create project",
-        }),
-      })}
-      ${Tooltip({
-        content: "Translate",
-        children: Button({
-          shape: "square",
-          icon: languagesIcon,
-          "aria-label": "Translate",
-        }),
-      })}
-      ${Tooltip({
-        content: "Settings",
-        children: Button({
-          shape: "square",
-          icon: settingsIcon,
-          "aria-label": "Settings",
-        }),
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-2">
+    <Tooltip content="Create project">
+      <Button
+        shape="square"
+        icon={<Icon icon={Plus} />}
+        aria-label="Create project"
+      />
+    </Tooltip>
+    <Tooltip content="Translate">
+      <Button
+        shape="square"
+        icon={<Icon icon={Languages} />}
+        aria-label="Translate"
+      />
+    </Tooltip>
+    <Tooltip content="Settings">
+      <Button
+        shape="square"
+        icon={<Icon icon={Settings} />}
+        aria-label="Settings"
+      />
+    </Tooltip>
+  </div>
+));
 ```
 
 ### Side
 
 Use `side` to choose the preferred side of the trigger. Collision handling may flip the tooltip at runtime when there is not enough space.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Tooltip } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="grid grid-cols-2 gap-3">
-      ${Tooltip({
-        side: "top",
-        content: "Top tooltip",
-        children: Button({ children: "Top" }),
-      })}
-      ${Tooltip({
-        side: "bottom",
-        content: "Bottom tooltip",
-        children: Button({ children: "Bottom" }),
-      })}
-      ${Tooltip({
-        side: "left",
-        content: "Left tooltip",
-        children: Button({ children: "Left" }),
-      })}
-      ${Tooltip({
-        side: "right",
-        content: "Right tooltip",
-        children: Button({ children: "Right" }),
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="grid grid-cols-2 gap-3">
+    <Tooltip side="top" content="Top tooltip">
+      <Button>Top</Button>
+    </Tooltip>
+    <Tooltip side="bottom" content="Bottom tooltip">
+      <Button>Bottom</Button>
+    </Tooltip>
+    <Tooltip side="left" content="Left tooltip">
+      <Button>Left</Button>
+    </Tooltip>
+    <Tooltip side="right" content="Right tooltip">
+      <Button>Right</Button>
+    </Tooltip>
+  </div>
+));
 ```
 
 ### Alignment
 
 Use `align` to align the tooltip along the selected side.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Tooltip } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-3">
-      ${Tooltip({
-        align: "start",
-        content: "Start aligned",
-        children: Button({ children: "Start" }),
-      })}
-      ${Tooltip({
-        align: "center",
-        content: "Center aligned",
-        children: Button({ children: "Center" }),
-      })}
-      ${Tooltip({
-        align: "end",
-        content: "End aligned",
-        children: Button({ children: "End" }),
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-3">
+    <Tooltip align="start" content="Start aligned">
+      <Button>Start</Button>
+    </Tooltip>
+    <Tooltip align="center" content="Center aligned">
+      <Button>Center</Button>
+    </Tooltip>
+    <Tooltip align="end" content="End aligned">
+      <Button>End</Button>
+    </Tooltip>
+  </div>
+));
 ```
 
 ### Delay Control
 
 Use `delay` to control how long to wait before opening. Use `skipDelayDuration` to control the warm-up window after a tooltip closes.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Tooltip } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-3">
-      ${Tooltip({
-        delay: 1000,
-        content: "Opens after one second",
-        children: Button({ children: "1s delay" }),
-      })}
-      ${Tooltip({
-        delay: 0,
-        skipDelayDuration: 0,
-        content: "Opens instantly with no warm-up window",
-        children: Button({ children: "Instant" }),
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-3">
+    <Tooltip delay={1000} content="Opens after one second">
+      <Button>1s delay</Button>
+    </Tooltip>
+    <Tooltip
+      delay={0}
+      skipDelayDuration={0}
+      content="Opens instantly with no warm-up window"
+    >
+      <Button>Instant</Button>
+    </Tooltip>
+  </div>
+));
 ```
 
 ### Without Arrow
 
-Set `arrow: false` to hide the decorative arrow.
+Set `arrow={false}` to hide the decorative arrow.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Tooltip } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tooltip({
-      arrow: false,
-      content: "No arrow",
-      children: Button({ children: "Hover me" }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tooltip arrow={false} content="No arrow">
+    <Button>Hover me</Button>
+  </Tooltip>
+));
 ```
 
 ### Custom Content
 
-The `content` prop accepts Ilha markup.
+The `content` prop accepts markup.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Button, Tooltip } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tooltip({
-      content: html`
-        <div class="flex max-w-48 flex-col gap-1">
-          <span class="font-medium">Deploy preview</span>
-          <span class="text-areia-subtle"
-            >Creates a temporary preview environment.</span
-          >
-        </div>
-      `,
-      children: Button({ children: "Deploy" }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tooltip
+    content={
+      <div class="flex max-w-48 flex-col gap-1">
+        <span class="font-medium">Deploy preview</span>
+        <span class="text-areia-subtle">
+          Creates a temporary preview environment.
+        </span>
+      </div>
+    }
+  >
+    <Button>Deploy</Button>
+  </Tooltip>
+));
 ```
 
 ### Custom Trigger
 
 Use `trigger` when you need complete control over the trigger markup. The custom trigger must include `data-slot="tooltip-trigger"`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tooltip } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tooltip({
-      content: "Custom trigger markup",
-      trigger: html`<span
+export default ilha.render(() => (
+  <Tooltip
+    content="Custom trigger markup"
+    trigger={
+      <span
         data-slot="tooltip-trigger"
         tabindex="0"
         class="inline-flex rounded-full bg-areia-surface-muted px-2 py-1 text-sm text-areia-default"
       >
         Beta
-      </span>`,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+      </span>
+    }
+  />
+));
 ```
 
 ### Static Composition
 
 Use low-level parts for static markup or when you want to call `createTooltip` yourself.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Tooltip } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Tooltip.Static({
-      content: "Static tooltip markup",
-      children: "Hover me",
-      triggerAs: "span",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Tooltip.Static
+    content="Static tooltip markup"
+    triggerAs="span"
+  >
+    Hover me
+  </Tooltip.Static>
+));
 ```
 
 ## API Reference

@@ -5,25 +5,23 @@ description: Displays a small label for status, categorization, or metadata.
 
 Displays a small label for status, categorization, or metadata.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Badge } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-2">
-      ${Badge({ variant: "primary", children: "Primary" })}
-      ${Badge({ variant: "secondary", children: "Secondary" })}
-      ${Badge({ variant: "error", children: "Error" })}
-      ${Badge({ variant: "success", children: "Success" })}
-      ${Badge({ variant: "warning", children: "Warning" })}
-      ${Badge({ variant: "info", children: "Info" })}
-      ${Badge({ variant: "outline", children: "Outline" })}
-      ${Badge({ variant: "beta", children: "Beta" })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-2">
+    <Badge variant="primary">Primary</Badge>
+    <Badge variant="secondary">Secondary</Badge>
+    <Badge variant="error">Error</Badge>
+    <Badge variant="success">Success</Badge>
+    <Badge variant="warning">Warning</Badge>
+    <Badge variant="info">Info</Badge>
+    <Badge variant="outline">Outline</Badge>
+    <Badge variant="beta">Beta</Badge>
+  </div>
+));
 ```
 
 ## Import
@@ -34,14 +32,11 @@ import { Badge } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Badge } from "areia";
 
-const Example = ilha.render(
-  () => html`${Badge({ children: "New" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => <Badge>New</Badge>);
 ```
 
 ## Examples
@@ -50,72 +45,60 @@ Example.mount(document.getElementById("root")!);
 
 Use semantic variants for common status and categorization states.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Badge } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-2">
-      ${Badge({ variant: "primary", children: "Primary" })}
-      ${Badge({ variant: "secondary", children: "Secondary" })}
-      ${Badge({ variant: "error", children: "Error" })}
-      ${Badge({ variant: "success", children: "Success" })}
-      ${Badge({ variant: "warning", children: "Warning" })}
-      ${Badge({ variant: "info", children: "Info" })}
-      ${Badge({ variant: "outline", children: "Outline" })}
-      ${Badge({ variant: "beta", children: "Beta" })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-2">
+    <Badge variant="primary">Primary</Badge>
+    <Badge variant="secondary">Secondary</Badge>
+    <Badge variant="error">Error</Badge>
+    <Badge variant="success">Success</Badge>
+    <Badge variant="warning">Warning</Badge>
+    <Badge variant="info">Info</Badge>
+    <Badge variant="outline">Outline</Badge>
+    <Badge variant="beta">Beta</Badge>
+  </div>
+));
 ```
 
 ### Other Variants
 
 Use color variants for product-specific labels where semantic badges are not enough to convey the intended meaning or status.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Badge } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex flex-wrap items-center gap-2">
-      ${Badge({ variant: "neutral", children: "Neutral" })}
-      ${Badge({ variant: "red", children: "Red" })}
-      ${Badge({ variant: "orange", children: "Orange" })}
-      ${Badge({ variant: "green", children: "Green" })}
-      ${Badge({ variant: "teal", children: "Teal" })}
-      ${Badge({
-        variant: "teal-subtle",
-        children: "Teal Subtle",
-      })}
-      ${Badge({ variant: "blue", children: "Blue" })}
-      ${Badge({ variant: "purple", children: "Purple" })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-2">
+    <Badge variant="neutral">Neutral</Badge>
+    <Badge variant="red">Red</Badge>
+    <Badge variant="orange">Orange</Badge>
+    <Badge variant="green">Green</Badge>
+    <Badge variant="teal">Teal</Badge>
+    <Badge variant="teal-subtle">Teal Subtle</Badge>
+    <Badge variant="blue">Blue</Badge>
+    <Badge variant="purple">Purple</Badge>
+  </div>
+));
 ```
 
 ### In a Sentence
 
 Badges can be used inline with nearby text to call attention to lightweight metadata.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Badge } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <p class="flex items-center gap-2 text-areia-default">
-      Ilha Islands
-      ${Badge({ variant: "success", children: "Stable" })}
-    </p>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <p class="flex items-center gap-2 text-areia-default">
+    Ilha Islands
+    <Badge variant="success">Stable</Badge>
+  </p>
+));
 ```
 
 ## API Reference

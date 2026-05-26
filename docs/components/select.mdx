@@ -7,24 +7,23 @@ Displays a native list of options for the user to pick from.
 
 Areia's `Select` uses the platform `<select>` primitive, so it keeps native keyboard, form, and mobile behavior while adding Areia styling and field helpers.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      id: "fruit",
-      label: "Fruit",
-      value: "apple",
-      items: {
-        apple: "Apple",
-        banana: "Banana",
-        cherry: "Cherry",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="fruit"
+    label="Fruit"
+    value="apple"
+    items={{
+      apple: "Apple",
+      banana: "Banana",
+      cherry: "Cherry",
+    }}
+  />
+));
 ```
 
 ## Import
@@ -35,24 +34,22 @@ import { Select } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      id: "plan",
-      label: "Plan",
-      placeholder: "Choose a plan",
-      items: {
-        free: "Free",
-        pro: "Pro",
-        team: "Team",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="plan"
+    label="Plan"
+    placeholder="Choose a plan"
+    items={{
+      free: "Free",
+      pro: "Pro",
+      team: "Team",
+    }}
+  />
+));
 ```
 
 ## Examples
@@ -61,32 +58,30 @@ Example.mount(document.getElementById("root")!);
 
 A select with a visible label. When you provide the `label` prop, the select renders with a field wrapper and label above it.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      id: "basic-fruit",
-      label: "Fruit",
-      value: "apple",
-      items: {
-        apple: "Apple",
-        banana: "Banana",
-        cherry: "Cherry",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="basic-fruit"
+    label="Fruit"
+    value="apple"
+    items={{
+      apple: "Apple",
+      banana: "Banana",
+      cherry: "Cherry",
+    }}
+  />
+));
 ```
 
 ### Sizes
 
 Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
 const items = {
@@ -95,296 +90,264 @@ const items = {
   cherry: "Cherry",
 };
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Select({
-        size: "xs",
-        "aria-label": "Extra small select",
-        value: "apple",
-        items,
-      })}
-      ${Select({
-        size: "sm",
-        "aria-label": "Small select",
-        value: "apple",
-        items,
-      })}
-      ${Select({
-        size: "base",
-        "aria-label": "Base select",
-        value: "apple",
-        items,
-      })}
-      ${Select({
-        size: "lg",
-        "aria-label": "Large select",
-        value: "apple",
-        items,
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <Select
+      size="xs"
+      aria-label="Extra small select"
+      value="apple"
+      items={items}
+    />
+    <Select
+      size="sm"
+      aria-label="Small select"
+      value="apple"
+      items={items}
+    />
+    <Select
+      size="base"
+      aria-label="Base select"
+      value="apple"
+      items={items}
+    />
+    <Select
+      size="lg"
+      aria-label="Large select"
+      value="apple"
+      items={items}
+    />
+  </div>
+));
 ```
 
 ### Without Visible Label
 
 When a visible label is not needed, use `aria-label` for accessibility.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      "aria-label": "Select fruit",
-      value: "banana",
-      items: {
-        apple: "Apple",
-        banana: "Banana",
-        cherry: "Cherry",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    aria-label="Select fruit"
+    value="banana"
+    items={{
+      apple: "Apple",
+      banana: "Banana",
+      cherry: "Cherry",
+    }}
+  />
+));
 ```
 
 ### With Description and Error
 
 `Select` can show description text and validation errors. Error styling is automatically applied when the `error` prop is truthy.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      id: "issue-type",
-      label: "Issue type",
-      description:
-        "Choose the category that best matches your report.",
-      error: "Select an issue type before continuing.",
-      placeholder: "Choose an issue type",
-      items: {
-        bug: "Bug",
-        documentation: "Documentation",
-        feature: "Feature",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="issue-type"
+    label="Issue type"
+    description="Choose the category that best matches your report."
+    error="Select an issue type before continuing."
+    placeholder="Choose an issue type"
+    items={{
+      bug: "Bug",
+      documentation: "Documentation",
+      feature: "Feature",
+    }}
+  />
+));
 ```
 
 ### Placeholder
 
 Use the `placeholder` prop to render a placeholder option before the selectable items.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      id: "priority",
-      label: "Priority",
-      placeholder: "Choose priority",
-      items: {
-        low: "Low",
-        medium: "Medium",
-        high: "High",
-        critical: "Critical",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="priority"
+    label="Priority"
+    placeholder="Choose priority"
+    items={{
+      low: "Low",
+      medium: "Medium",
+      high: "High",
+      critical: "Critical",
+    }}
+  />
+));
 ```
 
 ### Label with Tooltip
 
 Use `labelTooltip` to add additional context via a native `title` attribute on the label.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      id: "severity",
-      label: "Severity",
-      labelTooltip:
-        "Choose the highest impact level that applies.",
-      placeholder: "Choose severity",
-      items: {
-        low: "Low",
-        medium: "Medium",
-        high: "High",
-        critical: "Critical",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="severity"
+    label="Severity"
+    labelTooltip="Choose the highest impact level that applies."
+    placeholder="Choose severity"
+    items={{
+      low: "Low",
+      medium: "Medium",
+      high: "High",
+      critical: "Critical",
+    }}
+  />
+));
 ```
 
 ### Disabled
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      label: "Fruit",
-      disabled: true,
-      value: "apple",
-      items: {
-        apple: "Apple",
-        banana: "Banana",
-        cherry: "Cherry",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    label="Fruit"
+    disabled
+    value="apple"
+    items={{
+      apple: "Apple",
+      banana: "Banana",
+      cherry: "Cherry",
+    }}
+  />
+));
 ```
 
 ### Multiple Selection
 
 Enable native multiple selection with the `multiple` prop. The select becomes a multi-row native control.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      id: "columns",
-      label: "Columns",
-      multiple: true,
-      description:
-        "Hold Command or Control to select multiple options.",
-      items: {
-        name: "Name",
-        location: "Location",
-        size: "Size",
-        read: "Read",
-        write: "Write",
-        createdAt: "Created At",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="columns"
+    label="Columns"
+    multiple
+    description="Hold Command or Control to select multiple options."
+    items={{
+      name: "Name",
+      location: "Location",
+      size: "Size",
+      read: "Read",
+      write: "Write",
+      createdAt: "Created At",
+    }}
+  />
+));
 ```
 
 ### Disabled Options
 
 Options can be disabled with descriptor objects in the `items` prop.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      id: "plan-disabled",
-      label: "Plan",
-      value: "free",
-      items: {
-        free: "Free",
-        pro: "Pro",
-        business: { label: "Business", disabled: true },
-        enterprise: { label: "Enterprise", disabled: true },
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="plan-disabled"
+    label="Plan"
+    value="free"
+    items={{
+      free: "Free",
+      pro: "Pro",
+      business: { label: "Business", disabled: true },
+      enterprise: { label: "Enterprise", disabled: true },
+    }}
+  />
+));
 ```
 
 ### Options as Children
 
 Use `Select.Option` when you want explicit control over individual option markup.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select(
-      {
-        id: "explicit-options",
-        label: "Fruit",
-        placeholder: "Choose fruit",
-      },
-      [
-        Select.Option({ value: "apple", label: "Apple" }),
-        Select.Option({ value: "banana", label: "Banana" }),
-        Select.Option({ value: "cherry", label: "Cherry" }),
-      ],
-    )}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="explicit-options"
+    label="Fruit"
+    placeholder="Choose fruit"
+  >
+    <Select.Option value="apple" label="Apple" />
+    <Select.Option value="banana" label="Banana" />
+    <Select.Option value="cherry" label="Cherry" />
+  </Select>
+));
 ```
 
 ### Grouped Options
 
 Use `Select.Group` to organize related options under native `optgroup` labels.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select(
-      {
-        id: "grouped-food",
-        label: "Food",
-        placeholder: "Choose food",
-      },
-      [
-        Select.Group({ label: "Fruits" }, [
-          Select.Option({ value: "apple", label: "Apple" }),
-          Select.Option({ value: "banana", label: "Banana" }),
-        ]),
-        Select.Group({ label: "Vegetables" }, [
-          Select.Option({ value: "carrot", label: "Carrot" }),
-          Select.Option({ value: "lettuce", label: "Lettuce" }),
-        ]),
-      ],
-    )}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    id="grouped-food"
+    label="Food"
+    placeholder="Choose food"
+  >
+    <Select.Group label="Fruits">
+      <Select.Option value="apple" label="Apple" />
+      <Select.Option value="banana" label="Banana" />
+    </Select.Group>
+    <Select.Group label="Vegetables">
+      <Select.Option value="carrot" label="Carrot" />
+      <Select.Option value="lettuce" label="Lettuce" />
+    </Select.Group>
+  </Select>
+));
 ```
 
 ### Ghost Variant
 
 Use `variant: "ghost"` for compact UIs where the select should blend into the surrounding surface.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Select } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Select({
-      variant: "ghost",
-      "aria-label": "Sort by",
-      value: "updated",
-      items: {
-        updated: "Recently updated",
-        created: "Recently created",
-        name: "Name",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Select
+    variant="ghost"
+    aria-label="Sort by"
+    value="updated"
+    items={{
+      updated: "Recently updated",
+      created: "Recently created",
+      name: "Name",
+    }}
+  />
+));
 ```
 
 ## API Reference

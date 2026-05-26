@@ -5,19 +5,18 @@ description: A text input field for user input with built-in label, description,
 
 A styled text input control. When you pass `label`, `description`, or `error`, `Input` delegates to `Field` for accessible labeling, descriptions, validation messaging, and field state attributes.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      label: "Email",
-      placeholder: "you@example.com",
-      type: "email",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    label="Email"
+    placeholder="you@example.com"
+    type="email"
+  />
+));
 ```
 
 ## Import
@@ -32,41 +31,36 @@ import { Input } from "areia";
 
 Use the `label` prop to enable the `Field` wrapper with label, description, and error support.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      id: "email",
-      label: "Email",
-      description:
-        "We'll only use this for account notifications.",
-      placeholder: "you@example.com",
-      type: "email",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    id="email"
+    label="Email"
+    description="We'll only use this for account notifications."
+    placeholder="you@example.com"
+    type="email"
+  />
+));
 ```
 
 ### Bare Input
 
 For custom form layouts, use `Input` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility. Use `Input.Static(...)` when composing a raw input inside `Field` manually.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      "aria-label": "Search",
-      placeholder: "Search...",
-      type: "search",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    aria-label="Search"
+    placeholder="Search..."
+    type="search"
+  />
+));
 ```
 
 ## Examples
@@ -75,260 +69,231 @@ Example.mount(document.getElementById("root")!);
 
 The `label` prop enables the `Field` wrapper with automatic vertical layout.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      id: "project-name",
-      label: "Project name",
-      description: "Use a short, memorable name.",
-      placeholder: "My Ilha app",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    id="project-name"
+    label="Project name"
+    description="Use a short, memorable name."
+    placeholder="My Ilha app"
+  />
+));
 ```
 
 ### With Error
 
 Pass `error` as a string for simple error messages. Error styling is automatically applied when the `error` prop is truthy.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      id: "email-error",
-      label: "Email",
-      placeholder: "you@example.com",
-      type: "email",
-      value: "not-an-email",
-      error: "Enter a valid email address.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    id="email-error"
+    label="Email"
+    placeholder="you@example.com"
+    type="email"
+    value="not-an-email"
+    error="Enter a valid email address."
+  />
+));
 ```
 
 ### With Validation Object
 
 Pass `error` as an object with a `message` property when you want to keep validation metadata near the field.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      id: "username",
-      label: "Username",
-      required: true,
-      placeholder: "areia-user",
-      error: {
-        message: "Username is required.",
-        match: "valueMissing",
-      },
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    id="username"
+    label="Username"
+    required
+    placeholder="areia-user"
+    error={{
+      message: "Username is required.",
+      match: "valueMissing",
+    }}
+  />
+));
 ```
 
 ### Input Sizes
 
 Four sizes are available: `xs`, `sm`, `base`, and `lg`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Input({
-        size: "xs",
-        "aria-label": "Extra small input",
-        placeholder: "Extra small",
-      })}
-      ${Input({
-        size: "sm",
-        "aria-label": "Small input",
-        placeholder: "Small",
-      })}
-      ${Input({
-        size: "base",
-        "aria-label": "Base input",
-        placeholder: "Base",
-      })}
-      ${Input({
-        size: "lg",
-        "aria-label": "Large input",
-        placeholder: "Large",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <Input
+      size="xs"
+      aria-label="Extra small input"
+      placeholder="Extra small"
+    />
+    <Input
+      size="sm"
+      aria-label="Small input"
+      placeholder="Small"
+    />
+    <Input
+      size="base"
+      aria-label="Base input"
+      placeholder="Base"
+    />
+    <Input
+      size="lg"
+      aria-label="Large input"
+      placeholder="Large"
+    />
+  </div>
+));
 ```
 
 ### Disabled
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      label: "Email",
-      placeholder: "you@example.com",
-      disabled: true,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input label="Email" placeholder="you@example.com" disabled />
+));
 ```
 
 ### Optional Field
 
 Set `required: false` to show optional text after the label.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      id: "website",
-      label: "Website",
-      required: false,
-      placeholder: "https://example.com",
-      type: "url",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    id="website"
+    label="Website"
+    required={false}
+    placeholder="https://example.com"
+    type="url"
+  />
+));
 ```
 
 ### With Label Tooltip
 
 Use `labelTooltip` to add additional context via a native `title` attribute on the label.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      id: "team-name",
-      label: "Team name",
-      labelTooltip:
-        "This name is visible to everyone in your workspace.",
-      placeholder: "Design systems",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    id="team-name"
+    label="Team name"
+    labelTooltip="This name is visible to everyone in your workspace."
+    placeholder="Design systems"
+  />
+));
 ```
 
 ### Rich Label
 
 The `label` prop accepts Ilha markup for richer formatting.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      id: "billing-email",
-      label: html`Email for <strong>billing</strong>`,
-      required: true,
-      placeholder: "billing@example.com",
-      type: "email",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    id="billing-email"
+    label={
+      <>
+        Email for <strong>billing</strong>
+      </>
+    }
+    required
+    placeholder="billing@example.com"
+    type="email"
+  />
+));
 ```
 
 ### Bare Input with Error
 
 Error messages and descriptions can render without a visible label. Use `aria-label` to keep the input accessible.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      id: "search-error",
-      "aria-label": "Search",
-      placeholder: "Search...",
-      description: "Search by name or ID.",
-      error: "Search is currently unavailable.",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    id="search-error"
+    aria-label="Search"
+    placeholder="Search..."
+    description="Search by name or ID."
+    error="Search is currently unavailable."
+  />
+));
 ```
 
 ### Input Types
 
 Supports standard HTML input types such as `text`, `email`, `password`, `number`, `tel`, and `url`.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex w-full max-w-sm flex-col gap-3">
-      ${Input({
-        label: "Email",
-        type: "email",
-        placeholder: "you@example.com",
-      })}
-      ${Input({
-        label: "Password",
-        type: "password",
-        placeholder: "••••••••",
-      })}
-      ${Input({
-        label: "Team size",
-        type: "number",
-        placeholder: "12",
-      })}
-      ${Input({
-        label: "Website",
-        type: "url",
-        placeholder: "https://example.com",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <Input
+      label="Email"
+      type="email"
+      placeholder="you@example.com"
+    />
+    <Input
+      label="Password"
+      type="password"
+      placeholder="••••••••"
+    />
+    <Input label="Team size" type="number" placeholder="12" />
+    <Input
+      label="Website"
+      type="url"
+      placeholder="https://example.com"
+    />
+  </div>
+));
 ```
 
 ### Password Manager Overlays
 
 Set `passwordManagerIgnore` on non-credential inputs that password managers might incorrectly classify as login fields.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Input({
-      label: "Project slug",
-      placeholder: "my-ilha-app",
-      passwordManagerIgnore: true,
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Input
+    label="Project slug"
+    placeholder="my-ilha-app"
+    passwordManagerIgnore
+  />
+));
 ```
 
 ## API Reference

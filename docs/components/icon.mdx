@@ -7,29 +7,22 @@ Renders Lucide icons as Ilha markup.
 
 `Icon` accepts a Lucide `IconNode` and converts it into raw SVG markup that can be passed into other Areia components, such as `Button` and `Banner`.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { CircleCheck, Info, TriangleAlert } from "lucide";
 import { Icon } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div
-      class="flex flex-wrap items-center gap-3 text-areia-default"
-    >
-      ${Icon({ icon: Info })}
-      ${Icon({
-        icon: CircleCheck,
-        class: "text-areia-success",
-      })}
-      ${Icon({
-        icon: TriangleAlert,
-        class: "text-areia-warning-soft-foreground",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex flex-wrap items-center gap-3 text-areia-default">
+    <Icon icon={Info} />
+    <Icon icon={CircleCheck} class="text-areia-success" />
+    <Icon
+      icon={TriangleAlert}
+      class="text-areia-warning-soft-foreground"
+    />
+  </div>
+));
 ```
 
 ## Import
@@ -46,15 +39,12 @@ import { Info } from "lucide";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Info } from "lucide";
 import { Icon } from "areia";
 
-const Example = ilha.render(
-  () => html`${Icon({ icon: Info })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => <Icon icon={Info} />);
 ```
 
 ## Examples
@@ -63,30 +53,27 @@ Example.mount(document.getElementById("root")!);
 
 Use `class` or `className` to change the rendered SVG size.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Info } from "lucide";
 import { Icon } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-3 text-areia-default">
-      ${Icon({ icon: Info, class: "size-3" })}
-      ${Icon({ icon: Info })}
-      ${Icon({ icon: Info, class: "size-5" })}
-      ${Icon({ icon: Info, class: "size-6" })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-3 text-areia-default">
+    <Icon icon={Info} class="size-3" />
+    <Icon icon={Info} />
+    <Icon icon={Info} class="size-5" />
+    <Icon icon={Info} class="size-6" />
+  </div>
+));
 ```
 
 ### Color
 
 Icons use `currentColor`, so text color utilities can be used to control their color.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import {
   CircleCheck,
   Info,
@@ -95,106 +82,90 @@ import {
 } from "lucide";
 import { Icon } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-3">
-      ${Icon({
-        icon: Info,
-        class: "text-areia-info-soft-foreground",
-      })}
-      ${Icon({
-        icon: CircleCheck,
-        class: "text-areia-success-soft-foreground",
-      })}
-      ${Icon({
-        icon: TriangleAlert,
-        class: "text-areia-warning-soft-foreground",
-      })}
-      ${Icon({
-        icon: CircleX,
-        class: "text-areia-destructive-soft-foreground",
-      })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-3">
+    <Icon icon={Info} class="text-areia-info-soft-foreground" />
+    <Icon
+      icon={CircleCheck}
+      class="text-areia-success-soft-foreground"
+    />
+    <Icon
+      icon={TriangleAlert}
+      class="text-areia-warning-soft-foreground"
+    />
+    <Icon
+      icon={CircleX}
+      class="text-areia-destructive-soft-foreground"
+    />
+  </div>
+));
 ```
 
 ### Stroke Width
 
 Use `strokeWidth` to adjust the SVG stroke width.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Info } from "lucide";
 import { Icon } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    <div class="flex items-center gap-3 text-areia-default">
-      ${Icon({ icon: Info, strokeWidth: 1 })}
-      ${Icon({ icon: Info, strokeWidth: 1.75 })}
-      ${Icon({ icon: Info, strokeWidth: 2.5 })}
-    </div>
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <div class="flex items-center gap-3 text-areia-default">
+    <Icon icon={Info} strokeWidth={1} />
+    <Icon icon={Info} strokeWidth={1.75} />
+    <Icon icon={Info} strokeWidth={2.5} />
+  </div>
+));
 ```
 
 ### Accessible Icon
 
 By default, icons are decorative and rendered with `aria-hidden="true"`. Provide `label` when the icon itself communicates meaning without nearby text.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { CircleCheck } from "lucide";
 import { Icon } from "areia";
 
-const Example = ilha.render(
-  () => html`${Icon({ icon: CircleCheck, label: "Success" })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Icon icon={CircleCheck} label="Success" />
+));
 ```
 
 ### In a Button
 
 Use `Icon` to provide Lucide icons to components that accept an `icon` slot.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "secondary",
-      icon: Icon({ icon: Plus }),
-      label: "Create item",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button variant="secondary" icon={<Icon icon={Plus} />}>
+    Create item
+  </Button>
+));
 ```
 
 ### Icon Only Button
 
 When an icon is used without visible text, provide an accessible label on the button.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Plus } from "lucide";
 import { Button, Icon } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Button({
-      variant: "secondary",
-      shape: "square",
-      icon: Icon({ icon: Plus }),
-      "aria-label": "Create item",
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Button
+    variant="secondary"
+    shape="square"
+    icon={<Icon icon={Plus} />}
+    aria-label="Create item"
+  />
+));
 ```
 
 ## API Reference

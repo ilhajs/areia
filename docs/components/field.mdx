@@ -5,24 +5,21 @@ description: Groups a label, form control, description, and validation message.
 
 Groups a label, form control, description, and validation message. `Field` wires accessible relationships and tracks focused, filled, dirty, touched, valid, and invalid states.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { Field, Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Field({
-      label: "Email",
-      description: "Use your work email.",
-      children: Input({
-        "data-slot": "field-control",
-        type: "email",
-        name: "email",
-        placeholder: "you@example.com",
-      }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Field label="Email" description="Use your work email.">
+    <Input
+      data-slot="field-control"
+      type="email"
+      name="email"
+      placeholder="you@example.com"
+    />
+  </Field>
+));
 ```
 
 ## Import
@@ -35,23 +32,22 @@ import { Field } from "areia";
 
 Render a control with `data-slot="field-control"` inside `Field`. The controller associates `Field.Label`, `Field.Description`, and `Field.Error` with the control.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Field, Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Field({
-      label: "Username",
-      description: "This will be visible on your profile.",
-      children: Input({
-        "data-slot": "field-control",
-        name: "username",
-        placeholder: "ryuz",
-      }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Field
+    label="Username"
+    description="This will be visible on your profile."
+  >
+    <Input
+      data-slot="field-control"
+      name="username"
+      placeholder="ryuz"
+    />
+  </Field>
+));
 ```
 
 ## Examples
@@ -60,108 +56,96 @@ Example.mount(document.getElementById("root")!);
 
 Native constraint validation is read from the field control.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Field, Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Field({
-      label: "Project name",
-      error: "Project name is required.",
-      children: Input({
-        "data-slot": "field-control",
-        name: "project",
-        required: true,
-        placeholder: "My app",
-      }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Field label="Project name" error="Project name is required.">
+    <Input
+      data-slot="field-control"
+      name="project"
+      required
+      placeholder="My app"
+    />
+  </Field>
+));
 ```
 
 ### Custom Validation
 
 Return a string from `validate` to mark the field invalid.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Field, Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Field({
-      label: "Email",
-      error: "Enter a valid email address.",
-      validationMode: "onBlur",
-      validate: (value) =>
-        value.includes("@")
-          ? null
-          : "Enter a valid email address.",
-      children: Input({
-        "data-slot": "field-control",
-        type: "email",
-        name: "email",
-        placeholder: "you@example.com",
-      }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Field
+    label="Email"
+    error="Enter a valid email address."
+    validationMode="onBlur"
+    validate={(value) =>
+      value.includes("@")
+        ? null
+        : "Enter a valid email address."
+    }
+  >
+    <Input
+      data-slot="field-control"
+      type="email"
+      name="email"
+      placeholder="you@example.com"
+    />
+  </Field>
+));
 ```
 
 ### Invalid State
 
 Use `invalid` when validity is controlled by server state or another external source.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Field, Input } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${Field({
-      label: "Workspace slug",
-      invalid: true,
-      error: "This slug is already taken.",
-      children: Input({
-        "data-slot": "field-control",
-        name: "slug",
-        value: "areia",
-      }),
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Field
+    label="Workspace slug"
+    invalid
+    error="This slug is already taken."
+  >
+    <Input
+      data-slot="field-control"
+      name="slug"
+      value="areia"
+    />
+  </Field>
+));
 ```
 
 ### Composed Parts
 
 Use the part helpers when you need a custom layout.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { Field, Textarea } from "areia";
 
-const Example = ilha.render(
-  () => html`
-    ${Field.Root({
-      children: html`
-        ${Field.Label({ label: "Description" })}
-        ${Textarea({
-          "data-slot": "field-control",
-          name: "description",
-          placeholder: "Describe your project...",
-        })}
-        <div class="flex items-center justify-between gap-3">
-          ${Field.Description({
-            description: "Keep it concise.",
-          })}
-          ${Field.Error({ error: "Description is required." })}
-        </div>
-      `,
-    })}
-  `,
-);
-Example.mount(document.getElementById("root")!);
+export default ilha.render(() => (
+  <Field.Root>
+    <Field.Label label="Description" />
+    <Textarea
+      data-slot="field-control"
+      name="description"
+      placeholder="Describe your project..."
+    />
+    <div class="flex items-center justify-between gap-3">
+      <Field.Description description="Keep it concise." />
+      <Field.Error error="Description is required." />
+    </div>
+  </Field.Root>
+));
 ```
 
 ## API

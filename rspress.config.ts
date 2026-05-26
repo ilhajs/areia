@@ -2,6 +2,7 @@ import * as path from "node:path";
 import { defineConfig } from "@rspress/core";
 import { pluginPreview } from "@rspress/plugin-preview";
 import { pluginTwoslash } from "@rspress/plugin-twoslash";
+import ts from "typescript";
 
 export default defineConfig({
   root: path.join(__dirname, "docs"),
@@ -30,20 +31,27 @@ export default defineConfig({
   plugins: [
     pluginPreview({
       defaultPreviewMode: "iframe-follow",
-      previewLanguages: ["ts"],
+      previewLanguages: ["tsx"],
+      previewCodeTransform: ({ language, code }) => {
+        if (language !== "tsx") return code;
+        return `/** @jsxImportSource ilha */\n${code}`;
+      },
       iframeOptions: {
         customEntry: ({ demoPath }) => {
-          return `import ${JSON.stringify(demoPath)};
-        `;
+          return `
+            import(${JSON.stringify(demoPath)}).then((PreviewModule) => {
+              const Preview = PreviewModule.default;
+              if (Preview && typeof Preview.mount === "function") {
+                Preview.mount(document.querySelector("#root"));
+              }
+            });
+          `;
         },
         builderConfig: {
           source: {
             preEntry: [path.join(__dirname, "docs.css")],
           },
         },
-      },
-      previewCodeTransform(codeInfo) {
-        return codeInfo.code;
       },
     }),
     pluginTwoslash({
@@ -56,6 +64,9 @@ export default defineConfig({
         compilerOptions: {
           strict: true,
           baseUrl: __dirname,
+          jsx: ts.JsxEmit.ReactJSX,
+          jsxImportSource: "ilha",
+          moduleResolution: ts.ModuleResolutionKind.Bundler,
           paths: {
             areia: ["./packages/areia/src/index.ts"],
             "@areia/slots": ["./packages/slots/src/index.ts"],

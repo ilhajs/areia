@@ -5,25 +5,23 @@ description: Opens a menu at the pointer on right click or touch long press.
 
 Opens a menu at the pointer on right click or touch long press. Use context menus for actions related to a region, item, or surface.
 
-```ts preview twoslash
-import ilha, { html } from "ilha";
+```tsx preview twoslash
+// @errors: 2322 2686 2786
+import ilha from "ilha";
 import { ContextMenu } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${ContextMenu({
-      trigger: html`<div
-        class="rounded-lg border border-dashed border-areia-border p-8 text-center text-areia-subtle"
-      >
+export default ilha.render(() => (
+  <ContextMenu
+    trigger={
+      <div class="rounded-lg border border-dashed border-areia-border p-8 text-center text-areia-subtle">
         Right click here
-      </div>`,
-      children: [
-        ContextMenu.Item({ value: "copy", label: "Copy" }),
-        ContextMenu.Item({ value: "paste", label: "Paste" }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+      </div>
+    }
+  >
+    <ContextMenu.Item value="copy" label="Copy" />
+    <ContextMenu.Item value="paste" label="Paste" />
+  </ContextMenu>
+));
 ```
 
 ## Import
@@ -34,145 +32,117 @@ import { ContextMenu } from "areia";
 
 ## Usage
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ContextMenu } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${ContextMenu({
-      trigger: html`<button
-        class="rounded-lg bg-areia-control-background px-3 py-2 ring ring-areia-control-border"
-      >
+export default ilha.render(() => (
+  <ContextMenu
+    trigger={
+      <button class="rounded-lg bg-areia-control-background px-3 py-2 ring ring-areia-control-border">
         Right click me
-      </button>`,
-      children: [
-        ContextMenu.Item({ value: "rename", label: "Rename" }),
-        ContextMenu.Item({
-          value: "duplicate",
-          label: "Duplicate",
-        }),
-        ContextMenu.Item({ value: "delete", label: "Delete" }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+      </button>
+    }
+  >
+    <ContextMenu.Item value="rename" label="Rename" />
+    <ContextMenu.Item value="duplicate" label="Duplicate" />
+    <ContextMenu.Item value="delete" label="Delete" />
+  </ContextMenu>
+));
 ```
 
 ## Examples
 
 ### Basic Menu
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ContextMenu } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${ContextMenu({
-      trigger: html`<div
-        class="rounded-lg bg-areia-surface-muted p-6 text-areia-default"
-      >
+export default ilha.render(() => (
+  <ContextMenu
+    trigger={
+      <div class="rounded-lg bg-areia-surface-muted p-6 text-areia-default">
         Right click this card
-      </div>`,
-      children: [
-        ContextMenu.Item({ value: "open", label: "Open" }),
-        ContextMenu.Item({
-          value: "copy-link",
-          label: "Copy link",
-        }),
-        ContextMenu.Item({
-          value: "archive",
-          label: "Archive",
-        }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+      </div>
+    }
+  >
+    <ContextMenu.Item value="open" label="Open" />
+    <ContextMenu.Item value="copy-link" label="Copy link" />
+    <ContextMenu.Item value="archive" label="Archive" />
+  </ContextMenu>
+));
 ```
 
 ### Checkbox Item
 
 Set `closeOnSelect: false` when menu items should toggle without closing immediately.
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ContextMenu } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${ContextMenu({
-      closeOnSelect: false,
-      trigger: html`<div
-        class="rounded-lg border border-areia-border p-6"
-      >
+export default ilha.render(() => (
+  <ContextMenu
+    closeOnSelect={false}
+    trigger={
+      <div class="rounded-lg border border-areia-border p-6">
         Right click for view options
-      </div>`,
-      children: [
-        ContextMenu.CheckboxItem({
-          value: "show-hidden",
-          label: "Show hidden files",
-        }),
-        ContextMenu.CheckboxItem({
-          value: "show-sidebar",
-          label: "Show sidebar",
-          checked: true,
-        }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+      </div>
+    }
+  >
+    <ContextMenu.CheckboxItem
+      value="show-hidden"
+      label="Show hidden files"
+    />
+    <ContextMenu.CheckboxItem
+      value="show-sidebar"
+      label="Show sidebar"
+      checked
+    />
+  </ContextMenu>
+));
 ```
 
 ### Disabled Item
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ContextMenu } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${ContextMenu({
-      trigger: html`<div
-        class="rounded-lg bg-areia-surface-muted p-6"
-      >
+export default ilha.render(() => (
+  <ContextMenu
+    trigger={
+      <div class="rounded-lg bg-areia-surface-muted p-6">
         Right click
-      </div>`,
-      children: [
-        ContextMenu.Item({ value: "cut", label: "Cut" }),
-        ContextMenu.Item({
-          value: "paste",
-          label: "Paste",
-          disabled: true,
-        }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+      </div>
+    }
+  >
+    <ContextMenu.Item value="cut" label="Cut" />
+    <ContextMenu.Item value="paste" label="Paste" disabled />
+  </ContextMenu>
+));
 ```
 
 ### Selection Callback
 
-```ts preview
-import ilha, { html } from "ilha";
+```tsx preview
+import ilha from "ilha";
 import { ContextMenu } from "areia";
 
-const Example = ilha.render(
-  () =>
-    html`${ContextMenu({
-      onSelect: (value) => console.log("selected", value),
-      trigger: html`<div
-        class="rounded-lg border border-areia-border p-6"
-      >
+export default ilha.render(() => (
+  <ContextMenu
+    onSelect={(value) => console.log("selected", value)}
+    trigger={
+      <div class="rounded-lg border border-areia-border p-6">
         Right click and select an action
-      </div>`,
-      children: [
-        ContextMenu.Item({ value: "copy", label: "Copy" }),
-        ContextMenu.Item({ value: "share", label: "Share" }),
-      ],
-    })}`,
-);
-Example.mount(document.getElementById("root")!);
+      </div>
+    }
+  >
+    <ContextMenu.Item value="copy" label="Copy" />
+    <ContextMenu.Item value="share" label="Share" />
+  </ContextMenu>
+));
 ```
 
 ## API

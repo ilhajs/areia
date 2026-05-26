@@ -1,11 +1,16 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "ilha",
     "paths": {
       "areia": ["./packages/areia/src/index.ts"],
       "@areia/slots": ["./packages/slots/src/index.ts"]
     }
   },
   "include": ["packages/*/src/**/*"],
-  "exclude": ["**/dist", "**/node_modules"]
+  "exclude": ["**/dist", "**/node_modules"],
+  "mdx": {
+    "checkMdx": true
+  }
 }
