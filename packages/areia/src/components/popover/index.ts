@@ -116,6 +116,10 @@ function render(value: unknown): string {
   return String(value);
 }
 
+function hasSlot(value: unknown, slot: string) {
+  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(render(value));
+}
+
 function withSlot(value: unknown, slot: string, className?: string, aliasedClassName?: string) {
   const markup = rawValue(value);
   if (!markup || !markup.trimStart().startsWith("<")) return undefined;
@@ -383,11 +387,20 @@ function renderPopover(input: PopoverInput = {}) {
     ...rootProps
   } = input;
 
-  const generatedTrigger =
-    withSlot(trigger, "popover-trigger", triggerClass, triggerClassName) ??
-    (trigger != null ? raw(render(trigger)) : undefined) ??
-    withSlot(children, "popover-trigger", triggerClass, triggerClassName) ??
-    PopoverTrigger({ as: triggerAs, class: triggerClass, className: triggerClassName, children });
+  const composedChildren = render(children);
+  const hasComposedContent = hasSlot(children, "popover-content");
+  const hasComposedTrigger = hasSlot(children, "popover-trigger");
+  const generatedTrigger = hasComposedTrigger
+    ? undefined
+    : (withSlot(trigger, "popover-trigger", triggerClass, triggerClassName) ??
+      (trigger != null ? raw(render(trigger)) : undefined) ??
+      withSlot(children, "popover-trigger", triggerClass, triggerClassName) ??
+      PopoverTrigger({
+        as: triggerAs,
+        class: triggerClass,
+        className: triggerClassName,
+        children,
+      }));
 
   return html`<div
     data-slot="popover"
@@ -408,20 +421,22 @@ function renderPopover(input: PopoverInput = {}) {
     )}
     ${raw(toAttrs(rootProps))}
   >
-    ${generatedTrigger}
-    ${PopoverContent({
-      align,
-      alignOffset,
-      arrow,
-      avoidCollisions,
-      class: contentClass,
-      className: contentClassName,
-      collisionPadding,
-      children: content,
-      portal,
-      side,
-      sideOffset,
-    })}
+    ${hasComposedContent ? raw(composedChildren) : generatedTrigger}
+    ${hasComposedContent
+      ? ""
+      : PopoverContent({
+          align,
+          alignOffset,
+          arrow,
+          avoidCollisions,
+          class: contentClass,
+          className: contentClassName,
+          collisionPadding,
+          children: content,
+          portal,
+          side,
+          sideOffset,
+        })}
   </div>`;
 }
 

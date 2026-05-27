@@ -49,20 +49,19 @@ import { Tabs } from "areia";
 
 ## Usage
 
-Call `Tabs(...)` for interactive behavior. It initializes the tabs controller, syncs ARIA and `data-state` attributes, and emits `tabs:change` when the active tab changes.
+Call `Tabs(...)` for interactive behavior. Prefer composing `Tabs.List`, `Tabs.Trigger`, and `Tabs.Content` as children; the `tabs` array remains available as a shortcut. It initializes the tabs controller, syncs ARIA and `data-state` attributes, and emits `tabs:change` when the active tab changes.
 
 ```tsx preview
 import ilha from "ilha";
 import { Tabs } from "areia";
 
 export default ilha.render(() => (
-  <Tabs
-    tabs={[
-      { value: "overview", label: "Overview" },
-      { value: "settings", label: "Settings" },
-    ]}
-    selectedValue="overview"
-  />
+  <Tabs selectedValue="overview">
+    <Tabs.List>
+      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+      <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+    </Tabs.List>
+  </Tabs>
 ));
 ```
 
@@ -204,17 +203,45 @@ export default ilha
 
 ### Content Panels
 
-Pass `content` on each item to render tab panels. Content can be text, markup, or an Ilha island result.
+Compose `Tabs.Content` children for panel content. This keeps panel JSX colocated with each tab value.
 
 ```tsx preview
 import ilha from "ilha";
 import { Tabs } from "areia";
 
-const ActivityPanel = ilha.render(() => (
-  <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
-    Recent project activity appears here.
-  </div>
+export default ilha.render(() => (
+  <Tabs selectedValue="overview">
+    <Tabs.List>
+      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+      <Tabs.Trigger value="activity">Activity</Tabs.Trigger>
+      <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+    </Tabs.List>
+    <Tabs.Content value="overview">
+      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
+        Project health and key metrics.
+      </div>
+    </Tabs.Content>
+    <Tabs.Content value="activity">
+      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
+        Recent project activity appears here.
+      </div>
+    </Tabs.Content>
+    <Tabs.Content value="settings">
+      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
+        Workspace preferences and access controls.
+      </div>
+    </Tabs.Content>
+  </Tabs>
 ));
+```
+
+### Data Shortcut
+
+Use the `tabs` array for concise data-driven tabs. Pass `content` on each item to generate content panels.
+
+```tsx preview
+import ilha from "ilha";
+import { Tabs } from "areia";
 
 export default ilha.render(() => (
   <Tabs
@@ -223,25 +250,12 @@ export default ilha.render(() => (
       {
         value: "overview",
         label: "Overview",
-        content: (
-          <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
-            Project health and key metrics.
-          </div>
-        ),
-      },
-      {
-        value: "activity",
-        label: "Activity",
-        content: ActivityPanel,
+        content: "Overview panel",
       },
       {
         value: "settings",
         label: "Settings",
-        content: (
-          <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">
-            Workspace preferences and access controls.
-          </div>
-        ),
+        content: "Settings panel",
       },
     ]}
   />
@@ -272,25 +286,26 @@ export default ilha.render(() => (
 
 ### `Tabs(input)`
 
-| Prop                 | Type                         | Default       | Description                                             |
-| -------------------- | ---------------------------- | ------------- | ------------------------------------------------------- |
-| `tabs`               | `TabsItem[]`                 | `[]`          | Items rendered as tab triggers.                         |
-| `value`              | `string`                     | —             | Initial active value.                                   |
-| `selectedValue`      | `string`                     | —             | Initial active value for uncontrolled usage.            |
-| `defaultValue`       | `string`                     | —             | Alias for the initial active value.                     |
-| `variant`            | `"segmented" \| "underline"` | `"segmented"` | Visual style.                                           |
-| `size`               | `"base" \| "sm"`             | `"base"`      | Tab size.                                               |
-| `activationMode`     | `"auto" \| "manual"`         | `"manual"`    | Keyboard activation mode passed to the tabs controller. |
-| `activateOnFocus`    | `boolean`                    | `false`       | Uses automatic arrow-key activation when `true`.        |
-| `class`              | `string`                     | —             | Additional classes for the root.                        |
-| `className`          | `string`                     | —             | Alias for `class`.                                      |
-| `listClass`          | `string`                     | —             | Additional classes for the tab list.                    |
-| `listClassName`      | `string`                     | —             | Alias for `listClass`.                                  |
-| `contentClass`       | `string`                     | —             | Additional classes for every generated content panel.   |
-| `contentClassName`   | `string`                     | —             | Alias for `contentClass`.                               |
-| `indicatorClass`     | `string`                     | —             | Additional classes for the active indicator.            |
-| `indicatorClassName` | `string`                     | —             | Alias for `indicatorClass`.                             |
-| `onValueChange`      | `(value: string) => void`    | —             | Called when the active tab changes.                     |
+| Prop                 | Type                         | Default       | Description                                                                                  |
+| -------------------- | ---------------------------- | ------------- | -------------------------------------------------------------------------------------------- |
+| `tabs`               | `TabsItem[]`                 | `[]`          | Items rendered as tab triggers.                                                              |
+| `children`           | `unknown`                    | —             | Composed `Tabs.List`, `Tabs.Trigger`, and `Tabs.Content` markup. Takes priority over `tabs`. |
+| `value`              | `string`                     | —             | Initial active value.                                                                        |
+| `selectedValue`      | `string`                     | —             | Initial active value for uncontrolled usage.                                                 |
+| `defaultValue`       | `string`                     | —             | Alias for the initial active value.                                                          |
+| `variant`            | `"segmented" \| "underline"` | `"segmented"` | Visual style.                                                                                |
+| `size`               | `"base" \| "sm"`             | `"base"`      | Tab size.                                                                                    |
+| `activationMode`     | `"auto" \| "manual"`         | `"manual"`    | Keyboard activation mode passed to the tabs controller.                                      |
+| `activateOnFocus`    | `boolean`                    | `false`       | Uses automatic arrow-key activation when `true`.                                             |
+| `class`              | `string`                     | —             | Additional classes for the root.                                                             |
+| `className`          | `string`                     | —             | Alias for `class`.                                                                           |
+| `listClass`          | `string`                     | —             | Additional classes for the tab list.                                                         |
+| `listClassName`      | `string`                     | —             | Alias for `listClass`.                                                                       |
+| `contentClass`       | `string`                     | —             | Additional classes for every generated content panel.                                        |
+| `contentClassName`   | `string`                     | —             | Alias for `contentClass`.                                                                    |
+| `indicatorClass`     | `string`                     | —             | Additional classes for the active indicator.                                                 |
+| `indicatorClassName` | `string`                     | —             | Alias for `indicatorClass`.                                                                  |
+| `onValueChange`      | `(value: string) => void`    | —             | Called when the active tab changes.                                                          |
 
 ### `TabsItem`
 

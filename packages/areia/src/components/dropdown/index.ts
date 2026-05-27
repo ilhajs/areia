@@ -65,7 +65,9 @@ export type DropdownInput = Omit<HTMLElementProps<HTMLDivElement>, "className" |
     class?: string;
     className?: string;
     triggerClass?: string;
+    triggerClassName?: string;
     contentClass?: string;
+    contentClassName?: string;
   };
 
 export type DropdownTriggerInput = Omit<HTMLElementProps<HTMLElement>, "className" | "children"> &
@@ -139,6 +141,31 @@ export type DropdownItemInput = DropdownVariantsProps &
   };
 
 const checkIcon = Icon({ icon: Check, class: "size-3.5" });
+
+function rawValue(value: unknown): string | undefined {
+  if (typeof value === "string") return value;
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "value" in value &&
+    typeof value.value === "string"
+  ) {
+    return value.value;
+  }
+  return undefined;
+}
+
+function render(value: unknown): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(render).join("");
+  const markup = rawValue(value);
+  if (markup !== undefined) return markup;
+  return String(value);
+}
+
+function hasSlot(value: unknown, slot: string) {
+  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(render(value));
+}
 
 function itemSlot(type?: DropdownItemKind) {
   if (type === "checkbox") return "dropdown-menu-checkbox-item";
@@ -368,7 +395,9 @@ function renderDropdown(input: DropdownInput = {}) {
     class: className,
     className: aliasedClassName,
     triggerClass,
+    triggerClassName,
     contentClass,
+    contentClassName,
     defaultOpen,
     defaultValue,
     defaultValues,
@@ -390,6 +419,9 @@ function renderDropdown(input: DropdownInput = {}) {
     variant: _variant,
     ...rest
   } = input;
+
+  const composedChildren = render(children);
+  const hasComposedContent = hasSlot(children, "dropdown-menu-content");
 
   return html`<div
     data-slot="dropdown-menu"
@@ -414,8 +446,13 @@ function renderDropdown(input: DropdownInput = {}) {
       }),
     )}
   >
-    ${DropdownTrigger({ children: trigger, class: triggerClass })}
-    ${DropdownContent({ children: children ?? renderItems(items), class: contentClass })}
+    ${hasComposedContent
+      ? raw(composedChildren)
+      : html`${DropdownTrigger({ children: trigger, class: cn(triggerClass, triggerClassName) })}
+        ${DropdownContent({
+          children: children ?? renderItems(items),
+          class: cn(contentClass, contentClassName),
+        })}`}
   </div>`;
 }
 

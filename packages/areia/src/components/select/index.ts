@@ -314,6 +314,8 @@ function SelectBase(inputOrChildren: SelectInput | unknown[] = {}, children?: un
 }
 
 export const Select = Object.assign(SelectBase, {
+  Root: SelectBase,
+  Static: SelectBase,
   Option: SelectOption,
   Group: SelectGroup,
   Separator: SelectSeparator,

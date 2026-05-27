@@ -39,6 +39,30 @@ export default defineConfig({
       iframeOptions: {
         customEntry: ({ demoPath }) => {
           return `
+            (function(){
+              function apply(dark) {
+                document.documentElement.classList.toggle("dark", dark);
+                document.documentElement.classList.toggle("rp-dark", dark);
+                document.documentElement.style.colorScheme = dark ? "dark" : "light";
+              }
+              try {
+                if (window.parent !== window) {
+                  apply(window.parent.document.documentElement.classList.contains("dark"));
+                }
+                return;
+              } catch {}
+              if (window.parent !== window) {
+                var handler = function(ev) {
+                  if (ev.data && ev.data.type === "theme-change") {
+                    apply(ev.data.dark);
+                    window.removeEventListener("message", handler);
+                  }
+                };
+                window.addEventListener("message", handler);
+                window.parent.postMessage({ type: "request-theme" }, "*");
+              }
+            })();
+
             import(${JSON.stringify(demoPath)}).then((PreviewModule) => {
               const Preview = PreviewModule.default;
               if (Preview && typeof Preview.mount === "function") {
@@ -85,6 +109,24 @@ export default defineConfig({
   },
   globalStyles: path.join(__dirname, "docs.css"),
   builderConfig: {
+    html: {
+      tags: [
+        {
+          tag: "script",
+          head: true,
+          children: `
+            (function() {
+              window.addEventListener("message", function(e) {
+                if (e.data && e.data.type === "request-theme" && e.source && e.source !== window) {
+                  var isDark = document.documentElement.classList.contains("dark");
+                  e.source.postMessage({ type: "theme-change", dark: isDark }, "*");
+                }
+              });
+            })();
+          `,
+        },
+      ],
+    },
     resolve: {
       alias: {
         areia: path.join(__dirname, "packages", "areia", "src", "index.ts"),

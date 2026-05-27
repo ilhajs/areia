@@ -299,7 +299,9 @@ export interface BreadcrumbsInput extends BreadcrumbsVariantsProps {
    * })
    * ```
    */
-  items: BreadcrumbItem[];
+  items?: BreadcrumbItem[];
+  /** Breadcrumb markup rendered directly. Use `Breadcrumbs.Link`, `Breadcrumbs.Separator`, and `Breadcrumbs.Current` for composition-first usage. */
+  children?: unknown;
   /**
    * When true, the current page label is replaced with a loading skeleton.
    * @default false
@@ -335,9 +337,10 @@ export interface BreadcrumbsInput extends BreadcrumbsVariantsProps {
  * })
  * ```
  */
-export function Breadcrumbs(input: BreadcrumbsInput) {
+function BreadcrumbsBase(input: BreadcrumbsInput) {
   const {
-    items,
+    items = [],
+    children,
     size = BREADCRUMBS_DEFAULT_VARIANTS.size,
     loading,
     copyUrl,
@@ -345,15 +348,19 @@ export function Breadcrumbs(input: BreadcrumbsInput) {
     className: aliasedClassName,
   } = input;
 
-  const fullTrail = buildFullTrail(items, loading);
-  const mobileTrail = buildMobileTrail(items, loading);
+  const composedChildren = render(children);
+  const hasComposedChildren = composedChildren.trim().length > 0;
+  const fullTrail = hasComposedChildren ? [] : buildFullTrail(items, loading);
+  const mobileTrail = hasComposedChildren ? [] : buildMobileTrail(items, loading);
 
   return html`<nav
     class="${cn(breadcrumbsVariants({ size }), className, aliasedClassName)}"
     aria-label="breadcrumb"
   >
-    <div class="contents sm:hidden">${raw(render(mobileTrail))}</div>
-    <div class="hidden sm:contents">${raw(render(fullTrail))}</div>
+    ${hasComposedChildren
+      ? raw(composedChildren)
+      : html`<div class="contents sm:hidden">${raw(render(mobileTrail))}</div>
+          <div class="hidden sm:contents">${raw(render(fullTrail))}</div>`}
     ${copyUrl != null ? BreadcrumbsClipboard({ text: copyUrl }) : ""}
   </nav>`;
 }
@@ -362,10 +369,14 @@ export function Breadcrumbs(input: BreadcrumbsInput) {
 // Compound component export
 // ---------------------------------------------------------------------------
 
-export const BreadcrumbsRoot = Object.assign(Breadcrumbs, {
+export const Breadcrumbs = Object.assign(BreadcrumbsBase, {
+  Root: BreadcrumbsBase,
+  Static: BreadcrumbsBase,
   Link: BreadcrumbsLink,
   Current: BreadcrumbsCurrent,
   Separator: BreadcrumbsSeparator,
   Clipboard: BreadcrumbsClipboard,
   MobileEllipsis: BreadcrumbsMobileEllipsis,
 });
+
+export const BreadcrumbsRoot = Breadcrumbs;

@@ -45,18 +45,20 @@ import { Dialog } from "areia";
 
 ## Usage
 
-Use `Dialog` for an interactive dialog. The component renders the required `dialog`, `dialog-trigger`, `dialog-portal`, `dialog-overlay`, and `dialog-content` slots for `@data-slot/dialog`.
+Use `Dialog` for an interactive dialog. The composition-first API accepts `Dialog.Trigger`, `Dialog.Portal`, `Dialog.Overlay`, and `Dialog.Content` as children. The `trigger` and `content` props remain available as shortcuts.
 
 ```tsx preview
 import ilha from "ilha";
 import { Button, Dialog } from "areia";
 
 export default ilha.render(() => (
-  <Dialog
-    trigger={<Button>Open</Button>}
-    contentClass="grid gap-4 p-6"
-    content={
-      <>
+  <Dialog>
+    <Dialog.Trigger>
+      <Button>Open</Button>
+    </Dialog.Trigger>
+    <Dialog.Portal>
+      <Dialog.Overlay />
+      <Dialog.Content class="grid gap-4 p-6">
         <Dialog.Title>Dialog title</Dialog.Title>
         <Dialog.Description>
           Helpful supporting text for the dialog.
@@ -64,9 +66,9 @@ export default ilha.render(() => (
         <Dialog.Close>
           <Button>Close</Button>
         </Dialog.Close>
-      </>
-    }
-  />
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog>
 ));
 ```
 
@@ -172,9 +174,9 @@ export default ilha.render(() => (
 ));
 ```
 
-### Compound helpers
+### Prop shortcut
 
-You can compose slots manually when you need lower-level control. Use `Dialog` at the top so the primitive is mounted.
+For simple dialogs, pass `trigger` and `content`. Areia generates the trigger, portal, overlay, and content slots for you.
 
 ```tsx preview
 import ilha from "ilha";
@@ -182,19 +184,19 @@ import { Button, Dialog } from "areia";
 
 export default ilha.render(() => (
   <Dialog
-    trigger={<Button>Manual trigger</Button>}
-    contentClass="p-6"
+    trigger={<Button>Open shortcut dialog</Button>}
+    contentClass="grid gap-4 p-6"
     content={
-      <div class="grid gap-4">
-        <Dialog.Title>Manual composition</Dialog.Title>
+      <>
+        <Dialog.Title>Shortcut API</Dialog.Title>
         <Dialog.Description>
-          Trigger, title, description, and close are slot
-          helpers.
+          Use props when you do not need to customize the slot
+          structure.
         </Dialog.Description>
         <Dialog.Close>
           <Button>Done</Button>
         </Dialog.Close>
-      </div>
+      </>
     }
   />
 ));
@@ -204,18 +206,18 @@ export default ilha.render(() => (
 
 ### `Dialog`
 
-| Prop                  | Type                             | Default                            | Description                                     |
-| --------------------- | -------------------------------- | ---------------------------------- | ----------------------------------------------- |
-| `trigger`             | `unknown`                        | —                                  | Custom trigger markup.                          |
-| `children`            | `unknown`                        | —                                  | Trigger content when `trigger` is not provided. |
-| `content`             | `unknown`                        | —                                  | Dialog panel content.                           |
-| `size`                | `"sm" \| "base" \| "lg" \| "xl"` | `"base"`                           | Dialog width.                                   |
-| `role`                | `"dialog" \| "alertdialog"`      | `"dialog"`                         | Dialog semantic role.                           |
-| `defaultOpen`         | `boolean`                        | `false`                            | Initial open state.                             |
-| `closeOnClickOutside` | `boolean`                        | `true` (`false` for alert dialogs) | Close when clicking outside content.            |
-| `closeOnEscape`       | `boolean`                        | `true`                             | Close when pressing Escape.                     |
-| `lockScroll`          | `boolean`                        | `true`                             | Lock body scroll while open.                    |
-| `onOpenChange`        | `(open: boolean) => void`        | —                                  | Called when open state changes.                 |
+| Prop                  | Type                             | Default                            | Description                                                                          |
+| --------------------- | -------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------ |
+| `trigger`             | `unknown`                        | —                                  | Custom trigger markup.                                                               |
+| `children`            | `unknown`                        | —                                  | Composed dialog slots, or trigger content when no `Dialog.Content` child is present. |
+| `content`             | `unknown`                        | —                                  | Dialog panel content.                                                                |
+| `size`                | `"sm" \| "base" \| "lg" \| "xl"` | `"base"`                           | Dialog width.                                                                        |
+| `role`                | `"dialog" \| "alertdialog"`      | `"dialog"`                         | Dialog semantic role.                                                                |
+| `defaultOpen`         | `boolean`                        | `false`                            | Initial open state.                                                                  |
+| `closeOnClickOutside` | `boolean`                        | `true` (`false` for alert dialogs) | Close when clicking outside content.                                                 |
+| `closeOnEscape`       | `boolean`                        | `true`                             | Close when pressing Escape.                                                          |
+| `lockScroll`          | `boolean`                        | `true`                             | Lock body scroll while open.                                                         |
+| `onOpenChange`        | `(open: boolean) => void`        | —                                  | Called when open state changes.                                                      |
 
 ### Compound exports
 

@@ -85,6 +85,8 @@ export type TabsInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "ch
   TabsVariantsProps &
   Record<string, unknown> & {
     tabs?: TabsItem[];
+    /** Composed tab markup. Use `Tabs.List`, `Tabs.Trigger`, and `Tabs.Content` for composition-first usage. */
+    children?: unknown;
     value?: string;
     selectedValue?: string;
     defaultValue?: string;
@@ -147,6 +149,43 @@ function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVar
   fallback: TKey,
 ) {
   return variants[value ?? fallback] ?? variants[fallback];
+}
+
+function rawValue(value: unknown): string | undefined {
+  if (typeof value === "string") return value;
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "value" in value &&
+    typeof value.value === "string"
+  ) {
+    return value.value;
+  }
+  return undefined;
+}
+
+function islandCallParts(
+  value: unknown,
+): { island: { toString?: (props?: unknown) => string }; props?: unknown } | undefined {
+  if (!value || (typeof value !== "object" && typeof value !== "function")) return undefined;
+  const symbol = Object.getOwnPropertySymbols(value).find(
+    (item) => item.description === "ilha.islandCall",
+  );
+  if (!symbol) return undefined;
+  const record = value as Record<PropertyKey, unknown>;
+  const island = record["island"];
+  if (!island || (typeof island !== "object" && typeof island !== "function")) return undefined;
+  return { island: island as { toString?: (props?: unknown) => string }, props: record["props"] };
+}
+
+function render(value: unknown): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(render).join("");
+  const markup = rawValue(value);
+  if (markup !== undefined) return markup;
+  const islandCall = islandCallParts(value);
+  if (islandCall?.island.toString) return islandCall.island.toString(islandCall.props);
+  return String(value);
 }
 
 export function tabsVariants({
@@ -343,6 +382,7 @@ export function TabsContent(input: TabsContentInput) {
 function renderTabs(input: TabsInput = {}) {
   const {
     tabs = [],
+    children,
     value,
     selectedValue,
     defaultValue,
@@ -362,7 +402,9 @@ function renderTabs(input: TabsInput = {}) {
     ...rest
   } = input;
 
-  if (tabs.length === 0) return "";
+  const composedChildren = render(children);
+  const hasComposedChildren = composedChildren.trim().length > 0;
+  if (tabs.length === 0 && !hasComposedChildren) return "";
 
   const selected = value ?? selectedValue ?? defaultValue ?? tabs[0]?.value;
   const listChildren = tabs.map((tab) =>
@@ -400,14 +442,16 @@ function renderTabs(input: TabsInput = {}) {
           )}"
         ></div>`
       : ""}
-    ${TabsList({
-      children: listChildren,
-      variant,
-      size,
-      class: cn(listClass, listClassName),
-      indicatorClass: cn(indicatorClass, indicatorClassName),
-    })}
-    ${contentPanels}
+    ${hasComposedChildren
+      ? raw(composedChildren)
+      : html`${TabsList({
+          children: listChildren,
+          variant,
+          size,
+          class: cn(listClass, listClassName),
+          indicatorClass: cn(indicatorClass, indicatorClassName),
+        })}
+        ${contentPanels}`}
   </div>`;
 }
 

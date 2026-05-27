@@ -97,6 +97,7 @@ function dataAttrs(
 }
 
 function rawValue(value: unknown): string | undefined {
+  if (typeof value === "string") return value;
   if (
     typeof value === "object" &&
     value !== null &&
@@ -108,8 +109,36 @@ function rawValue(value: unknown): string | undefined {
   return undefined;
 }
 
-function withSlot(value: unknown, slot: string, className?: string, aliasedClassName?: string) {
+function islandCallParts(
+  value: unknown,
+): { island: { toString?: (props?: unknown) => string }; props?: unknown } | undefined {
+  if (!value || (typeof value !== "object" && typeof value !== "function")) return undefined;
+  const symbol = Object.getOwnPropertySymbols(value).find(
+    (item) => item.description === "ilha.islandCall",
+  );
+  if (!symbol) return undefined;
+  const record = value as Record<PropertyKey, unknown>;
+  const island = record["island"];
+  if (!island || (typeof island !== "object" && typeof island !== "function")) return undefined;
+  return { island: island as { toString?: (props?: unknown) => string }, props: record["props"] };
+}
+
+function render(value: unknown): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(render).join("");
   const markup = rawValue(value);
+  if (markup !== undefined) return markup;
+  const islandCall = islandCallParts(value);
+  if (islandCall?.island.toString) return islandCall.island.toString(islandCall.props);
+  return String(value);
+}
+
+function hasSlot(value: unknown, slot: string) {
+  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(render(value));
+}
+
+function withSlot(value: unknown, slot: string, className?: string, aliasedClassName?: string) {
+  const markup = render(value);
   if (!markup || !markup.trimStart().startsWith("<")) return undefined;
 
   const classes = cn(className, aliasedClassName);
@@ -209,7 +238,7 @@ export function DialogContent(input: DialogContentInput = {}) {
     class="${cn(dialogVariants({ size }), className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
-    ${children}
+    ${raw(render(children))}
   </div>`;
 }
 
@@ -302,7 +331,7 @@ export function DialogPortal(input: DialogPortalInput = {}) {
     class="${cn(className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
-    ${children}
+    ${raw(render(children))}
   </div>`;
 }
 
@@ -360,15 +389,19 @@ function renderDialog(input: DialogInput = {}) {
   } = input;
 
   const isAlertDialog = alertDialog ?? role === "alertdialog";
-  const generatedTrigger =
-    withSlot(trigger, "dialog-trigger", triggerClass, triggerClassName) ??
-    withSlot(children, "dialog-trigger", triggerClass, triggerClassName) ??
-    DialogTrigger({
-      as: triggerAs,
-      class: triggerClass,
-      className: triggerClassName,
-      children: trigger ?? children,
-    });
+  const composedChildren = render(children);
+  const hasComposedContent = hasSlot(children, "dialog-content");
+  const hasComposedTrigger = hasSlot(children, "dialog-trigger");
+  const generatedTrigger = hasComposedTrigger
+    ? undefined
+    : (withSlot(trigger, "dialog-trigger", triggerClass, triggerClassName) ??
+      withSlot(children, "dialog-trigger", triggerClass, triggerClassName) ??
+      DialogTrigger({
+        as: triggerAs,
+        class: triggerClass,
+        className: triggerClassName,
+        children: trigger ?? children,
+      }));
 
   return html`<div
     data-slot="dialog"
@@ -384,18 +417,20 @@ function renderDialog(input: DialogInput = {}) {
     )}
     ${raw(toAttrs(rootProps))}
   >
-    ${generatedTrigger}
-    ${DialogPortal({
-      class: portalClass,
-      className: portalClassName,
-      children: html`${DialogOverlay({ class: overlayClass, className: overlayClassName })}
-      ${DialogContent({
-        class: contentClass,
-        className: contentClassName,
-        children: content,
-        size,
-      })}`,
-    })}
+    ${hasComposedContent ? raw(composedChildren) : generatedTrigger}
+    ${hasComposedContent
+      ? ""
+      : DialogPortal({
+          class: portalClass,
+          className: portalClassName,
+          children: html`${DialogOverlay({ class: overlayClass, className: overlayClassName })}
+          ${DialogContent({
+            class: contentClass,
+            className: contentClassName,
+            children: content,
+            size,
+          })}`,
+        })}
   </div>`;
 }
 
@@ -419,10 +454,19 @@ export const DialogRoot = ilha
 
     return () => controller.destroy();
   })
-  .render(({ input }) => renderDialog(input));
+  .render(({ input }) => renderDialog(normalizeDialogInput(input)));
+
+function normalizeDialogInput(input: DialogInput = {}): DialogInput {
+  return {
+    ...input,
+    content: input.content == null ? input.content : render(input.content),
+    trigger: input.trigger == null ? input.trigger : render(input.trigger),
+    children: input.children == null ? input.children : render(input.children),
+  };
+}
 
 function DialogBase(input: DialogInput = {}) {
-  return renderDialog(input);
+  return renderDialog(normalizeDialogInput(input));
 }
 
 export const Dialog = Object.assign(DialogRoot, {

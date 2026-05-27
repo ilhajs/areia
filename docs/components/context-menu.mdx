@@ -37,16 +37,17 @@ import ilha from "ilha";
 import { ContextMenu } from "areia";
 
 export default ilha.render(() => (
-  <ContextMenu
-    trigger={
+  <ContextMenu>
+    <ContextMenu.Trigger>
       <button class="rounded-lg bg-areia-control-background px-3 py-2 ring ring-areia-control-border">
         Right click me
       </button>
-    }
-  >
-    <ContextMenu.Item value="rename" label="Rename" />
-    <ContextMenu.Item value="duplicate" label="Duplicate" />
-    <ContextMenu.Item value="delete" label="Delete" />
+    </ContextMenu.Trigger>
+    <ContextMenu.Content>
+      <ContextMenu.Item value="rename" label="Rename" />
+      <ContextMenu.Item value="duplicate" label="Duplicate" />
+      <ContextMenu.Item value="delete" label="Delete" />
+    </ContextMenu.Content>
   </ContextMenu>
 ));
 ```
@@ -149,14 +150,16 @@ export default ilha.render(() => (
 
 ### `ContextMenu(input)`
 
-| Prop            | Type                      | Default | Description                                              |
-| --------------- | ------------------------- | ------- | -------------------------------------------------------- |
-| `trigger`       | `unknown`                 | —       | Region that opens the menu on right click or long press. |
-| `children`      | `unknown`                 | —       | Menu item markup.                                        |
-| `disabled`      | `boolean`                 | `false` | Disables opening the menu.                               |
-| `closeOnSelect` | `boolean`                 | `true`  | Whether selecting an item closes the menu.               |
-| `onOpenChange`  | `(open: boolean) => void` | —       | Called when the menu opens or closes.                    |
-| `onSelect`      | `(value: string) => void` | —       | Called when an item is selected.                         |
+| Prop               | Type                      | Default | Description                                                                         |
+| ------------------ | ------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `trigger`          | `unknown`                 | —       | Region that opens the menu on right click or long press.                            |
+| `children`         | `unknown`                 | —       | Composed menu slots, or item markup when no `ContextMenu.Content` child is present. |
+| `disabled`         | `boolean`                 | `false` | Disables opening the menu.                                                          |
+| `closeOnSelect`    | `boolean`                 | `true`  | Whether selecting an item closes the menu.                                          |
+| `onOpenChange`     | `(open: boolean) => void` | —       | Called when the menu opens or closes.                                               |
+| `onSelect`         | `(value: string) => void` | —       | Called when an item is selected.                                                    |
+| `triggerClassName` | `string`                  | —       | Alias for `triggerClass`.                                                           |
+| `contentClassName` | `string`                  | —       | Alias for `contentClass`.                                                           |
 
 ### `ContextMenu.Item(input)`
 

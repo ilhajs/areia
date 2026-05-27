@@ -7,9 +7,14 @@ import type { HTMLElementProps } from "$lib/types";
 function render(value: unknown): string {
   if (value === null || value === undefined || value === false) return "";
   if (Array.isArray(value)) return value.map(render).join("");
+  if (typeof value === "string") return value;
   if (typeof value === "object" && "value" in value && typeof value.value === "string")
     return value.value;
   return String(value);
+}
+
+function hasSlot(value: unknown, slot: string) {
+  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(render(value));
 }
 
 export type ContextMenuInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
@@ -21,7 +26,9 @@ export type ContextMenuInput = Omit<HTMLElementProps<HTMLDivElement>, "className
     class?: string;
     className?: string;
     triggerClass?: string;
+    triggerClassName?: string;
     contentClass?: string;
+    contentClassName?: string;
     onOpenChange?: (open: boolean) => void;
     onSelect?: (value: string) => void;
   };
@@ -129,19 +136,26 @@ function renderContextMenu(input: ContextMenuInput = {}) {
     class: className,
     className: aliasedClassName,
     triggerClass,
+    triggerClassName,
     contentClass,
+    contentClassName,
     onOpenChange: _onOpenChange,
     onSelect: _onSelect,
     ...rest
   } = input;
+
+  const composedChildren = render(children);
+  const hasComposedContent = hasSlot(children, "context-menu-content");
 
   return html`<div
     data-slot="context-menu"
     class="${cn("contents", className, aliasedClassName)}"
     ${raw(toAttrs({ ...rest, "data-disabled": disabled, "data-close-on-select": closeOnSelect }))}
   >
-    ${ContextMenuTrigger({ children: trigger, class: triggerClass })}
-    ${ContextMenuContent({ children, class: contentClass })}
+    ${hasComposedContent
+      ? raw(composedChildren)
+      : html`${ContextMenuTrigger({ children: trigger, class: cn(triggerClass, triggerClassName) })}
+        ${ContextMenuContent({ children, class: cn(contentClass, contentClassName) })}`}
   </div>`;
 }
 
