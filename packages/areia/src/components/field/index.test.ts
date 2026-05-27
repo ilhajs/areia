@@ -85,7 +85,7 @@ describe("Field.Error", () => {
 
 describe("Field.Item", () => {
   it("renders item wrapper with data-slot", () => {
-    const output = markup(Field.Item({ children: "X" }));
+    const output = markup(Field.Item({}));
     expect(output).toContain('data-slot="field-item"');
   });
 });

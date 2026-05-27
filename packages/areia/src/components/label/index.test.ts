@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { Label, labelVariants, labelContentVariants } from "./index";
+import { Label, labelVariants } from "./index";
 
 function markup(value: unknown): string {
   if (value && typeof value === "object" && "value" in value) {
