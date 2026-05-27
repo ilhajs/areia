@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createSwitch, type SwitchOptions } from "../../../../slots/src/switch";
+import { Switch as SwitchPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -348,7 +348,7 @@ export const SwitchRoot = ilha
       : host.querySelector('[data-slot="switch"]');
     if (!root) return;
 
-    const controller = createSwitch(root as HTMLElement, {
+    const controller = SwitchPrimitive.createSwitch(root as HTMLElement, {
       defaultChecked:
         typeof input.checked === "boolean"
           ? input.checked
@@ -365,7 +365,7 @@ export const SwitchRoot = ilha
         input.onCheckedChange?.(checked);
         emitSwitchChange(root, checked);
       },
-    } satisfies SwitchOptions);
+    } satisfies SwitchPrimitive.SwitchOptions);
 
     return () => controller.destroy();
   })

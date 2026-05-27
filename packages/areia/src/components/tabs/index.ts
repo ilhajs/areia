@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createTabs, type TabsOptions } from "../../../../slots/src/tabs";
+import { Tabs as TabsPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -90,7 +90,7 @@ export type TabsInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "ch
     value?: string;
     selectedValue?: string;
     defaultValue?: string;
-    activationMode?: TabsOptions["activationMode"];
+    activationMode?: TabsPrimitive.TabsOptions["activationMode"];
     activateOnFocus?: boolean;
     class?: string;
     className?: string;
@@ -570,7 +570,7 @@ export const TabsRoot = ilha
       : host.querySelector('[data-slot="tabs"]');
     if (!root) return;
 
-    const controller = createTabs(root, {
+    const controller = TabsPrimitive.createTabs(root, {
       defaultValue: input.value ?? input.selectedValue ?? input.defaultValue,
       activationMode: input.activationMode ?? (input.activateOnFocus ? "auto" : "manual"),
       onValueChange: input.onValueChange,

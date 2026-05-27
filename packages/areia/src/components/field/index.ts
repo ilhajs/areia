@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createField, type FieldOptions, type FieldValidate } from "../../../../slots/src/field";
+import { Field as FieldPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -13,8 +13,8 @@ export type FieldInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "c
     name?: string;
     disabled?: boolean;
     invalid?: boolean;
-    validate?: FieldValidate;
-    validationMode?: FieldOptions["validationMode"];
+    validate?: FieldPrimitive.FieldValidate;
+    validationMode?: FieldPrimitive.FieldOptions["validationMode"];
     class?: string;
     className?: string;
     labelClass?: string;
@@ -137,13 +137,13 @@ export const FieldRoot = ilha
       : host.querySelector('[data-slot="field"]');
     if (!root) return;
 
-    const controller = createField(root, {
+    const controller = FieldPrimitive.createField(root, {
       name: input.name,
       disabled: input.disabled,
       invalid: input.invalid,
       validate: input.validate,
       validationMode: input.validationMode,
-    } satisfies FieldOptions);
+    } satisfies FieldPrimitive.FieldOptions);
 
     return () => controller.destroy();
   })

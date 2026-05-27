@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createCombobox, type ComboboxOptions } from "../../../../slots/src/combobox";
+import { Combobox as ComboboxPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -91,7 +91,7 @@ export type ComboboxError = unknown | { message: unknown; match?: unknown };
  */
 export type ComboboxInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   ComboboxVariantsProps &
-  Omit<ComboboxOptions, "disabled" | "required" | "placeholder"> &
+  Omit<ComboboxPrimitive.ComboboxOptions, "disabled" | "required" | "placeholder"> &
   Record<string, unknown> & {
     /** Label content for the combobox. Enables the field wrapper. */
     label?: unknown;
@@ -115,11 +115,11 @@ export type ComboboxInput = Omit<HTMLElementProps<HTMLDivElement>, "className" |
      * Called when the search/filter text changes. This is not necessarily the selected value.
      * Use `onValueChange` for committed option selection.
      */
-    onInputValueChange?: ComboboxOptions["onInputValueChange"];
+    onInputValueChange?: ComboboxPrimitive.ComboboxOptions["onInputValueChange"];
     /** Called when the committed option value changes. */
-    onValueChange?: ComboboxOptions["onValueChange"];
+    onValueChange?: ComboboxPrimitive.ComboboxOptions["onValueChange"];
     /** Called when the options popup opens or closes. */
-    onOpenChange?: ComboboxOptions["onOpenChange"];
+    onOpenChange?: ComboboxPrimitive.ComboboxOptions["onOpenChange"];
     /** Additional CSS classes applied to the combobox root. */
     class?: string;
     className?: string;
@@ -686,7 +686,7 @@ export const ComboboxRoot = ilha
       : host.querySelector('[data-slot="combobox"]');
     if (!root) return;
 
-    const controller = createCombobox(root, {
+    const controller = ComboboxPrimitive.createCombobox(root, {
       align: input.align,
       alignOffset: input.alignOffset,
       autoHighlight: input.autoHighlight,

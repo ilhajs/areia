@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createSlider, type SliderOptions } from "../../../../slots/src/slider";
+import { Slider as SliderPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -196,7 +196,7 @@ export const SliderRoot = ilha
       : host.querySelector('[data-slot="slider"]');
     if (!root) return;
 
-    const controller = createSlider(root, {
+    const controller = SliderPrimitive.createSlider(root, {
       defaultValue: input.value ?? input.defaultValue,
       min: input.min,
       max: input.max,
@@ -206,7 +206,7 @@ export const SliderRoot = ilha
       thumbAlignment: input.thumbAlignment,
       onValueChange: input.onValueChange,
       onValueCommit: input.onValueCommit,
-    } satisfies SliderOptions);
+    } satisfies SliderPrimitive.SliderOptions);
 
     return () => controller.destroy();
   })

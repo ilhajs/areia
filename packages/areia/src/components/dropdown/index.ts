@@ -1,11 +1,6 @@
 import ilha, { html, raw } from "ilha";
 import { Check } from "lucide";
-import {
-  createDropdownMenu,
-  type Align,
-  type DropdownMenuOptions,
-  type Side,
-} from "../../../../slots/src/dropdown-menu";
+import { DropdownMenu as DropdownMenuPrimitive } from "@areia/slots";
 import { Icon } from "$components/icon";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
@@ -32,13 +27,13 @@ export function dropdownVariants({ variant = "default" }: DropdownVariantsProps 
   return DROPDOWN_VARIANTS.variant[variant];
 }
 
-export type DropdownSide = Side;
-export type DropdownAlign = Align;
+export type DropdownSide = DropdownMenuPrimitive.Side;
+export type DropdownAlign = DropdownMenuPrimitive.Align;
 
 export type DropdownInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   DropdownVariantsProps &
   Pick<
-    DropdownMenuOptions,
+    DropdownMenuPrimitive.DropdownMenuOptions,
     | "defaultOpen"
     | "defaultValue"
     | "defaultValues"
@@ -464,7 +459,7 @@ export const DropdownRoot = ilha
       : host.querySelector('[data-slot="dropdown-menu"]');
     if (!root) return;
 
-    const controller = createDropdownMenu(root, {
+    const controller = DropdownMenuPrimitive.createDropdownMenu(root, {
       defaultOpen: input.defaultOpen,
       defaultValue: input.defaultValue,
       defaultValues: input.defaultValues,
@@ -483,7 +478,7 @@ export const DropdownRoot = ilha
       collisionPadding: input.collisionPadding,
       lockScroll: input.lockScroll,
       highlightItemOnHover: input.highlightItemOnHover,
-    } satisfies DropdownMenuOptions);
+    } satisfies DropdownMenuPrimitive.DropdownMenuOptions);
 
     return () => controller.destroy();
   })

@@ -1,9 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import {
-  createResizable,
-  type ResizableOptions,
-  type PaneConstraints,
-} from "../../../../slots/src/resizable";
+import { Resizable as ResizablePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -37,7 +33,7 @@ function render(value: Renderable): string {
 }
 
 export type ResizableInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
-  Pick<ResizableOptions, "direction" | "keyboardResizeBy" | "onLayoutChange"> &
+  Pick<ResizablePrimitive.ResizableOptions, "direction" | "keyboardResizeBy" | "onLayoutChange"> &
   Record<string, unknown> & {
     children?: unknown;
     class?: string;
@@ -45,7 +41,10 @@ export type ResizableInput = Omit<HTMLElementProps<HTMLDivElement>, "className" 
   };
 
 export type ResizablePanelInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
-  Pick<PaneConstraints, "defaultSize" | "minSize" | "maxSize" | "collapsedSize" | "collapsible"> &
+  Pick<
+    ResizablePrimitive.PaneConstraints,
+    "defaultSize" | "minSize" | "maxSize" | "collapsedSize" | "collapsible"
+  > &
   Record<string, unknown> & {
     children?: unknown;
     class?: string;
@@ -173,16 +172,16 @@ export const ResizablePanelGroupRoot = ilha
       : host.querySelector('[data-slot="resizable"]');
     if (!root) return;
 
-    const controller = createResizable(root, {
+    const controller = ResizablePrimitive.createResizable(root, {
       direction: input.direction,
       keyboardResizeBy: input.keyboardResizeBy,
       onLayoutChange: input.onLayoutChange,
-    } satisfies ResizableOptions);
+    } satisfies ResizablePrimitive.ResizableOptions);
     const nestedControllers = Array.from(
       root.querySelectorAll<HTMLElement>('[data-slot="resizable"]'),
     )
       .filter((nestedRoot) => nestedRoot !== root)
-      .map((nestedRoot) => createResizable(nestedRoot));
+      .map((nestedRoot) => ResizablePrimitive.createResizable(nestedRoot));
 
     return () => {
       nestedControllers.forEach((nestedController) => nestedController.destroy());

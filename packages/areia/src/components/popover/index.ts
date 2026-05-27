@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createPopover, type PopoverOptions } from "../../../../slots/src/popover";
+import { Popover as PopoverPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -338,7 +338,7 @@ export function PopoverClose(input: PopoverCloseInput = {}) {
 }
 
 export type PopoverInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
-  PopoverOptions &
+  PopoverPrimitive.PopoverOptions &
   PopoverVariantsProps &
   Record<string, unknown> & {
     /** Popover panel content. */
@@ -455,7 +455,7 @@ const PopoverRootIsland = ilha
       if (arrow && side) arrow.setAttribute("data-side", side);
     };
 
-    const controller = createPopover(root, {
+    const controller = PopoverPrimitive.createPopover(root, {
       align: input.align,
       alignOffset: input.alignOffset,
       avoidCollisions: input.avoidCollisions,

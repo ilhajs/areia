@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createTooltip, type TooltipOptions } from "../../../../slots/src/tooltip";
+import { Tooltip as TooltipPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -254,7 +254,7 @@ export function TooltipTrigger(input: TooltipTriggerInput = {}) {
 }
 
 export type TooltipInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
-  TooltipOptions &
+  TooltipPrimitive.TooltipOptions &
   TooltipVariantsProps &
   Record<string, unknown> & {
     /** Content to display inside the tooltip popup. */
@@ -357,7 +357,7 @@ export const TooltipRoot = ilha
       : host.querySelector('[data-slot="tooltip"]');
     if (!root) return;
 
-    const controller = createTooltip(root, {
+    const controller = TooltipPrimitive.createTooltip(root, {
       align: input.align,
       alignOffset: input.alignOffset,
       avoidCollisions: input.avoidCollisions,

@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createProgress, type ProgressOptions } from "../../../../slots/src/progress";
+import { Progress as ProgressPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -112,12 +112,12 @@ export const ProgressRoot = ilha
       : host.querySelector('[data-slot="progress"]');
     if (!root) return;
 
-    const controller = createProgress(root, {
+    const controller = ProgressPrimitive.createProgress(root, {
       value: input.value,
       min: input.min,
       max: input.max,
       onValueChange: input.onValueChange,
-    } satisfies ProgressOptions);
+    } satisfies ProgressPrimitive.ProgressOptions);
 
     return () => controller.destroy();
   })

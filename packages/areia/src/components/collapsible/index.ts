@@ -1,7 +1,6 @@
 import ilha, { html, raw } from "ilha";
 import { ChevronDown } from "lucide";
-import { createAccordion, type AccordionOptions } from "../../../../slots/src/accordion";
-import { createCollapsible, type CollapsibleOptions } from "../../../../slots/src/collapsible";
+import { Accordion as AccordionPrimitive, Collapsible as CollapsiblePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -95,7 +94,7 @@ export type CollapsibleAccordionInput = Omit<
     value?: string | string[];
     defaultValue?: string | string[];
     disabled?: boolean;
-    orientation?: AccordionOptions["orientation"];
+    orientation?: AccordionPrimitive.AccordionOptions["orientation"];
     loopFocus?: boolean;
     hiddenUntilFound?: boolean;
     class?: string;
@@ -392,7 +391,7 @@ export const CollapsibleRootIsland = ilha
       : host.querySelector('[data-slot="accordion"]');
 
     if (accordionRoot) {
-      const controller = createAccordion(accordionRoot, {
+      const controller = AccordionPrimitive.createAccordion(accordionRoot, {
         multiple: input.multiple,
         defaultValue: input.defaultValue ?? input.value,
         disabled: input.disabled,
@@ -410,11 +409,11 @@ export const CollapsibleRootIsland = ilha
       : host.querySelector('[data-slot="collapsible"]');
     if (!root) return;
 
-    const controller = createCollapsible(root, {
+    const controller = CollapsiblePrimitive.createCollapsible(root, {
       defaultOpen: input.defaultOpen ?? input.open,
       hiddenUntilFound: input.hiddenUntilFound,
       onOpenChange: input.onOpenChange,
-    } satisfies CollapsibleOptions);
+    } satisfies CollapsiblePrimitive.CollapsibleOptions);
 
     return () => controller.destroy();
   })

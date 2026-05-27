@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createHoverCard, type HoverCardOptions } from "../../../../slots/src/hover-card";
+import { HoverCard as HoverCardPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -295,7 +295,7 @@ export function HoverCardDescription(input: HoverCardDescriptionInput = {}) {
 }
 
 export type HoverCardInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
-  HoverCardOptions &
+  HoverCardPrimitive.HoverCardOptions &
   HoverCardVariantsProps &
   Record<string, unknown> & {
     /** HoverCard panel content. */
@@ -408,7 +408,7 @@ const HoverCardRootIsland = ilha
       : host.querySelector('[data-slot="hover-card"]');
     if (!root) return;
 
-    const controller = createHoverCard(root, {
+    const controller = HoverCardPrimitive.createHoverCard(root, {
       align: input.align,
       alignOffset: input.alignOffset,
       avoidCollisions: input.avoidCollisions,

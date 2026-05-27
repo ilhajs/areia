@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createDialog, type DialogOptions } from "../../../../slots/src/dialog";
+import { Dialog as DialogPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -336,7 +336,7 @@ export function DialogPortal(input: DialogPortalInput = {}) {
 }
 
 export type DialogInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
-  DialogOptions &
+  DialogPrimitive.DialogOptions &
   DialogVariantsProps &
   Record<string, unknown> & {
     /** Dialog ARIA role. `alertdialog` disables outside-click closing by default. */
@@ -443,7 +443,7 @@ export const DialogRoot = ilha
     if (!root) return;
 
     const isAlertDialog = input.alertDialog ?? input.role === "alertdialog";
-    const controller = createDialog(root, {
+    const controller = DialogPrimitive.createDialog(root, {
       alertDialog: isAlertDialog,
       closeOnClickOutside: input.closeOnClickOutside ?? (isAlertDialog ? false : undefined),
       closeOnEscape: input.closeOnEscape,

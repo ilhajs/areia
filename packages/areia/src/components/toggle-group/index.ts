@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createToggleGroup, type ToggleGroupOptions } from "../../../../slots/src/toggle-group";
+import { ToggleGroup as ToggleGroupPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -141,14 +141,14 @@ const ToggleGroupRoot = ilha
       : host.querySelector('[data-slot="toggle-group"]');
     if (!root) return;
 
-    const controller = createToggleGroup(root, {
+    const controller = ToggleGroupPrimitive.createToggleGroup(root, {
       defaultValue: input.defaultValue,
       multiple: input.type === "multiple",
       orientation: input.orientation,
       loop: input.loop,
       disabled: input.disabled,
       onValueChange: input.onValueChange,
-    } satisfies ToggleGroupOptions);
+    } satisfies ToggleGroupPrimitive.ToggleGroupOptions);
 
     return () => controller.destroy();
   })

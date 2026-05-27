@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createToggle, type ToggleOptions } from "../../../../slots/src/toggle";
+import { Toggle as TogglePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -50,7 +50,7 @@ export function toggleVariants({
 
 export type ToggleInput = Omit<HTMLElementProps<HTMLButtonElement>, "className" | "children"> &
   ToggleVariantsProps &
-  Pick<ToggleOptions, "defaultPressed" | "disabled" | "onPressedChange"> &
+  Pick<TogglePrimitive.ToggleOptions, "defaultPressed" | "disabled" | "onPressedChange"> &
   Record<string, unknown> & {
     children?: unknown;
     class?: string;
@@ -96,11 +96,11 @@ export const ToggleRoot = ilha
       : (host.querySelector('[data-slot="toggle"]') as HTMLElement | null);
     if (!root) return;
 
-    const controller = createToggle(root, {
+    const controller = TogglePrimitive.createToggle(root, {
       defaultPressed: input.defaultPressed,
       disabled: input.disabled,
       onPressedChange: input.onPressedChange,
-    } satisfies ToggleOptions);
+    } satisfies TogglePrimitive.ToggleOptions);
 
     return () => controller.destroy();
   })

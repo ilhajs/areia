@@ -1,5 +1,5 @@
 import ilha, { html, raw } from "ilha";
-import { createContextMenu, type ContextMenuOptions } from "../../../../slots/src/context-menu";
+import { ContextMenu as ContextMenuPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -167,12 +167,12 @@ export const ContextMenuRoot = ilha
       : host.querySelector('[data-slot="context-menu"]');
     if (!root) return;
 
-    const controller = createContextMenu(root, {
+    const controller = ContextMenuPrimitive.createContextMenu(root, {
       disabled: input.disabled,
       closeOnSelect: input.closeOnSelect,
       onOpenChange: input.onOpenChange,
       onSelect: input.onSelect,
-    } satisfies ContextMenuOptions);
+    } satisfies ContextMenuPrimitive.ContextMenuOptions);
 
     return () => controller.destroy();
   })
