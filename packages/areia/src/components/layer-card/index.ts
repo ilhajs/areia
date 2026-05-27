@@ -7,9 +7,9 @@ export const LAYER_CARD_SURFACE_CLASSES =
   "overflow-hidden rounded-lg bg-areia-background shadow-xs ring ring-areia-foreground/10";
 export const LAYER_CARD_LAYERED_ROOT_CLASSES =
   "flex w-full flex-col overflow-hidden rounded-lg bg-areia-surface-muted text-base ring ring-areia-foreground/10";
-export const LAYER_CARD_SECONDARY_CLASSES =
+export const LAYER_CARD_TITLE_CLASSES =
   "-my-2 flex items-center gap-2 bg-areia-surface-muted p-4 text-base font-medium text-areia-subtle";
-export const LAYER_CARD_PRIMARY_CLASSES =
+export const LAYER_CARD_CONTENT_CLASSES =
   "relative flex flex-col gap-2 overflow-hidden rounded-lg bg-areia-background p-4 pr-3 text-inherit no-underline ring ring-areia-foreground/10";
 
 /** LayerCard variant definitions (currently empty, reserved for future additions). */
@@ -37,8 +37,8 @@ function render(value: Renderable): string {
 function containsLayerCardSection(value: Renderable): boolean {
   const markup = render(value);
   return (
-    markup.includes('data-slot="layer-card-primary"') ||
-    markup.includes('data-slot="layer-card-secondary"')
+    markup.includes('data-slot="layer-card-content"') ||
+    markup.includes('data-slot="layer-card-title"')
   );
 }
 
@@ -64,24 +64,24 @@ export type LayerCardSectionInput = Omit<
     className?: string;
   };
 
-export function LayerCardPrimary(input: LayerCardSectionInput = {}) {
+export function LayerCardContent(input: LayerCardSectionInput = {}) {
   const { children, class: className, className: aliasedClassName, ...props } = input;
 
   return html`<div
-    data-slot="layer-card-primary"
-    class="${cn(LAYER_CARD_PRIMARY_CLASSES, className, aliasedClassName)}"
+    data-slot="layer-card-content"
+    class="${cn(LAYER_CARD_CONTENT_CLASSES, className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
     ${raw(render(children))}
   </div>`;
 }
 
-export function LayerCardSecondary(input: LayerCardSectionInput = {}) {
+export function LayerCardTitle(input: LayerCardSectionInput = {}) {
   const { children, class: className, className: aliasedClassName, ...props } = input;
 
   return html`<div
-    data-slot="layer-card-secondary"
-    class="${cn(LAYER_CARD_SECONDARY_CLASSES, className, aliasedClassName)}"
+    data-slot="layer-card-title"
+    class="${cn(LAYER_CARD_TITLE_CLASSES, className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
     ${raw(render(children))}
@@ -106,6 +106,8 @@ function LayerCardBase(input: LayerCardInput = {}) {
 }
 
 export const LayerCard = Object.assign(LayerCardBase, {
-  Primary: LayerCardPrimary,
-  Secondary: LayerCardSecondary,
+  Root: LayerCardBase,
+  Static: LayerCardBase,
+  Content: LayerCardContent,
+  Title: LayerCardTitle,
 });

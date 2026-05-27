@@ -2,6 +2,7 @@ import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { Spinner } from "$components/spinner";
 import { Tooltip } from "$components/tooltip";
 
 /** Button variant definitions mapping shape, size, and variant names to their Tailwind classes. */
@@ -94,12 +95,41 @@ export interface ButtonVariantsProps {
 
 type VariantConfig = Record<string, { classes: string }>;
 
+type Renderable = unknown;
+
+function render(value: Renderable): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(render).join("");
+  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
+    return value.value;
+  }
+  return String(value);
+}
+
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
   variants: TVariants,
   value: TKey | undefined,
   fallback: TKey,
 ) {
   return variants[value ?? fallback] ?? variants[fallback];
+}
+
+export type ButtonGroupOrientation = "horizontal" | "vertical";
+
+export interface ButtonGroupVariantsProps {
+  /** Layout direction for grouped controls. */
+  orientation?: ButtonGroupOrientation;
+}
+
+export function buttonGroupVariants({ orientation = "horizontal" }: ButtonGroupVariantsProps = {}) {
+  return cn(
+    "flex w-fit items-stretch overflow-hidden rounded-lg border border-areia-control-border *:focus-visible:relative *:focus-visible:z-10",
+    "has-[>[data-slot=button-group]]:gap-2 [&>input]:flex-1",
+    "[&>button:not([class*='w-'])]:w-fit [&>a:not([class*='w-'])]:w-fit",
+    "[&>button]:rounded-none [&>a]:rounded-none [&>[data-slot=button-group-text]]:rounded-none [&>button]:shadow-none [&>a]:shadow-none [&>button]:ring-0 [&>a]:ring-0 [&>[data-slot=button-group-text]]:ring-0",
+    orientation === "horizontal" && "flex-row",
+    orientation === "vertical" && "flex-col",
+  );
 }
 
 export function buttonVariants({
@@ -123,29 +153,101 @@ export function buttonVariants({
   );
 }
 
-const loaderSize = (size: ButtonSize) => (size === "lg" ? 16 : 14);
+export type ButtonGroupInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
+  ButtonGroupVariantsProps &
+  Record<string, unknown> & {
+    children?: unknown;
+    class?: string;
+    className?: string;
+  };
 
-function loaderIcon(size: ButtonSize) {
-  const pixels = loaderSize(size);
-  return html`<svg
-    aria-hidden="true"
-    class="animate-spin"
-    width="${pixels}"
-    height="${pixels}"
-    viewBox="0 0 24 24"
-    fill="none"
+function ButtonGroupRoot(input: ButtonGroupInput = {}) {
+  const {
+    children,
+    class: className,
+    className: aliasedClassName,
+    orientation = "horizontal",
+    role,
+    ...rest
+  } = input;
+
+  return html`<div
+    role="${role ?? "group"}"
+    data-slot="button-group"
+    data-orientation="${orientation}"
+    class="${cn(buttonGroupVariants({ orientation }), className, aliasedClassName)}"
+    ${raw(toAttrs(rest))}
   >
-    <circle
-      class="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      stroke-width="4"
-    ></circle>
-    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path>
-  </svg>`;
+    ${raw(render(children))}
+  </div>`;
 }
+
+export type ButtonGroupTextInput = Omit<
+  HTMLElementProps<HTMLDivElement>,
+  "className" | "children"
+> &
+  Record<string, unknown> & {
+    children?: unknown;
+    class?: string;
+    className?: string;
+  };
+
+export function ButtonGroupText(input: ButtonGroupTextInput = {}) {
+  const { children, class: className, className: aliasedClassName, ...rest } = input;
+
+  return html`<div
+    data-slot="button-group-text"
+    class="${cn(
+      "flex items-center gap-2 rounded-lg bg-areia-surface-muted px-2.5 text-sm font-medium text-areia-default ring ring-areia-border [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+      className,
+      aliasedClassName,
+    )}"
+    ${raw(toAttrs(rest))}
+  >
+    ${raw(render(children))}
+  </div>`;
+}
+
+export type ButtonGroupSeparatorInput = Omit<
+  HTMLElementProps<HTMLDivElement>,
+  "className" | "children"
+> &
+  Record<string, unknown> & {
+    orientation?: ButtonGroupOrientation;
+    class?: string;
+    className?: string;
+  };
+
+export function ButtonGroupSeparator(input: ButtonGroupSeparatorInput = {}) {
+  const {
+    class: className,
+    className: aliasedClassName,
+    orientation = "vertical",
+    role = "separator",
+    ...rest
+  } = input;
+
+  return html`<div
+    role="${role}"
+    aria-orientation="${orientation}"
+    data-slot="button-group-separator"
+    data-orientation="${orientation}"
+    class="${cn(
+      "relative shrink-0 self-stretch bg-areia-border",
+      orientation === "horizontal" && "mx-px h-px w-auto self-auto",
+      orientation === "vertical" && "my-px h-auto w-px",
+      className,
+      aliasedClassName,
+    )}"
+    ${raw(toAttrs(rest))}
+  ></div>`;
+}
+
+export const ButtonGroup = Object.assign(ButtonGroupRoot, {
+  Root: ButtonGroupRoot,
+  Text: ButtonGroupText,
+  Separator: ButtonGroupSeparator,
+});
 
 export type ButtonInput = Omit<HTMLElementProps<HTMLButtonElement>, "className" | "children"> &
   ButtonVariantsProps &
@@ -186,10 +288,11 @@ export function Button(input: ButtonInput = {}) {
 
   const button = html`<button
     type="${type ?? "button"}"
+    data-variant="${variant}"
     class="${classes}"
     ${raw(toAttrs({ ...rest, disabled: Boolean(loading || disabled) }))}
   >
-    ${loading ? loaderIcon(size) : icon}
+    ${loading ? Spinner({ size: size === "lg" ? "lg" : "base" }) : icon}
     ${children != null ? html`<span class="contents">${children}</span>` : ""}
   </button>`;
 
@@ -227,6 +330,7 @@ export function LinkButton(input: LinkButtonInput = {}) {
   } = input;
 
   return html`<a
+    data-variant="${variant}"
     class="${cn(
       buttonVariants({ variant, size, shape }),
       "flex items-center no-underline!",

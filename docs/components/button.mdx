@@ -26,7 +26,7 @@ export default ilha.render(() => (
 ## Import
 
 ```ts
-import { Button } from "areia";
+import { Button, ButtonGroup } from "areia";
 ```
 
 ## Usage
@@ -228,6 +228,56 @@ export default ilha.render(() => (
 ));
 ```
 
+### Button Group
+
+Use `ButtonGroup` to visually join related buttons or controls.
+
+```tsx preview
+import ilha from "ilha";
+import { Bold, Italic, Underline } from "lucide";
+import { Button, ButtonGroup, Icon } from "areia";
+
+export default ilha.render(() => (
+  <ButtonGroup aria-label="Text formatting">
+    <Button
+      variant="outline"
+      shape="square"
+      icon={<Icon icon={Bold} />}
+      aria-label="Bold"
+    />
+    <Button
+      variant="outline"
+      shape="square"
+      icon={<Icon icon={Italic} />}
+      aria-label="Italic"
+    />
+    <Button
+      variant="outline"
+      shape="square"
+      icon={<Icon icon={Underline} />}
+      aria-label="Underline"
+    />
+  </ButtonGroup>
+));
+```
+
+Use `orientation="vertical"` for stacked groups, `ButtonGroup.Text` for text segments, and `ButtonGroup.Separator` to separate controls.
+
+```tsx preview
+import ilha from "ilha";
+import { Button, ButtonGroup } from "areia";
+
+export default ilha.render(() => (
+  <ButtonGroup>
+    <Button variant="outline">Back</Button>
+    <ButtonGroup.Separator />
+    <ButtonGroup.Text>Page 1</ButtonGroup.Text>
+    <ButtonGroup.Separator />
+    <Button variant="outline">Next</Button>
+  </ButtonGroup>
+));
+```
+
 ### Link as Button
 
 Use `LinkButton` when the interaction should navigate somewhere but still look like a button. Use `Button` for in-place actions like submitting, opening, or toggling UI.
@@ -271,3 +321,26 @@ export default ilha.render(() => (
 | `name`      | `string`                                                                                       | -             | Native button name attribute.                             |
 | `type`      | `"submit" \| "reset" \| "button"`                                                              | `"button"`    | Native button type attribute.                             |
 | `value`     | `string \| string[] \| number`                                                                 | -             | Native button value attribute.                            |
+
+### ButtonGroup
+
+| Prop          | Type                         | Default        | Description                         |
+| ------------- | ---------------------------- | -------------- | ----------------------------------- |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Layout direction for grouped items. |
+| `children`    | `unknown`                    | -              | Grouped controls.                   |
+| `class`       | `string`                     | -              | Additional CSS classes.             |
+| `className`   | `string`                     | -              | Alias for `class`.                  |
+
+### ButtonGroup.Text
+
+Text segment for use inside `ButtonGroup`. Accepts standard `div` attributes plus `children`, `class`, and `className`.
+
+### ButtonGroup.Separator
+
+Separator segment for use inside `ButtonGroup`.
+
+| Prop          | Type                         | Default      | Description             |
+| ------------- | ---------------------------- | ------------ | ----------------------- |
+| `orientation` | `"horizontal" \| "vertical"` | `"vertical"` | Separator orientation.  |
+| `class`       | `string`                     | -            | Additional CSS classes. |
+| `className`   | `string`                     | -            | Alias for `class`.      |

@@ -20,7 +20,7 @@ export default ilha.render(() => (
 ## Import
 
 ```ts
-import { Toggle } from "areia";
+import { Toggle, ToggleGroup } from "areia";
 ```
 
 ## Usage
@@ -107,6 +107,50 @@ export default ilha.render(() => (
 ));
 ```
 
+### Toggle Group
+
+Use `ToggleGroup` when multiple toggles belong together as a single control.
+
+```tsx preview
+import ilha from "ilha";
+import { ToggleGroup } from "areia";
+
+export default ilha.render(() => (
+  <ToggleGroup type="single" defaultValue="center">
+    <ToggleGroup.Item value="left" variant="outline">
+      Left
+    </ToggleGroup.Item>
+    <ToggleGroup.Item value="center" variant="outline">
+      Center
+    </ToggleGroup.Item>
+    <ToggleGroup.Item value="right" variant="outline">
+      Right
+    </ToggleGroup.Item>
+  </ToggleGroup>
+));
+```
+
+Use `type="multiple"` to allow more than one item to be pressed at a time.
+
+```tsx preview
+import ilha from "ilha";
+import { ToggleGroup } from "areia";
+
+export default ilha.render(() => (
+  <ToggleGroup type="multiple" defaultValue={["bold"]}>
+    <ToggleGroup.Item value="bold" variant="outline">
+      Bold
+    </ToggleGroup.Item>
+    <ToggleGroup.Item value="italic" variant="outline">
+      Italic
+    </ToggleGroup.Item>
+    <ToggleGroup.Item value="underline" variant="outline">
+      Underline
+    </ToggleGroup.Item>
+  </ToggleGroup>
+));
+```
+
 ### Change Events
 
 Use `onPressedChange` to respond to state changes.
@@ -149,6 +193,36 @@ Root component that manages the toggle state.
 | `defaultPressed`  | `boolean`                    | `false`     | Initial pressed state.                                      |
 | `disabled`        | `boolean`                    | `false`     | Disables interaction and applies muted styling.             |
 | `onPressedChange` | `(pressed: boolean) => void` | —           | Called when the pressed state changes.                      |
+
+### ToggleGroup
+
+| Prop            | Type                         | Default        | Description                               |
+| --------------- | ---------------------------- | -------------- | ----------------------------------------- |
+| `type`          | `"single" \| "multiple"`     | `"single"`     | Selection mode.                           |
+| `defaultValue`  | `string \| string[]`         | —              | Initial selected value(s).                |
+| `orientation`   | `"horizontal" \| "vertical"` | `"horizontal"` | Layout direction for keyboard navigation. |
+| `loop`          | `boolean`                    | `true`         | Wrap keyboard focus at ends.              |
+| `disabled`      | `boolean`                    | `false`        | Disable the entire group.                 |
+| `onValueChange` | `(value: string[]) => void`  | —              | Called when the selection changes.        |
+| `children`      | `unknown`                    | —              | `ToggleGroup.Item` children.              |
+| `class`         | `string`                     | —              | Additional CSS classes.                   |
+| `className`     | `string`                     | —              | Alias for `class`.                        |
+
+### ToggleGroup.Item
+
+| Prop        | Type                        | Default     | Description                       |
+| ----------- | --------------------------- | ----------- | --------------------------------- |
+| `value`     | `string`                    | —           | Unique item value.                |
+| `variant`   | `"default" \| "outline"`    | `"default"` | Visual variant.                   |
+| `size`      | `"sm" \| "default" \| "lg"` | `"default"` | Size of the item.                 |
+| `disabled`  | `boolean`                   | `false`     | Disables this item.               |
+| `children`  | `unknown`                   | —           | Content rendered inside the item. |
+| `class`     | `string`                    | —           | Additional CSS classes.           |
+| `className` | `string`                    | —           | Alias for `class`.                |
+
+### ToggleGroup.Separator
+
+Visual divider between toggle items. Accepts standard `div` attributes plus `class` and `className`.
 
 ## Slots
 

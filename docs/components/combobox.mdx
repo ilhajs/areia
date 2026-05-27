@@ -384,6 +384,44 @@ export default ilha.render(() => (
 ));
 ```
 
+### Autocomplete Behavior
+
+Combobox supports autocomplete-style filtering natively. As the user types, the dropdown filters visible items automatically using the built-in substring matcher. Provide `items` and the controller handles narrowing without re-rendering.
+
+```tsx preview
+import ilha from "ilha";
+import { Combobox } from "areia";
+
+export default ilha.render(() => (
+  <Combobox
+    id="autocomplete"
+    label="Language"
+    placeholder="Start typing..."
+    openOnFocus
+    items={{
+      rust: "Rust",
+      ruby: "Ruby",
+      react: "React",
+      python: "Python",
+      php: "PHP",
+      perl: "Perl",
+    }}
+  />
+));
+```
+
+For a custom filter, pass a `filter` function instead of re-rendering with filtered items.
+
+```ts
+filter={(inputValue, itemValue, itemLabel) =>
+  itemLabel.toLowerCase().startsWith(inputValue.toLowerCase())
+}
+```
+
+Use `onInputValueChange` to read the typed text for side effects like remote fetching. Do not use it to drive re-renders of the item list — the controller already filters internally.
+
+For free-form values that do not need to match the list, use `itemToStringValue` to control how the selected text is displayed, or treat the input value as the committed value when the user submits the form without selecting an item.
+
 ### Dropdown Height
 
 `Combobox.Content` defaults to `24rem` or the available viewport height, whichever is smaller. Pass `class` or `className` when composing the low-level content yourself.

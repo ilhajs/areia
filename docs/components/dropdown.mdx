@@ -52,28 +52,24 @@ export default ilha.render(() => (
 ));
 ```
 
-`DropdownMenu` is available as an alias if that reads better in your code.
+`Dropdown` is available as an alias if that reads better in your code.
 
 ```tsx preview
 import ilha from "ilha";
-import { Button, DropdownMenu } from "areia";
+import { Button, Dropdown } from "areia";
 
 export default ilha.render(() => (
-  <DropdownMenu trigger={<Button>Actions</Button>}>
-    <DropdownMenu.Group>
-      <DropdownMenu.Label>Project</DropdownMenu.Label>
-      <DropdownMenu.Item value="rename">
-        Rename
-      </DropdownMenu.Item>
-      <DropdownMenu.Item value="duplicate">
-        Duplicate
-      </DropdownMenu.Item>
-    </DropdownMenu.Group>
-    <DropdownMenu.Separator />
-    <DropdownMenu.Item value="delete" variant="danger">
+  <Dropdown trigger={<Button>Actions</Button>}>
+    <Dropdown.Group>
+      <Dropdown.Label>Project</Dropdown.Label>
+      <Dropdown.Item value="rename">Rename</Dropdown.Item>
+      <Dropdown.Item value="duplicate">Duplicate</Dropdown.Item>
+    </Dropdown.Group>
+    <Dropdown.Separator />
+    <Dropdown.Item value="delete" variant="danger">
       Delete
-    </DropdownMenu.Item>
-  </DropdownMenu>
+    </Dropdown.Item>
+  </Dropdown>
 ));
 ```
 
