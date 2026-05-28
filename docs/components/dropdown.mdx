@@ -16,9 +16,9 @@ import { Button, Dropdown } from "areia";
 
 export default ilha.render(() => (
   <Dropdown trigger={<Button>Add</Button>}>
-    <Dropdown.Item value="worker">Worker</Dropdown.Item>
-    <Dropdown.Item value="pages">Pages</Dropdown.Item>
-    <Dropdown.Item value="kv">KV Namespace</Dropdown.Item>
+    <Dropdown.Item value="component">Component</Dropdown.Item>
+    <Dropdown.Item value="primitive">Primitive</Dropdown.Item>
+    <Dropdown.Item value="example">Example</Dropdown.Item>
   </Dropdown>
 ));
 ```
@@ -87,9 +87,9 @@ import { Button, Dropdown } from "areia";
 
 export default ilha.render(() => (
   <Dropdown trigger={<Button>Add</Button>}>
-    <Dropdown.Item value="worker">Worker</Dropdown.Item>
-    <Dropdown.Item value="pages">Pages</Dropdown.Item>
-    <Dropdown.Item value="kv">KV Namespace</Dropdown.Item>
+    <Dropdown.Item value="component">Component</Dropdown.Item>
+    <Dropdown.Item value="primitive">Primitive</Dropdown.Item>
+    <Dropdown.Item value="example">Example</Dropdown.Item>
   </Dropdown>
 ));
 ```
@@ -289,11 +289,11 @@ export default ilha.render(() => (
     </Dropdown.LinkItem>
     <Dropdown.Separator />
     <Dropdown.LinkItem
-      href="https://developers.cloudflare.com"
+      href="https://ilha.build/llms.txt"
       external
-      value="developer-docs"
+      value="ilha-llms"
     >
-      Developer Docs
+      Ilha llms.txt
     </Dropdown.LinkItem>
   </Dropdown>
 ));

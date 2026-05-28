@@ -1,6 +1,6 @@
 import ilha, { html, raw } from "ilha";
 import { Check, Copy } from "lucide";
-import { Button, type ButtonSize } from "$components/button";
+import { Button, type ButtonInput, type ButtonSize } from "$components/button";
 import { Icon } from "$components/icon";
 import { inputVariants } from "$components/input";
 import { Tooltip, type TooltipSide } from "$components/tooltip";
@@ -117,13 +117,16 @@ function srText(copiedText: string) {
   ></span>`;
 }
 
+const INLINE_COPY_HANDLER = `var b=this,r=b.closest('[data-slot="clipboard-text"]'),t=b.getAttribute('data-copy-text')||'',w=function(){var c=r&&r.querySelector('[data-slot="clipboard-text-copied-icon"]'),i=r&&r.querySelector('[data-slot="clipboard-text-copy-icon"]'),s=r&&r.querySelector('[data-slot="clipboard-text-status"]');c&&c.classList.remove('translate-y-full','opacity-0');c&&c.classList.add('translate-y-0','opacity-100');i&&i.classList.add('-translate-y-full','opacity-0');i&&i.classList.remove('opacity-100');if(s)s.textContent=b.getAttribute('data-copied-text')||'Copied';clearTimeout(b._clipboardTextTimeout);b._clipboardTextTimeout=setTimeout(function(){c&&c.classList.add('translate-y-full','opacity-0');c&&c.classList.remove('translate-y-0','opacity-100');i&&i.classList.remove('-translate-y-full','opacity-0');i&&i.classList.add('opacity-100');if(s)s.textContent=''},1500)};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(w).catch(function(){})}else{var a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='absolute';a.style.left='-9999px';document.body.appendChild(a);a.select();try{document.execCommand('copy');w()}finally{document.body.removeChild(a)}}`;
+
 function copyButton(input: {
   buttonSize: ButtonSize;
   copyAction: string;
   copiedText: string;
   textToCopy: string;
+  inlineCopy?: boolean;
 }) {
-  const { buttonSize, copiedText, copyAction, textToCopy } = input;
+  const { buttonSize, copiedText, copyAction, textToCopy, inlineCopy } = input;
 
   return Button({
     size: buttonSize,
@@ -136,6 +139,7 @@ function copyButton(input: {
     "data-slot": "clipboard-text-button",
     "data-copy-text": textToCopy,
     "data-copied-text": copiedText,
+    onclick: inlineCopy ? INLINE_COPY_HANDLER : undefined,
     children: html`<span
         data-slot="clipboard-text-copied-icon"
         class="pointer-events-none absolute inset-0 flex translate-y-full items-center justify-center opacity-0 transition-all duration-200"
@@ -146,7 +150,7 @@ function copyButton(input: {
         class="flex items-center justify-center transition-all duration-200"
         >${copyIcon}</span
       >`,
-  });
+  } as ButtonInput);
 }
 
 function renderClipboardText(input: ClipboardTextInput) {
@@ -154,7 +158,7 @@ function renderClipboardText(input: ClipboardTextInput) {
     class: className,
     className: aliasedClassName,
     labels,
-    onCopy: _onCopy,
+    onCopy,
     size = CLIPBOARD_TEXT_DEFAULT_VARIANTS.size,
     text,
     textToCopy = text,
@@ -173,6 +177,7 @@ function renderClipboardText(input: ClipboardTextInput) {
     copiedText,
     copyAction,
     textToCopy,
+    inlineCopy: onCopy == null,
   });
 
   return html`<div
@@ -254,6 +259,7 @@ export const ClipboardTextRoot = ilha
       : host.querySelector('[data-slot="clipboard-text"]');
     const button = root?.querySelector<HTMLButtonElement>('[data-slot="clipboard-text-button"]');
     if (!root || !button) return;
+    if (input.onCopy == null && button.hasAttribute("onclick")) return;
 
     let timeout: ReturnType<typeof setTimeout> | undefined;
 

@@ -386,8 +386,8 @@ import ilha from "ilha";
 import { Table } from "areia";
 
 const rows = Array.from({ length: 12 }, (_, index) => ({
-  name: `Worker ${index + 1}`,
-  status: index % 2 === 0 ? "Active" : "Idle",
+  name: `Component ${index + 1}`,
+  status: index % 2 === 0 ? "Stable" : "Draft",
 }));
 
 export default ilha.render(() => (
