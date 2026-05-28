@@ -2,6 +2,8 @@ import * as path from "node:path";
 import { defineConfig } from "@rspress/core";
 import { pluginPreview } from "@rspress/plugin-preview";
 import { pluginTwoslash } from "@rspress/plugin-twoslash";
+import { pluginLlms } from "@rspress/plugin-llms";
+import { pluginSitemap } from "@rspress/plugin-sitemap";
 import ts from "typescript";
 
 export default defineConfig({
@@ -9,7 +11,9 @@ export default defineConfig({
   title: "Areia",
   icon: "/logo.svg",
   logo: "/logo.svg",
+  logoText: "Areia",
   themeConfig: {
+    llmsUI: true,
     socialLinks: [
       {
         icon: "github",
@@ -27,6 +31,9 @@ export default defineConfig({
         content: "https://x.com/ilha_js",
       },
     ],
+    editLink: {
+      docRepoBaseUrl: "https://github.com/ilhajs/areia/tree/main",
+    },
   },
   plugins: [
     pluginPreview({
@@ -101,6 +108,8 @@ export default defineConfig({
         },
       },
     }),
+    pluginLlms(),
+    pluginSitemap({ siteUrl: "https://areia.ilha.build" }),
   ],
   markdown: {
     shiki: {
@@ -124,6 +133,35 @@ export default defineConfig({
               });
             })();
           `,
+        },
+        {
+          tag: "script",
+          attrs: {
+            src: "https://umami.guarana.studio/script.js",
+            "data-website-id": "f076d3da-2fe2-4d6d-aecb-f23029fa62df7",
+            defer: true,
+          },
+        },
+        {
+          tag: "meta",
+          attrs: {
+            property: "og:image",
+            content: "https://areia.ilha.build/og.jpg",
+          },
+        },
+        {
+          tag: "meta",
+          attrs: {
+            name: "twitter:image",
+            content: "https://areia.ilha.build/og.jpg",
+          },
+        },
+        {
+          tag: "link",
+          attrs: {
+            rel: "canonical",
+            href: "https://areia.ilha.build",
+          },
         },
       ],
     },

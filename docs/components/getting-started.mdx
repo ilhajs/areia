@@ -1,0 +1,133 @@
+---
+title: Getting Started
+description: Install Areia and start building Ilha interfaces with imports first, customization later.
+---
+
+import { PackageManagerTabs } from "@rspress/core/theme";
+
+Areia is a Vanilla TypeScript-first UI kit for Ilha. Start by importing ready-made components, then eject/copy component source later when your product needs deeper customization.
+
+## Install
+
+Install Areia in your Ilha project:
+
+<PackageManagerTabs command="install areia" />
+
+Some components use optional peer packages. For example, install `sonner` when using the Sonner/Toaster component:
+
+<PackageManagerTabs command="install sonner" />
+
+## Import a component
+
+Use components directly from `areia`:
+
+```tsx
+import ilha from "ilha";
+import { Button } from "areia";
+
+export default ilha.render(() => (
+  <Button variant="primary">Create project</Button>
+));
+```
+
+## Use JSX or html literals
+
+Areia components are designed for Ilha and can be used with JSX or Ilha's html literal style.
+
+```tsx
+import ilha, { html } from "ilha";
+import { Button } from "areia";
+
+// Default JSX syntax
+export default ilha.render(() => (
+  <div class="flex gap-2">
+    <Button variant="primary">Save</Button>
+    <Button variant="secondary">Cancel</Button>
+  </div>
+));
+
+// No-build html template literal
+export default ilha.render(
+  () => html`
+    <div class="flex gap-2">
+      ${Button({ variant: "primary", children: "Save" })}
+      ${Button({ variant: "secondary", children: "Cancel" })}
+    </div>
+  `,
+);
+```
+
+## Add styles
+
+Areia is handcrafted with Tailwind. First, install and configure Tailwind in your app — the [Tailwind Vite installation guide](https://tailwindcss.com/docs/installation/using-vite) is the recommended starting point for Vite-based Ilha projects.
+
+After Tailwind is configured, make sure your app styles are loaded by Ilha. A minimal app stylesheet might look like this:
+
+```css
+@import "tailwindcss";
+```
+
+Then add your own theme tokens, utilities, and overrides as your app grows.
+
+## Theme Areia
+
+Areia components rely on Tailwind utilities backed by `--areia-*` design tokens. The docs theme in `docs.css` is a good starting point: define the CSS variables in `:root`, override them in `.dark`, and expose them to Tailwind with `@theme`.
+
+```css
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --areia-background: #fff;
+  --areia-foreground: oklch(21% 0.006 285.885);
+  --areia-surface: #fff;
+  --areia-surface-muted: oklch(97% 0 0);
+  --areia-border: oklch(93.5% 0 0);
+  --areia-divider: oklch(14.5% 0 0 / 0.1);
+  --areia-ring: oklch(0.5772 0.2324 260);
+  --areia-primary: oklch(0.5772 0.2324 260);
+  --areia-primary-foreground: #fff;
+  --areia-control-background: var(--areia-surface);
+  --areia-control-hover: var(--areia-surface-muted);
+}
+
+.dark {
+  --areia-background: oklch(10% 0 0);
+  --areia-foreground: oklch(97% 0 0);
+  --areia-surface: oklch(17% 0 0);
+  --areia-surface-muted: oklch(26.9% 0 0);
+  --areia-border: oklch(26.9% 0 0);
+  --areia-divider: oklch(26.9% 0 0);
+}
+
+@theme {
+  --color-areia-background: var(--areia-background);
+  --color-areia-foreground: var(--areia-foreground);
+  --color-areia-surface: var(--areia-surface);
+  --color-areia-surface-muted: var(--areia-surface-muted);
+  --color-areia-border: var(--areia-border);
+  --color-areia-divider: var(--areia-divider);
+  --color-areia-ring: var(--areia-ring);
+  --color-areia-primary: var(--areia-primary);
+  --color-areia-primary-foreground: var(
+    --areia-primary-foreground
+  );
+  --color-areia-control-background: var(
+    --areia-control-background
+  );
+  --color-areia-control-hover: var(--areia-control-hover);
+}
+```
+
+Most components use the same token groups: surfaces (`background`, `surface`, `surface-muted`), text (`foreground`, `text-default`, `text-subtle`), borders/focus (`border`, `divider`, `ring`), controls (`control-background`, `control-hover`, `control-active`), and semantic colors (`primary`, `success`, `warning`, `destructive`, `info`). Copy the full token set from `docs.css` when you want complete coverage for every component variant.
+
+## Customize later
+
+The recommended flow is progressive:
+
+1. Import components from `areia` to move quickly.
+2. Build screens and product flows with the default behavior.
+3. When a component needs custom behavior or markup, copy/eject its source into your app.
+4. Keep using Areia primitives and Tailwind conventions around your customized components.
+
+This keeps the early development loop fast while still giving you ownership of the final UI.

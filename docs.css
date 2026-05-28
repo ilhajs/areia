@@ -22,6 +22,14 @@
   display: contents;
 }
 
+.rp-nav {
+  @apply border-b-0!;
+}
+
+.rp-doc-layout__sidebar {
+  @apply border-r-0!;
+}
+
 .rp-preview-operations {
   @apply hidden!;
 }
