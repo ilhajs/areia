@@ -36,16 +36,16 @@
       "name": "areia",
       "version": "0.1.0",
       "dependencies": {
-        "@areia/slots": "workspace:*",
+        "@areia/slots": "0.1.0",
         "clsx": "2.1.1",
         "date-fns": "4.2.1",
-        "ilha": "0.6.0",
         "tailwind-merge": "3.6.0",
       },
       "devDependencies": {
         "lucide": "^1.16.0",
       },
       "peerDependencies": {
+        "ilha": "^0.6.0",
         "sonner": "^2.0.7",
       },
     },
