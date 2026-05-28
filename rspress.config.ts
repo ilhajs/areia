@@ -138,7 +138,7 @@ export default defineConfig({
           tag: "script",
           attrs: {
             src: "https://umami.guarana.studio/script.js",
-            "data-website-id": "f076d3da-2fe2-4d6d-aecb-f23029fa62df7",
+            "data-website-id": "f076d3da-2fe2-4d6d-aecb-f23029fa62df",
             defer: true,
           },
         },
