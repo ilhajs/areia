@@ -65,7 +65,10 @@ jobs:
             apps/*/node_modules
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
       - name: Build Website
-        run: bun run docs:build
+        run: |
+          bun install
+          bun run build
+          bun run docs:build
       - name: Upload static files as artifact
         uses: actions/upload-pages-artifact@v3
         with:

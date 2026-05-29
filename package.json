@@ -28,6 +28,7 @@
     "@types/node": "^22.8.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "areia": "workspace:*",
     "husky": "^9.1.7",
     "ilha": "0.6.0",
     "lucide": "^1.16.0",

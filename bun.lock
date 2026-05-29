@@ -17,6 +17,7 @@
         "@types/node": "^22.8.1",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
+        "areia": "workspace:*",
         "husky": "^9.1.7",
         "ilha": "0.6.0",
         "lucide": "^1.16.0",
@@ -34,7 +35,7 @@
     },
     "packages/areia": {
       "name": "areia",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "dependencies": {
         "@areia/slots": "0.1.0",
         "clsx": "2.1.1",
