@@ -22,12 +22,13 @@ export type FieldInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "c
     errorClass?: string;
   };
 
-function render(value: unknown): string {
+function render(value: unknown): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
-  if (typeof value === "object" && "value" in value && typeof value.value === "string")
-    return value.value;
-  return String(value);
+  if (Array.isArray(value)) return value.map(render);
+  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
+    return raw(value.value);
+  }
+  return value;
 }
 
 export function FieldLabel(input: { label?: unknown; class?: string; className?: string } = {}) {
@@ -39,7 +40,7 @@ export function FieldLabel(input: { label?: unknown; class?: string; className?:
       className,
       aliasedClassName,
     )}"
-    >${raw(render(label))}</label
+    >${render(label)}</label
   >`;
 }
 
@@ -51,7 +52,7 @@ export function FieldDescription(
     data-slot="field-description"
     class="${cn("text-sm text-areia-subtle data-disabled:opacity-50", className, aliasedClassName)}"
   >
-    ${raw(render(description))}
+    ${render(description)}
   </p>`;
 }
 
@@ -61,7 +62,7 @@ export function FieldError(input: { error?: unknown; class?: string; className?:
     data-slot="field-error"
     class="${cn("text-sm text-areia-destructive-soft-foreground", className, aliasedClassName)}"
   >
-    ${raw(render(error))}
+    ${render(error)}
   </div>`;
 }
 
@@ -87,7 +88,7 @@ export function FieldItem(
     class="${cn("flex items-start gap-2 data-disabled:opacity-50", className, aliasedClassName)}"
     ${raw(toAttrs({ ...rest, "data-disabled": disabled }))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -123,7 +124,7 @@ function renderField(input: FieldInput = {}) {
       }),
     )}
   >
-    ${label != null ? FieldLabel({ label, class: labelClass }) : ""} ${raw(render(children))}
+    ${label != null ? FieldLabel({ label, class: labelClass }) : ""} ${render(children)}
     ${description != null ? FieldDescription({ description, class: descriptionClass }) : ""}
     ${error != null ? FieldError({ error, class: errorClass }) : FieldError()}
   </div>`;

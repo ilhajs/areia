@@ -123,9 +123,26 @@ function islandCallParts(
   return { island: island as { toString?: (props?: unknown) => string }, props: record["props"] };
 }
 
-function render(value: unknown): string {
+function isIlhaIsland(value: unknown): boolean {
+  if (!value || (typeof value !== "object" && typeof value !== "function")) return false;
+  return Object.getOwnPropertySymbols(value).some(
+    (item) => item.description === "ilha.island" || item.description === "ilha.islandMountInternal",
+  );
+}
+
+function render(value: unknown): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
+  const markup = rawValue(value);
+  if (markup !== undefined) return raw(markup);
+  if (isIlhaIsland(value) || islandCallParts(value)) return value;
+  return value;
+}
+
+function renderString(value: unknown): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(renderString).join("");
+  if (isIlhaIsland(value)) return "";
   const markup = rawValue(value);
   if (markup !== undefined) return markup;
   const islandCall = islandCallParts(value);
@@ -134,11 +151,11 @@ function render(value: unknown): string {
 }
 
 function hasSlot(value: unknown, slot: string) {
-  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(render(value));
+  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(renderString(value));
 }
 
 function withSlot(value: unknown, slot: string, className?: string, aliasedClassName?: string) {
-  const markup = render(value);
+  const markup = renderString(value);
   if (!markup || !markup.trimStart().startsWith("<")) return undefined;
 
   const classes = cn(className, aliasedClassName);
@@ -177,7 +194,9 @@ export function DialogTrigger(input: DialogTriggerInput = {}) {
     type,
     ...props
   } = input;
-  const slottedChild = withSlot(children, "dialog-trigger", className, aliasedClassName);
+  const slottedChild = isIlhaIsland(children)
+    ? undefined
+    : withSlot(children, "dialog-trigger", className, aliasedClassName);
   if (slottedChild) return slottedChild;
 
   const tag = as;
@@ -195,7 +214,7 @@ export function DialogTrigger(input: DialogTriggerInput = {}) {
         type: tag === "button" ? (type ?? "button") : type,
       }),
     )}
-  >${children}</${raw(tag)}>`;
+  >${render(children)}</${raw(tag)}>`;
 }
 
 export type DialogOverlayInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
@@ -238,7 +257,7 @@ export function DialogContent(input: DialogContentInput = {}) {
     class="${cn(dialogVariants({ size }), className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -331,7 +350,7 @@ export function DialogPortal(input: DialogPortalInput = {}) {
     class="${cn(className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -394,8 +413,18 @@ function renderDialog(input: DialogInput = {}) {
   const hasComposedTrigger = hasSlot(children, "dialog-trigger");
   const generatedTrigger = hasComposedTrigger
     ? undefined
-    : (withSlot(trigger, "dialog-trigger", triggerClass, triggerClassName) ??
-      withSlot(children, "dialog-trigger", triggerClass, triggerClassName) ??
+    : (withSlot(
+        isIlhaIsland(trigger) ? undefined : trigger,
+        "dialog-trigger",
+        triggerClass,
+        triggerClassName,
+      ) ??
+      withSlot(
+        isIlhaIsland(children) ? undefined : children,
+        "dialog-trigger",
+        triggerClass,
+        triggerClassName,
+      ) ??
       DialogTrigger({
         as: triggerAs,
         class: triggerClass,
@@ -417,7 +446,7 @@ function renderDialog(input: DialogInput = {}) {
     )}
     ${raw(toAttrs(rootProps))}
   >
-    ${hasComposedContent ? raw(composedChildren) : generatedTrigger}
+    ${hasComposedContent ? composedChildren : generatedTrigger}
     ${hasComposedContent
       ? ""
       : DialogPortal({

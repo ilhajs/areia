@@ -58,13 +58,13 @@ export interface SwitchVariantsProps {
 type VariantConfig = Record<string, { classes: string; thumbClasses?: string }>;
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
 }
 
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
@@ -264,7 +264,7 @@ export function SwitchLegend(input: SwitchLegendInput = {}) {
   return html`<legend
     class="${cn("text-base font-medium text-areia-default", className, aliasedClassName)}"
   >
-    ${raw(render(children ?? label))}
+    ${render(children ?? label)}
   </legend>`;
 }
 
@@ -329,9 +329,9 @@ export function SwitchGroup(
     ${legend != null ? SwitchLegend({ label: legend }) : ""}
     <div class="flex flex-col gap-2">${content ?? ""}</div>
     ${error != null
-      ? html`<p class="text-sm text-areia-destructive-soft-foreground">${raw(render(error))}</p>`
+      ? html`<p class="text-sm text-areia-destructive-soft-foreground">${render(error)}</p>`
       : description != null
-        ? html`<p class="text-sm text-areia-subtle">${raw(render(description))}</p>`
+        ? html`<p class="text-sm text-areia-subtle">${render(description)}</p>`
         : ""}
   </fieldset>`;
 }

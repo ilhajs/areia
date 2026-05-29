@@ -56,13 +56,22 @@ export function breadcrumbsVariants({
 
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
+}
+
+function renderString(value: Renderable): string {
+  const rendered = render(value);
+  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
+  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
+    return String(rendered.value);
+  }
+  return String(rendered);
 }
 
 function escapeAttr(value: string): string {
@@ -348,7 +357,7 @@ function BreadcrumbsBase(input: BreadcrumbsInput) {
     className: aliasedClassName,
   } = input;
 
-  const composedChildren = render(children);
+  const composedChildren = renderString(children);
   const hasComposedChildren = composedChildren.trim().length > 0;
   const fullTrail = hasComposedChildren ? [] : buildFullTrail(items, loading);
   const mobileTrail = hasComposedChildren ? [] : buildMobileTrail(items, loading);
@@ -359,8 +368,8 @@ function BreadcrumbsBase(input: BreadcrumbsInput) {
   >
     ${hasComposedChildren
       ? raw(composedChildren)
-      : html`<div class="contents sm:hidden">${raw(render(mobileTrail))}</div>
-          <div class="hidden sm:contents">${raw(render(fullTrail))}</div>`}
+      : html`<div class="contents sm:hidden">${render(mobileTrail)}</div>
+          <div class="hidden sm:contents">${render(fullTrail)}</div>`}
     ${copyUrl != null ? BreadcrumbsClipboard({ text: copyUrl }) : ""}
   </nav>`;
 }

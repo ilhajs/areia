@@ -4,17 +4,27 @@ import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
-function render(value: unknown): string {
+function render(value: unknown): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
-  if (typeof value === "string") return value;
-  if (typeof value === "object" && "value" in value && typeof value.value === "string")
-    return value.value;
-  return String(value);
+  if (Array.isArray(value)) return value.map(render);
+  if (typeof value === "string") return raw(value);
+  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
+    return raw(value.value);
+  }
+  return value;
+}
+
+function renderString(value: unknown): string {
+  const rendered = render(value);
+  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
+  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
+    return String(rendered.value);
+  }
+  return String(rendered);
 }
 
 function hasSlot(value: unknown, slot: string) {
-  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(render(value));
+  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(renderString(value));
 }
 
 export type ContextMenuInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
@@ -55,7 +65,7 @@ export function ContextMenuTrigger(
     data-slot="context-menu-trigger"
     class="${cn("contents", className, aliasedClassName)}"
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -72,7 +82,7 @@ export function ContextMenuContent(
       aliasedClassName,
     )}"
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -111,7 +121,7 @@ function renderItem(input: ContextMenuItemInput = {}, type?: "checkbox" | "radio
       }),
     )}
   >
-    ${raw(render(children ?? label ?? value))}
+    ${render(children ?? label ?? value)}
   </button>`;
 }
 
@@ -153,7 +163,7 @@ function renderContextMenu(input: ContextMenuInput = {}) {
     ${raw(toAttrs({ ...rest, "data-disabled": disabled, "data-close-on-select": closeOnSelect }))}
   >
     ${hasComposedContent
-      ? raw(composedChildren)
+      ? composedChildren
       : html`${ContextMenuTrigger({ children: trigger, class: cn(triggerClass, triggerClassName) })}
         ${ContextMenuContent({ children, class: cn(contentClass, contentClassName) })}`}
   </div>`;

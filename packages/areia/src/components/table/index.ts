@@ -55,13 +55,13 @@ export interface TableVariantsProps {
 type VariantConfig = Record<string, { classes: string }>;
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
 }
 
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
@@ -127,7 +127,7 @@ function TableRoot(input: TableInput = {}) {
     class="${cn(tableVariants({ layout }), className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </table>`;
 }
 
@@ -166,7 +166,7 @@ export function TableHeader(input: TableHeaderInput = {}) {
     )}"
     ${raw(toAttrs({ ...props, "data-compact": isCompact || undefined }))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </thead>`;
 }
 
@@ -223,7 +223,7 @@ export function TableRow(input: TableRowInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </tr>`;
 }
 
@@ -241,7 +241,7 @@ export function TableBody(input: TableBodyInput = {}) {
   const { children, class: className, className: aliasedClassName, ...props } = input;
 
   return html`<tbody class="${cn(className, aliasedClassName)}" ${raw(toAttrs(props))}>
-    ${raw(render(children))}
+    ${render(children)}
   </tbody>`;
 }
 
@@ -282,7 +282,7 @@ export function TableFooter(input: TableFooterInput = {}) {
   const { children, class: className, className: aliasedClassName, ...props } = input;
 
   return html`<tfoot class="${cn(className, aliasedClassName)}" ${raw(toAttrs(props))}>
-    ${raw(render(children))}
+    ${render(children)}
   </tfoot>`;
 }
 

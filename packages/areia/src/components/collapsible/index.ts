@@ -15,12 +15,22 @@ export function collapsibleVariants(_props: CollapsibleVariantsProps = {}) {
   return cn();
 }
 
-function render(value: unknown): string {
+function render(value: unknown): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
-  if (typeof value === "object" && "value" in value && typeof value.value === "string")
-    return value.value;
-  return String(value);
+  if (Array.isArray(value)) return value.map(render);
+  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
+    return raw(value.value);
+  }
+  return value;
+}
+
+function renderString(value: unknown): string {
+  const rendered = render(value);
+  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
+  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
+    return String(rendered.value);
+  }
+  return String(rendered);
 }
 
 const defaultChevron = Icon({
@@ -143,7 +153,7 @@ export function CollapsibleTrigger(input: CollapsibleTriggerInput = {}) {
     class="${cn("group cursor-pointer", className, aliasedClassName)}"
     ${raw(toAttrs({ ...rest, "data-disabled": disabled, disabled }))}
   >
-    ${raw(render(children ?? label))}${icon != null ? icon : ""}
+    ${render(children ?? label)}${icon != null ? icon : ""}
   </button>`;
 }
 
@@ -159,7 +169,7 @@ export function CollapsiblePanel(input: CollapsiblePanelInput = {}) {
     )}"
     ${raw(toAttrs(rest))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -176,7 +186,7 @@ export function CollapsibleDefaultTrigger(input: CollapsibleTriggerInput = {}) {
   return CollapsibleTrigger({
     ...rest,
     icon,
-    children: html`<span class="min-w-0 flex-1">${raw(render(children ?? label))}</span>`,
+    children: html`<span class="min-w-0 flex-1">${render(children ?? label)}</span>`,
     class: cn(
       "flex w-full items-center gap-2 bg-transparent py-2 text-left text-sm font-medium text-areia-default select-none hover:text-areia-strong",
       className,
@@ -197,7 +207,7 @@ export function CollapsibleDefaultPanel(input: CollapsiblePanelInput = {}) {
         aliasedClassName,
       )}"
     >
-      ${raw(render(children))}
+      ${render(children)}
     </div>`,
   });
 }
@@ -225,7 +235,7 @@ export function CollapsibleRoot(input: CollapsibleRootInput = {}) {
       }),
     )}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -244,14 +254,17 @@ export function CollapsibleAccordionItem(input: CollapsibleAccordionItemInput) {
     class="${cn("border-b border-areia-border last:border-b-0", className, aliasedClassName)}"
     ${raw(toAttrs({ ...rest, "data-value": value, "data-disabled": disabled }))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
 export function CollapsibleAccordionTrigger(input: CollapsibleTriggerInput = {}) {
   const trigger = CollapsibleDefaultTrigger(input);
   return html`${raw(
-    render(trigger).replaceAll('data-slot="collapsible-trigger"', 'data-slot="accordion-trigger"'),
+    renderString(trigger).replaceAll(
+      'data-slot="collapsible-trigger"',
+      'data-slot="accordion-trigger"',
+    ),
   )}`;
 }
 
@@ -267,7 +280,7 @@ export function CollapsibleAccordionPanel(input: CollapsiblePanelInput = {}) {
     )}"
     ${raw(toAttrs(rest))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -311,7 +324,7 @@ export function CollapsibleAccordion(input: CollapsibleAccordionInput = {}) {
           CollapsibleAccordionPanel({
             class: cn(panelClass, panelClassName, item.panelClass, item.panelClassName),
             children: html`<div class="pb-3 text-sm text-areia-subtle">
-              ${raw(render(item.content ?? item.children))}
+              ${render(item.content ?? item.children)}
             </div>`,
           }),
         ],
@@ -335,7 +348,7 @@ export function CollapsibleAccordion(input: CollapsibleAccordionInput = {}) {
       }),
     )}
   >
-    ${raw(render(renderedItems))}
+    ${render(renderedItems)}
   </div>`;
 }
 

@@ -40,13 +40,13 @@ type VariantConfig = Record<string, { classes: string }>;
 
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
 }
 
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
@@ -372,7 +372,7 @@ export function ComboboxContent(input: ComboboxContentInput = {}) {
     ${raw(placementDataAttrs(props))}
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -390,7 +390,7 @@ export function ComboboxList(input: ComboboxListInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -423,7 +423,7 @@ export function ComboboxItem(input: ComboboxItemInput) {
     )}"
     ${raw(toAttrs({ ...props, "data-label": label, "data-disabled": disabled, disabled }))}
   >
-    <div class="col-start-1">${raw(render(children))}</div>
+    <div class="col-start-1">${render(children)}</div>
     <span data-slot="combobox-item-indicator" class="col-start-2 flex items-center"
       >${checkIcon()}</span
     >
@@ -449,7 +449,7 @@ export function ComboboxEmpty(input: ComboboxEmptyInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -467,7 +467,7 @@ export function ComboboxGroup(input: ComboboxGroupInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -488,7 +488,7 @@ export function ComboboxGroupLabel(input: ComboboxGroupLabelInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -562,7 +562,7 @@ export function ComboboxChip(input: ComboboxChipInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
     <button
       type="button"
       aria-label="${removeLabel}"

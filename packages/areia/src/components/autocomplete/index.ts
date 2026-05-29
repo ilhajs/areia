@@ -25,13 +25,22 @@ type Renderable = unknown;
 
 type VariantConfig = Record<string, { classes: string }>;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
+}
+
+function renderString(value: Renderable): string {
+  const rendered = render(value);
+  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
+  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
+    return String(rendered.value);
+  }
+  return String(rendered);
 }
 
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
@@ -210,7 +219,7 @@ export function AutocompleteContent(input: AutocompleteContentInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -231,7 +240,7 @@ export function AutocompleteList(input: AutocompleteListInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -266,7 +275,7 @@ export function AutocompleteItem(input: AutocompleteItemInput) {
     )}"
     ${raw(toAttrs({ ...props, "data-disabled": disabled, disabled }))}
   >
-    <div class="col-start-1">${raw(render(children))}</div>
+    <div class="col-start-1">${render(children)}</div>
     <span
       data-slot="autocomplete-item-indicator"
       class="col-start-2 hidden items-center group-data-selected:flex"
@@ -298,7 +307,7 @@ export function AutocompleteEmpty(input: AutocompleteEmptyInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -319,7 +328,7 @@ export function AutocompleteGroup(input: AutocompleteGroupInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -340,7 +349,7 @@ export function AutocompleteGroupLabel(input: AutocompleteGroupLabelInput = {}) 
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -418,7 +427,7 @@ function renderAutocomplete(input: AutocompleteInput = {}, children?: unknown[])
       className: inputClassName,
       "aria-invalid": normalizedError ? "true" : rootProps["aria-invalid"],
     })}
-    ${raw(render(content))}
+    ${render(content)}
   </div>`;
 }
 
@@ -455,7 +464,7 @@ function syncItems(root: Element, input: AutocompleteInput, query: string) {
   const list = root.querySelector<HTMLElement>('[data-slot="autocomplete-list"]');
   if (!list || !input.items) return;
   const nextInput = { ...input, value: query };
-  list.innerHTML = render(renderItems(filterItems(normalizeItems(input.items), nextInput)));
+  list.innerHTML = renderString(renderItems(filterItems(normalizeItems(input.items), nextInput)));
   root.querySelectorAll<HTMLElement>('[data-slot="autocomplete-item"]').forEach((item) => {
     item.removeAttribute("data-highlighted");
     item.removeAttribute("data-selected");

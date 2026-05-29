@@ -63,35 +63,10 @@ Areia is handcrafted with Tailwind. First, install and configure Tailwind in you
 
 ```css
 @import "tailwindcss";
+@plugin "areia";
 ```
 
-Components rely on `--areia-*` design tokens exposed to Tailwind via `@theme`. Define them in `:root`, override them in `.dark`, and customize token groups like surfaces, text, borders, focus rings, controls, and semantic colors.
-
-```css
-:root {
-  --areia-background: #fff;
-  --areia-foreground: oklch(21% 0.006 285.885);
-  --areia-surface: #fff;
-  --areia-surface-muted: oklch(97% 0 0);
-  --areia-border: oklch(93.5% 0 0);
-  --areia-ring: oklch(0.5772 0.2324 260);
-  --areia-primary: oklch(0.5772 0.2324 260);
-  --areia-primary-foreground: #fff;
-}
-
-@theme {
-  --color-areia-background: var(--areia-background);
-  --color-areia-foreground: var(--areia-foreground);
-  --color-areia-surface: var(--areia-surface);
-  --color-areia-surface-muted: var(--areia-surface-muted);
-  --color-areia-border: var(--areia-border);
-  --color-areia-ring: var(--areia-ring);
-  --color-areia-primary: var(--areia-primary);
-  --color-areia-primary-foreground: var(--areia-primary-foreground);
-}
-```
-
-See `docs.css` for the complete token set used by the documentation site.
+The `@plugin "areia"` directive registers design tokens (`--areia-*` in `:root` and `.dark`), utility mappings (`bg-areia-background`, `text-areia-subtle`, etc.), a `dark:` variant, and automatically scans Areia's built components in `node_modules` for class names. You can also use `@import "areia/tailwind.css"` as a one-line equivalent. Override tokens in your own CSS after the plugin when you need custom branding.
 
 ## What's included
 

@@ -9,13 +9,13 @@ import { Tooltip } from "$components/tooltip";
 
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
 }
 
 /** Label variant definitions (currently empty, reserved for future additions). */
@@ -73,7 +73,7 @@ function tooltipIndicator(content: unknown) {
 }
 
 function labelText({ children, label, showOptional = false }: LabelInput) {
-  return html`${raw(render(children ?? label))}${showOptional
+  return html`${render(children ?? label)}${showOptional
     ? html`<span class="font-normal text-areia-subtle">(optional)</span>`
     : ""}`;
 }

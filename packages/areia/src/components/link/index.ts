@@ -5,13 +5,13 @@ import type { HTMLElementProps } from "$lib/types";
 
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
 }
 
 /** Visual indicator for links that open in a new tab/window. */
@@ -135,7 +135,7 @@ function LinkBase(input: LinkInput = {}) {
       }),
     )}
   >
-    ${raw(render(children ?? label))}
+    ${render(children ?? label)}
   </a>`;
 }
 

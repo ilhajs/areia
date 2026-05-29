@@ -1,6 +1,6 @@
 {
   "name": "areia",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vanilla TS component library for building modern web applications",
   "keywords": [
     "components",
@@ -16,7 +16,9 @@
     "url": "git+https://github.com/ilhajs/areia.git"
   },
   "files": [
-    "dist"
+    "dist",
+    "plugin.js",
+    "tailwind.css"
   ],
   "type": "module",
   "browser": {
@@ -26,7 +28,18 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "import": "./dist/plugin.js",
+      "default": "./dist/plugin.js"
+    },
+    "./plugin.js": {
+      "types": "./dist/plugin.d.ts",
+      "import": "./dist/plugin.js",
+      "default": "./dist/plugin.js"
+    },
+    "./tailwind.css": "./tailwind.css"
   },
   "scripts": {
     "build": "tsc && tsdown",
@@ -39,10 +52,17 @@
     "tailwind-merge": "3.6.0"
   },
   "devDependencies": {
-    "lucide": "^1.16.0"
+    "lucide": "^1.16.0",
+    "tailwindcss": "^4.3.0"
   },
   "peerDependencies": {
     "ilha": "^0.6.0",
-    "sonner": "^2.0.7"
+    "sonner": "^2.0.7",
+    "tailwindcss": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
   }
 }

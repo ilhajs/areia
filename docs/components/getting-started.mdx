@@ -65,59 +65,30 @@ After Tailwind is configured, make sure your app styles are loaded by Ilha. A mi
 
 ```css
 @import "tailwindcss";
+@plugin "areia";
 ```
 
-Then add your own theme tokens, utilities, and overrides as your app grows.
+`@plugin "areia"` registers the full `--areia-*` token set (light and dark), maps them into Tailwind utilities, adds a `dark:` variant for `.dark` roots, and scans Areia's built output in `node_modules` for class names.
+
+Then add your own utilities and overrides as your app grows.
 
 ## Theme Areia
 
-Areia components rely on Tailwind utilities backed by `--areia-*` design tokens. The docs theme in `docs.css` is a good starting point: define the CSS variables in `:root`, override them in `.dark`, and expose them to Tailwind with `@theme`.
+Areia components rely on Tailwind utilities backed by `--areia-*` design tokens. Load the built-in theme with:
 
 ```css
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
-
-:root {
-  --areia-background: #fff;
-  --areia-foreground: oklch(21% 0.006 285.885);
-  --areia-surface: #fff;
-  --areia-surface-muted: oklch(97% 0 0);
-  --areia-border: oklch(93.5% 0 0);
-  --areia-divider: oklch(14.5% 0 0 / 0.1);
-  --areia-ring: oklch(0.5772 0.2324 260);
-  --areia-primary: oklch(0.5772 0.2324 260);
-  --areia-primary-foreground: #fff;
-  --areia-control-background: var(--areia-surface);
-  --areia-control-hover: var(--areia-surface-muted);
-}
-
-.dark {
-  --areia-background: oklch(10% 0 0);
-  --areia-foreground: oklch(97% 0 0);
-  --areia-surface: oklch(17% 0 0);
-  --areia-surface-muted: oklch(26.9% 0 0);
-  --areia-border: oklch(26.9% 0 0);
-  --areia-divider: oklch(26.9% 0 0);
-}
-
-@theme {
-  --color-areia-background: var(--areia-background);
-  --color-areia-foreground: var(--areia-foreground);
-  --color-areia-surface: var(--areia-surface);
-  --color-areia-surface-muted: var(--areia-surface-muted);
-  --color-areia-border: var(--areia-border);
-  --color-areia-divider: var(--areia-divider);
-  --color-areia-ring: var(--areia-ring);
-  --color-areia-primary: var(--areia-primary);
-  --color-areia-primary-foreground: var(
-    --areia-primary-foreground
-  );
-  --color-areia-control-background: var(
-    --areia-control-background
-  );
-  --color-areia-control-hover: var(--areia-control-hover);
-}
+@plugin "areia";
 ```
+
+Or import the bundled entry:
+
+```css
+@import "tailwindcss";
+@import "areia/tailwind.css";
+```
+
+Override any token in `:root` or `.dark` after loading the theme.
 
 Most components use the same token groups: surfaces (`background`, `surface`, `surface-muted`), text (`foreground`, `text-default`, `text-subtle`), borders/focus (`border`, `divider`, `ring`), controls (`control-background`, `control-hover`, `control-active`), and semantic colors (`primary`, `success`, `warning`, `destructive`, `info`). Copy the full token set from `docs.css` when you want complete coverage for every component variant.
 

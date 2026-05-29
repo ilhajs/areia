@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { html } from "ilha";
 import { ContextMenu } from "./index";
 
 function markup(value: unknown): string {
@@ -33,6 +34,23 @@ describe("ContextMenu", () => {
     );
     expect(output).toContain('data-slot="context-menu-content"');
     expect(output).toContain('data-slot="context-menu-item"');
+  });
+
+  it("renders HTML trigger markup instead of escaped syntax", () => {
+    const output = markup(
+      ContextMenu({
+        trigger: html`<div
+          class="rounded-lg border border-dashed border-areia-border p-8 text-center text-areia-subtle"
+        >
+          Right click here
+        </div>`,
+        children: ContextMenu.Item({ label: "Copy" }),
+      }),
+    );
+
+    expect(output).not.toContain("&lt;div");
+    expect(output).toContain('class="rounded-lg');
+    expect(output).toContain("Right click here");
   });
 
   it("sets data-disabled", () => {

@@ -106,9 +106,18 @@ function islandCallParts(
   return { island: island as { toString?: (props?: unknown) => string }, props: record["props"] };
 }
 
-function render(value: unknown): string {
+function render(value: unknown): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
+  const markup = rawValue(value);
+  if (markup !== undefined) return raw(markup);
+  if (islandCallParts(value)) return value;
+  return value;
+}
+
+function renderString(value: unknown): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(renderString).join("");
   const markup = rawValue(value);
   if (markup !== undefined) return markup;
   const islandCall = islandCallParts(value);
@@ -117,7 +126,7 @@ function render(value: unknown): string {
 }
 
 function hasSlot(value: unknown, slot: string) {
-  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(render(value));
+  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(renderString(value));
 }
 
 function withSlot(value: unknown, slot: string, className?: string, aliasedClassName?: string) {
@@ -262,7 +271,7 @@ export function PopoverContent(input: PopoverContentInput = {}) {
     )}
     ${raw(toAttrs(props))}
   >
-    ${arrow ? PopoverArrow({ side }) : ""} ${raw(render(children))}
+    ${arrow ? PopoverArrow({ side }) : ""} ${render(children)}
   </div>`;
 }
 
@@ -393,7 +402,7 @@ function renderPopover(input: PopoverInput = {}) {
   const generatedTrigger = hasComposedTrigger
     ? undefined
     : (withSlot(trigger, "popover-trigger", triggerClass, triggerClassName) ??
-      (trigger != null ? raw(render(trigger)) : undefined) ??
+      (trigger != null ? render(trigger) : undefined) ??
       withSlot(children, "popover-trigger", triggerClass, triggerClassName) ??
       PopoverTrigger({
         as: triggerAs,
@@ -421,7 +430,7 @@ function renderPopover(input: PopoverInput = {}) {
     )}
     ${raw(toAttrs(rootProps))}
   >
-    ${hasComposedContent ? raw(composedChildren) : generatedTrigger}
+    ${hasComposedContent ? composedChildren : generatedTrigger}
     ${hasComposedContent
       ? ""
       : PopoverContent({

@@ -1,5 +1,13 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { Resizable } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
 
 function markup(value: unknown): string {
   if (value && typeof value === "object" && "value" in value) {
@@ -36,7 +44,7 @@ describe("Resizable", () => {
   });
 
   it("renders handle orientation and grip classes", () => {
-    const output = markup(Resizable.Handle({ withHandle: true }));
+    const output = markup(Resizable.Static({ children: Resizable.Handle({ withHandle: true }) }));
 
     expect(output).toContain('data-slot="resizable-handle"');
     expect(output).not.toContain('onpointerdown="');
@@ -48,11 +56,109 @@ describe("Resizable", () => {
   });
 
   it("renders panel flex sizing from defaultSize", () => {
-    const output = markup(Resizable.Panel({ defaultSize: 35, children: "Side" }));
+    const output = markup(
+      Resizable.Static({ children: Resizable.Panel({ defaultSize: 35, children: "Side" }) }),
+    );
 
     expect(output).toContain('data-default-size="35"');
     expect(output).toContain("flex-basis:0");
     expect(output).toContain("flex-shrink:1");
     expect(output).toContain("flex-grow:35");
+  });
+
+  it("mounts interactive Ilha child islands inside panels", async () => {
+    document.body.innerHTML = "";
+
+    const Counter = ilha
+      .state("count", 0)
+      .on("button@click", ({ state }) => state.count(state.count() + 1))
+      .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+
+    const App = ilha.render(
+      () =>
+        html`${Resizable({
+          direction: "horizontal",
+          children: [
+            Resizable.Panel({ defaultSize: 50, children: Counter }),
+            Resizable.Handle(),
+            Resizable.Panel({ defaultSize: 50, children: "Other" }),
+          ],
+        })}`,
+    );
+
+    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    const { unmount } = mount({ App, Counter }, { root: document.body, lazy: false });
+
+    try {
+      await Promise.resolve();
+      const root = document.querySelector('[data-slot="resizable"]');
+      const button = document.querySelector<HTMLButtonElement>("button");
+
+      expect(root).toBeTruthy();
+      expect(root?.querySelector('[data-slot="resizable-handle"]')).toBeTruthy();
+      expect(button?.textContent).toBe("Count: 0");
+      expect(document.body.innerHTML).not.toContain(
+        'data-ilha-slot="p:0" data-ilha-props="{}"></div>',
+      );
+
+      button?.click();
+      await Promise.resolve();
+
+      expect(button?.textContent).toBe("Count: 1");
+    } finally {
+      unmount();
+    }
+  });
+
+  it("mounts interactive Ilha child islands inside nested panels", async () => {
+    document.body.innerHTML = "";
+
+    const Counter = ilha
+      .state("count", 0)
+      .on("button@click", ({ state }) => state.count(state.count() + 1))
+      .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+
+    const App = ilha.render(
+      () =>
+        html`${Resizable({
+          direction: "horizontal",
+          children: [
+            Resizable.Panel({ defaultSize: 50, children: "Outer" }),
+            Resizable.Handle(),
+            Resizable.Panel({
+              defaultSize: 50,
+              children: Resizable({
+                direction: "vertical",
+                children: [
+                  Resizable.Panel({ defaultSize: 50, children: Counter }),
+                  Resizable.Handle(),
+                  Resizable.Panel({ defaultSize: 50, children: "Other" }),
+                ],
+              }),
+            }),
+          ],
+        })}`,
+    );
+
+    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    const { unmount } = mount({ App, Counter }, { root: document.body, lazy: false });
+
+    try {
+      await Promise.resolve();
+      const button = document.querySelector<HTMLButtonElement>("button");
+
+      expect(document.querySelectorAll('[data-slot="resizable"]')).toHaveLength(2);
+      expect(button?.textContent).toBe("Count: 0");
+      expect(document.body.innerHTML).not.toContain(
+        'data-ilha-slot="p:0" data-ilha-props="{}"></div>',
+      );
+
+      button?.click();
+      await Promise.resolve();
+
+      expect(button?.textContent).toBe("Count: 1");
+    } finally {
+      unmount();
+    }
   });
 });

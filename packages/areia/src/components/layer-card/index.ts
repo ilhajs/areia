@@ -25,17 +25,26 @@ export function layerCardVariants(_props: LayerCardVariantsProps = {}) {
 
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
+}
+
+function renderString(value: Renderable): string {
+  const rendered = render(value);
+  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
+  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
+    return String(rendered.value);
+  }
+  return String(rendered);
 }
 
 function containsLayerCardSection(value: Renderable): boolean {
-  const markup = render(value);
+  const markup = renderString(value);
   return (
     markup.includes('data-slot="layer-card-content"') ||
     markup.includes('data-slot="layer-card-title"')
@@ -72,7 +81,7 @@ export function LayerCardContent(input: LayerCardSectionInput = {}) {
     class="${cn(LAYER_CARD_CONTENT_CLASSES, className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -84,7 +93,7 @@ export function LayerCardTitle(input: LayerCardSectionInput = {}) {
     class="${cn(LAYER_CARD_TITLE_CLASSES, className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -101,7 +110,7 @@ function LayerCardBase(input: LayerCardInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 

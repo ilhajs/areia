@@ -97,13 +97,13 @@ type VariantConfig = Record<string, { classes: string }>;
 
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
 }
 
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
@@ -178,7 +178,7 @@ function ButtonGroupRoot(input: ButtonGroupInput = {}) {
     class="${cn(buttonGroupVariants({ orientation }), className, aliasedClassName)}"
     ${raw(toAttrs(rest))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 
@@ -204,7 +204,7 @@ export function ButtonGroupText(input: ButtonGroupTextInput = {}) {
     )}"
     ${raw(toAttrs(rest))}
   >
-    ${raw(render(children))}
+    ${render(children)}
   </div>`;
 }
 

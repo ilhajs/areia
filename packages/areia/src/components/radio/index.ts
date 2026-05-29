@@ -58,13 +58,13 @@ export interface RadioVariantsProps {
 type VariantConfig = Record<string, { classes: string }>;
 type Renderable = unknown;
 
-function render(value: Renderable): string {
+function render(value: Renderable): unknown {
   if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
+  if (Array.isArray(value)) return value.map(render);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return value.value;
+    return raw(value.value);
   }
-  return String(value);
+  return value;
 }
 
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
@@ -309,7 +309,7 @@ export function RadioGroup(
             : "flex flex-row flex-wrap gap-2",
       )}"
     >
-      ${raw(render(content))}
+      ${render(content)}
     </div>
     ${error != null
       ? html`<p class="text-sm text-areia-destructive-soft-foreground">${error}</p>`
