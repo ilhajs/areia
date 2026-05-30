@@ -1,5 +1,11 @@
 import ilha, { html, raw } from "ilha";
 import { HoverCard as HoverCardPrimitive } from "@areia/slots";
+import {
+  createOpenBindSync,
+  openBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -306,6 +312,7 @@ export function HoverCardDescription(input: HoverCardDescriptionInput = {}) {
 export type HoverCardInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   HoverCardPrimitive.HoverCardOptions &
   HoverCardVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** HoverCard panel content. */
     content?: unknown;
@@ -341,7 +348,7 @@ function renderHoverCard(input: HoverCardInput = {}) {
     content,
     contentClass,
     contentClassName,
-    defaultOpen,
+    defaultOpen: defaultOpenProp,
     delay,
     onOpenChange: _onOpenChange,
     portal,
@@ -354,6 +361,7 @@ function renderHoverCard(input: HoverCardInput = {}) {
     triggerClassName,
     ...rootProps
   } = input;
+  const defaultOpen = openBindDefault(input, defaultOpenProp);
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "hover-card-content");
@@ -417,6 +425,8 @@ const HoverCardRootIsland = ilha
       : host.querySelector('[data-slot="hover-card"]');
     if (!root) return;
 
+    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
     const controller = HoverCardPrimitive.createHoverCard(root, {
       align: input.align,
       alignOffset: input.alignOffset,
@@ -425,16 +435,31 @@ const HoverCardRootIsland = ilha
       closeOnClickOutside: input.closeOnClickOutside,
       closeOnEscape: input.closeOnEscape,
       collisionPadding: input.collisionPadding,
-      defaultOpen: input.defaultOpen,
+      defaultOpen: openBindDefault(input, input.defaultOpen),
       delay: input.delay,
-      onOpenChange: input.onOpenChange,
+      onOpenChange: (open) => {
+        bindSync?.onUserChange(open);
+        input.onOpenChange?.(open);
+      },
       portal: input.portal,
       side: input.side,
       sideOffset: input.sideOffset,
       skipDelayDuration: input.skipDelayDuration,
     });
 
+    bindSync = createOpenBindSync(input, controller);
+    bindSync?.applyFromSignal();
+
     return () => controller.destroy();
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="hover-card"]')
+      ? host
+      : host.querySelector('[data-slot="hover-card"]');
+    if (!root) return;
+
+    createOpenBindSync(input, HoverCardPrimitive.createHoverCard(root))?.applyFromSignal();
   })
   .render(({ input }) => renderHoverCard(input));
 

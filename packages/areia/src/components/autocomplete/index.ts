@@ -1,4 +1,10 @@
 import ilha, { html, raw } from "ilha";
+import {
+  createOpenBindSync,
+  openBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -77,6 +83,7 @@ export type AutocompleteError = unknown | { message: unknown; match?: unknown };
 
 export type AutocompleteInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   AutocompleteVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Suggestions shown as the user types. Free-form values remain valid. */
     items?: AutocompleteItems;
@@ -447,15 +454,21 @@ function renderField(input: AutocompleteInput, children?: unknown[]) {
   });
 }
 
-function setOpen(root: Element, open: boolean, input: AutocompleteInput) {
+function isAutocompleteOpen(root: Element) {
+  const content = root.querySelector<HTMLElement>('[data-slot="autocomplete-content"]');
+  return content ? !content.hidden : false;
+}
+
+function setOpen(root: Element, open: boolean, onOpenChange?: (open: boolean) => void) {
   const content = root.querySelector<HTMLElement>('[data-slot="autocomplete-content"]');
   if (!content) return;
   content.hidden = !open || !content.querySelector('[data-slot="autocomplete-item"]');
-  input.onOpenChange?.(!content.hidden);
+  const isOpen = !content.hidden;
+  onOpenChange?.(isOpen);
   root.dispatchEvent(
     new CustomEvent("autocomplete:open-change", {
       bubbles: true,
-      detail: { open: !content.hidden },
+      detail: { open: isOpen },
     }),
   );
 }
@@ -482,6 +495,24 @@ export const AutocompleteRoot = ilha
     const textInput = root.querySelector<HTMLInputElement>('[data-slot="autocomplete-input"]');
     if (!textInput) return;
 
+    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+    let notifyOpenChange: (open: boolean) => void = () => {};
+    const openController = {
+      get isOpen() {
+        return isAutocompleteOpen(root);
+      },
+      open: () => setOpen(root, true, notifyOpenChange),
+      close: () => setOpen(root, false, notifyOpenChange),
+    };
+    notifyOpenChange = (open: boolean) => {
+      bindSync?.onUserChange(open);
+      input.onOpenChange?.(open);
+    };
+
+    bindSync = createOpenBindSync(input, openController);
+    if (openBindDefault(input, false)) openController.open();
+    else bindSync?.applyFromSignal();
+
     const highlight = (item: HTMLElement | undefined) => {
       root
         .querySelectorAll<HTMLElement>('[data-slot="autocomplete-item"]')
@@ -496,11 +527,11 @@ export const AutocompleteRoot = ilha
       root.dispatchEvent(
         new CustomEvent("autocomplete:value-change", { bubbles: true, detail: { value } }),
       );
-      setOpen(root, true, input);
+      setOpen(root, true, notifyOpenChange);
     };
 
     const handleFocus = () => {
-      if (input.openOnFocus) setOpen(root, true, input);
+      if (input.openOnFocus) setOpen(root, true, notifyOpenChange);
     };
 
     const handleClick = (event: Event) => {
@@ -516,7 +547,7 @@ export const AutocompleteRoot = ilha
       root.dispatchEvent(
         new CustomEvent("autocomplete:value-change", { bubbles: true, detail: { value } }),
       );
-      setOpen(root, false, input);
+      setOpen(root, false, notifyOpenChange);
       textInput.focus();
     };
 
@@ -530,23 +561,23 @@ export const AutocompleteRoot = ilha
       const index = current ? items.indexOf(current) : -1;
       if (event.key === "ArrowDown") {
         event.preventDefault();
-        setOpen(root, true, input);
+        setOpen(root, true, notifyOpenChange);
         highlight(items[Math.min(index + 1, items.length - 1)] ?? items[0]);
       }
       if (event.key === "ArrowUp") {
         event.preventDefault();
-        setOpen(root, true, input);
+        setOpen(root, true, notifyOpenChange);
         highlight(items[Math.max(index - 1, 0)] ?? items[items.length - 1]);
       }
       if (event.key === "Enter" && current) {
         event.preventDefault();
         current.click();
       }
-      if (event.key === "Escape") setOpen(root, false, input);
+      if (event.key === "Escape") setOpen(root, false, notifyOpenChange);
     };
 
     const handleDocumentPointerDown = (event: PointerEvent) => {
-      if (!root.contains(event.target as Node | null)) setOpen(root, false, input);
+      if (!root.contains(event.target as Node | null)) setOpen(root, false, notifyOpenChange);
     };
 
     textInput.addEventListener("input", handleInput);
@@ -562,6 +593,21 @@ export const AutocompleteRoot = ilha
       root.removeEventListener("click", handleClick);
       document.removeEventListener("pointerdown", handleDocumentPointerDown);
     };
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="autocomplete"]')
+      ? host
+      : host.querySelector('[data-slot="autocomplete"]');
+    if (!root) return;
+
+    createOpenBindSync(input, {
+      get isOpen() {
+        return isAutocompleteOpen(root);
+      },
+      open: () => setOpen(root, true, input.onOpenChange),
+      close: () => setOpen(root, false, input.onOpenChange),
+    })?.applyFromSignal();
   })
   .render(({ input }) => renderField(input));
 

@@ -17,6 +17,13 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide";
 import { Button } from "$components/button";
 import { Icon } from "$components/icon";
+import {
+  applyThisBind,
+  createDateBindSync,
+  getBindAccessor,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -36,6 +43,7 @@ export const DATE_PICKER_DEFAULT_VARIANTS = {
 
 export type DatePickerInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   DatePickerVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Selection mode. */
     mode?: DatePickerMode;
@@ -245,14 +253,23 @@ function renderDatePicker(input: DatePickerInput = {}) {
     weekStartsOn = DATE_PICKER_DEFAULT_VARIANTS.weekStartsOn,
     ...props
   } = input;
-  const normalizedInput = { ...input, mode, numberOfMonths, showOutsideDays, weekStartsOn };
+  const boundDate = getBindAccessor<Date | null>(input, "bind:valueAsDate");
+  const selected = boundDate ? (boundDate() ?? undefined) : input.selected;
+  const normalizedInput = {
+    ...input,
+    mode,
+    numberOfMonths,
+    showOutsideDays,
+    weekStartsOn,
+    selected,
+  };
   const month = resolveInitialMonth(normalizedInput);
 
   return html`<div
     data-slot="date-picker"
     data-mode="${mode}"
     data-month="${dateKey(month)}"
-    data-selected="${serializeSelected(input.selected)}"
+    data-selected="${serializeSelected(selected)}"
     class="${cn(datePickerVariants(), "w-max p-3", className, aliasedClassName)}"
     ${raw(toAttrs(props))}
   >
@@ -370,8 +387,33 @@ export const DatePickerRoot = ilha
     let currentInput: DatePickerInput = {
       ...input,
       month: parseDate(root.dataset["month"]) ?? resolveInitialMonth(input),
-      selected: selectedFromDataset(root, input.mode ?? DATE_PICKER_DEFAULT_VARIANTS.mode),
+      selected:
+        getBindAccessor<Date | null>(input, "bind:valueAsDate")?.() ??
+        selectedFromDataset(root, input.mode ?? DATE_PICKER_DEFAULT_VARIANTS.mode),
     };
+    let dateSync: ReturnType<typeof createDateBindSync> = null;
+
+    const getSelectedDate = (): Date | null | undefined => {
+      const selected = currentInput.selected;
+      if (selected instanceof Date) return selected;
+      if (selected == null) return null;
+      return undefined;
+    };
+
+    const setSelectedDate = (date: Date | null) => {
+      currentInput = { ...currentInput, selected: date ?? undefined };
+      syncRoot(root, currentInput);
+      input.onChange?.(currentInput.selected);
+      emitChange(root, currentInput.selected);
+    };
+
+    dateSync = createDateBindSync(input, {
+      getDate: getSelectedDate,
+      setDate: setSelectedDate,
+    });
+    dateSync?.applyFromSignal();
+
+    const cleanupThis = applyThisBind(root, input);
 
     const handleClick = (event: Event) => {
       const target = event.target as HTMLElement | null;
@@ -393,6 +435,12 @@ export const DatePickerRoot = ilha
       const date = parseDate(day?.dataset["date"]);
       if (!day || !date || day.hasAttribute("disabled")) return;
 
+      const mode = currentInput.mode ?? DATE_PICKER_DEFAULT_VARIANTS.mode;
+      if (mode === "single" && input["bind:valueAsDate"]) {
+        dateSync?.onUserChange(date);
+        return;
+      }
+
       const selected = nextSelected(currentInput.selected, date, currentInput);
       currentInput = { ...currentInput, selected };
       syncRoot(root, currentInput);
@@ -401,7 +449,32 @@ export const DatePickerRoot = ilha
     };
 
     root.addEventListener("click", handleClick);
-    return () => root.removeEventListener("click", handleClick);
+    return () => {
+      cleanupThis?.();
+      root.removeEventListener("click", handleClick);
+    };
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="date-picker"]')
+      ? (host as HTMLElement)
+      : host.querySelector<HTMLElement>('[data-slot="date-picker"]');
+    if (!root) return;
+
+    createDateBindSync(input, {
+      getDate: () => {
+        const selected = selectedFromDataset(root, input.mode ?? DATE_PICKER_DEFAULT_VARIANTS.mode);
+        return selected instanceof Date ? selected : null;
+      },
+      setDate: (date) => {
+        const nextInput = {
+          ...input,
+          selected: date ?? undefined,
+          month: date ?? resolveInitialMonth(input),
+        };
+        syncRoot(root, nextInput);
+      },
+    })?.applyFromSignal();
   })
   .render(({ input }) => renderDatePicker(input));
 

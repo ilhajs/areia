@@ -1,5 +1,7 @@
-import { html, raw } from "ilha";
+import { boundElement } from "$lib/binds";
+import type { IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { splitBindProps } from "$lib/binds";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Field } from "$components/field";
@@ -98,6 +100,7 @@ export type TextareaError = unknown | { message: unknown; match?: unknown };
 
 export type TextareaInput = NativeTextareaProps &
   Pick<TextareaVariantsProps, "size" | "variant"> &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Label content for the textarea. Enables the field wrapper. */
     label?: unknown;
@@ -121,7 +124,23 @@ function normalizeError(error: TextareaError): unknown {
   return error;
 }
 
+type TextareaControlAttrs = NativeTextareaProps &
+  Pick<TextareaVariantsProps, "size" | "variant"> & {
+    children?: unknown;
+    defaultValue?: string;
+    description?: unknown;
+    error?: TextareaError;
+    label?: unknown;
+    labelTooltip?: string;
+    rows?: number;
+    value?: string;
+    class?: string;
+    className?: string;
+  };
+
 function renderTextarea(input: TextareaInput) {
+  const { binds, attrs } = splitBindProps(input);
+  const inputProps = attrs as TextareaControlAttrs;
   const {
     class: className,
     className: aliasedClassName,
@@ -136,34 +155,34 @@ function renderTextarea(input: TextareaInput) {
     defaultValue,
     children,
     ...restProps
-  } = input;
+  } = inputProps;
 
   const variant = variantProp ?? (error ? "error" : TEXTAREA_DEFAULT_VARIANTS.variant);
+  const hasValueBind = binds["bind:value"] != null;
   // <textarea> uses text content for its initial value, not a `value`
   // attribute. Resolve the initial content from value > defaultValue >
-  // children.
-  const initialValue = value ?? defaultValue ?? children ?? "";
+  // children unless bind:value handles it.
+  const initialValue = hasValueBind ? "" : (value ?? defaultValue ?? children ?? "");
+  const passthrough = restProps as Record<string, unknown>;
 
-  return html`<textarea
-    class="${cn(
+  return boundElement(
+    "textarea",
+    binds,
+    ` class="${cn(
       textareaVariants({ size, variant, focusIndicator: true }),
       className,
       aliasedClassName,
-    )}"
-    rows="${rows}"
-    ${raw(
-      toAttrs({
-        ...restProps,
-        "aria-invalid": error ? "true" : restProps["aria-invalid"],
-        "aria-describedby":
-          typeof restProps["aria-describedby"] === "string"
-            ? restProps["aria-describedby"]
-            : undefined,
-      }),
-    )}
-  >
-${initialValue}</textarea
-  >`;
+    )}" rows="${rows}"${toAttrs({
+      ...passthrough,
+      ...(hasValueBind ? { value: undefined, defaultValue: undefined } : {}),
+      "aria-invalid": error ? "true" : passthrough["aria-invalid"],
+      "aria-describedby":
+        typeof passthrough["aria-describedby"] === "string"
+          ? passthrough["aria-describedby"]
+          : undefined,
+    })}`,
+    initialValue,
+  );
 }
 
 /** Multi-line text input with optional label, description, and error messaging. */

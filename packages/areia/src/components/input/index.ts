@@ -1,5 +1,7 @@
-import { html, raw } from "ilha";
+import { boundVoidElement } from "$lib/binds";
+import type { IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { splitBindProps } from "$lib/binds";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Field } from "$components/field";
@@ -123,6 +125,7 @@ export type InputError = unknown | { message: unknown; match?: unknown };
 
 export type InputInput = NativeInputProps &
   Pick<InputVariantsProps, "size" | "variant"> &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Label content for the input. Enables the field wrapper. */
     label?: unknown;
@@ -146,7 +149,20 @@ function normalizeError(error: InputError): unknown {
   return error;
 }
 
+type InputControlAttrs = NativeInputProps &
+  Pick<InputVariantsProps, "size" | "variant"> & {
+    description?: unknown;
+    error?: InputError;
+    label?: unknown;
+    labelTooltip?: string;
+    passwordManagerIgnore?: boolean;
+    class?: string;
+    className?: string;
+  };
+
 function renderInput(input: InputInput) {
+  const { binds, attrs } = splitBindProps(input);
+  const inputProps = attrs as InputControlAttrs;
   const {
     class: className,
     className: aliasedClassName,
@@ -157,35 +173,35 @@ function renderInput(input: InputInput) {
     passwordManagerIgnore,
     size = INPUT_DEFAULT_VARIANTS.size,
     variant: variantProp,
-    ...inputProps
-  } = input;
+    ...restProps
+  } = inputProps;
   const variant = variantProp ?? (error ? "error" : INPUT_DEFAULT_VARIANTS.variant);
-  return html`<input
-    class="${cn(
+  const passthrough = restProps as Record<string, unknown>;
+  return boundVoidElement(
+    "input",
+    binds,
+    ` class="${cn(
       inputVariants({ size, variant, focusIndicator: true }),
       passwordManagerIgnore && "keeper-ignore",
       className,
       aliasedClassName,
-    )}"
-    ${raw(
-      toAttrs({
-        ...inputProps,
-        "aria-invalid": error ? "true" : inputProps["aria-invalid"],
-        "aria-describedby":
-          typeof inputProps["aria-describedby"] === "string"
-            ? inputProps["aria-describedby"]
-            : undefined,
-        ...(passwordManagerIgnore
-          ? {
-              "data-1p-ignore": "true",
-              "data-bwignore": "true",
-              "data-form-type": "other",
-              "data-lpignore": "true",
-            }
-          : {}),
-      }),
-    )}
-  />`;
+    )}"${toAttrs({
+      ...passthrough,
+      "aria-invalid": error ? "true" : passthrough["aria-invalid"],
+      "aria-describedby":
+        typeof passthrough["aria-describedby"] === "string"
+          ? passthrough["aria-describedby"]
+          : undefined,
+      ...(passwordManagerIgnore
+        ? {
+            "data-1p-ignore": "true",
+            "data-bwignore": "true",
+            "data-form-type": "other",
+            "data-lpignore": "true",
+          }
+        : {}),
+    })}" />`,
+  );
 }
 
 /** Text input with optional label, description, and error messaging. */

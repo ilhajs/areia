@@ -1,6 +1,12 @@
 import ilha, { html, raw } from "ilha";
 import { ChevronDown } from "lucide";
 import { Accordion as AccordionPrimitive, Collapsible as CollapsiblePrimitive } from "@areia/slots";
+import {
+  createOpenBindSync,
+  openBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -66,6 +72,7 @@ export type CollapsibleRootInput = Omit<
   "className" | "children"
 > &
   CollapsibleVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     children?: unknown;
     open?: boolean;
@@ -386,7 +393,10 @@ function renderCollapsible(input: CollapsibleInput = {}) {
 
   return CollapsibleRoot({
     ...rest,
-    defaultOpen: defaultOpen ?? (typeof input.open === "boolean" ? input.open : undefined),
+    defaultOpen: openBindDefault(
+      input,
+      defaultOpen ?? (typeof input.open === "boolean" ? input.open : undefined),
+    ),
     hiddenUntilFound,
     class: cn(className, aliasedClassName),
     children: children ?? [
@@ -422,13 +432,30 @@ export const CollapsibleRootIsland = ilha
       : host.querySelector('[data-slot="collapsible"]');
     if (!root) return;
 
+    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
     const controller = CollapsiblePrimitive.createCollapsible(root, {
-      defaultOpen: input.defaultOpen ?? input.open,
+      defaultOpen: openBindDefault(input, input.defaultOpen ?? input.open),
       hiddenUntilFound: input.hiddenUntilFound,
-      onOpenChange: input.onOpenChange,
+      onOpenChange: (open) => {
+        bindSync?.onUserChange(open);
+        input.onOpenChange?.(open);
+      },
     } satisfies CollapsiblePrimitive.CollapsibleOptions);
 
+    bindSync = createOpenBindSync(input, controller);
+    bindSync?.applyFromSignal();
+
     return () => controller.destroy();
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="collapsible"]')
+      ? host
+      : host.querySelector('[data-slot="collapsible"]');
+    if (!root) return;
+
+    createOpenBindSync(input, CollapsiblePrimitive.createCollapsible(root))?.applyFromSignal();
   })
   .render(({ input }) => renderCollapsible(input));
 

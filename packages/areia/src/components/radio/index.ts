@@ -1,5 +1,8 @@
 import { html, raw } from "ilha";
+import { boundVoidElement } from "$lib/binds";
+import type { IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { splitBindProps } from "$lib/binds";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Label } from "$components/label";
@@ -88,6 +91,7 @@ export function radioVariants({
 
 export type RadioItemInput = Omit<HTMLElementProps<HTMLInputElement>, "className" | "type"> &
   RadioVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Label content displayed next to radio. */
     label: unknown;
@@ -123,26 +127,35 @@ type RadioControlInput = Omit<
   variant?: RadioVariant;
 };
 
-function radioControl({
-  checked,
-  disabled,
-  variant = RADIO_DEFAULT_VARIANTS.variant,
-  ...rest
-}: RadioControlInput) {
+function radioControl(input: RadioControlInput) {
+  const { binds, attrs: restProps } = splitBindProps(input);
+  const {
+    checked,
+    disabled,
+    variant = RADIO_DEFAULT_VARIANTS.variant,
+    ...rest
+  } = restProps as RadioControlInput;
+
+  const hasCheckedBind = binds["bind:checked"] != null || binds["bind:group"] != null;
+
   return html`<span
     class="relative mt-0.5 inline-flex size-4 shrink-0 items-center justify-center [&:has(input:checked)>input]:bg-areia-foreground [&:has(input:checked)>input]:ring-areia-foreground [&:has(input:checked)>span]:flex"
   >
-    <input
-      type="radio"
-      class="${cn(
+    ${boundVoidElement(
+      "input",
+      binds,
+      ` type="radio" class="${cn(
         "peer size-4 appearance-none rounded-full border-0 bg-areia-control-background ring focus:outline-none after:absolute after:-inset-x-3 after:-inset-y-2",
         radioVariants({ variant }),
         !disabled &&
           "cursor-pointer hover:ring-areia-control-border focus:ring-areia-ring focus:ring-2 focus-visible:ring-2 focus-visible:ring-areia-ring focus-visible:outline-offset-3",
         disabled && "cursor-not-allowed opacity-50",
-      )}"
-      ${raw(toAttrs({ ...rest, checked: Boolean(checked), disabled }))}
-    />
+      )}"${toAttrs({
+        ...rest,
+        ...(hasCheckedBind ? {} : { checked: Boolean(checked) }),
+        disabled,
+      })} />`,
+    )}
     <span class="pointer-events-none absolute inset-0 hidden items-center justify-center">
       <span class="size-2 rounded-full bg-areia-control-background"></span>
     </span>

@@ -1,5 +1,6 @@
 import ilha, { html, raw } from "ilha";
 import { ContextMenu as ContextMenuPrimitive } from "@areia/slots";
+import { createOpenBindSync, subscribeBindProps, type IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -28,6 +29,7 @@ function hasSlot(value: unknown, slot: string) {
 }
 
 export type ContextMenuInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
+  IlhaBindProps &
   Record<string, unknown> & {
     trigger?: unknown;
     children?: unknown;
@@ -177,14 +179,31 @@ export const ContextMenuRoot = ilha
       : host.querySelector('[data-slot="context-menu"]');
     if (!root) return;
 
+    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
     const controller = ContextMenuPrimitive.createContextMenu(root, {
       disabled: input.disabled,
       closeOnSelect: input.closeOnSelect,
-      onOpenChange: input.onOpenChange,
+      onOpenChange: (open) => {
+        bindSync?.onUserChange(open);
+        input.onOpenChange?.(open);
+      },
       onSelect: input.onSelect,
     } satisfies ContextMenuPrimitive.ContextMenuOptions);
 
+    bindSync = createOpenBindSync(input, controller);
+    bindSync?.applyFromSignal();
+
     return () => controller.destroy();
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="context-menu"]')
+      ? host
+      : host.querySelector('[data-slot="context-menu"]');
+    if (!root) return;
+
+    createOpenBindSync(input, ContextMenuPrimitive.createContextMenu(root))?.applyFromSignal();
   })
   .render(({ input }) => renderContextMenu(input));
 

@@ -1,5 +1,6 @@
 import ilha, { html, raw } from "ilha";
 import { Switch as SwitchPrimitive } from "@areia/slots";
+import { createCheckedBindSync, type IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -114,6 +115,7 @@ type SwitchControlInput = Omit<HTMLElementProps<HTMLSpanElement>, "className" | 
   };
 
 export type SwitchInput = Omit<SwitchControlInput, "className" | "children"> &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Label content for the switch. */
     label?: unknown;
@@ -348,6 +350,8 @@ export const SwitchRoot = ilha
       : host.querySelector('[data-slot="switch"]');
     if (!root) return;
 
+    let bindSync: ReturnType<typeof createCheckedBindSync> = null;
+
     const controller = SwitchPrimitive.createSwitch(root as HTMLElement, {
       defaultChecked:
         typeof input.checked === "boolean"
@@ -362,12 +366,25 @@ export const SwitchRoot = ilha
       value: typeof input.value === "string" ? input.value : undefined,
       uncheckedValue: typeof input.uncheckedValue === "string" ? input.uncheckedValue : undefined,
       onCheckedChange: (checked) => {
+        bindSync?.onUserChange(checked);
         input.onCheckedChange?.(checked);
         emitSwitchChange(root, checked);
       },
     } satisfies SwitchPrimitive.SwitchOptions);
 
+    bindSync = createCheckedBindSync(input, controller);
+    bindSync?.applyFromSignal();
+
     return () => controller.destroy();
+  })
+  .effect(({ host, input }) => {
+    const root = host.matches('[data-slot="switch"]')
+      ? host
+      : host.querySelector('[data-slot="switch"]');
+    if (!root) return;
+
+    const controller = SwitchPrimitive.createSwitch(root as HTMLElement);
+    createCheckedBindSync(input, controller)?.applyFromSignal();
   })
   .render(({ input }) => renderSwitch(input));
 

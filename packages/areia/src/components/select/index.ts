@@ -1,5 +1,8 @@
 import { html, raw } from "ilha";
+import { boundElement } from "$lib/binds";
+import type { IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { splitBindProps } from "$lib/binds";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { INPUT_VARIANTS, type InputSize } from "$components/input";
@@ -221,6 +224,7 @@ export type SelectError = unknown | { message: unknown; match?: unknown };
 
 export type SelectInput = NativeSelectProps &
   SelectVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Label content for the select. Enables the field wrapper. */
     label?: unknown;
@@ -248,7 +252,22 @@ function normalizeError(error: SelectError): unknown {
   return error;
 }
 
+type SelectControlAttrs = NativeSelectProps &
+  SelectVariantsProps & {
+    children?: unknown;
+    description?: unknown;
+    error?: SelectError;
+    items?: SelectItems;
+    label?: unknown;
+    labelTooltip?: string;
+    placeholder?: string;
+    class?: string;
+    className?: string;
+  };
+
 function renderSelect(input: SelectInput, children?: unknown[]) {
+  const { binds, attrs } = splitBindProps(input);
+  const inputProps = attrs as SelectControlAttrs;
   const {
     class: className,
     className: aliasedClassName,
@@ -263,33 +282,31 @@ function renderSelect(input: SelectInput, children?: unknown[]) {
     size = SELECT_DEFAULT_VARIANTS.size,
     variant: variantProp,
     ...selectProps
-  } = input;
+  } = inputProps;
   const variant = variantProp ?? (error ? "error" : SELECT_DEFAULT_VARIANTS.variant);
   const options = children ?? (items ? renderOptionsFromItems(items) : inputChildren);
+  const passthrough = selectProps as Record<string, unknown>;
 
-  return html`<select
-    class="${cn(selectVariants({ size, variant }), className, aliasedClassName)}"
-    ${raw(
-      toAttrs({
-        ...selectProps,
-        "aria-invalid": error ? "true" : selectProps["aria-invalid"],
-        "aria-describedby":
-          typeof selectProps["aria-describedby"] === "string"
-            ? selectProps["aria-describedby"]
-            : undefined,
-      }),
-    )}
-  >
-    ${placeholder != null
+  return boundElement(
+    "select",
+    binds,
+    ` class="${cn(selectVariants({ size, variant }), className, aliasedClassName)}"${toAttrs({
+      ...passthrough,
+      "aria-invalid": error ? "true" : passthrough["aria-invalid"],
+      "aria-describedby":
+        typeof passthrough["aria-describedby"] === "string"
+          ? passthrough["aria-describedby"]
+          : undefined,
+    })}`,
+    html`${placeholder != null
       ? SelectOption({
           value: "",
           label: placeholder,
-          disabled: Boolean(selectProps.required),
-          selected: selectProps.value == null,
+          disabled: Boolean(passthrough.required),
+          selected: passthrough.value == null,
         })
-      : ""}
-    ${render(options)}
-  </select>`;
+      : ""}${render(options)}`,
+  );
 }
 
 /** Native select with optional label, description, and error messaging. */

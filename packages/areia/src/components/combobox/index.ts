@@ -1,5 +1,14 @@
 import ilha, { html, raw } from "ilha";
 import { Combobox as ComboboxPrimitive } from "@areia/slots";
+import {
+  applyThisBind,
+  createGroupBindSync,
+  createOpenBindSync,
+  groupBindDefault,
+  openBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -92,6 +101,7 @@ export type ComboboxError = unknown | { message: unknown; match?: unknown };
 export type ComboboxInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   ComboboxVariantsProps &
   Omit<ComboboxPrimitive.ComboboxOptions, "disabled" | "required" | "placeholder"> &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Label content for the combobox. Enables the field wrapper. */
     label?: unknown;
@@ -598,8 +608,8 @@ function renderCombobox(input: ComboboxInput, children?: unknown[]) {
     class: className,
     className: aliasedClassName,
     children: inputChildren,
-    defaultOpen,
-    defaultValue,
+    defaultOpen: defaultOpenProp,
+    defaultValue: defaultValueProp,
     description: _description,
     disabled,
     error,
@@ -621,6 +631,8 @@ function renderCombobox(input: ComboboxInput, children?: unknown[]) {
     variant: _variant,
     ...rootProps
   } = input;
+  const defaultOpen = openBindDefault(input, defaultOpenProp);
+  const defaultValue = groupBindDefault(input, defaultValueProp) as string | undefined;
   const variant = error ? "error" : "default";
   const normalizedError = normalizeError(error);
   const describedBy =
@@ -686,21 +698,31 @@ export const ComboboxRoot = ilha
       : host.querySelector('[data-slot="combobox"]');
     if (!root) return;
 
+    let openSync: ReturnType<typeof createOpenBindSync> = null;
+    let groupSync: ReturnType<typeof createGroupBindSync> = null;
+
     const controller = ComboboxPrimitive.createCombobox(root, {
       align: input.align,
       alignOffset: input.alignOffset,
       autoHighlight: input.autoHighlight,
       avoidCollisions: input.avoidCollisions,
       collisionPadding: input.collisionPadding,
-      defaultOpen: input.defaultOpen,
-      defaultValue: input.defaultValue,
+      defaultOpen: openBindDefault(input, input.defaultOpen),
+      defaultValue:
+        (groupBindDefault(input, input.defaultValue) as string | undefined) ?? undefined,
       disabled: input.disabled,
       filter: input.filter,
       itemToStringValue: input.itemToStringValue,
       name: input.name,
       onInputValueChange: input.onInputValueChange,
-      onOpenChange: input.onOpenChange,
-      onValueChange: input.onValueChange,
+      onOpenChange: (open) => {
+        openSync?.onUserChange(open);
+        input.onOpenChange?.(open);
+      },
+      onValueChange: (value) => {
+        groupSync?.onUserChange(value);
+        input.onValueChange?.(value);
+      },
       openOnFocus: input.openOnFocus,
       placeholder: input.placeholder,
       required: input.required,
@@ -708,7 +730,55 @@ export const ComboboxRoot = ilha
       sideOffset: input.sideOffset,
     });
 
-    return () => controller.destroy();
+    openSync = createOpenBindSync(input, controller);
+    groupSync = createGroupBindSync(
+      input,
+      {
+        getValue: () => controller.value,
+        setValue: (value) => {
+          if (value == null) controller.clear();
+          else if (typeof value === "string") controller.select(value);
+          else if (value[0]) controller.select(value[0]);
+          else controller.clear();
+        },
+      },
+      "single",
+    );
+    openSync?.applyFromSignal();
+    groupSync?.applyFromSignal();
+
+    const bindTarget =
+      root.querySelector<HTMLElement>('[data-slot="combobox-input"]') ??
+      root.querySelector<HTMLElement>('[data-slot="combobox"]');
+    const cleanupThis = applyThisBind(bindTarget, input);
+
+    return () => {
+      cleanupThis?.();
+      controller.destroy();
+    };
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="combobox"]')
+      ? host
+      : host.querySelector('[data-slot="combobox"]');
+    if (!root) return;
+
+    const controller = ComboboxPrimitive.createCombobox(root);
+    createOpenBindSync(input, controller)?.applyFromSignal();
+    createGroupBindSync(
+      input,
+      {
+        getValue: () => controller.value,
+        setValue: (value) => {
+          if (value == null) controller.clear();
+          else if (typeof value === "string") controller.select(value);
+          else if (value[0]) controller.select(value[0]);
+          else controller.clear();
+        },
+      },
+      "single",
+    )?.applyFromSignal();
   })
   .render(({ input }) => renderField(input));
 

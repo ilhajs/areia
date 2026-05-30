@@ -13,6 +13,7 @@ export function toAttrs(input: Record<string, unknown>): string {
 
   const attrs = Object.entries(input)
     .flatMap(([key, value]) => {
+      if (key.startsWith("bind:")) return [];
       if (value === null || value === undefined || value === false) return [];
       const attr = aliases[key] ?? toKebab(key);
       if (value === true) return [attr];

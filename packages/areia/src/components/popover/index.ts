@@ -1,5 +1,11 @@
 import ilha, { html, raw } from "ilha";
 import { Popover as PopoverPrimitive } from "@areia/slots";
+import {
+  createOpenBindSync,
+  openBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -349,6 +355,7 @@ export function PopoverClose(input: PopoverCloseInput = {}) {
 export type PopoverInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   PopoverPrimitive.PopoverOptions &
   PopoverVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Popover panel content. */
     content?: unknown;
@@ -383,7 +390,7 @@ function renderPopover(input: PopoverInput = {}) {
     content,
     contentClass,
     contentClassName,
-    defaultOpen,
+    defaultOpen: defaultOpenProp,
     onOpenChange: _onOpenChange,
     portal,
     position: _position,
@@ -395,6 +402,7 @@ function renderPopover(input: PopoverInput = {}) {
     triggerClassName,
     ...rootProps
   } = input;
+  const defaultOpen = openBindDefault(input, defaultOpenProp);
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "popover-content");
@@ -464,6 +472,8 @@ const PopoverRootIsland = ilha
       if (arrow && side) arrow.setAttribute("data-side", side);
     };
 
+    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
     const controller = PopoverPrimitive.createPopover(root, {
       align: input.align,
       alignOffset: input.alignOffset,
@@ -471,12 +481,18 @@ const PopoverRootIsland = ilha
       closeOnClickOutside: input.closeOnClickOutside,
       closeOnEscape: input.closeOnEscape,
       collisionPadding: input.collisionPadding,
-      defaultOpen: input.defaultOpen,
-      onOpenChange: input.onOpenChange,
+      defaultOpen: openBindDefault(input, input.defaultOpen),
+      onOpenChange: (open) => {
+        bindSync?.onUserChange(open);
+        input.onOpenChange?.(open);
+      },
       portal: input.portal,
       side: input.side,
       sideOffset: input.sideOffset,
     });
+
+    bindSync = createOpenBindSync(input, controller);
+    bindSync?.applyFromSignal();
 
     syncArrowSide();
     const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
@@ -487,6 +503,15 @@ const PopoverRootIsland = ilha
       observer?.disconnect();
       controller.destroy();
     };
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="popover"]')
+      ? host
+      : host.querySelector('[data-slot="popover"]');
+    if (!root) return;
+
+    createOpenBindSync(input, PopoverPrimitive.createPopover(root))?.applyFromSignal();
   })
   .render(({ input }) => renderPopover(input));
 

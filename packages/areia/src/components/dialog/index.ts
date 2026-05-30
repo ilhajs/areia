@@ -1,5 +1,11 @@
 import ilha, { html, raw } from "ilha";
 import { Dialog as DialogPrimitive } from "@areia/slots";
+import {
+  createOpenBindSync,
+  openBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -357,6 +363,7 @@ export function DialogPortal(input: DialogPortalInput = {}) {
 export type DialogInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   DialogPrimitive.DialogOptions &
   DialogVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Dialog ARIA role. `alertdialog` disables outside-click closing by default. */
     role?: DialogRole;
@@ -391,7 +398,7 @@ function renderDialog(input: DialogInput = {}) {
     content,
     contentClass,
     contentClassName,
-    defaultOpen,
+    defaultOpen: defaultOpenProp,
     lockScroll,
     onOpenChange: _onOpenChange,
     overlayClass,
@@ -408,6 +415,7 @@ function renderDialog(input: DialogInput = {}) {
   } = input;
 
   const isAlertDialog = alertDialog ?? role === "alertdialog";
+  const defaultOpen = openBindDefault(input, defaultOpenProp);
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "dialog-content");
   const hasComposedTrigger = hasSlot(children, "dialog-trigger");
@@ -472,16 +480,34 @@ export const DialogRoot = ilha
     if (!root) return;
 
     const isAlertDialog = input.alertDialog ?? input.role === "alertdialog";
+    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
     const controller = DialogPrimitive.createDialog(root, {
       alertDialog: isAlertDialog,
       closeOnClickOutside: input.closeOnClickOutside ?? (isAlertDialog ? false : undefined),
       closeOnEscape: input.closeOnEscape,
-      defaultOpen: input.defaultOpen,
+      defaultOpen: openBindDefault(input, input.defaultOpen),
       lockScroll: input.lockScroll,
-      onOpenChange: input.onOpenChange,
+      onOpenChange: (open) => {
+        bindSync?.onUserChange(open);
+        input.onOpenChange?.(open);
+      },
     });
 
+    bindSync = createOpenBindSync(input, controller);
+    bindSync?.applyFromSignal();
+
     return () => controller.destroy();
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="dialog"]')
+      ? host
+      : host.querySelector('[data-slot="dialog"]');
+    if (!root) return;
+
+    const controller = DialogPrimitive.createDialog(root);
+    createOpenBindSync(input, controller)?.applyFromSignal();
   })
   .render(({ input }) => renderDialog(normalizeDialogInput(input)));
 

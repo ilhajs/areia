@@ -1,5 +1,11 @@
 import ilha, { html, raw } from "ilha";
 import { Tabs as TabsPrimitive } from "@areia/slots";
+import {
+  createGroupBindSync,
+  groupBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -83,6 +89,7 @@ export type TabsItem = Omit<
 
 export type TabsInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   TabsVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     tabs?: TabsItem[];
     /** Composed tab markup. Use `Tabs.List`, `Tabs.Trigger`, and `Tabs.Content` for composition-first usage. */
@@ -385,7 +392,7 @@ function renderTabs(input: TabsInput = {}) {
     children,
     value,
     selectedValue,
-    defaultValue,
+    defaultValue: defaultValueProp,
     activationMode: _activationMode,
     activateOnFocus: _activateOnFocus,
     class: className,
@@ -406,7 +413,11 @@ function renderTabs(input: TabsInput = {}) {
   const hasComposedChildren = composedChildren.trim().length > 0;
   if (tabs.length === 0 && !hasComposedChildren) return "";
 
-  const selected = value ?? selectedValue ?? defaultValue ?? tabs[0]?.value;
+  const boundValue = groupBindDefault(input, value ?? selectedValue ?? defaultValueProp);
+  const selected =
+    (typeof boundValue === "string" ? boundValue : undefined) ??
+    (Array.isArray(boundValue) ? boundValue[0] : undefined) ??
+    tabs[0]?.value;
   const listChildren = tabs.map((tab) =>
     TabsTrigger({
       ...tab,
@@ -570,17 +581,64 @@ export const TabsRoot = ilha
       : host.querySelector('[data-slot="tabs"]');
     if (!root) return;
 
+    let groupSync: ReturnType<typeof createGroupBindSync> = null;
+    const initialValue =
+      groupBindDefault(input, input.value ?? input.selectedValue ?? input.defaultValue) ??
+      undefined;
+    const defaultValue =
+      typeof initialValue === "string"
+        ? initialValue
+        : Array.isArray(initialValue)
+          ? initialValue[0]
+          : undefined;
+
     const controller = TabsPrimitive.createTabs(root, {
-      defaultValue: input.value ?? input.selectedValue ?? input.defaultValue,
+      defaultValue,
       activationMode: input.activationMode ?? (input.activateOnFocus ? "auto" : "manual"),
-      onValueChange: input.onValueChange,
+      onValueChange: (value) => {
+        groupSync?.onUserChange(value);
+        input.onValueChange?.(value);
+      },
     });
     const cleanupOverflow = enhanceOverflow(root);
+
+    groupSync = createGroupBindSync(
+      input,
+      {
+        getValue: () => controller.value,
+        setValue: (value) => {
+          if (typeof value === "string") controller.select(value);
+          else if (Array.isArray(value) && value[0]) controller.select(value[0]);
+        },
+      },
+      "single",
+    );
+    groupSync?.applyFromSignal();
 
     return () => {
       cleanupOverflow();
       controller.destroy();
     };
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="tabs"]')
+      ? host
+      : host.querySelector('[data-slot="tabs"]');
+    if (!root) return;
+
+    const controller = TabsPrimitive.createTabs(root);
+    createGroupBindSync(
+      input,
+      {
+        getValue: () => controller.value,
+        setValue: (value) => {
+          if (typeof value === "string") controller.select(value);
+          else if (Array.isArray(value) && value[0]) controller.select(value[0]);
+        },
+      },
+      "single",
+    )?.applyFromSignal();
   })
   .render(({ input }) => renderTabs(input));
 

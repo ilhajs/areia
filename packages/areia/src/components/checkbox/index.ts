@@ -1,5 +1,6 @@
 import ilha, { html, raw } from "ilha";
 import { Checkbox as CheckboxPrimitive } from "@areia/slots";
+import { createCheckedBindSync, type IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -87,6 +88,7 @@ type InputProps = Omit<HTMLElementProps<HTMLInputElement>, "className" | "type">
 
 export type CheckboxInput = InputProps &
   CheckboxVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Label content for the checkbox. */
     label?: unknown;
@@ -284,16 +286,35 @@ export const CheckboxRoot = ilha
       : host.querySelector('[data-slot="checkbox"]');
     if (!root) return;
 
+    const itemValue = typeof input.value === "string" ? input.value : undefined;
+    let bindSync: ReturnType<typeof createCheckedBindSync> = null;
+
     const controller = CheckboxPrimitive.createCheckbox(root, {
       defaultChecked: typeof input.checked === "boolean" ? input.checked : undefined,
       indeterminate: typeof input.indeterminate === "boolean" ? input.indeterminate : undefined,
       disabled: typeof input.disabled === "boolean" ? input.disabled : undefined,
       required: typeof input.required === "boolean" ? input.required : undefined,
       name: typeof input.name === "string" ? input.name : undefined,
-      value: typeof input.value === "string" ? input.value : undefined,
+      value: itemValue,
+      onCheckedChange: (checked) => {
+        bindSync?.onUserChange(checked);
+      },
     } satisfies CheckboxPrimitive.CheckboxOptions);
 
+    bindSync = createCheckedBindSync(input, controller, itemValue);
+    bindSync?.applyFromSignal();
+
     return () => controller.destroy();
+  })
+  .effect(({ host, input }) => {
+    const root = host.matches('[data-slot="checkbox"]')
+      ? host
+      : host.querySelector('[data-slot="checkbox"]');
+    if (!root) return;
+
+    const controller = CheckboxPrimitive.createCheckbox(root);
+    const itemValue = typeof input.value === "string" ? input.value : undefined;
+    createCheckedBindSync(input, controller, itemValue)?.applyFromSignal();
   })
   .render(({ input }) => renderCheckbox(input));
 

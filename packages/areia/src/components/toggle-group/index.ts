@@ -1,5 +1,11 @@
 import ilha, { html, raw } from "ilha";
 import { ToggleGroup as ToggleGroupPrimitive } from "@areia/slots";
+import {
+  createGroupBindSync,
+  groupBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -38,6 +44,7 @@ export interface ToggleGroupVariantsProps {
 
 export type ToggleGroupInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   ToggleGroupVariantsProps &
+  IlhaBindProps &
   Record<string, unknown> & {
     /** Default selected value(s). */
     defaultValue?: string | string[];
@@ -99,7 +106,7 @@ function renderToggleGroup(input: ToggleGroupInput = {}) {
     class: className,
     className: aliasedClassName,
     type = "single",
-    defaultValue,
+    defaultValue: defaultValueProp,
     disabled,
     orientation = "horizontal",
     loop,
@@ -108,6 +115,13 @@ function renderToggleGroup(input: ToggleGroupInput = {}) {
     onValueChange: _onValueChange,
     ...rest
   } = input;
+  const defaultValue = groupBindDefault(input, defaultValueProp);
+  const resolvedDefaultValue =
+    defaultValue == null
+      ? undefined
+      : Array.isArray(defaultValue)
+        ? defaultValue.join(" ")
+        : String(defaultValue);
 
   return html`<div
     data-slot="toggle-group"
@@ -116,12 +130,7 @@ function renderToggleGroup(input: ToggleGroupInput = {}) {
     ${raw(
       toAttrs({
         ...rest,
-        "data-default-value":
-          defaultValue == null
-            ? undefined
-            : Array.isArray(defaultValue)
-              ? defaultValue.join(" ")
-              : defaultValue,
+        "data-default-value": resolvedDefaultValue,
         "data-multiple": type === "multiple" ? "" : undefined,
         "data-orientation": orientation,
         "data-loop": loop,
@@ -141,16 +150,49 @@ const ToggleGroupRoot = ilha
       : host.querySelector('[data-slot="toggle-group"]');
     if (!root) return;
 
+    const mode = input.type === "multiple" ? "multiple" : "single";
+    let groupSync: ReturnType<typeof createGroupBindSync> = null;
+
     const controller = ToggleGroupPrimitive.createToggleGroup(root, {
-      defaultValue: input.defaultValue,
+      defaultValue: groupBindDefault(input, input.defaultValue) ?? undefined,
       multiple: input.type === "multiple",
       orientation: input.orientation,
       loop: input.loop,
       disabled: input.disabled,
-      onValueChange: input.onValueChange,
+      onValueChange: (value) => {
+        groupSync?.onUserChange(value);
+        input.onValueChange?.(value);
+      },
     } satisfies ToggleGroupPrimitive.ToggleGroupOptions);
 
+    groupSync = createGroupBindSync(
+      input,
+      {
+        getValue: () => controller.value,
+        setValue: (value) => controller.setValue(value ?? []),
+      },
+      mode,
+    );
+    groupSync?.applyFromSignal();
+
     return () => controller.destroy();
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="toggle-group"]')
+      ? host
+      : host.querySelector('[data-slot="toggle-group"]');
+    if (!root) return;
+
+    const controller = ToggleGroupPrimitive.createToggleGroup(root);
+    createGroupBindSync(
+      input,
+      {
+        getValue: () => controller.value,
+        setValue: (value) => controller.setValue(value ?? []),
+      },
+      input.type === "multiple" ? "multiple" : "single",
+    )?.applyFromSignal();
   })
   .render(({ input }) => renderToggleGroup(input));
 

@@ -1,6 +1,12 @@
 import ilha, { html, raw } from "ilha";
 import { Check } from "lucide";
 import { DropdownMenu as DropdownMenuPrimitive } from "@areia/slots";
+import {
+  createOpenBindSync,
+  openBindDefault,
+  subscribeBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { Icon } from "$components/icon";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
@@ -53,6 +59,7 @@ export type DropdownInput = Omit<HTMLElementProps<HTMLDivElement>, "className" |
     | "onValueChange"
     | "onValuesChange"
   > &
+  IlhaBindProps &
   Record<string, unknown> & {
     trigger?: unknown;
     children?: unknown;
@@ -393,7 +400,7 @@ function renderDropdown(input: DropdownInput = {}) {
     triggerClassName,
     contentClass,
     contentClassName,
-    defaultOpen,
+    defaultOpen: defaultOpenProp,
     defaultValue,
     defaultValues,
     closeOnClickOutside,
@@ -414,6 +421,7 @@ function renderDropdown(input: DropdownInput = {}) {
     variant: _variant,
     ...rest
   } = input;
+  const defaultOpen = openBindDefault(input, defaultOpenProp);
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "dropdown-menu-content");
@@ -459,11 +467,16 @@ export const DropdownRoot = ilha
       : host.querySelector('[data-slot="dropdown-menu"]');
     if (!root) return;
 
+    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
     const controller = DropdownMenuPrimitive.createDropdownMenu(root, {
-      defaultOpen: input.defaultOpen,
+      defaultOpen: openBindDefault(input, input.defaultOpen),
       defaultValue: input.defaultValue,
       defaultValues: input.defaultValues,
-      onOpenChange: input.onOpenChange,
+      onOpenChange: (open) => {
+        bindSync?.onUserChange(open);
+        input.onOpenChange?.(open);
+      },
       onSelect: input.onSelect,
       onValueChange: input.onValueChange,
       onValuesChange: input.onValuesChange,
@@ -480,7 +493,19 @@ export const DropdownRoot = ilha
       highlightItemOnHover: input.highlightItemOnHover,
     } satisfies DropdownMenuPrimitive.DropdownMenuOptions);
 
+    bindSync = createOpenBindSync(input, controller);
+    bindSync?.applyFromSignal();
+
     return () => controller.destroy();
+  })
+  .effect(({ host, input }) => {
+    subscribeBindProps(input);
+    const root = host.matches('[data-slot="dropdown-menu"]')
+      ? host
+      : host.querySelector('[data-slot="dropdown-menu"]');
+    if (!root) return;
+
+    createOpenBindSync(input, DropdownMenuPrimitive.createDropdownMenu(root))?.applyFromSignal();
   })
   .render(({ input }) => renderDropdown(input));
 
