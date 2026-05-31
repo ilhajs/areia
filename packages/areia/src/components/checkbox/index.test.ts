@@ -57,6 +57,17 @@ describe("Checkbox", () => {
     expect(output).toContain("a");
     expect(output).toContain("b");
   });
+
+  it("places passthrough data attributes on the native input, not the visual root", () => {
+    const output = markup(
+      Checkbox({ "data-params": "x", "data-todo-checkbox": true, id: "terms" }),
+    );
+    expect(output).toContain('data-slot="checkbox-input"');
+    expect(output).toContain('data-params="x"');
+    expect(output).toContain("data-todo-checkbox");
+    expect(output).toContain('id="terms"');
+    expect(output).not.toMatch(/data-slot="checkbox"[^>]*data-params/);
+  });
 });
 
 describe("Checkbox.Group", () => {

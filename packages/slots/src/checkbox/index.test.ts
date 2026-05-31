@@ -166,4 +166,36 @@ describe("Checkbox", () => {
 
     clearRootBinding(root, ROOT_BINDING_KEY, foreignController);
   });
+
+  it("reuses an embedded SSR input and preserves passthrough data attributes", () => {
+    document.body.innerHTML = `
+      <span data-slot="checkbox" id="root" data-name="terms" data-value="yes">
+        <input
+          type="checkbox"
+          data-slot="checkbox-input"
+          data-params="x"
+          data-todo-checkbox
+          data-checkbox-generated="input"
+          class="sr-only"
+        />
+        <span data-slot="checkbox-indicator">✓</span>
+      </span>
+    `;
+    const root = document.getElementById("root")!;
+    const embedded = root.querySelector('[data-slot="checkbox-input"]') as HTMLInputElement;
+    const controller = createCheckbox(root);
+    const inputs = root.querySelectorAll('input[type="checkbox"]');
+
+    expect(inputs.length).toBe(1);
+    expect(inputs[0]).toBe(embedded);
+    expect(embedded.getAttribute("data-params")).toBe("x");
+    expect(embedded.hasAttribute("data-todo-checkbox")).toBe(true);
+
+    root.click();
+    expect(controller.checked).toBe(true);
+    expect(embedded.checked).toBe(true);
+
+    controller.destroy();
+    expect(root.contains(embedded)).toBe(true);
+  });
 });

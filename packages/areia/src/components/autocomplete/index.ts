@@ -1,7 +1,9 @@
 import ilha, { html, raw } from "ilha";
 import {
+  boundVoidElement,
   createOpenBindSync,
   openBindDefault,
+  splitBindProps,
   subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
@@ -184,24 +186,24 @@ export type AutocompleteInputGroupInput = Omit<
   };
 
 export function AutocompleteInputGroup(input: AutocompleteInputGroupInput = {}) {
+  const { binds, attrs: props } = splitBindProps(input);
   const {
     class: className,
     className: aliasedClassName,
     size = AUTOCOMPLETE_DEFAULT_VARIANTS.size,
-    ...props
-  } = input;
+    ...rest
+  } = props as AutocompleteInputGroupInput;
 
-  return html`<input
-    data-slot="autocomplete-input"
-    class="${cn(
+  return boundVoidElement(
+    "input",
+    binds,
+    ` data-slot="autocomplete-input" class="${cn(
       inputVariants({ size, focusIndicator: true }),
       "w-full",
       className,
       aliasedClassName,
-    )}"
-    autocomplete="off"
-    ${raw(toAttrs(props))}
-  />`;
+    )}" autocomplete="off"${toAttrs(rest)} />`,
+  );
 }
 
 export type AutocompleteContentInput = Omit<
@@ -383,6 +385,7 @@ function renderItems(items: AutocompleteItemDescriptor[]) {
 }
 
 function renderAutocomplete(input: AutocompleteInput = {}, children?: unknown[]) {
+  const { binds, attrs } = splitBindProps(input);
   const {
     children: inputChildren,
     class: className,
@@ -404,8 +407,8 @@ function renderAutocomplete(input: AutocompleteInput = {}, children?: unknown[])
     required,
     size = AUTOCOMPLETE_DEFAULT_VARIANTS.size,
     value,
-    ...rootProps
-  } = input;
+    ...inputPassthrough
+  } = attrs as AutocompleteInput;
   const normalizedError = normalizeError(error);
   const content =
     children ??
@@ -420,10 +423,10 @@ function renderAutocomplete(input: AutocompleteInput = {}, children?: unknown[])
     data-slot="autocomplete"
     data-open-on-focus="${openOnFocus ? "true" : "false"}"
     class="${cn("relative w-full", className, aliasedClassName)}"
-    ${raw(toAttrs(rootProps))}
   >
     ${AutocompleteInputGroup({
-      id: typeof rootProps.id === "string" ? rootProps.id : undefined,
+      ...inputPassthrough,
+      ...binds,
       value: value == null ? undefined : String(value),
       defaultValue: defaultValue == null ? undefined : String(defaultValue),
       disabled,
@@ -432,7 +435,7 @@ function renderAutocomplete(input: AutocompleteInput = {}, children?: unknown[])
       size,
       class: inputClass,
       className: inputClassName,
-      "aria-invalid": normalizedError ? "true" : rootProps["aria-invalid"],
+      "aria-invalid": normalizedError ? "true" : inputPassthrough["aria-invalid"],
     })}
     ${render(content)}
   </div>`;

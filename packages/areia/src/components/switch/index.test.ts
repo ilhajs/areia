@@ -71,6 +71,14 @@ describe("Switch", () => {
     expect(output).toContain("a");
     expect(output).toContain("b");
   });
+
+  it("places passthrough data attributes on the native input, not the visual root", () => {
+    const output = markup(Switch({ "data-params": "x", id: "notify" }));
+    expect(output).toContain('data-slot="switch-input"');
+    expect(output).toContain('data-params="x"');
+    expect(output).toContain('id="notify"');
+    expect(output).not.toMatch(/data-slot="switch"[^>]*data-params/);
+  });
 });
 
 describe("Switch.Group", () => {

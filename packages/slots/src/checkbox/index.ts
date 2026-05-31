@@ -139,17 +139,21 @@ function isNaturallyFocusable(el: HTMLElement): boolean {
   return false;
 }
 
-function getRootLabels(root: HTMLElement): HTMLLabelElement[] {
+function getRootLabels(
+  root: HTMLElement,
+  controlInput?: HTMLInputElement | null,
+): HTMLLabelElement[] {
   const labels: HTMLLabelElement[] = [];
   const wrappingLabel = root.closest("label");
   if (wrappingLabel instanceof HTMLLabelElement) {
     labels.push(wrappingLabel);
   }
 
-  if (!root.id) return labels;
+  const id = controlInput?.id || root.id;
+  if (!id) return labels;
 
   const doc = root.ownerDocument ?? document;
-  const selector = `label[for="${CSS.escape(root.id)}"]`;
+  const selector = `label[for="${CSS.escape(id)}"]`;
   for (const label of doc.querySelectorAll<HTMLLabelElement>(selector)) {
     if (!labels.includes(label)) {
       labels.push(label);
@@ -159,6 +163,14 @@ function getRootLabels(root: HTMLElement): HTMLLabelElement[] {
   return labels;
 }
 
+function findEmbeddedInput(root: HTMLElement): HTMLInputElement | null {
+  const scoped = root.querySelector<HTMLInputElement>(
+    ':scope > input[type="checkbox"][data-slot="checkbox-input"]',
+  );
+  if (scoped) return scoped;
+  return root.querySelector<HTMLInputElement>(':scope > input[type="checkbox"]');
+}
+
 /**
  * Create a checkbox controller for a root element.
  *
@@ -166,6 +178,7 @@ function getRootLabels(root: HTMLElement): HTMLLabelElement[] {
  * ```html
  * <label>
  *   <span data-slot="checkbox" data-name="terms">
+ *     <input type="checkbox" data-slot="checkbox-input" />
  *     <span data-slot="checkbox-indicator"></span>
  *   </span>
  *   Accept terms
@@ -181,9 +194,11 @@ export function createCheckbox(root: Element, options: CheckboxOptions = {}): Ch
   if (existingController) return existingController;
 
   const rootElement = root as HTMLElement;
+  const embeddedInput = findEmbeddedInput(rootElement);
   const disabled =
     options.disabled ??
     getDataBool(rootElement, "disabled") ??
+    embeddedInput?.disabled ??
     (rootElement.hasAttribute("disabled") || rootElement.getAttribute("aria-disabled") === "true");
   const readOnly =
     options.readOnly ??
@@ -192,30 +207,40 @@ export function createCheckbox(root: Element, options: CheckboxOptions = {}): Ch
   const required =
     options.required ??
     getDataBool(rootElement, "required") ??
+    embeddedInput?.required ??
     rootElement.getAttribute("aria-required") === "true";
   const defaultChecked =
     options.defaultChecked ??
     getDataBool(rootElement, "defaultChecked") ??
+    embeddedInput?.checked ??
     rootElement.getAttribute("aria-checked") === "true";
   const defaultIndeterminate =
     options.indeterminate ??
     getDataBool(rootElement, "indeterminate") ??
     rootElement.getAttribute("aria-checked") === "mixed";
-  const name = options.name ?? getDataString(rootElement, "name");
-  const form = options.form ?? getDataString(rootElement, "form");
-  const value = options.value ?? getDataString(rootElement, "value");
+  const name = options.name ?? getDataString(rootElement, "name") ?? embeddedInput?.name;
+  const form =
+    options.form ??
+    getDataString(rootElement, "form") ??
+    embeddedInput?.getAttribute("form") ??
+    undefined;
+  const value = options.value ?? getDataString(rootElement, "value") ?? embeddedInput?.value;
   const uncheckedValue = options.uncheckedValue ?? getDataString(rootElement, "uncheckedValue");
   const onCheckedChange = options.onCheckedChange;
 
   const cleanups: Array<() => void> = [];
   const doc = root.ownerDocument ?? document;
-  const hiddenInput = doc.createElement("input");
-  hiddenInput.type = "checkbox";
-  hiddenInput.tabIndex = -1;
-  hiddenInput.setAttribute("aria-hidden", "true");
-  hiddenInput.setAttribute("data-checkbox-generated", "input");
-  hiddenInput.style.cssText = VISUALLY_HIDDEN_STYLES;
-  insertAfter(rootElement, hiddenInput);
+  const hiddenInput = embeddedInput ?? doc.createElement("input");
+  if (!embeddedInput) {
+    hiddenInput.type = "checkbox";
+    hiddenInput.tabIndex = -1;
+    hiddenInput.setAttribute("aria-hidden", "true");
+    hiddenInput.setAttribute("data-checkbox-generated", "input");
+    hiddenInput.style.cssText = VISUALLY_HIDDEN_STYLES;
+    insertAfter(rootElement, hiddenInput);
+  } else if (!hiddenInput.hasAttribute("data-checkbox-generated")) {
+    hiddenInput.setAttribute("data-checkbox-generated", "input");
+  }
 
   let uncheckedInput: HTMLInputElement | null = null;
   let currentChecked = Boolean(defaultChecked);
@@ -331,7 +356,7 @@ export function createCheckbox(root: Element, options: CheckboxOptions = {}): Ch
     hiddenInput.click();
   };
 
-  const labels = getRootLabels(rootElement);
+  const labels = getRootLabels(rootElement, embeddedInput);
   if (labels.length > 0) {
     const labelIds = labels.map((label) => ensureId(label, "checkbox-label"));
     const labelledBy = mergeIdRefs(rootElement.getAttribute("aria-labelledby"), labelIds);
@@ -447,7 +472,7 @@ export function createCheckbox(root: Element, options: CheckboxOptions = {}): Ch
     destroy: () => {
       cleanups.forEach((fn) => fn());
       cleanups.length = 0;
-      hiddenInput.remove();
+      if (!embeddedInput) hiddenInput.remove();
       uncheckedInput?.remove();
       clearRootBinding(rootElement, ROOT_BINDING_KEY, controller);
     },

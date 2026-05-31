@@ -490,5 +490,33 @@ describe("Switch", () => {
       const controller = createSwitch(root);
       expect(controller.checked).toBe(false);
     });
+
+    it("reuses an embedded SSR input and preserves passthrough data attributes", () => {
+      document.body.innerHTML = `
+        <span data-slot="switch" id="root" data-name="notify">
+          <input
+            type="checkbox"
+            data-slot="switch-input"
+            data-params="x"
+            data-switch-generated="input"
+            class="sr-only"
+          />
+          <span data-slot="switch-thumb"></span>
+        </span>
+      `;
+      const root = document.getElementById("root") as HTMLElement;
+      const embedded = root.querySelector('[data-slot="switch-input"]') as HTMLInputElement;
+      const controller = createSwitch(root);
+
+      expect(root.querySelectorAll('input[type="checkbox"]').length).toBe(1);
+      expect(embedded.getAttribute("data-params")).toBe("x");
+
+      root.click();
+      expect(controller.checked).toBe(true);
+      expect(embedded.checked).toBe(true);
+
+      controller.destroy();
+      expect(root.contains(embedded)).toBe(true);
+    });
   });
 });

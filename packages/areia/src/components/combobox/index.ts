@@ -2,10 +2,12 @@ import ilha, { html, raw } from "ilha";
 import { Combobox as ComboboxPrimitive } from "@areia/slots";
 import {
   applyThisBind,
+  boundVoidElement,
   createGroupBindSync,
   createOpenBindSync,
   groupBindDefault,
   openBindDefault,
+  splitBindProps,
   subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
@@ -256,6 +258,7 @@ export type ComboboxSearchTriggerInput = Omit<
 export type ComboboxTriggerInputInput = ComboboxSearchTriggerInput;
 
 export function ComboboxTriggerInput(input: ComboboxSearchTriggerInput = {}) {
+  const { binds, attrs: props } = splitBindProps(input);
   const {
     clearLabel = "Clear selection",
     showOptionsLabel = "Show options",
@@ -263,8 +266,8 @@ export function ComboboxTriggerInput(input: ComboboxSearchTriggerInput = {}) {
     variant = "default",
     class: className,
     className: aliasedClassName,
-    ...props
-  } = input;
+    ...rest
+  } = props as ComboboxSearchTriggerInput;
   const iconStyles = triggerInputIconStyles[size];
 
   return html`<div
@@ -274,15 +277,15 @@ export function ComboboxTriggerInput(input: ComboboxSearchTriggerInput = {}) {
       aliasedClassName,
     )}"
   >
-    <input
-      data-slot="combobox-input"
-      class="${cn(
+    ${boundVoidElement(
+      "input",
+      binds,
+      ` data-slot="combobox-input" class="${cn(
         inputVariants({ size, variant }),
         "w-full disabled:cursor-not-allowed",
         iconStyles.padding,
-      )}"
-      ${raw(toAttrs(props))}
-    />
+      )}"${toAttrs(rest)} />`,
+    )}
     <button
       type="button"
       data-slot="combobox-clear"
@@ -529,23 +532,24 @@ export type ComboboxSearchInputInput = Omit<
 export type ComboboxPopupInputInput = ComboboxSearchInputInput;
 
 export function ComboboxInput(input: ComboboxSearchInputInput = {}) {
+  const { binds, attrs: props } = splitBindProps(input);
   const {
     size = COMBOBOX_DEFAULT_VARIANTS.size,
     variant = "default",
     class: className,
     className: aliasedClassName,
-    ...props
-  } = input;
-  return html`<input
-    data-slot="combobox-input"
-    class="${cn(
+    ...rest
+  } = props as ComboboxSearchInputInput;
+  return boundVoidElement(
+    "input",
+    binds,
+    ` data-slot="combobox-input" class="${cn(
       inputVariants({ size, variant }),
       "mx-1.5 w-[calc(100%-0.75rem)] shrink-0 first:mb-2",
       className,
       aliasedClassName,
-    )}"
-    ${raw(toAttrs(props))}
-  />`;
+    )}"${toAttrs(rest)} />`,
+  );
 }
 
 export type ComboboxChipInput = Omit<HTMLElementProps<HTMLSpanElement>, "className" | "children"> &
@@ -603,6 +607,7 @@ function renderItems(items: ComboboxItems) {
 }
 
 function renderCombobox(input: ComboboxInput, children?: unknown[]) {
+  const { binds, attrs } = splitBindProps(input);
   const {
     autoHighlight,
     class: className,
@@ -629,14 +634,30 @@ function renderCombobox(input: ComboboxInput, children?: unknown[]) {
     required,
     size = COMBOBOX_DEFAULT_VARIANTS.size,
     variant: _variant,
-    ...rootProps
-  } = input;
+    align,
+    alignOffset,
+    avoidCollisions,
+    collisionPadding,
+    side,
+    sideOffset,
+    ...inputPassthrough
+  } = attrs as ComboboxInput;
   const defaultOpen = openBindDefault(input, defaultOpenProp);
   const defaultValue = groupBindDefault(input, defaultValueProp) as string | undefined;
   const variant = error ? "error" : "default";
   const normalizedError = normalizeError(error);
   const describedBy =
-    typeof rootProps["aria-describedby"] === "string" ? rootProps["aria-describedby"] : undefined;
+    typeof inputPassthrough["aria-describedby"] === "string"
+      ? inputPassthrough["aria-describedby"]
+      : undefined;
+  const placementProps = {
+    align,
+    alignOffset,
+    avoidCollisions,
+    collisionPadding,
+    side,
+    sideOffset,
+  };
   const content = children ?? (items ? renderItems(items) : inputChildren);
 
   return html`<div
@@ -654,21 +675,23 @@ function renderCombobox(input: ComboboxInput, children?: unknown[]) {
         required,
       }),
     )}
-    ${raw(placementDataAttrs(rootProps))}
-    ${raw(toAttrs(rootProps))}
+    ${raw(placementDataAttrs(placementProps))}
   >
     ${ComboboxTriggerInput({
+      ...inputPassthrough,
+      ...binds,
       id,
+      name,
       placeholder,
       disabled,
       required,
       size,
       variant: variant as "default" | "error",
-      "aria-invalid": normalizedError != null ? "true" : rootProps["aria-invalid"],
+      "aria-invalid": normalizedError != null ? "true" : inputPassthrough["aria-invalid"],
       "aria-describedby": describedBy || undefined,
     })}
     ${ComboboxContent({
-      ...rootProps,
+      ...placementProps,
       children: ComboboxList({ children: [ComboboxEmpty(), content] }),
     })}
   </div>`;

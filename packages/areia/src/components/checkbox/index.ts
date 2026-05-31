@@ -1,6 +1,11 @@
 import ilha, { html, raw } from "ilha";
 import { Checkbox as CheckboxPrimitive } from "@areia/slots";
-import { createCheckedBindSync, type IlhaBindProps } from "$lib/binds";
+import {
+  boundVoidElement,
+  createCheckedBindSync,
+  splitBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -124,6 +129,7 @@ function checkboxDataAttrs(
 }
 
 function checkboxControl(input: CheckboxInput) {
+  const { binds, attrs: restProps } = splitBindProps(input);
   const {
     class: className,
     className: aliasedClassName,
@@ -131,8 +137,28 @@ function checkboxControl(input: CheckboxInput) {
     disabled,
     indeterminate,
     variant = CHECKBOX_DEFAULT_VARIANTS.variant,
-    ...rest
-  } = input;
+    id,
+    name,
+    value,
+    required,
+    readOnly,
+    defaultChecked,
+    uncheckedValue,
+    form,
+    role,
+    tabIndex,
+    tabindex,
+    "aria-checked": ariaChecked,
+    "aria-disabled": ariaDisabled,
+    "aria-readonly": ariaReadonly,
+    "aria-required": ariaRequired,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledby,
+    "aria-describedby": ariaDescribedby,
+    ...inputRest
+  } = restProps as CheckboxInput;
+
+  const hasCheckedBind = binds["bind:checked"] != null || binds["bind:group"] != null;
 
   return html`<span
     data-slot="checkbox"
@@ -145,17 +171,49 @@ function checkboxControl(input: CheckboxInput) {
       className,
       aliasedClassName,
     )}"
-    ${raw(checkboxDataAttrs({ ...rest, checked, disabled, indeterminate }))}
+    ${raw(
+      checkboxDataAttrs({
+        checked,
+        disabled,
+        indeterminate,
+        required,
+        readOnly,
+        name,
+        value,
+        defaultChecked,
+        uncheckedValue: typeof uncheckedValue === "string" ? uncheckedValue : undefined,
+      }),
+    )}
     ${raw(
       toAttrs({
-        ...rest,
-        role: rest.role ?? "checkbox",
-        tabindex: rest.tabindex ?? rest.tabIndex ?? 0,
-        "aria-checked": indeterminate ? "mixed" : checked ? "true" : "false",
-        "aria-disabled": disabled ? "true" : undefined,
+        role: role ?? "checkbox",
+        tabindex: disabled ? -1 : (tabindex ?? tabIndex ?? 0),
+        "aria-checked": ariaChecked ?? (indeterminate ? "mixed" : checked ? "true" : "false"),
+        "aria-disabled": ariaDisabled ?? (disabled ? "true" : undefined),
+        "aria-readonly": ariaReadonly ?? (readOnly ? "true" : undefined),
+        "aria-required": ariaRequired ?? (required ? "true" : undefined),
+        "aria-label": ariaLabel,
+        "aria-labelledby": ariaLabelledby,
+        "aria-describedby": ariaDescribedby,
       }),
     )}
   >
+    ${boundVoidElement(
+      "input",
+      binds,
+      ` type="checkbox" data-slot="checkbox-input" class="sr-only peer" data-checkbox-generated="input"${toAttrs(
+        {
+          ...inputRest,
+          id,
+          name,
+          value,
+          form,
+          required,
+          disabled,
+          ...(hasCheckedBind ? {} : { checked: Boolean(checked ?? defaultChecked) }),
+        },
+      )} />`,
+    )}
     <span
       data-slot="checkbox-indicator"
       class="pointer-events-none absolute inset-0 flex items-center justify-center text-areia-inverse"

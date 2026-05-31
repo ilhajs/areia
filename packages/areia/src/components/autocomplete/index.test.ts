@@ -79,6 +79,13 @@ describe("Autocomplete", () => {
     expect(output).toContain("a");
     expect(output).toContain("b");
   });
+
+  it("places passthrough data attributes on the autocomplete input, not the root", () => {
+    const output = markup(Autocomplete({ "data-params": "x", name: "city" }));
+    expect(output).toContain('data-params="x"');
+    expect(output).toContain('name="city"');
+    expect(output).not.toMatch(/data-slot="autocomplete"[^>]*data-params/);
+  });
 });
 
 describe("Autocomplete.Item", () => {

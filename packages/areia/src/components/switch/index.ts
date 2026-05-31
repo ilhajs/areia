@@ -1,6 +1,11 @@
 import ilha, { html, raw } from "ilha";
 import { Switch as SwitchPrimitive } from "@areia/slots";
-import { createCheckedBindSync, type IlhaBindProps } from "$lib/binds";
+import {
+  boundVoidElement,
+  createCheckedBindSync,
+  splitBindProps,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -146,6 +151,7 @@ function dataAttrs(
 }
 
 function SwitchControl(input: SwitchControlInput = {}) {
+  const { binds, attrs: restProps } = splitBindProps(input);
   const {
     checked,
     defaultChecked,
@@ -160,8 +166,24 @@ function SwitchControl(input: SwitchControlInput = {}) {
     variant = SWITCH_DEFAULT_VARIANTS.variant,
     class: className,
     className: aliasedClassName,
-    ...props
-  } = input;
+    id,
+    form,
+    role,
+    tabIndex,
+    tabindex,
+    "aria-checked": ariaChecked,
+    "aria-disabled": ariaDisabled,
+    "aria-readonly": ariaReadonly,
+    "aria-required": ariaRequired,
+    "aria-busy": ariaBusy,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledby,
+    "aria-describedby": ariaDescribedby,
+    ...inputRest
+  } = restProps as SwitchControlInput;
+
+  const resolvedChecked = Boolean(checked ?? defaultChecked);
+  const hasCheckedBind = binds["bind:checked"] != null || binds["bind:group"] != null;
 
   return html`<span
     data-slot="switch"
@@ -183,22 +205,40 @@ function SwitchControl(input: SwitchControlInput = {}) {
         required,
         name,
         value,
-        uncheckedValue,
+        uncheckedValue: typeof uncheckedValue === "string" ? uncheckedValue : undefined,
       }),
     )}
     ${raw(
       toAttrs({
-        ...props,
-        role: props.role ?? "switch",
-        tabindex: props.tabindex ?? props.tabIndex ?? 0,
-        "aria-checked": (checked ?? defaultChecked) ? "true" : "false",
-        "aria-disabled": disabled ? "true" : undefined,
-        "aria-readonly": readOnly ? "true" : undefined,
-        "aria-required": required ? "true" : undefined,
-        "aria-busy": transitioning ? "true" : undefined,
+        role: role ?? "switch",
+        tabindex: disabled ? -1 : (tabindex ?? tabIndex ?? 0),
+        "aria-checked": ariaChecked ?? (resolvedChecked ? "true" : "false"),
+        "aria-disabled": ariaDisabled ?? (disabled ? "true" : undefined),
+        "aria-readonly": ariaReadonly ?? (readOnly ? "true" : undefined),
+        "aria-required": ariaRequired ?? (required ? "true" : undefined),
+        "aria-busy": ariaBusy ?? (transitioning ? "true" : undefined),
+        "aria-label": ariaLabel,
+        "aria-labelledby": ariaLabelledby,
+        "aria-describedby": ariaDescribedby,
       }),
     )}
   >
+    ${boundVoidElement(
+      "input",
+      binds,
+      ` type="checkbox" data-slot="switch-input" class="sr-only peer" data-switch-generated="input"${toAttrs(
+        {
+          ...inputRest,
+          id,
+          name,
+          value,
+          form,
+          required,
+          disabled,
+          ...(hasCheckedBind ? {} : { checked: resolvedChecked }),
+        },
+      )} />`,
+    )}
     <span
       data-slot="switch-thumb"
       class="${cn(

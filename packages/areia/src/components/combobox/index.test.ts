@@ -70,6 +70,13 @@ describe("Combobox", () => {
     expect(output).toContain("a");
     expect(output).toContain("b");
   });
+
+  it("places passthrough data attributes on the combobox input, not the root", () => {
+    const output = markup(Combobox({ "data-params": "x", name: "country" }));
+    expect(output).toContain('data-params="x"');
+    expect(output).toContain('name="country"');
+    expect(output).not.toMatch(/data-slot="combobox"[^>]*data-params/);
+  });
 });
 
 describe("Combobox.Item", () => {
