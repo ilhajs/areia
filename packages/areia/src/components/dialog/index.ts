@@ -7,6 +7,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { hasSlot, isIlhaIsland, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -100,86 +101,6 @@ function dataAttrs(
     "data-default-open": input.defaultOpen,
     "data-lock-scroll": input.lockScroll,
   });
-}
-
-function rawValue(value: unknown): string | undefined {
-  if (typeof value === "string") return value;
-  if (
-    typeof value === "object" &&
-    value !== null &&
-    "value" in value &&
-    typeof value.value === "string"
-  ) {
-    return value.value;
-  }
-  return undefined;
-}
-
-function islandCallParts(
-  value: unknown,
-): { island: { toString?: (props?: unknown) => string }; props?: unknown } | undefined {
-  if (!value || (typeof value !== "object" && typeof value !== "function")) return undefined;
-  const symbol = Object.getOwnPropertySymbols(value).find(
-    (item) => item.description === "ilha.islandCall",
-  );
-  if (!symbol) return undefined;
-  const record = value as Record<PropertyKey, unknown>;
-  const island = record["island"];
-  if (!island || (typeof island !== "object" && typeof island !== "function")) return undefined;
-  return { island: island as { toString?: (props?: unknown) => string }, props: record["props"] };
-}
-
-function isIlhaIsland(value: unknown): boolean {
-  if (!value || (typeof value !== "object" && typeof value !== "function")) return false;
-  return Object.getOwnPropertySymbols(value).some(
-    (item) => item.description === "ilha.island" || item.description === "ilha.islandMountInternal",
-  );
-}
-
-function render(value: unknown): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  const markup = rawValue(value);
-  if (markup !== undefined) return raw(markup);
-  if (isIlhaIsland(value) || islandCallParts(value)) return value;
-  return value;
-}
-
-function renderString(value: unknown): string {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(renderString).join("");
-  if (isIlhaIsland(value)) return "";
-  const markup = rawValue(value);
-  if (markup !== undefined) return markup;
-  const islandCall = islandCallParts(value);
-  if (islandCall?.island.toString) return islandCall.island.toString(islandCall.props);
-  return String(value);
-}
-
-function hasSlot(value: unknown, slot: string) {
-  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(renderString(value));
-}
-
-function withSlot(value: unknown, slot: string, className?: string, aliasedClassName?: string) {
-  const markup = renderString(value);
-  if (!markup || !markup.trimStart().startsWith("<")) return undefined;
-
-  const classes = cn(className, aliasedClassName);
-  let next = markup;
-
-  if (!/\sdata-slot=/.test(next)) {
-    next = next.replace(/<([a-zA-Z][^\s/>]*)([^>]*)>/, `<$1$2 data-slot="${slot}">`);
-  }
-
-  if (classes) {
-    if (/\sclass=\"/.test(next)) {
-      next = next.replace(/\sclass=\"([^\"]*)\"/, ` class="${classes} $1"`);
-    } else {
-      next = next.replace(/<([a-zA-Z][^\s/>]*)([^>]*)>/, `<$1$2 class="${classes}">`);
-    }
-  }
-
-  return raw(next);
 }
 
 export type DialogTriggerInput = Omit<HTMLElementProps<HTMLElement>, "className" | "children"> &

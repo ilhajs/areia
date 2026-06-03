@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { createResizable, create } from "./index";
+import { createResizable, create, reconnectResizable } from "./index";
 import { clearRootBinding, setRootBinding } from "../core";
 
 describe("Resizable", () => {
@@ -536,6 +536,22 @@ describe("Resizable", () => {
       const rebound = createResizable(root);
       expect(rebound).not.toBe(controller);
       rebound.destroy();
+    });
+
+    it("reconnects fresh handles after the DOM is replaced", () => {
+      const { root, handles, controller } = setup({
+        panes: [{ "data-default-size": "50" }, { "data-default-size": "50" }],
+      });
+
+      const replacement = document.createElement("div");
+      replacement.setAttribute("data-slot", "resizable-handle");
+      handles[0].replaceWith(replacement);
+
+      const rebound = reconnectResizable(root);
+      expect(rebound).not.toBe(controller);
+      expect(replacement.getAttribute("role")).toBe("separator");
+      rebound.destroy();
+      controller.destroy();
     });
   });
 

@@ -52,4 +52,36 @@ describe("Tooltip", () => {
     expect(output).toContain("a");
     expect(output).toContain("b");
   });
+
+  it("renders serialized HTML trigger prop instead of [object Object]", () => {
+    const output = markup(
+      Tooltip({
+        content: "Tip",
+        trigger: { value: '<button type="button" data-testid="trigger">Hover</button>' },
+      }),
+    );
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-testid="trigger"');
+  });
+
+  it("renders serialized HTML content instead of [object Object]", () => {
+    const output = markup(
+      Tooltip({
+        children: "Hover",
+        content: { value: '<span data-testid="tip">Tip text</span>' },
+      }),
+    );
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-testid="tip"');
+  });
+
+  it("renders serialized HTML in Tooltip.Trigger", () => {
+    const output = markup(
+      Tooltip.Trigger({
+        children: { value: '<button type="button" data-testid="trigger">Hover</button>' },
+      }),
+    );
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-testid="trigger"');
+  });
 });

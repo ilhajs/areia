@@ -9,6 +9,7 @@ import {
 } from "$lib/binds";
 import { Icon } from "$components/icon";
 import { cn } from "$lib/cn";
+import { hasSlot, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -144,31 +145,6 @@ export type DropdownItemInput = DropdownVariantsProps &
 
 const checkIcon = Icon({ icon: Check, class: "size-3.5" });
 
-function rawValue(value: unknown): string | undefined {
-  if (typeof value === "string") return value;
-  if (
-    typeof value === "object" &&
-    value !== null &&
-    "value" in value &&
-    typeof value.value === "string"
-  ) {
-    return value.value;
-  }
-  return undefined;
-}
-
-function render(value: unknown): string {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
-  const markup = rawValue(value);
-  if (markup !== undefined) return markup;
-  return String(value);
-}
-
-function hasSlot(value: unknown, slot: string) {
-  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(render(value));
-}
-
 function itemSlot(type?: DropdownItemKind) {
   if (type === "checkbox") return "dropdown-menu-checkbox-item";
   if (type === "radio") return "dropdown-menu-radio-item";
@@ -218,7 +194,7 @@ export function DropdownTrigger(input: DropdownTriggerInput = {}) {
         type: tag === "button" ? (type ?? "button") : type,
       }),
     )}
-  >${children}</${raw(tag)}>`;
+  >${render(children)}</${raw(tag)}>`;
 }
 
 export function DropdownContent(input: DropdownContentInput = {}) {
@@ -234,7 +210,7 @@ export function DropdownContent(input: DropdownContentInput = {}) {
     )}"
     ${raw(toAttrs(rest))}
   >
-    ${children}
+    ${render(children)}
   </div>`;
 }
 
@@ -246,7 +222,7 @@ export function DropdownGroup(input: DropdownGroupInput = {}) {
     class="${cn("py-1", className, aliasedClassName)}"
     ${raw(toAttrs(rest))}
   >
-    ${children}
+    ${render(children)}
   </div>`;
 }
 
@@ -263,7 +239,7 @@ export function DropdownLabel(input: DropdownLabelInput = {}) {
     )}"
     ${raw(toAttrs(rest))}
   >
-    ${children}
+    ${render(children)}
   </div>`;
 }
 
@@ -289,7 +265,7 @@ export function DropdownShortcut(input: DropdownShortcutInput = {}) {
     )}"
     ${raw(toAttrs(rest))}
   >
-    ${children}
+    ${render(children)}
   </span>`;
 }
 
@@ -450,7 +426,7 @@ function renderDropdown(input: DropdownInput = {}) {
     )}
   >
     ${hasComposedContent
-      ? raw(composedChildren)
+      ? composedChildren
       : html`${DropdownTrigger({ children: trigger, class: cn(triggerClass, triggerClassName) })}
         ${DropdownContent({
           children: children ?? renderItems(items),

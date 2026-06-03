@@ -1,6 +1,7 @@
 import ilha, { html, raw } from "ilha";
 import { Resizable as ResizablePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
+import { decodeMarkupEntities, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -35,32 +36,35 @@ export type ResizableHandleInput = Omit<
   };
 
 const RESIZABLE_PART = "__areiaResizablePart";
-const RESIZABLE_PART_TOKEN = "__AREIA_RESIZABLE_PART_";
-let resizablePartId = 0;
-
-const resizableParts = new Map<string, ResizablePart>();
 
 type ResizablePart =
-  | { [RESIZABLE_PART]: "panel"; id: string; input: ResizablePanelInput; toString: () => string }
-  | { [RESIZABLE_PART]: "handle"; id: string; input: ResizableHandleInput; toString: () => string };
+  | { [RESIZABLE_PART]: "panel"; input: ResizablePanelInput }
+  | { [RESIZABLE_PART]: "handle"; input: ResizableHandleInput };
+
+function partToMarkup(part: ResizablePart): string {
+  const rendered = renderResizablePart(part);
+  if (rendered && typeof rendered === "object" && rendered !== null && "value" in rendered) {
+    return String(rendered.value);
+  }
+  return String(rendered ?? "");
+}
 
 function createResizablePart<T extends ResizablePart[typeof RESIZABLE_PART]>(
   type: T,
   input: T extends "panel" ? ResizablePanelInput : ResizableHandleInput,
 ): ResizablePart {
-  const id = `${resizablePartId++}`;
-  const part = {
-    [RESIZABLE_PART]: type,
-    id,
-    input,
-    toString: () => `${RESIZABLE_PART_TOKEN}${id}__`,
-  } as ResizablePart;
-  resizableParts.set(id, part);
+  const part = { [RESIZABLE_PART]: type, input } as ResizablePart;
+  Object.defineProperty(part, "toString", {
+    value: () => partToMarkup(part),
+    enumerable: false,
+  });
   return part;
 }
 
 function isResizablePart(value: unknown): value is ResizablePart {
-  return typeof value === "object" && value !== null && RESIZABLE_PART in value;
+  if (typeof value !== "object" || value === null) return false;
+  const type = (value as Record<string, unknown>)[RESIZABLE_PART];
+  return type === "panel" || type === "handle";
 }
 
 function renderResizablePart(part: ResizablePart): unknown {
@@ -69,28 +73,21 @@ function renderResizablePart(part: ResizablePart): unknown {
     : renderResizableHandle(part.input);
 }
 
-function renderPartTokens(value: string) {
-  const pattern = new RegExp(`${RESIZABLE_PART_TOKEN}(\\d+)__`, "g");
-  return raw(
-    value.replace(pattern, (_match, id: string) => {
-      const part = resizableParts.get(id);
-      if (!part) return "";
-      const rendered = renderResizablePart(part);
-      return typeof rendered === "object" && rendered !== null && "value" in rendered
-        ? String(rendered.value)
-        : String(rendered);
-    }),
-  );
-}
-
 function renderChildren(value: unknown): unknown {
   if (value === null || value === undefined || value === false) return "";
   if (Array.isArray(value)) return value.map(renderChildren);
   if (isResizablePart(value)) return renderResizablePart(value);
   if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return renderPartTokens(value.value);
+    const markup = decodeMarkupEntities(value.value);
+    if (
+      markup.includes('data-slot="resizable-panel"') ||
+      markup.includes('data-slot="resizable-handle"')
+    ) {
+      return raw(markup);
+    }
+    return render(markup);
   }
-  if (typeof value === "string") return renderPartTokens(value);
+  if (typeof value === "string") return render(value);
   return value;
 }
 
@@ -174,6 +171,51 @@ export function ResizableHandle(input: ResizableHandleInput = {}) {
   return createResizablePart("handle", input);
 }
 
+function resizableOptions(input: ResizableInput = {}): ResizablePrimitive.ResizableOptions {
+  return {
+    direction: input.direction,
+    keyboardResizeBy: input.keyboardResizeBy,
+    onLayoutChange: input.onLayoutChange,
+  } satisfies ResizablePrimitive.ResizableOptions;
+}
+
+function collectResizableRoots(scope: ParentNode): HTMLElement[] {
+  const roots = new Set<HTMLElement>();
+  if (scope instanceof HTMLElement) {
+    if (scope.matches('[data-slot="resizable"]')) roots.add(scope);
+    const ancestor = scope.closest('[data-slot="resizable"]');
+    if (ancestor instanceof HTMLElement) roots.add(ancestor);
+  }
+  scope.querySelectorAll?.('[data-slot="resizable"]').forEach((node) => {
+    if (node instanceof HTMLElement) roots.add(node);
+  });
+  return [...roots];
+}
+
+function connectResizableTree(
+  host: ParentNode,
+  input: ResizableInput = {},
+): (() => void) | undefined {
+  const options = resizableOptions(input);
+  const controllers: ResizablePrimitive.ResizableController[] = [];
+
+  for (const root of collectResizableRoots(host)) {
+    if (root.querySelectorAll('[data-slot="resizable-panel"]').length === 0) continue;
+    try {
+      controllers.push(ResizablePrimitive.reconnectResizable(root, options));
+    } catch {
+      // Ignore groups that are mid-render without a complete panel/handle structure.
+    }
+  }
+
+  if (controllers.length === 0) return undefined;
+  return () => controllers.forEach((controller) => controller.destroy());
+}
+
+function scheduleConnectResizableTree(host: ParentNode, input: ResizableInput = {}) {
+  queueMicrotask(() => connectResizableTree(host, input));
+}
+
 function renderResizable(input: ResizableInput = {}) {
   const {
     direction,
@@ -204,42 +246,27 @@ function renderResizable(input: ResizableInput = {}) {
   </div>`;
 }
 
-function mountResizableRoot(root: HTMLElement, options: ResizablePrimitive.ResizableOptions = {}) {
-  const controller = ResizablePrimitive.createResizable(root, options);
-  const nestedControllers = Array.from(
-    root.querySelectorAll<HTMLElement>('[data-slot="resizable"]'),
-  )
-    .filter((nestedRoot) => nestedRoot !== root)
-    .map((nestedRoot) => ResizablePrimitive.createResizable(nestedRoot));
-
-  return () => {
-    nestedControllers.forEach((nestedController) => nestedController.destroy());
-    controller.destroy();
-  };
-}
-
 export const ResizablePanelGroupRoot = ilha
   .input<ResizableInput>()
   .onMount(({ host, input }) => {
-    const root = host.matches('[data-slot="resizable"]')
-      ? (host as HTMLElement)
-      : host.querySelector<HTMLElement>('[data-slot="resizable"]');
-    if (!root) return;
-
-    return mountResizableRoot(root, {
-      direction: input.direction,
-      keyboardResizeBy: input.keyboardResizeBy,
-      onLayoutChange: input.onLayoutChange,
-    } satisfies ResizablePrimitive.ResizableOptions);
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      cleanup = connectResizableTree(host, input);
+    });
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
+  })
+  .effect(({ host, input }) => {
+    scheduleConnectResizableTree(host, input);
   })
   .render(({ input }) => renderResizable(input));
 
-function autoMountResizable(root: ParentNode = document) {
-  root.querySelectorAll<HTMLElement>('[data-slot="resizable"]').forEach((resizableRoot) => {
-    if (resizableRoot.dataset.areiaResizableMounted === "true") return;
-    resizableRoot.dataset.areiaResizableMounted = "true";
-    mountResizableRoot(resizableRoot);
-  });
+function autoMountResizable(scope: ParentNode = document) {
+  scheduleConnectResizableTree(scope);
 }
 
 if (typeof document !== "undefined") {

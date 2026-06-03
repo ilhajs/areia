@@ -3,6 +3,7 @@ import {
   getDataBool,
   reuseRootBinding,
   hasRootBinding,
+  getRootBinding,
   setRootBinding,
   clearRootBinding,
   ensureId,
@@ -909,6 +910,15 @@ export function createResizable(
 
   setRootBinding(root, ROOT_BINDING_KEY, controller);
   return controller;
+}
+
+/** Destroy any existing controller and bind fresh handles on the current DOM. */
+export function reconnectResizable(
+  root: Element,
+  options: ResizableOptions = {},
+): ResizableController {
+  getRootBinding<ResizableController>(root, ROOT_BINDING_KEY)?.destroy();
+  return createResizable(root, options);
 }
 
 /**

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { html } from "ilha";
 import { Dropdown, dropdownVariants } from "./index";
 
 function markup(value: unknown): string {
@@ -49,6 +50,60 @@ describe("Dropdown", () => {
     const output = markup(Dropdown({ trigger: "X", children: "Y", class: "a", className: "b" }));
     expect(output).toContain("a");
     expect(output).toContain("b");
+  });
+
+  it("renders serialized HTML trigger markup instead of [object Object]", () => {
+    const output = markup(
+      Dropdown({
+        trigger: { value: '<button type="button" data-testid="trigger">Open</button>' },
+        children: "Hello",
+      }),
+    );
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-testid="trigger"');
+    expect(output).toContain("Open");
+  });
+
+  it("renders HTML trigger markup from ilha html helper", () => {
+    const output = markup(
+      Dropdown({
+        trigger: html`<button type="button" class="custom-trigger">Open</button>`,
+        children: "Hello",
+      }),
+    );
+    expect(output).not.toContain("[object Object]");
+    expect(output).not.toContain("&lt;button");
+    expect(output).toContain('class="custom-trigger"');
+    expect(output).toContain("Open");
+  });
+
+  it("renders composed trigger children", () => {
+    const output = markup(
+      Dropdown({
+        children: [
+          Dropdown.Trigger({ children: "Open" }),
+          Dropdown.Content({ children: Dropdown.Item({ label: "One" }) }),
+        ],
+      }),
+    );
+    expect(output).toContain('data-slot="dropdown-menu-trigger"');
+    expect(output).toContain('data-slot="dropdown-menu-content"');
+    expect(output).toContain("Open");
+  });
+
+  it("renders serialized HTML in composed content", () => {
+    const output = markup(
+      Dropdown({
+        children: [
+          Dropdown.Trigger({ children: "Open" }),
+          Dropdown.Content({
+            children: { value: '<p data-testid="menu-body">Body</p>' },
+          }),
+        ],
+      }),
+    );
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-testid="menu-body"');
   });
 });
 

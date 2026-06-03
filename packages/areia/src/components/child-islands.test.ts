@@ -7,6 +7,7 @@ import {
   Collapsible,
   ContextMenu,
   Dialog,
+  Dropdown,
   Field,
   HoverCard,
   LayerCard,
@@ -14,6 +15,8 @@ import {
   Popover,
   Resizable,
   Table,
+  Toggle,
+  Tooltip,
 } from "../index";
 
 try {
@@ -35,6 +38,13 @@ function sampleTriggerMarkup() {
   >
     Right click here
   </div>`;
+}
+
+function serializedTriggerMarkup() {
+  return {
+    value:
+      '<div class="rounded-lg border border-dashed border-areia-border p-8 text-center text-areia-subtle">Right click here</div>',
+  };
 }
 
 function counterIsland() {
@@ -93,6 +103,24 @@ describe("child Ilha islands", () => {
           }),
       ],
       [
+        "Dropdown trigger",
+        () =>
+          Dropdown.Static({
+            trigger: sampleTriggerMarkup(),
+            children: Dropdown.Item({ label: "Copy" }),
+          }),
+      ],
+      [
+        "Dropdown composed trigger",
+        () =>
+          Dropdown.Static({
+            children: [
+              Dropdown.Trigger({ children: sampleTriggerMarkup() }),
+              Dropdown.Content({ children: Dropdown.Item({ label: "Copy" }) }),
+            ],
+          }),
+      ],
+      [
         "ContextMenu composed trigger",
         () =>
           ContextMenu.Static({
@@ -112,13 +140,30 @@ describe("child Ilha islands", () => {
         () => HoverCard.Static({ children: sampleTriggerMarkup(), content: "Body" }),
       ],
       [
+        "Popover composed trigger",
+        () =>
+          Popover.Static({
+            children: [
+              Popover.Trigger({ children: serializedTriggerMarkup() }),
+              Popover.Content({ children: "Body" }),
+            ],
+          }),
+      ],
+      [
+        "Tooltip trigger",
+        () => Tooltip.Static({ trigger: serializedTriggerMarkup(), content: "Tip" }),
+      ],
+      ["Toggle children", () => Toggle.Static({ children: serializedTriggerMarkup() })],
+      [
         "Collapsible panel",
         () => Collapsible.Static({ trigger: "Toggle", panel: sampleTriggerMarkup() }),
       ],
       ["Field children", () => Field.Static({ children: sampleTriggerMarkup() })],
       ["Button children", () => Button({ children: sampleTriggerMarkup() })],
+      ["Button serialized children", () => Button({ children: serializedTriggerMarkup() })],
       ["Link children", () => Link({ href: "#", children: sampleTriggerMarkup() })],
       ["Badge children", () => Badge({ children: sampleTriggerMarkup() })],
+      ["Badge serialized children", () => Badge({ children: serializedTriggerMarkup() })],
     ];
 
     for (const [name, make] of cases) {
@@ -172,6 +217,14 @@ describe("child Ilha islands", () => {
             ContextMenu({
               trigger: Counter,
               children: ContextMenu.Item({ label: "Copy" }),
+            }),
+        ],
+        [
+          "Dropdown trigger",
+          (Counter) =>
+            Dropdown({
+              trigger: Counter,
+              children: Dropdown.Item({ label: "Copy" }),
             }),
         ],
         [

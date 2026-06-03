@@ -53,6 +53,16 @@ describe("Popover.Trigger", () => {
     const output = markup(Popover.Trigger({ children: "Open" }));
     expect(output).toContain('data-slot="popover-trigger"');
   });
+
+  it("renders serialized HTML children instead of [object Object]", () => {
+    const output = markup(
+      Popover.Trigger({
+        children: { value: '<button type="button" data-testid="trigger">Open</button>' },
+      }),
+    );
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-testid="trigger"');
+  });
 });
 
 describe("Popover.Content", () => {

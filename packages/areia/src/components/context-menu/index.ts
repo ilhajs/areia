@@ -2,31 +2,9 @@ import ilha, { html, raw } from "ilha";
 import { ContextMenu as ContextMenuPrimitive } from "@areia/slots";
 import { createOpenBindSync, subscribeBindProps, type IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { hasSlot, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-
-function render(value: unknown): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "string") return raw(value);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
-
-function renderString(value: unknown): string {
-  const rendered = render(value);
-  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
-  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
-    return String(rendered.value);
-  }
-  return String(rendered);
-}
-
-function hasSlot(value: unknown, slot: string) {
-  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(renderString(value));
-}
 
 export type ContextMenuInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   IlhaBindProps &

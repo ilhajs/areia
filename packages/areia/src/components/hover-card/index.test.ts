@@ -48,6 +48,16 @@ describe("HoverCard.Trigger", () => {
     const output = markup(HoverCard.Trigger({ children: "Hover" }));
     expect(output).toContain('data-slot="hover-card-trigger"');
   });
+
+  it("renders serialized HTML children instead of [object Object]", () => {
+    const output = markup(
+      HoverCard.Trigger({
+        children: { value: '<button type="button" data-testid="trigger">Hover</button>' },
+      }),
+    );
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-testid="trigger"');
+  });
 });
 
 describe("HoverCard.Content", () => {

@@ -1,5 +1,6 @@
 import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
+import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -133,6 +134,6 @@ export function Badge(input: BadgeInput = {}) {
   return html`<span
     class="${cn(badgeVariants({ variant }), className, aliasedClassName)}"
     ${raw(toAttrs(rest))}
-    >${children}</span
+    >${render(children)}</span
   >`;
 }

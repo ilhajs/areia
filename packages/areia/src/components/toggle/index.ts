@@ -1,6 +1,7 @@
 import ilha, { html, raw } from "ilha";
 import { Toggle as TogglePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
+import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -84,7 +85,7 @@ function renderToggle(input: ToggleInput = {}) {
     ${raw(toggleDataAttrs({ defaultPressed, disabled }))}
     ${raw(toAttrs({ ...rest, disabled: disabled || undefined }))}
   >
-    ${children}
+    ${render(children)}
   </button>`;
 }
 

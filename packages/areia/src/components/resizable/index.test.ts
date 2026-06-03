@@ -66,6 +66,69 @@ describe("Resizable", () => {
     expect(output).toContain("flex-grow:35");
   });
 
+  it("renders serialized panel and handle parts from hydration props", () => {
+    const output = markup(
+      Resizable.Static({
+        children: [
+          { __areiaResizablePart: "panel", input: { defaultSize: 30, children: "Left" } },
+          { __areiaResizablePart: "handle", input: { withHandle: true } },
+          { __areiaResizablePart: "panel", input: { defaultSize: 70, children: "Right" } },
+        ],
+      }),
+    );
+
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-slot="resizable-panel"');
+    expect(output).toContain('data-slot="resizable-handle"');
+    expect(output).toContain("Left");
+    expect(output).toContain("Right");
+  });
+
+  it("renders escaped coerced markup children instead of entity text", () => {
+    const parts = [
+      Resizable.Panel({ defaultSize: 50, minSize: 10, children: "Left" }),
+      Resizable.Handle({ withHandle: true }),
+      Resizable.Panel({ defaultSize: 50, minSize: 10, children: "Right" }),
+    ];
+    const joined = parts.map(String).join("");
+    const escaped = joined
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+    const output = markup(
+      Resizable.Static({
+        children: { value: escaped },
+      }),
+    );
+
+    expect(output).not.toContain("&lt;div");
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-slot="resizable-panel"');
+    expect(output).toContain('data-slot="resizable-handle"');
+    expect(output).toContain("Left");
+    expect(output).toContain("Right");
+  });
+
+  it("renders coerced markup children instead of [object Object]", () => {
+    const parts = [
+      Resizable.Panel({ defaultSize: 50, children: "Left" }),
+      Resizable.Handle({ withHandle: true }),
+      Resizable.Panel({ defaultSize: 50, children: "Right" }),
+    ];
+    const output = markup(
+      Resizable.Static({
+        children: { value: parts.map(String).join("") },
+      }),
+    );
+
+    expect(output).not.toContain("[object Object]");
+    expect(output).toContain('data-slot="resizable-panel"');
+    expect(output).toContain('data-slot="resizable-handle"');
+    expect(output).toContain("Left");
+    expect(output).toContain("Right");
+  });
+
   it("mounts interactive Ilha child islands inside panels", async () => {
     document.body.innerHTML = "";
 
@@ -157,6 +220,150 @@ describe("Resizable", () => {
       await Promise.resolve();
 
       expect(button?.textContent).toBe("Count: 1");
+    } finally {
+      unmount();
+    }
+  });
+
+  it("reconnects handles after island re-render", async () => {
+    document.body.innerHTML = "";
+
+    let renderCount = 0;
+    const ResizableLayout = ilha.input<{ label?: string }>().render(({ input }) => {
+      renderCount++;
+      return html`${Resizable.Root({
+        direction: "horizontal",
+        children: [
+          Resizable.Panel({ defaultSize: 50, children: input?.label ?? "Left" }),
+          Resizable.Handle({ withHandle: true }),
+          Resizable.Panel({ defaultSize: 50, children: "Right" }),
+        ],
+      })}`;
+    });
+
+    const App = ilha.render(() => html`<div>${ResizableLayout({ label: "Left" })}</div>`);
+    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    const island = mount({ App, ResizableLayout }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    try {
+      const root = document.querySelector('[data-slot="resizable"]') as HTMLElement;
+      const drag = () => {
+        const handle = document.querySelector('[data-slot="resizable-handle"]') as HTMLElement;
+        const panels = document.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]');
+        Object.defineProperty(root, "getBoundingClientRect", {
+          configurable: true,
+          value: () =>
+            ({
+              width: 1000,
+              height: 500,
+              top: 0,
+              left: 0,
+              right: 1000,
+              bottom: 500,
+              x: 0,
+              y: 0,
+              toJSON: () => {},
+            }) as DOMRect,
+        });
+        handle.dispatchEvent(
+          new PointerEvent("pointerdown", {
+            bubbles: true,
+            clientX: 500,
+            pointerId: 1,
+            pointerType: "mouse",
+          }),
+        );
+        document.body.dispatchEvent(
+          new PointerEvent("pointermove", {
+            bubbles: true,
+            clientX: 600,
+            pointerId: 1,
+            pointerType: "mouse",
+          }),
+        );
+        return parseFloat(panels[0]?.style.flexGrow ?? "0");
+      };
+
+      expect(renderCount).toBeGreaterThan(1);
+      expect(drag()).toBeCloseTo(60);
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      expect(document.querySelector('[data-slot="resizable-handle"]')?.getAttribute("role")).toBe(
+        "separator",
+      );
+      expect(drag()).toBeCloseTo(60);
+    } finally {
+      island.unmount();
+    }
+  });
+
+  it("supports dragging after Resizable.Root hydration remount", async () => {
+    document.body.innerHTML = "";
+
+    const Layout = ilha.render(
+      () =>
+        html`<div class="layout">
+          ${Resizable.Root({
+            direction: "horizontal",
+            children: [
+              Resizable.Panel({ defaultSize: 50, children: "Left" }),
+              Resizable.Handle({ withHandle: true }),
+              Resizable.Panel({ defaultSize: 50, children: "Right" }),
+            ],
+          })}
+        </div>`,
+    );
+
+    document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
+    const { unmount } = mount({ Layout }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    try {
+      const root = document.querySelector('[data-slot="resizable"]') as HTMLElement;
+      const handle = document.querySelector('[data-slot="resizable-handle"]') as HTMLElement;
+      const panels = document.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]');
+
+      expect(handle?.getAttribute("role")).toBe("separator");
+      expect(panels).toHaveLength(2);
+
+      Object.defineProperty(root, "getBoundingClientRect", {
+        configurable: true,
+        value: () =>
+          ({
+            width: 1000,
+            height: 500,
+            top: 0,
+            left: 0,
+            right: 1000,
+            bottom: 500,
+            x: 0,
+            y: 0,
+            toJSON: () => {},
+          }) as DOMRect,
+      });
+
+      handle.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          clientX: 500,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+      document.body.dispatchEvent(
+        new PointerEvent("pointermove", {
+          bubbles: true,
+          clientX: 600,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+
+      expect(parseFloat(panels[0]?.style.flexGrow ?? "0")).toBeCloseTo(60);
     } finally {
       unmount();
     }

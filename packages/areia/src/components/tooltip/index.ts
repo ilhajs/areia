@@ -1,6 +1,7 @@
 import ilha, { html, raw } from "ilha";
 import { Tooltip as TooltipPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
+import { hasSlot, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -143,7 +144,7 @@ export function TooltipContent(input: TooltipContentInput = {}) {
     ${raw(dataAttrs({ ...props, side }))}
     ${raw(toAttrs(props))}
   >
-    ${arrow ? TooltipArrow() : ""} ${children}
+    ${arrow ? TooltipArrow() : ""} ${render(children)}
   </div>`;
 }
 
@@ -172,42 +173,8 @@ export function TooltipArrow(input: TooltipArrowInput = {}) {
     )}"
     ${raw(toAttrs(props))}
   >
-    ${children}
+    ${render(children)}
   </div>`;
-}
-
-function rawValue(value: unknown): string | undefined {
-  if (
-    typeof value === "object" &&
-    value !== null &&
-    "value" in value &&
-    typeof value.value === "string"
-  ) {
-    return value.value;
-  }
-  return undefined;
-}
-
-function withTriggerSlot(value: unknown, className?: string, aliasedClassName?: string) {
-  const markup = rawValue(value);
-  if (!markup || !markup.trimStart().startsWith("<")) return undefined;
-
-  const classes = cn(className, aliasedClassName);
-  let next = markup;
-
-  if (!/\sdata-slot=/.test(next)) {
-    next = next.replace(/<([a-zA-Z][^\s/>]*)([^>]*)>/, '<$1$2 data-slot="tooltip-trigger">');
-  }
-
-  if (classes) {
-    if (/\sclass=\"/.test(next)) {
-      next = next.replace(/\sclass=\"([^\"]*)\"/, ` class="${classes} $1"`);
-    } else {
-      next = next.replace(/<([a-zA-Z][^\s/>]*)([^>]*)>/, `<$1$2 class="${classes}">`);
-    }
-  }
-
-  return raw(next);
 }
 
 export type TooltipTriggerInput = Omit<HTMLElementProps<HTMLElement>, "className" | "children"> &
@@ -250,7 +217,7 @@ export function TooltipTrigger(input: TooltipTriggerInput = {}) {
         type: tag === "button" ? (type ?? "button") : type,
       }),
     )}
-  >${children}</${raw(tag)}>`;
+  >${render(children)}</${raw(tag)}>`;
 }
 
 export type TooltipInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
@@ -304,15 +271,20 @@ function renderTooltip(input: TooltipInput) {
     ...rootProps
   } = input;
 
-  const generatedTrigger =
-    trigger ??
-    withTriggerSlot(children, triggerClass, triggerClassName) ??
-    TooltipTrigger({
-      as: triggerAs,
-      class: triggerClass,
-      className: triggerClassName,
-      children,
-    });
+  const composedChildren = render(children);
+  const hasComposedContent = hasSlot(children, "tooltip-content");
+  const hasComposedTrigger = hasSlot(children, "tooltip-trigger");
+  const generatedTrigger = hasComposedTrigger
+    ? undefined
+    : (withSlot(trigger, "tooltip-trigger", triggerClass, triggerClassName) ??
+      (trigger != null ? render(trigger) : undefined) ??
+      withSlot(children, "tooltip-trigger", triggerClass, triggerClassName) ??
+      TooltipTrigger({
+        as: triggerAs,
+        class: triggerClass,
+        className: triggerClassName,
+        children,
+      }));
 
   return html`<div
     data-slot="tooltip"
@@ -332,20 +304,22 @@ function renderTooltip(input: TooltipInput) {
     )}
     ${raw(toAttrs(rootProps))}
   >
-    ${generatedTrigger}
-    ${TooltipContent({
-      align,
-      alignOffset,
-      arrow,
-      avoidCollisions,
-      class: contentClass,
-      className: contentClassName,
-      collisionPadding,
-      children: content,
-      portal,
-      side,
-      sideOffset,
-    })}
+    ${hasComposedContent ? composedChildren : generatedTrigger}
+    ${hasComposedContent
+      ? ""
+      : TooltipContent({
+          align,
+          alignOffset,
+          arrow,
+          avoidCollisions,
+          class: contentClass,
+          className: contentClassName,
+          collisionPadding,
+          children: content,
+          portal,
+          side,
+          sideOffset,
+        })}
   </div>`;
 }
 
