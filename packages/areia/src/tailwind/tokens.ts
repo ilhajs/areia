@@ -12,7 +12,7 @@ export const lightVariables = {
   "--areia-overlay": "oklch(0% 0 0 / 0.4)",
   "--areia-border": "oklch(93.5% 0 0)",
   "--areia-input": "var(--color-white, #fff)",
-  "--areia-ring": "oklch(0.5772 0.2324 260)",
+  "--areia-ring": "var(--areia-primary)",
   "--areia-divider": "oklch(14.5% 0 0 / 0.1)",
 
   /* text */
@@ -27,8 +27,8 @@ export const lightVariables = {
   /* brand & accent */
   "--areia-primary": "oklch(0.5772 0.2324 260)",
   "--areia-primary-foreground": "var(--color-white, #fff)",
-  "--areia-primary-soft": "var(--color-blue-100, oklch(93.2% 0.032 255.585))",
-  "--areia-primary-soft-foreground": "var(--color-blue-800, oklch(42.4% 0.199 265.638))",
+  "--areia-primary-soft": "color-mix(in oklch, var(--areia-primary) 14%, var(--areia-background))",
+  "--areia-primary-soft-foreground": "var(--areia-primary)",
   "--areia-accent": "#f6821f",
   "--areia-accent-foreground": "var(--color-white, #fff)",
   "--areia-accent-soft": "var(--color-orange-100, oklch(95.4% 0.038 75.164))",
@@ -138,8 +138,8 @@ export const darkVariables = {
   "--areia-text-inverse": "var(--color-neutral-900, oklch(20.5% 0 0))",
   "--areia-text-disabled": "var(--color-neutral-600, oklch(43.9% 0 0))",
 
-  "--areia-primary-soft": "var(--color-blue-900, oklch(37.9% 0.146 265.522))",
-  "--areia-primary-soft-foreground": "var(--color-blue-400, oklch(70.7% 0.165 254.624))",
+  "--areia-primary-soft": "color-mix(in oklch, var(--areia-primary) 32%, var(--areia-background))",
+  "--areia-primary-soft-foreground": "var(--areia-primary)",
   "--areia-accent-soft": "var(--color-orange-900, oklch(40.8% 0.123 38.172))",
   "--areia-accent-soft-foreground": "var(--color-orange-200, oklch(90.1% 0.076 70.697))",
   "--areia-badge-purple": "var(--color-purple-700, oklch(50.8% 0.118 165.612))",

@@ -26,6 +26,12 @@ describe("areia tailwind plugin", () => {
     expect(lightVariables["--areia-background"]).toContain("#fff");
     expect(darkVariables["--areia-background"]).toContain("oklch(10%");
     expect(lightVariables["--areia-primary"]).toContain("oklch");
+    expect(lightVariables["--areia-ring"]).toBe("var(--areia-primary)");
+    expect(darkVariables["--areia-ring"]).toBe("var(--areia-primary)");
+    expect(lightVariables["--areia-primary-soft"]).toContain("var(--areia-primary)");
+    expect(lightVariables["--areia-primary-soft-foreground"]).toBe("var(--areia-primary)");
+    expect(darkVariables["--areia-primary-soft"]).toContain("var(--areia-primary)");
+    expect(darkVariables["--areia-primary-soft-foreground"]).toBe("var(--areia-primary)");
   });
 
   it("ships a tailwind.css entry that loads the plugin", () => {
