@@ -116,14 +116,14 @@ describe("Button", () => {
     expect(output).not.toContain("&quot;save-button&quot;");
   });
 
-  it("renders title as tooltip content instead of a native title attribute", () => {
+  it("renders title as inline tooltip content instead of a native title attribute", () => {
     const output = markup(Button({ children: "Save", title: "Save changes" }));
 
-    expect(output).toContain('data-slot="tooltip"');
-    expect(output).toContain('data-slot="tooltip-trigger"');
-    expect(output).toContain('data-slot="tooltip-content"');
+    expect(output).toContain('role="tooltip"');
+    expect(output).toContain("group/button-title");
     expect(output).toContain("Save changes");
     expect(output).not.toContain('title="Save changes"');
+    expect(output).not.toContain("data-ilha-slot");
   });
 
   it("merges class and className", () => {
