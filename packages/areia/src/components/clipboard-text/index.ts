@@ -192,7 +192,7 @@ function renderClipboardText(input: ClipboardTextInput) {
   >
     <span data-slot="clipboard-text-value" class="grow truncate ps-4 pe-2">${text}</span>
     ${tooltip
-      ? Tooltip({
+      ? Tooltip.Static({
           content: tooltipText,
           side: tooltipSide,
           sideOffset: 8,
@@ -291,7 +291,11 @@ function ClipboardTextBase(input: ClipboardTextInput) {
   return renderClipboardText(input);
 }
 
-export const ClipboardText = Object.assign(ClipboardTextRoot, {
+function ClipboardTextComponent(input: ClipboardTextInput) {
+  return input.onCopy ? ClipboardTextRoot(input) : renderClipboardText(input);
+}
+
+export const ClipboardText = Object.assign(ClipboardTextComponent, {
   Root: ClipboardTextRoot,
   Static: ClipboardTextBase,
 });

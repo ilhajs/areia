@@ -4,7 +4,6 @@ import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Spinner } from "$components/spinner";
-import { Tooltip } from "$components/tooltip";
 
 /** Button variant definitions mapping shape, size, and variant names to their Tailwind classes. */
 export const BUTTON_VARIANTS = {
@@ -288,12 +287,14 @@ export function Button(input: ButtonInput = {}) {
 
   if (title == null || title === "") return button;
 
-  return Tooltip({
-    content: title,
-    children: button,
-    triggerClass: "contents",
-    contentClass: "font-sans text-xs",
-  });
+  return html`<span class="group/button-title relative inline-flex w-max">
+    ${button}
+    <span
+      role="tooltip"
+      class="pointer-events-none invisible absolute bottom-full left-1/2 z-(--areia-z-tooltip) mb-2 w-max max-w-xs -translate-x-1/2 rounded-md bg-areia-background px-2.5 py-1.5 font-sans text-xs font-normal text-areia-default opacity-0 shadow-lg outline outline-1 outline-areia-divider transition-opacity group-hover/button-title:visible group-hover/button-title:opacity-100 group-focus-within/button-title:visible group-focus-within/button-title:opacity-100"
+      >${render(title)}</span
+    >
+  </span>`;
 }
 
 export type LinkButtonInput = Omit<HTMLElementProps<HTMLAnchorElement>, "className" | "children"> &

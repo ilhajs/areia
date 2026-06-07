@@ -4,12 +4,14 @@ import ilha, { html, mount } from "ilha";
 import {
   Badge,
   Button,
+  ClipboardText,
   Collapsible,
   ContextMenu,
   Dialog,
   Dropdown,
   Field,
   HoverCard,
+  Label,
   LayerCard,
   Link,
   Popover,
@@ -171,6 +173,31 @@ describe("child Ilha islands", () => {
         expectRenderedHtmlMarkup(name, markup(make()));
       });
     }
+
+    it("renders ClipboardText and ClipboardText.Static tooltip buttons as visible markup", () => {
+      const text = "npx giget@latest gh:ilhajs/luz my-docs";
+      const dynamicOutput = markup(ClipboardText({ text, tooltip: true }));
+      const staticOutput = markup(ClipboardText.Static({ text, tooltip: true }));
+
+      for (const output of [dynamicOutput, staticOutput]) {
+        expect(output).toContain(text);
+        expect(output).toContain('data-slot="clipboard-text-button"');
+        expect(output).not.toContain("data-ilha-slot");
+      }
+    });
+
+    it("renders Button title and Label tooltip without nested Ilha placeholders", () => {
+      const buttonOutput = markup(Button({ title: "Copy", children: "Copy" }));
+      const labelOutput = markup(Label({ label: "Name", tooltip: "Your full name" }));
+
+      expect(buttonOutput).toContain('role="tooltip"');
+      expect(buttonOutput).toContain("Copy");
+      expect(buttonOutput).not.toContain("data-ilha-slot");
+
+      expect(labelOutput).toContain('role="tooltip"');
+      expect(labelOutput).toContain("Your full name");
+      expect(labelOutput).not.toContain("data-ilha-slot");
+    });
   });
 
   describe("interactive islands", () => {

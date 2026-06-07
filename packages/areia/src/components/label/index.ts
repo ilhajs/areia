@@ -5,7 +5,6 @@ import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Button } from "$components/button";
 import { Icon } from "$components/icon";
-import { Tooltip } from "$components/tooltip";
 
 type Renderable = unknown;
 
@@ -60,16 +59,20 @@ export type LabelInput = Omit<HTMLElementProps<HTMLLabelElement>, "className" | 
   };
 
 function tooltipIndicator(content: unknown) {
-  return Tooltip({
-    content,
-    children: Button({
+  return html`<span class="group/label-tooltip relative inline-flex">
+    ${Button({
       variant: "ghost",
       size: "xs",
       shape: "square",
       icon: Icon({ icon: Info, class: "size-4" }),
       "aria-label": "More information",
-    }),
-  });
+    })}
+    <span
+      role="tooltip"
+      class="pointer-events-none invisible absolute bottom-full left-1/2 z-(--areia-z-tooltip) mb-2 w-max max-w-xs -translate-x-1/2 rounded-md bg-areia-background px-2.5 py-1.5 text-xs font-normal text-areia-default opacity-0 shadow-lg outline outline-1 outline-areia-divider transition-opacity group-hover/label-tooltip:visible group-hover/label-tooltip:opacity-100 group-focus-within/label-tooltip:visible group-focus-within/label-tooltip:opacity-100"
+      >${render(content)}</span
+    >
+  </span>`;
 }
 
 function labelText({ children, label, showOptional = false }: LabelInput) {
