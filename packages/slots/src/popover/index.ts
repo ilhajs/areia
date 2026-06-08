@@ -359,10 +359,17 @@ export function createPopover(root: Element, options: PopoverOptions = {}): Popo
   // Trigger click
   cleanups.push(on(trigger, "click", () => updateState(!isOpen)));
 
-  // Close button click
+  // Close button click. Delegate from content as well so close controls added by
+  // nested Ilha children or moved through portals still work reliably.
   if (closeBtn) {
     cleanups.push(on(closeBtn, "click", () => updateState(false)));
   }
+  cleanups.push(
+    on(content, "click", (event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.('[data-slot="popover-close"]')) updateState(false);
+    }),
+  );
 
   cleanups.push(
     createDismissLayer({

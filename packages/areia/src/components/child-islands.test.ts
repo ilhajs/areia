@@ -14,6 +14,7 @@ import {
   Label,
   LayerCard,
   Link,
+  LinkButton,
   Popover,
   Resizable,
   Table,
@@ -93,13 +94,9 @@ function expectRenderedHtmlMarkup(name: string, output: string) {
   expect(output, name).toContain("Right click here");
 }
 
-function clickInlinePopover(trigger: HTMLElement | null | undefined) {
-  trigger?.click();
-  const root = trigger?.closest<HTMLElement>('[data-slot="popover"]');
-  const handler = root?.getAttribute("onclick");
-  if (root && handler) {
-    new Function("event", handler).call(root, { target: trigger });
-  }
+async function waitForPopoverClose() {
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 }
 
 describe("child Ilha islands", () => {
@@ -287,12 +284,13 @@ describe("child Ilha islands", () => {
       document.body.innerHTML = "";
 
       const App = ilha.render(
-        () => html`${Popover({
-          side: "bottom",
-          align: "end",
-          trigger: Button({ "aria-label": "Open navigation", children: "Open" }),
-          content: html`<nav data-testid="mobile-nav">Hello</nav>`,
-        })}`,
+        () =>
+          html`${Popover({
+            side: "bottom",
+            align: "end",
+            trigger: Button({ "aria-label": "Open navigation", children: "Open" }),
+            content: html`<nav data-testid="mobile-nav">Hello</nav>`,
+          })}`,
       );
 
       const ssr = await App.hydratable({}, { name: "App", snapshot: true });
@@ -309,9 +307,12 @@ describe("child Ilha islands", () => {
 
         expect(trigger).not.toBeNull();
         expect(content).not.toBeNull();
+        expect(document.querySelector('[data-slot="popover"]')?.getAttribute("onclick")).toBeNull();
+        expect(trigger?.getAttribute("aria-haspopup")).toBe("dialog");
+        expect(trigger?.getAttribute("aria-controls")).toBeTruthy();
         expect(content?.hidden).toBe(true);
 
-        clickInlinePopover(trigger);
+        trigger?.click();
         await Promise.resolve();
 
         expect(content?.hidden).toBe(false);
@@ -325,14 +326,29 @@ describe("child Ilha islands", () => {
       document.body.innerHTML = "";
 
       const MobileNav = ilha.render(
-        () => html`${Popover({
-          side: "bottom",
-          align: "end",
-          trigger: Button({ "aria-label": "Open navigation", children: "Open" }),
-          content: html`<nav data-testid="mobile-nav">Hello</nav>`,
-        })}`,
+        () =>
+          html`${Popover({
+            side: "bottom",
+            align: "end",
+            trigger: Button({ "aria-label": "Open navigation", children: "Open" }),
+            content: html`<nav data-testid="mobile-nav">
+              ${Popover.Close({
+                children: LinkButton({ href: "/getting-started", children: "Getting Started" }),
+              })}
+              ${Collapsible({
+                defaultOpen: true,
+                trigger: "Section",
+                panel: html`<a href="/guide/writing">Writing</a>`,
+              })}
+            </nav>`,
+          })}`,
       );
-      const Layout = ilha.render(() => html`<div>${MobileNav}</div>`);
+      const Layout = ilha.render(
+        () => html`<div>
+          <div data-ilha-slot="k:page">page content</div>
+          <div class="fixed top-4 right-4 z-50 md:hidden">${MobileNav}</div>
+        </div>`,
+      );
 
       document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
       const { unmount } = mount({ Layout }, { root: document.body, lazy: false });
@@ -344,13 +360,25 @@ describe("child Ilha islands", () => {
 
         expect(trigger).not.toBeNull();
         expect(content).not.toBeNull();
+        expect(document.querySelector('[data-slot="popover"]')?.getAttribute("onclick")).toBeNull();
+        expect(trigger?.getAttribute("aria-haspopup")).toBe("dialog");
+        expect(trigger?.getAttribute("aria-controls")).toBeTruthy();
         expect(content?.hidden).toBe(true);
 
-        clickInlinePopover(trigger);
+        trigger?.click();
         await Promise.resolve();
 
         expect(content?.hidden).toBe(false);
         expect(content?.getAttribute("data-state")).toBe("open");
+        expect(trigger?.getAttribute("aria-expanded")).toBe("true");
+
+        const closeLink = document.querySelector<HTMLAnchorElement>('[data-slot="popover-close"]');
+        expect(closeLink?.getAttribute("href")).toBe("/getting-started");
+        closeLink?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+        await waitForPopoverClose();
+
+        expect(content?.hidden).toBe(true);
+        expect(content?.getAttribute("data-state")).toBe("closed");
       } finally {
         unmount();
       }

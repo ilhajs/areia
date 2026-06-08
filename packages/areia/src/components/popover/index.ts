@@ -307,9 +307,7 @@ export type PopoverInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | 
     triggerClassName?: string;
   };
 
-const INLINE_POPOVER_HANDLER = `var r=this,t=event.target&&event.target.closest('[data-slot=popover-trigger],[data-slot=popover-close]');if(!t||!r.contains(t))return;var c=r.querySelector('[data-slot=popover-content]'),a=r.querySelector('[data-slot=popover-arrow]'),o=t.getAttribute('data-slot')==='popover-trigger'?(c&&c.hidden):false;if(c){c.hidden=!o;c.setAttribute('data-state',o?'open':'closed');c.toggleAttribute('data-open',o);c.toggleAttribute('data-closed',!o)}r.setAttribute('data-state',o?'open':'closed');r.toggleAttribute('data-open',o);r.toggleAttribute('data-closed',!o);var b=r.querySelector('[data-slot=popover-trigger]');b&&b.setAttribute('aria-expanded',o?'true':'false');if(a){a.setAttribute('data-state',o?'open':'closed');a.toggleAttribute('data-open',o);a.toggleAttribute('data-closed',!o)}`;
-
-function renderPopover(input: PopoverInput = {}, inlineFallback = false) {
+function renderPopover(input: PopoverInput = {}, autoBind = false) {
   const {
     align,
     alignOffset,
@@ -356,7 +354,7 @@ function renderPopover(input: PopoverInput = {}, inlineFallback = false) {
   return html`<div
     data-slot="popover"
     class="${cn("inline-flex", className, aliasedClassName)}"
-    onclick="${raw(inlineFallback ? INLINE_POPOVER_HANDLER : "")}" 
+    ${raw(toAttrs({ "data-areia-popover": autoBind }))}
     ${raw(
       dataAttrs({
         align,
@@ -391,6 +389,60 @@ function renderPopover(input: PopoverInput = {}, inlineFallback = false) {
         })}
   </div>`;
 }
+
+const autoBoundPopovers = new WeakMap<Element, () => void>();
+
+function bindPopoverRoot(root: Element) {
+  if (autoBoundPopovers.has(root)) return undefined;
+
+  const syncArrowSide = () => {
+    const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
+    const arrow = root.querySelector<HTMLElement>('[data-slot="popover-arrow"]');
+    const side = content?.getAttribute("data-side");
+    if (arrow && side) arrow.setAttribute("data-side", side);
+  };
+
+  const controller = PopoverPrimitive.createPopover(root);
+  syncArrowSide();
+
+  const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
+  const observer = content ? new MutationObserver(syncArrowSide) : undefined;
+  observer?.observe(content!, { attributes: true, attributeFilter: ["data-side"] });
+
+  const cleanup = () => {
+    observer?.disconnect();
+    controller.destroy();
+    autoBoundPopovers.delete(root);
+  };
+  autoBoundPopovers.set(root, cleanup);
+  return cleanup;
+}
+
+function bindPopovers(scope: ParentNode) {
+  const roots =
+    scope instanceof Element && scope.matches('[data-areia-popover][data-slot="popover"]')
+      ? [scope]
+      : [];
+  roots.push(...scope.querySelectorAll('[data-areia-popover][data-slot="popover"]'));
+
+  return roots.flatMap((root) => bindPopoverRoot(root) ?? []);
+}
+
+function popoverAutoBindScope(host: Element): ParentNode {
+  const previous = host.previousElementSibling;
+  if (previous?.matches('[data-areia-popover][data-slot="popover"]')) return previous;
+  return host.parentElement ?? host.ownerDocument;
+}
+
+const PopoverAutoBindIsland = ilha
+  .onMount(({ host }) => {
+    const cleanups = bindPopovers(popoverAutoBindScope(host));
+    return () => cleanups.forEach((cleanup) => cleanup());
+  })
+  .effect(({ host }) => {
+    bindPopovers(popoverAutoBindScope(host));
+  })
+  .render(() => "");
 
 const PopoverRootIsland = ilha
   .input<PopoverInput>()
@@ -465,11 +517,13 @@ function needsPopoverIsland(input: PopoverInput) {
 
 export function PopoverRoot(input: PopoverInput = {}) {
   const normalized = normalizePopoverInput(input);
-  return needsPopoverIsland(input) ? PopoverRootIsland(normalized) : renderPopover(normalized, true);
+  if (needsPopoverIsland(input)) return PopoverRootIsland(normalized);
+
+  return html`${renderPopover(normalized, true)}${PopoverAutoBindIsland}`;
 }
 
 function PopoverBase(input: PopoverInput = {}) {
-  return renderPopover(normalizePopoverInput(input), true);
+  return renderPopover(normalizePopoverInput(input));
 }
 
 export const Popover = Object.assign(PopoverRoot, {
