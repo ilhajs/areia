@@ -307,7 +307,9 @@ export type PopoverInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | 
     triggerClassName?: string;
   };
 
-function renderPopover(input: PopoverInput = {}) {
+const INLINE_POPOVER_HANDLER = `var r=this,t=event.target&&event.target.closest('[data-slot=popover-trigger],[data-slot=popover-close]');if(!t||!r.contains(t))return;var c=r.querySelector('[data-slot=popover-content]'),a=r.querySelector('[data-slot=popover-arrow]'),o=t.getAttribute('data-slot')==='popover-trigger'?(c&&c.hidden):false;if(c){c.hidden=!o;c.setAttribute('data-state',o?'open':'closed');c.toggleAttribute('data-open',o);c.toggleAttribute('data-closed',!o)}r.setAttribute('data-state',o?'open':'closed');r.toggleAttribute('data-open',o);r.toggleAttribute('data-closed',!o);var b=r.querySelector('[data-slot=popover-trigger]');b&&b.setAttribute('aria-expanded',o?'true':'false');if(a){a.setAttribute('data-state',o?'open':'closed');a.toggleAttribute('data-open',o);a.toggleAttribute('data-closed',!o)}`;
+
+function renderPopover(input: PopoverInput = {}, inlineFallback = false) {
   const {
     align,
     alignOffset,
@@ -354,6 +356,7 @@ function renderPopover(input: PopoverInput = {}) {
   return html`<div
     data-slot="popover"
     class="${cn("inline-flex", className, aliasedClassName)}"
+    onclick="${raw(inlineFallback ? INLINE_POPOVER_HANDLER : "")}" 
     ${raw(
       dataAttrs({
         align,
@@ -456,12 +459,17 @@ function normalizePopoverInput(input: PopoverInput = {}): PopoverInput {
   };
 }
 
+function needsPopoverIsland(input: PopoverInput) {
+  return input.onOpenChange != null || input["bind:open"] != null;
+}
+
 export function PopoverRoot(input: PopoverInput = {}) {
-  return PopoverRootIsland(normalizePopoverInput(input));
+  const normalized = normalizePopoverInput(input);
+  return needsPopoverIsland(input) ? PopoverRootIsland(normalized) : renderPopover(normalized, true);
 }
 
 function PopoverBase(input: PopoverInput = {}) {
-  return renderPopover(normalizePopoverInput(input));
+  return renderPopover(normalizePopoverInput(input), true);
 }
 
 export const Popover = Object.assign(PopoverRoot, {

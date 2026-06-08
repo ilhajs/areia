@@ -93,6 +93,15 @@ function expectRenderedHtmlMarkup(name: string, output: string) {
   expect(output, name).toContain("Right click here");
 }
 
+function clickInlinePopover(trigger: HTMLElement | null | undefined) {
+  trigger?.click();
+  const root = trigger?.closest<HTMLElement>('[data-slot="popover"]');
+  const handler = root?.getAttribute("onclick");
+  if (root && handler) {
+    new Function("event", handler).call(root, { target: trigger });
+  }
+}
+
 describe("child Ilha islands", () => {
   describe("markup rendering", () => {
     const cases: Array<[string, () => unknown]> = [
@@ -286,7 +295,11 @@ describe("child Ilha islands", () => {
         })}`,
       );
 
-      document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+      const ssr = await App.hydratable({}, { name: "App", snapshot: true });
+      expect(ssr).toContain('data-slot="popover-trigger"');
+      expect(ssr).toContain('data-slot="popover-content"');
+
+      document.body.innerHTML = ssr;
       const { unmount } = mount({ App }, { root: document.body, lazy: false });
 
       try {
@@ -298,7 +311,42 @@ describe("child Ilha islands", () => {
         expect(content).not.toBeNull();
         expect(content?.hidden).toBe(true);
 
-        trigger?.click();
+        clickInlinePopover(trigger);
+        await Promise.resolve();
+
+        expect(content?.hidden).toBe(false);
+        expect(content?.getAttribute("data-state")).toBe("open");
+      } finally {
+        unmount();
+      }
+    });
+
+    it("opens Popover nested inside a child Ilha island within a parent layout island", async () => {
+      document.body.innerHTML = "";
+
+      const MobileNav = ilha.render(
+        () => html`${Popover({
+          side: "bottom",
+          align: "end",
+          trigger: Button({ "aria-label": "Open navigation", children: "Open" }),
+          content: html`<nav data-testid="mobile-nav">Hello</nav>`,
+        })}`,
+      );
+      const Layout = ilha.render(() => html`<div>${MobileNav}</div>`);
+
+      document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
+      const { unmount } = mount({ Layout }, { root: document.body, lazy: false });
+
+      try {
+        await Promise.resolve();
+        const trigger = document.querySelector<HTMLButtonElement>('[data-slot="popover-trigger"]');
+        const content = document.querySelector<HTMLElement>('[data-slot="popover-content"]');
+
+        expect(trigger).not.toBeNull();
+        expect(content).not.toBeNull();
+        expect(content?.hidden).toBe(true);
+
+        clickInlinePopover(trigger);
         await Promise.resolve();
 
         expect(content?.hidden).toBe(false);
