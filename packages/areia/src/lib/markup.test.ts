@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import ilha, { html } from "ilha";
 import { decodeMarkupEntities, hasSlot, render, renderString, withSlot } from "./markup";
 
 function markup(value: unknown): string {
@@ -42,6 +43,17 @@ describe("markup", () => {
       withSlot({ value: '<button type="button">Open</button>' }, "tooltip-trigger", "custom"),
     );
     expect(output).toContain('data-slot="tooltip-trigger"');
+    expect(output).toContain('class="custom"');
+  });
+
+  it("injects data-slot into Ilha island host wrappers", () => {
+    const Counter = ilha
+      .state("count", 0)
+      .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+    const output = markup(withSlot(Counter, "popover-trigger", "custom"));
+
+    expect(output).toContain("data-ilha-slot");
+    expect(output).toContain('data-slot="popover-trigger"');
     expect(output).toContain('class="custom"');
   });
 });

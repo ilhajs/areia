@@ -120,6 +120,12 @@ describe("Dropdown.Item", () => {
     expect(output).toContain('href="/x"');
   });
 
+  it("passes data-no-intercept through to anchor items", () => {
+    const output = markup(Dropdown.Item({ label: "Link", href: "/x", "data-no-intercept": true }));
+    expect(output).toContain("<a");
+    expect(output).toContain("data-no-intercept");
+  });
+
   it("renders external link with target", () => {
     const output = markup(Dropdown.Item({ label: "Link", href: "https://x.com", external: true }));
     expect(output).toContain('target="_blank"');

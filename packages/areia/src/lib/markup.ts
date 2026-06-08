@@ -1,4 +1,4 @@
-import { raw } from "ilha";
+import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
 
 /** Decode HTML entities from ilha-serialized markup strings. */
@@ -84,7 +84,8 @@ export function withSlot(
   className?: string,
   aliasedClassName?: string,
 ) {
-  const markup = renderString(value);
+  const islandMarkup = isIlhaIsland(value) ? rawValue(html`${value}`) : undefined;
+  const markup = islandMarkup ?? renderString(value);
   if (!markup || !markup.trimStart().startsWith("<")) return undefined;
 
   const classes = cn(className, aliasedClassName);

@@ -43,6 +43,13 @@ describe("Breadcrumbs", () => {
     expect(output).toContain("Home");
   });
 
+  it("passes data-no-intercept through to composed links", () => {
+    const output = markup(
+      Breadcrumbs.Link({ href: "/", children: "Home", "data-no-intercept": true }),
+    );
+    expect(output).toContain("data-no-intercept");
+  });
+
   it("renders current page without link", () => {
     const output = markup(
       Breadcrumbs({

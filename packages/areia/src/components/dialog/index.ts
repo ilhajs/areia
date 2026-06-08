@@ -7,7 +7,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
-import { hasSlot, isIlhaIsland, render, withSlot } from "$lib/markup";
+import { hasSlot, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -121,9 +121,7 @@ export function DialogTrigger(input: DialogTriggerInput = {}) {
     type,
     ...props
   } = input;
-  const slottedChild = isIlhaIsland(children)
-    ? undefined
-    : withSlot(children, "dialog-trigger", className, aliasedClassName);
+  const slottedChild = withSlot(children, "dialog-trigger", className, aliasedClassName);
   if (slottedChild) return slottedChild;
 
   const tag = as;
@@ -342,18 +340,8 @@ function renderDialog(input: DialogInput = {}) {
   const hasComposedTrigger = hasSlot(children, "dialog-trigger");
   const generatedTrigger = hasComposedTrigger
     ? undefined
-    : (withSlot(
-        isIlhaIsland(trigger) ? undefined : trigger,
-        "dialog-trigger",
-        triggerClass,
-        triggerClassName,
-      ) ??
-      withSlot(
-        isIlhaIsland(children) ? undefined : children,
-        "dialog-trigger",
-        triggerClass,
-        triggerClassName,
-      ) ??
+    : (withSlot(trigger, "dialog-trigger", triggerClass, triggerClassName) ??
+      withSlot(children, "dialog-trigger", triggerClass, triggerClassName) ??
       DialogTrigger({
         as: triggerAs,
         class: triggerClass,

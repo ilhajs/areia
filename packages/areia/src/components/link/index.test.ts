@@ -42,6 +42,11 @@ describe("Link", () => {
     expect(output).toContain('rel="prefetch"');
   });
 
+  it("passes data-no-intercept through to anchors", () => {
+    const output = markup(Link({ href: "/x", "data-no-intercept": true, children: "X" }));
+    expect(output).toContain("data-no-intercept");
+  });
+
   it("merges custom class and className", () => {
     const output = markup(Link({ href: "/", children: "Home", class: "a", className: "b" }));
     expect(output).toContain("a");

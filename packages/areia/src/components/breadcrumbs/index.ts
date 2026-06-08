@@ -1,5 +1,7 @@
 import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
+import { toAttrs } from "$lib/input";
+import type { HTMLElementProps } from "$lib/types";
 
 /** Breadcrumbs size variant definitions. */
 export const BREADCRUMBS_VARIANTS = {
@@ -108,28 +110,32 @@ export function BreadcrumbsMobileEllipsis() {
 }
 
 /** A breadcrumb link item. */
-export interface BreadcrumbsLinkInput {
-  /** Link target URL. */
-  href: string;
-  /** Content rendered inside the link. */
-  children?: unknown;
-  /** Icon rendered before the content. Use the `Icon` component or raw SVG markup. */
-  icon?: unknown;
-  /** Additional CSS classes. */
-  class?: string;
-  className?: string;
-}
+export type BreadcrumbsLinkInput = Omit<
+  HTMLElementProps<HTMLAnchorElement>,
+  "className" | "children"
+> &
+  Record<string, unknown> & {
+    /** Link target URL. */
+    href: string;
+    /** Content rendered inside the link. */
+    children?: unknown;
+    /** Icon rendered before the content. Use the `Icon` component or raw SVG markup. */
+    icon?: unknown;
+    /** Additional CSS classes. */
+    class?: string;
+    className?: string;
+  };
 
 export function BreadcrumbsLink(input: BreadcrumbsLinkInput) {
-  const { href, children, icon, class: className, className: aliasedClassName } = input;
+  const { children, icon, class: className, className: aliasedClassName, ...props } = input;
 
   return html`<a
-    href="${href}"
     class="${cn(
       "flex min-w-0 max-w-full items-center gap-1 text-areia-subtle no-underline",
       className,
       aliasedClassName,
     )}"
+    ${raw(toAttrs(props))}
   >
     ${icon != null ? html`<span class="flex shrink-0 items-center">${icon}</span>` : ""}
     <span class="truncate">${children}</span>

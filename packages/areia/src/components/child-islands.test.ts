@@ -255,11 +255,18 @@ describe("child Ilha islands", () => {
             }),
         ],
         [
-          "Dialog trigger",
+          "Dialog children trigger",
           (Counter) => Dialog({ triggerAs: "span", children: Counter, content: "Body" }),
         ],
-        ["Popover trigger", (Counter) => Popover({ children: Counter, content: "Body" })],
-        ["HoverCard trigger", (Counter) => HoverCard({ children: Counter, content: "Body" })],
+        ["Dialog trigger prop", (Counter) => Dialog({ trigger: Counter, content: "Body" })],
+        ["Popover children trigger", (Counter) => Popover({ children: Counter, content: "Body" })],
+        ["Popover trigger prop", (Counter) => Popover({ trigger: Counter, content: "Body" })],
+        ["Tooltip trigger prop", (Counter) => Tooltip({ trigger: Counter, content: "Tip" })],
+        [
+          "HoverCard children trigger",
+          (Counter) => HoverCard({ children: Counter, content: "Body" }),
+        ],
+        ["HoverCard trigger prop", (Counter) => HoverCard({ trigger: Counter, content: "Body" })],
       ];
 
       for (const [name, make] of cases) {

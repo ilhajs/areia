@@ -199,6 +199,14 @@ describe("LinkButton", () => {
     expect(output).toContain('rel="prefetch"');
   });
 
+  it("passes data-no-intercept through to anchors", () => {
+    const output = markup(
+      LinkButton({ href: "/docs", "data-no-intercept": true, children: "Docs" }),
+    );
+
+    expect(output).toContain("data-no-intercept");
+  });
+
   it("renders icon before children", () => {
     const output = markup(
       LinkButton({
