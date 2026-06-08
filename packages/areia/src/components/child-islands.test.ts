@@ -274,6 +274,40 @@ describe("child Ilha islands", () => {
       }
     });
 
+    it("opens Popover nested inside a parent Ilha island with a Button trigger", async () => {
+      document.body.innerHTML = "";
+
+      const App = ilha.render(
+        () => html`${Popover({
+          side: "bottom",
+          align: "end",
+          trigger: Button({ "aria-label": "Open navigation", children: "Open" }),
+          content: html`<nav data-testid="mobile-nav">Hello</nav>`,
+        })}`,
+      );
+
+      document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+      const { unmount } = mount({ App }, { root: document.body, lazy: false });
+
+      try {
+        await Promise.resolve();
+        const trigger = document.querySelector<HTMLButtonElement>('[data-slot="popover-trigger"]');
+        const content = document.querySelector<HTMLElement>('[data-slot="popover-content"]');
+
+        expect(trigger).not.toBeNull();
+        expect(content).not.toBeNull();
+        expect(content?.hidden).toBe(true);
+
+        trigger?.click();
+        await Promise.resolve();
+
+        expect(content?.hidden).toBe(false);
+        expect(content?.getAttribute("data-state")).toBe("open");
+      } finally {
+        unmount();
+      }
+    });
+
     it("keeps interactive islands mounted in overlay content", async () => {
       const cases: Array<[string, (Counter: ReturnType<typeof counterIsland>) => unknown]> = [
         ["Dialog content", (Counter) => Dialog({ children: "Open", content: Counter })],

@@ -83,6 +83,18 @@ describe("Dialog.Content", () => {
   });
 });
 
+describe("Dialog.Close", () => {
+  it("injects close slot into anchor children", () => {
+    const output = markup(
+      Dialog.Close({ children: { value: '<a href="/docs" data-no-intercept>Docs</a>' } }),
+    );
+    expect(output).toContain("<a");
+    expect(output).toContain('data-slot="dialog-close"');
+    expect(output).toContain("data-no-intercept");
+    expect(output).not.toContain("<button");
+  });
+});
+
 describe("Dialog.Title", () => {
   it("renders h2 with data-slot", () => {
     const output = markup(Dialog.Title({ children: "Title" }));

@@ -73,6 +73,18 @@ describe("Popover.Content", () => {
   });
 });
 
+describe("Popover.Close", () => {
+  it("injects close slot into anchor children", () => {
+    const output = markup(
+      Popover.Close({ children: { value: '<a href="/docs" data-no-intercept>Docs</a>' } }),
+    );
+    expect(output).toContain("<a");
+    expect(output).toContain('data-slot="popover-close"');
+    expect(output).toContain("data-no-intercept");
+    expect(output).not.toContain("<button");
+  });
+});
+
 describe("Popover.Title", () => {
   it("renders h3 with classes", () => {
     const output = markup(Popover.Title({ children: "Title" }));

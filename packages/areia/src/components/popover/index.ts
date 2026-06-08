@@ -272,6 +272,9 @@ export function PopoverClose(input: PopoverCloseInput = {}) {
     type,
     ...props
   } = input;
+  const slottedChild = withSlot(children, "popover-close", className, aliasedClassName);
+  if (slottedChild) return slottedChild;
+
   const tag = as;
 
   return html`<${raw(tag)}
