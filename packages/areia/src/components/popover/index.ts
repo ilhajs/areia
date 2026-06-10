@@ -514,7 +514,13 @@ const PopoverRootIsland = ilha
     const controller = autoBoundPopovers.get(root) ?? PopoverPrimitive.createPopover(root);
     createOpenBindSync(input, controller)?.applyFromSignal();
   })
-  .on("[data-slot='popover-content']", "animationend transitionend", ({ host }) => {
+  .on("[data-slot='popover-content']@animationend", ({ host }) => {
+    const root = host.matches('[data-slot="popover"]')
+      ? host
+      : host.querySelector('[data-slot="popover"]');
+    if (root) syncPopoverArrowSide(root);
+  })
+  .on("[data-slot='popover-content']@transitionend", ({ host }) => {
     const root = host.matches('[data-slot="popover"]')
       ? host
       : host.querySelector('[data-slot="popover"]');
