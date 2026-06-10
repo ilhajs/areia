@@ -3,11 +3,11 @@ export const lightVariables = {
   /* surfaces */
   "--areia-background": "var(--color-white)",
   "--areia-foreground": "var(--color-neutral-900, oklch(21% 0.006 285.885))",
-  "--areia-surface": "var(--color-neutral-50, oklch(98.5% 0 0))",
+  "--areia-surface": "var(--color-white, oklch(98.5% 0 0))",
   "--areia-surface-foreground": "var(--color-neutral-900, oklch(21% 0.006 285.885))",
   "--areia-surface-muted": "var(--color-neutral-100, oklch(97% 0 0))",
   "--areia-surface-muted-foreground": "var(--color-neutral-500, oklch(55.6% 0 0))",
-  "--areia-surface-elevated": "var(--color-white, #fff)",
+  "--areia-surface-elevated": "var(--color-neutral-50, #fff)",
   "--areia-surface-elevated-foreground": "var(--color-neutral-950, oklch(14.5% 0 0))",
   "--areia-overlay": "oklch(0% 0 0 / 0.4)",
   "--areia-border": "var(--color-neutral-200)",
@@ -118,7 +118,7 @@ export const lightVariables = {
 export const darkVariables = {
   "--areia-background": "oklch(10% 0 0)",
   "--areia-foreground": "var(--color-neutral-100)",
-  "--areia-surface": "var(--color-neutral-900)",
+  "--areia-surface": "var(--color-neutral-950)",
   "--areia-surface-foreground": "var(--color-neutral-100)",
   "--areia-surface-muted": "var(--color-neutral-800)",
   "--areia-surface-muted-foreground": "var(--color-neutral-400)",
