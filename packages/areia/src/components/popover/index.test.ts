@@ -1,5 +1,12 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import { Popover, popoverVariants } from "./index";
+import { Popover, bindPopoverRoot, popoverVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered
+}
 
 function markup(value: unknown): string {
   if (value && typeof value === "object" && "value" in value) {
@@ -98,5 +105,40 @@ describe("Popover.Description", () => {
     const output = markup(Popover.Description({ children: "Desc" }));
     expect(output).toContain("<p");
     expect(output).toContain("Desc");
+  });
+});
+
+describe("bindPopoverRoot", () => {
+  function makeRoot() {
+    const div = document.createElement("div");
+    div.innerHTML = markup(Popover({ children: "Open", content: "Hello" }));
+    const root = div.querySelector('[data-slot="popover"]') as Element;
+    document.body.appendChild(div);
+    return root;
+  }
+
+  it("attaches aria attributes to trigger after binding", () => {
+    const root = makeRoot();
+    bindPopoverRoot(root);
+    const trigger = root.querySelector('[data-slot="popover-trigger"]');
+    expect(trigger?.getAttribute("aria-haspopup")).toBe("dialog");
+    expect(trigger?.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("opens content on trigger click", () => {
+    const root = makeRoot();
+    bindPopoverRoot(root);
+    const trigger = root.querySelector<HTMLElement>('[data-slot="popover-trigger"]');
+    const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
+    trigger?.click();
+    expect(trigger?.getAttribute("aria-expanded")).toBe("true");
+    expect(content?.getAttribute("data-state")).toBe("open");
+  });
+
+  it("returns the same controller on repeated calls", () => {
+    const root = makeRoot();
+    const c1 = bindPopoverRoot(root);
+    const c2 = bindPopoverRoot(root);
+    expect(c1).toBe(c2);
   });
 });

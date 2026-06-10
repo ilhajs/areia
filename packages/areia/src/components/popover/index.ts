@@ -390,59 +390,72 @@ function renderPopover(input: PopoverInput = {}, autoBind = false) {
   </div>`;
 }
 
-const autoBoundPopovers = new WeakMap<Element, () => void>();
+const autoBoundPopovers = new WeakMap<Element, PopoverPrimitive.PopoverController>();
+const autoBindDocuments = new WeakSet<Document>();
 
-function bindPopoverRoot(root: Element) {
-  if (autoBoundPopovers.has(root)) return undefined;
+function syncPopoverArrowSide(root: Element): void {
+  const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
+  const arrow = root.querySelector<HTMLElement>('[data-slot="popover-arrow"]');
+  const side = content?.getAttribute("data-side");
+  if (arrow && side) arrow.setAttribute("data-side", side);
+}
 
-  const syncArrowSide = () => {
-    const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
-    const arrow = root.querySelector<HTMLElement>('[data-slot="popover-arrow"]');
-    const side = content?.getAttribute("data-side");
-    if (arrow && side) arrow.setAttribute("data-side", side);
-  };
+export function bindPopoverRoot(root: Element) {
+  const existing = autoBoundPopovers.get(root);
+  if (existing) return existing;
 
   const controller = PopoverPrimitive.createPopover(root);
-  syncArrowSide();
-
-  const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
-  const observer = content ? new MutationObserver(syncArrowSide) : undefined;
-  observer?.observe(content!, { attributes: true, attributeFilter: ["data-side"] });
-
-  const cleanup = () => {
-    observer?.disconnect();
-    controller.destroy();
-    autoBoundPopovers.delete(root);
-  };
-  autoBoundPopovers.set(root, cleanup);
-  return cleanup;
+  syncPopoverArrowSide(root);
+  autoBoundPopovers.set(root, controller);
+  return controller;
 }
 
-function bindPopovers(scope: ParentNode) {
-  const roots =
-    scope instanceof Element && scope.matches('[data-areia-popover][data-slot="popover"]')
-      ? [scope]
-      : [];
-  roots.push(...scope.querySelectorAll('[data-areia-popover][data-slot="popover"]'));
+function rootFromPopoverEventTarget(target: Element | null) {
+  const localRoot = target?.closest?.('[data-areia-popover][data-slot="popover"]');
+  if (localRoot) return localRoot;
 
-  return roots.flatMap((root) => bindPopoverRoot(root) ?? []);
+  const content = target?.closest?.('[data-slot="popover-content"]');
+  const contentId = content?.getAttribute("id");
+  if (!content || !contentId) return null;
+  return (
+    content.ownerDocument.querySelector(
+      `[data-areia-popover][data-slot="popover"] [data-slot="popover-trigger"][aria-controls="${contentId}"]`,
+    ) ??
+    content.ownerDocument.querySelector(
+      `[data-areia-popover][data-slot="popover"] [data-slot="popover-close"][aria-controls="${contentId}"]`,
+    )
+  )?.closest('[data-areia-popover][data-slot="popover"]');
 }
 
-function popoverAutoBindScope(host: Element): ParentNode {
-  const previous = host.previousElementSibling;
-  if (previous?.matches('[data-areia-popover][data-slot="popover"]')) return previous;
-  return host.parentElement ?? host.ownerDocument;
-}
+function ensurePopoverAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || autoBindDocuments.has(doc)) return;
+  autoBindDocuments.add(doc);
 
-const PopoverAutoBindIsland = ilha
-  .onMount(({ host }) => {
-    const cleanups = bindPopovers(popoverAutoBindScope(host));
-    return () => cleanups.forEach((cleanup) => cleanup());
-  })
-  .effect(({ host }) => {
-    bindPopovers(popoverAutoBindScope(host));
-  })
-  .render(() => "");
+  doc.addEventListener(
+    "click",
+    (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const root = rootFromPopoverEventTarget(target);
+      if (!root) return;
+
+      const trigger = target?.closest?.('[data-slot="popover-trigger"]');
+      const close = target?.closest?.('[data-slot="popover-close"]');
+      if (!trigger && !close) return;
+
+      const wasBound = autoBoundPopovers.has(root);
+      const controller = bindPopoverRoot(root);
+      if (wasBound) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (trigger) controller.toggle();
+      else controller.close();
+
+      syncPopoverArrowSide(root);
+    },
+    true,
+  );
+}
 
 const PopoverRootIsland = ilha
   .input<PopoverInput>()
@@ -498,7 +511,14 @@ const PopoverRootIsland = ilha
       : host.querySelector('[data-slot="popover"]');
     if (!root) return;
 
-    createOpenBindSync(input, PopoverPrimitive.createPopover(root))?.applyFromSignal();
+    const controller = autoBoundPopovers.get(root) ?? PopoverPrimitive.createPopover(root);
+    createOpenBindSync(input, controller)?.applyFromSignal();
+  })
+  .on("[data-slot='popover-content']", "animationend transitionend", ({ host }) => {
+    const root = host.matches('[data-slot="popover"]')
+      ? host
+      : host.querySelector('[data-slot="popover"]');
+    if (root) syncPopoverArrowSide(root);
   })
   .render(({ input }) => renderPopover(input));
 
@@ -511,6 +531,19 @@ function normalizePopoverInput(input: PopoverInput = {}): PopoverInput {
   };
 }
 
+const autoBindScheduled = new WeakSet<Document>();
+
+function schedulePopoverAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || autoBindScheduled.has(doc)) return;
+  autoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    autoBindScheduled.delete(doc);
+    for (const root of doc.querySelectorAll('[data-areia-popover][data-slot="popover"]')) {
+      bindPopoverRoot(root);
+    }
+  });
+}
+
 function needsPopoverIsland(input: PopoverInput) {
   return input.onOpenChange != null || input["bind:open"] != null;
 }
@@ -519,7 +552,9 @@ export function PopoverRoot(input: PopoverInput = {}) {
   const normalized = normalizePopoverInput(input);
   if (needsPopoverIsland(input)) return PopoverRootIsland(normalized);
 
-  return html`${renderPopover(normalized, true)}${PopoverAutoBindIsland}`;
+  ensurePopoverAutoBind();
+  schedulePopoverAutoBind();
+  return renderPopover(normalized, true);
 }
 
 function PopoverBase(input: PopoverInput = {}) {
