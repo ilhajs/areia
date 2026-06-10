@@ -1,6 +1,8 @@
 import ilha, { html, raw } from "ilha";
 import { ChevronDown } from "lucide";
 import { Accordion as AccordionPrimitive, Collapsible as CollapsiblePrimitive } from "@areia/slots";
+
+const collapsibleControllers = new WeakMap<Element, CollapsiblePrimitive.CollapsibleController>();
 import {
   createOpenBindSync,
   openBindDefault,
@@ -445,8 +447,12 @@ export const CollapsibleRootIsland = ilha
 
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
+    collapsibleControllers.set(root, controller);
 
-    return () => controller.destroy();
+    return () => {
+      collapsibleControllers.delete(root);
+      controller.destroy();
+    };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
@@ -455,7 +461,10 @@ export const CollapsibleRootIsland = ilha
       : host.querySelector('[data-slot="collapsible"]');
     if (!root) return;
 
-    createOpenBindSync(input, CollapsiblePrimitive.createCollapsible(root))?.applyFromSignal();
+    createOpenBindSync(
+      input,
+      collapsibleControllers.get(root) ?? CollapsiblePrimitive.createCollapsible(root),
+    )?.applyFromSignal();
   })
   .render(({ input }) => renderCollapsible(input));
 

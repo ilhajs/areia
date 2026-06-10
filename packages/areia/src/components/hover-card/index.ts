@@ -1,5 +1,7 @@
 import ilha, { html, raw } from "ilha";
 import { HoverCard as HoverCardPrimitive } from "@areia/slots";
+
+const hoverCardControllers = new WeakMap<Element, HoverCardPrimitive.HoverCardController>();
 import {
   createOpenBindSync,
   openBindDefault,
@@ -378,8 +380,12 @@ const HoverCardRootIsland = ilha
 
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
+    hoverCardControllers.set(root, controller);
 
-    return () => controller.destroy();
+    return () => {
+      hoverCardControllers.delete(root);
+      controller.destroy();
+    };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
@@ -388,7 +394,10 @@ const HoverCardRootIsland = ilha
       : host.querySelector('[data-slot="hover-card"]');
     if (!root) return;
 
-    createOpenBindSync(input, HoverCardPrimitive.createHoverCard(root))?.applyFromSignal();
+    createOpenBindSync(
+      input,
+      hoverCardControllers.get(root) ?? HoverCardPrimitive.createHoverCard(root),
+    )?.applyFromSignal();
   })
   .render(({ input }) => renderHoverCard(input));
 

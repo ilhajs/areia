@@ -1,6 +1,8 @@
 import ilha, { html, raw } from "ilha";
 import { Check } from "lucide";
 import { DropdownMenu as DropdownMenuPrimitive } from "@areia/slots";
+
+const dropdownControllers = new WeakMap<Element, DropdownMenuPrimitive.DropdownMenuController>();
 import {
   createOpenBindSync,
   openBindDefault,
@@ -471,8 +473,12 @@ export const DropdownRoot = ilha
 
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
+    dropdownControllers.set(root, controller);
 
-    return () => controller.destroy();
+    return () => {
+      dropdownControllers.delete(root);
+      controller.destroy();
+    };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
@@ -481,7 +487,10 @@ export const DropdownRoot = ilha
       : host.querySelector('[data-slot="dropdown-menu"]');
     if (!root) return;
 
-    createOpenBindSync(input, DropdownMenuPrimitive.createDropdownMenu(root))?.applyFromSignal();
+    createOpenBindSync(
+      input,
+      dropdownControllers.get(root) ?? DropdownMenuPrimitive.createDropdownMenu(root),
+    )?.applyFromSignal();
   })
   .render(({ input }) => renderDropdown(input));
 

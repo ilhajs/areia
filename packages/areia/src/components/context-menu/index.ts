@@ -1,5 +1,7 @@
 import ilha, { html, raw } from "ilha";
 import { ContextMenu as ContextMenuPrimitive } from "@areia/slots";
+
+const contextMenuControllers = new WeakMap<Element, ContextMenuPrimitive.ContextMenuController>();
 import { createOpenBindSync, subscribeBindProps, type IlhaBindProps } from "$lib/binds";
 import { cn } from "$lib/cn";
 import { hasSlot, render } from "$lib/markup";
@@ -171,8 +173,12 @@ export const ContextMenuRoot = ilha
 
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
+    contextMenuControllers.set(root, controller);
 
-    return () => controller.destroy();
+    return () => {
+      contextMenuControllers.delete(root);
+      controller.destroy();
+    };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
@@ -181,7 +187,10 @@ export const ContextMenuRoot = ilha
       : host.querySelector('[data-slot="context-menu"]');
     if (!root) return;
 
-    createOpenBindSync(input, ContextMenuPrimitive.createContextMenu(root))?.applyFromSignal();
+    createOpenBindSync(
+      input,
+      contextMenuControllers.get(root) ?? ContextMenuPrimitive.createContextMenu(root),
+    )?.applyFromSignal();
   })
   .render(({ input }) => renderContextMenu(input));
 

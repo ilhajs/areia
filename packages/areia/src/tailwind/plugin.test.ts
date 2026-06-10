@@ -23,7 +23,7 @@ describe("areia tailwind plugin", () => {
   });
 
   it("defines light and dark design tokens", () => {
-    expect(lightVariables["--areia-background"]).toContain("#fff");
+    expect(lightVariables["--areia-background"]).toContain("var(--color-white)");
     expect(darkVariables["--areia-background"]).toContain("oklch(10%");
     expect(lightVariables["--areia-primary"]).toContain("oklch");
     expect(lightVariables["--areia-ring"]).toBe("var(--areia-primary)");

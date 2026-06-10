@@ -1,5 +1,7 @@
 import ilha, { html, raw } from "ilha";
 import { Dialog as DialogPrimitive } from "@areia/slots";
+
+const dialogControllers = new WeakMap<Element, DialogPrimitive.DialogController>();
 import {
   createOpenBindSync,
   openBindDefault,
@@ -405,8 +407,12 @@ export const DialogRoot = ilha
 
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
+    dialogControllers.set(root, controller);
 
-    return () => controller.destroy();
+    return () => {
+      dialogControllers.delete(root);
+      controller.destroy();
+    };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
@@ -415,7 +421,7 @@ export const DialogRoot = ilha
       : host.querySelector('[data-slot="dialog"]');
     if (!root) return;
 
-    const controller = DialogPrimitive.createDialog(root);
+    const controller = dialogControllers.get(root) ?? DialogPrimitive.createDialog(root);
     createOpenBindSync(input, controller)?.applyFromSignal();
   })
   .render(({ input }) => renderDialog(normalizeDialogInput(input)));
