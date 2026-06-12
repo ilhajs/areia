@@ -283,7 +283,7 @@ if (typeof document !== "undefined") {
   }).observe(document.documentElement, { childList: true, subtree: true });
 }
 
-export const Resizable = Object.assign(renderResizable, ResizablePanelGroupRoot, {
+export const Resizable = Object.assign(renderResizable, {
   Root: ResizablePanelGroupRoot,
   Static: renderResizable,
   Panel: ResizablePanel,

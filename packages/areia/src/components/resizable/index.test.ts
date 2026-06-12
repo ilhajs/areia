@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import ilha, { html, mount } from "ilha";
+import ilha, { html, jsxs, jsx, mount } from "ilha";
 import { Resizable } from "./index";
 
 try {
@@ -367,5 +367,37 @@ describe("Resizable", () => {
     } finally {
       unmount();
     }
+  });
+
+  it("does not carry ilha island symbols — Resizable must not be detected as a child island", () => {
+    const ISLAND = Symbol.for("ilha.island");
+    const isIsland = (v: unknown) =>
+      typeof v === "function" &&
+      (ISLAND in v || Object.getOwnPropertySymbols(v).some((s) => s.description === "ilha.island"));
+    expect(isIsland(Resizable)).toBe(false);
+  });
+
+  it("nests panels inside root in SSR when used via JSX inside a layout island", async () => {
+    document.body.innerHTML = "";
+    const Layout = ilha.render(() =>
+      jsxs("div", {
+        class: "layout-container",
+        children: [
+          jsxs(Resizable, {
+            direction: "horizontal",
+            children: [
+              jsx(Resizable.Panel, { defaultSize: 20, children: "Sidebar" }),
+              jsx(Resizable.Handle, {}),
+              jsx(Resizable.Panel, { defaultSize: 80, children: "Content" }),
+            ],
+          }),
+        ],
+      }),
+    );
+    document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
+    const root = document.querySelector('[data-slot="resizable"]');
+    expect(root).toBeTruthy();
+    expect(root?.querySelector('[data-slot="resizable-panel"]')).toBeTruthy();
+    expect(root?.querySelector('[data-slot="resizable-handle"]')).toBeTruthy();
   });
 });
