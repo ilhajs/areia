@@ -36,6 +36,7 @@ export type ResizableHandleInput = Omit<
   };
 
 const RESIZABLE_PART = "__areiaResizablePart";
+const ILHA_RENDER_PART = Symbol.for("ilha.renderPart");
 
 type ResizablePart =
   | { [RESIZABLE_PART]: "panel"; input: ResizablePanelInput }
@@ -53,7 +54,7 @@ function createResizablePart<T extends ResizablePart[typeof RESIZABLE_PART]>(
   type: T,
   input: T extends "panel" ? ResizablePanelInput : ResizableHandleInput,
 ): ResizablePart {
-  const part = { [RESIZABLE_PART]: type, input } as ResizablePart;
+  const part = { [RESIZABLE_PART]: type, [ILHA_RENDER_PART]: true, input } as ResizablePart;
   Object.defineProperty(part, "toString", {
     value: () => partToMarkup(part),
     enumerable: false,

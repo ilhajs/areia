@@ -369,6 +369,14 @@ describe("Resizable", () => {
     }
   });
 
+  it("Panel and Handle parts carry Symbol.for('ilha.renderPart')", () => {
+    const RENDER_PART = Symbol.for("ilha.renderPart");
+    const panel = Resizable.Panel({ defaultSize: 50 });
+    const handle = Resizable.Handle();
+    expect((panel as Record<symbol, unknown>)[RENDER_PART]).toBe(true);
+    expect((handle as Record<symbol, unknown>)[RENDER_PART]).toBe(true);
+  });
+
   it("does not carry ilha island symbols — Resizable must not be detected as a child island", () => {
     const ISLAND = Symbol.for("ilha.island");
     const isIsland = (v: unknown) =>
