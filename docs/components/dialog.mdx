@@ -84,11 +84,11 @@ Ilha’s renderer **morphs only the island host** (`data-ilha`). After the porta
 
 **Supported patterns today**
 
-| Approach | When to use |
-| -------- | ----------- |
-| **One island owns everything** | `open`, `query`, and list markup live in a **single** parent `.render`. Prefer the shortcut `content={…}` or composed `Dialog.Content` **without** a separate child island only inside the portal. |
+| Approach                             | When to use                                                                                                                                                                                                                                                                                 |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **One island owns everything**       | `open`, `query`, and list markup live in a **single** parent `.render`. Prefer the shortcut `content={…}` or composed `Dialog.Content` **without** a separate child island only inside the portal.                                                                                          |
 | **Imperative bridge (escape hatch)** | `onPortalMounted(container)` on portaled primitives — **Dialog**, **Popover**, **Dropdown**, **HoverCard**, **Tooltip**, **ContextMenu**, **Combobox** (slots), **Select** (slots). Use to sync portaled DOM (e.g. command palette bridge). Remove when Ilha can patch teleported subtrees. |
-| **`Dialog.Static`** | SSR / docs only — not for signal-driven UI inside a portaled panel. |
+| **`Dialog.Static`**                  | SSR / docs only — not for signal-driven UI inside a portaled panel.                                                                                                                                                                                                                         |
 
 **Close controls:** `Dialog.Close` and `Popover.Close` with `as="button"` (default) wrap icon-only children (SVG / `Icon`) in `<button type="button" data-slot="…-close">` instead of putting the close slot on the SVG alone.
 
@@ -224,19 +224,19 @@ export default ilha.render(() => (
 
 ### `Dialog`
 
-| Prop                  | Type                             | Default                            | Description                                                                          |
-| --------------------- | -------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------ |
-| `trigger`             | `unknown`                        | —                                  | Custom trigger markup.                                                               |
-| `children`            | `unknown`                        | —                                  | Composed dialog slots, or trigger content when no `Dialog.Content` child is present. |
-| `content`             | `unknown`                        | —                                  | Dialog panel content.                                                                |
-| `size`                | `"sm" \| "base" \| "lg" \| "xl"` | `"base"`                           | Dialog width.                                                                        |
-| `role`                | `"dialog" \| "alertdialog"`      | `"dialog"`                         | Dialog semantic role.                                                                |
-| `defaultOpen`         | `boolean`                        | `false`                            | Initial open state.                                                                  |
-| `closeOnClickOutside` | `boolean`                        | `true` (`false` for alert dialogs) | Close when clicking outside content.                                                 |
-| `closeOnEscape`       | `boolean`                        | `true`                             | Close when pressing Escape.                                                          |
-| `lockScroll`          | `boolean`                        | `true`                             | Lock body scroll while open.                                                         |
-| `onOpenChange`        | `(open: boolean) => void`        | —                                  | Called when open state changes.                                                      |
-| `onPortalMounted`     | `(container: HTMLElement) => void` | —                                | After portal moves to `document.body` on open. Also on Popover, Dropdown, HoverCard; AlertDialog via slots `createAlertDialog`. |
+| Prop                  | Type                               | Default                            | Description                                                                                                                     |
+| --------------------- | ---------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `trigger`             | `unknown`                          | —                                  | Custom trigger markup.                                                                                                          |
+| `children`            | `unknown`                          | —                                  | Composed dialog slots, or trigger content when no `Dialog.Content` child is present.                                            |
+| `content`             | `unknown`                          | —                                  | Dialog panel content.                                                                                                           |
+| `size`                | `"sm" \| "base" \| "lg" \| "xl"`   | `"base"`                           | Dialog width.                                                                                                                   |
+| `role`                | `"dialog" \| "alertdialog"`        | `"dialog"`                         | Dialog semantic role.                                                                                                           |
+| `defaultOpen`         | `boolean`                          | `false`                            | Initial open state.                                                                                                             |
+| `closeOnClickOutside` | `boolean`                          | `true` (`false` for alert dialogs) | Close when clicking outside content.                                                                                            |
+| `closeOnEscape`       | `boolean`                          | `true`                             | Close when pressing Escape.                                                                                                     |
+| `lockScroll`          | `boolean`                          | `true`                             | Lock body scroll while open.                                                                                                    |
+| `onOpenChange`        | `(open: boolean) => void`          | —                                  | Called when open state changes.                                                                                                 |
+| `onPortalMounted`     | `(container: HTMLElement) => void` | —                                  | After portal moves to `document.body` on open. Also on Popover, Dropdown, HoverCard; AlertDialog via slots `createAlertDialog`. |
 
 ### Compound exports
 

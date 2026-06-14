@@ -194,7 +194,7 @@ root?.dispatchEvent(
 | `closeOnClickOutside` | `boolean`                                   | `true`     | Close when clicking outside the popover.                            |
 | `closeOnEscape`       | `boolean`                                   | `true`     | Close when pressing Escape.                                         |
 | `onOpenChange`        | `(open: boolean) => void`                   | —          | Called when open state changes.                                     |
-| `onPortalMounted`     | `(container: HTMLElement) => void`          | —          | After portaled content mounts on open.                                |
+| `onPortalMounted`     | `(container: HTMLElement) => void`          | —          | After portaled content mounts on open.                              |
 | `position`            | `PopoverSide`                               | —          | **Deprecated.** Use `side` instead.                                 |
 
 Options can also be set via `data-*` attributes on the root element, using kebab-case names (e.g. `data-side-offset="8"`). JS options take precedence over data attributes.

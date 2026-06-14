@@ -421,31 +421,31 @@ Use `Tooltip` to label an icon button or add a short explanation. Use `HoverCard
 
 `HoverCard` is an Ilha island. It accepts standard HTML `div` attributes plus `@areia/slots/hover-card` options.
 
-| Prop                  | Type                                     | Default    | Description                                                                      |
-| --------------------- | ---------------------------------------- | ---------- | -------------------------------------------------------------------------------- |
-| `content`             | `unknown`                                | -          | Content to display inside the hover-card popup.                                  |
-| `children`            | `unknown`                                | -          | Trigger content when `trigger` is not provided.                                  |
-| `trigger`             | `unknown`                                | -          | Custom trigger markup. Must include `data-slot="hover-card-trigger"`.            |
-| `triggerAs`           | `"button" \| "span" \| "div" \| "a"`     | `"span"`   | Tag used for the generated trigger.                                              |
-| `class`               | `string`                                 | -          | Additional CSS classes applied to the hover-card root.                           |
-| `className`           | `string`                                 | -          | Alias for `class`.                                                               |
-| `triggerClass`        | `string`                                 | -          | Additional CSS classes applied to the generated trigger.                         |
-| `triggerClassName`    | `string`                                 | -          | Alias for `triggerClass`.                                                        |
-| `contentClass`        | `string`                                 | -          | Additional CSS classes applied to the hover-card popup.                          |
-| `contentClassName`    | `string`                                 | -          | Alias for `contentClass`.                                                        |
-| `side`                | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side relative to the trigger.                                          |
-| `align`               | `"start" \| "center" \| "end"`           | `"center"` | Preferred alignment along the selected side.                                     |
-| `sideOffset`          | `number`                                 | `4`        | Distance from the trigger in pixels.                                             |
-| `alignOffset`         | `number`                                 | `0`        | Offset from the aligned edge in pixels.                                          |
-| `avoidCollisions`     | `boolean`                                | `true`     | Flip or shift to stay inside the viewport.                                       |
-| `collisionPadding`    | `number`                                 | `8`        | Viewport edge padding used for collision handling.                               |
-| `delay`               | `number`                                 | `700`      | Delay before showing the hover-card in milliseconds.                             |
-| `closeDelay`          | `number`                                 | `300`      | Delay before closing after mouse leave in milliseconds.                          |
-| `skipDelayDuration`   | `number`                                 | `300`      | Warm-up window where another hover-card opens without delay. Set `0` to disable. |
-| `portal`              | `boolean`                                | `true`     | Portal content to `document.body` while open.                                    |
-| `closeOnClickOutside` | `boolean`                                | `true`     | Close when clicking outside the hover-card.                                      |
-| `closeOnEscape`       | `boolean`                                | `true`     | Close when pressing Escape.                                                      |
-| `onOpenChange`        | `(open: boolean) => void`                | -          | Called when visibility changes.                                                  |
+| Prop                  | Type                                     | Default    | Description                                                                           |
+| --------------------- | ---------------------------------------- | ---------- | ------------------------------------------------------------------------------------- |
+| `content`             | `unknown`                                | -          | Content to display inside the hover-card popup.                                       |
+| `children`            | `unknown`                                | -          | Trigger content when `trigger` is not provided.                                       |
+| `trigger`             | `unknown`                                | -          | Custom trigger markup. Must include `data-slot="hover-card-trigger"`.                 |
+| `triggerAs`           | `"button" \| "span" \| "div" \| "a"`     | `"span"`   | Tag used for the generated trigger.                                                   |
+| `class`               | `string`                                 | -          | Additional CSS classes applied to the hover-card root.                                |
+| `className`           | `string`                                 | -          | Alias for `class`.                                                                    |
+| `triggerClass`        | `string`                                 | -          | Additional CSS classes applied to the generated trigger.                              |
+| `triggerClassName`    | `string`                                 | -          | Alias for `triggerClass`.                                                             |
+| `contentClass`        | `string`                                 | -          | Additional CSS classes applied to the hover-card popup.                               |
+| `contentClassName`    | `string`                                 | -          | Alias for `contentClass`.                                                             |
+| `side`                | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side relative to the trigger.                                               |
+| `align`               | `"start" \| "center" \| "end"`           | `"center"` | Preferred alignment along the selected side.                                          |
+| `sideOffset`          | `number`                                 | `4`        | Distance from the trigger in pixels.                                                  |
+| `alignOffset`         | `number`                                 | `0`        | Offset from the aligned edge in pixels.                                               |
+| `avoidCollisions`     | `boolean`                                | `true`     | Flip or shift to stay inside the viewport.                                            |
+| `collisionPadding`    | `number`                                 | `8`        | Viewport edge padding used for collision handling.                                    |
+| `delay`               | `number`                                 | `700`      | Delay before showing the hover-card in milliseconds.                                  |
+| `closeDelay`          | `number`                                 | `300`      | Delay before closing after mouse leave in milliseconds.                               |
+| `skipDelayDuration`   | `number`                                 | `300`      | Warm-up window where another hover-card opens without delay. Set `0` to disable.      |
+| `portal`              | `boolean`                                | `true`     | Portal content to `document.body` while open.                                         |
+| `closeOnClickOutside` | `boolean`                                | `true`     | Close when clicking outside the hover-card.                                           |
+| `closeOnEscape`       | `boolean`                                | `true`     | Close when pressing Escape.                                                           |
+| `onOpenChange`        | `(open: boolean) => void`                | -          | Called when visibility changes.                                                       |
 | `onPortalMounted`     | `(container: HTMLElement) => void`       | -          | After portaled content mounts on open. See Dialog docs, **Ilha + portaled overlays**. |
 
 ### HoverCard.Trigger

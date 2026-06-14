@@ -81,8 +81,7 @@ describe("Popover.Close", () => {
         as: "button",
         "aria-label": "Close",
         children: {
-          value:
-            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0"></path></svg>',
+          value: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0"></path></svg>',
         },
       }),
     );

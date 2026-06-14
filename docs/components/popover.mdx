@@ -380,30 +380,30 @@ export default ilha.render(() => (
 
 `Popover` is an Ilha island. It accepts standard HTML `div` attributes plus `@data-slot/popover` options.
 
-| Prop                  | Type                                     | Default    | Description                                                                            |
-| --------------------- | ---------------------------------------- | ---------- | -------------------------------------------------------------------------------------- |
-| `children`            | `unknown`                                | -          | Composed popover slots, or trigger content when no `Popover.Content` child is present. |
-| `content`             | `unknown`                                | -          | Popover panel content.                                                                 |
-| `trigger`             | `unknown`                                | -          | Custom trigger markup. Must include `data-slot="popover-trigger"`.                     |
-| `triggerAs`           | `"button" \| "span" \| "div" \| "a"`     | `"span"`   | Tag used for the generated trigger.                                                    |
-| `arrow`               | `boolean`                                | `true`     | Whether to render the decorative arrow.                                                |
-| `class`               | `string`                                 | -          | Additional CSS classes applied to the root.                                            |
-| `className`           | `string`                                 | -          | Alias for `class`.                                                                     |
-| `triggerClass`        | `string`                                 | -          | Additional CSS classes applied to the generated trigger.                               |
-| `triggerClassName`    | `string`                                 | -          | Alias for `triggerClass`.                                                              |
-| `contentClass`        | `string`                                 | -          | Additional CSS classes applied to the content.                                         |
-| `contentClassName`    | `string`                                 | -          | Alias for `contentClass`.                                                              |
-| `defaultOpen`         | `boolean`                                | `false`    | Initial open state.                                                                    |
-| `side`                | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side relative to the trigger.                                                |
-| `align`               | `"start" \| "center" \| "end"`           | `"center"` | Preferred alignment on the side axis.                                                  |
-| `sideOffset`          | `number`                                 | `8`        | Distance from the trigger in pixels.                                                   |
-| `alignOffset`         | `number`                                 | `0`        | Offset from the alignment edge in pixels.                                              |
-| `avoidCollisions`     | `boolean`                                | `true`     | Flip or shift to stay inside the viewport.                                             |
-| `collisionPadding`    | `number`                                 | `8`        | Viewport edge padding used for collision handling.                                     |
-| `portal`              | `boolean`                                | `true`     | Portal content to `document.body` while open.                                          |
-| `closeOnClickOutside` | `boolean`                                | `true`     | Close when clicking outside the popover.                                               |
-| `closeOnEscape`       | `boolean`                                | `true`     | Close when pressing Escape.                                                            |
-| `onOpenChange`        | `(open: boolean) => void`                | -          | Called when open state changes.                                                        |
+| Prop                  | Type                                     | Default    | Description                                                                                                      |
+| --------------------- | ---------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------- |
+| `children`            | `unknown`                                | -          | Composed popover slots, or trigger content when no `Popover.Content` child is present.                           |
+| `content`             | `unknown`                                | -          | Popover panel content.                                                                                           |
+| `trigger`             | `unknown`                                | -          | Custom trigger markup. Must include `data-slot="popover-trigger"`.                                               |
+| `triggerAs`           | `"button" \| "span" \| "div" \| "a"`     | `"span"`   | Tag used for the generated trigger.                                                                              |
+| `arrow`               | `boolean`                                | `true`     | Whether to render the decorative arrow.                                                                          |
+| `class`               | `string`                                 | -          | Additional CSS classes applied to the root.                                                                      |
+| `className`           | `string`                                 | -          | Alias for `class`.                                                                                               |
+| `triggerClass`        | `string`                                 | -          | Additional CSS classes applied to the generated trigger.                                                         |
+| `triggerClassName`    | `string`                                 | -          | Alias for `triggerClass`.                                                                                        |
+| `contentClass`        | `string`                                 | -          | Additional CSS classes applied to the content.                                                                   |
+| `contentClassName`    | `string`                                 | -          | Alias for `contentClass`.                                                                                        |
+| `defaultOpen`         | `boolean`                                | `false`    | Initial open state.                                                                                              |
+| `side`                | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side relative to the trigger.                                                                          |
+| `align`               | `"start" \| "center" \| "end"`           | `"center"` | Preferred alignment on the side axis.                                                                            |
+| `sideOffset`          | `number`                                 | `8`        | Distance from the trigger in pixels.                                                                             |
+| `alignOffset`         | `number`                                 | `0`        | Offset from the alignment edge in pixels.                                                                        |
+| `avoidCollisions`     | `boolean`                                | `true`     | Flip or shift to stay inside the viewport.                                                                       |
+| `collisionPadding`    | `number`                                 | `8`        | Viewport edge padding used for collision handling.                                                               |
+| `portal`              | `boolean`                                | `true`     | Portal content to `document.body` while open.                                                                    |
+| `closeOnClickOutside` | `boolean`                                | `true`     | Close when clicking outside the popover.                                                                         |
+| `closeOnEscape`       | `boolean`                                | `true`     | Close when pressing Escape.                                                                                      |
+| `onOpenChange`        | `(open: boolean) => void`                | -          | Called when open state changes.                                                                                  |
 | `onPortalMounted`     | `(container: HTMLElement) => void`       | -          | After portaled content mounts on open (Ilha bridge escape hatch). See Dialog docs, **Ilha + portaled overlays**. |
 
 ### Popover.Trigger

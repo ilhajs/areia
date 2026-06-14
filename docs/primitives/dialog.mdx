@@ -175,15 +175,15 @@ root?.dispatchEvent(
 
 `Dialog.createDialog(root, options)`
 
-| Option                | Type                      | Default | Description                                      |
-| --------------------- | ------------------------- | ------- | ------------------------------------------------ |
-| `defaultOpen`         | `boolean`                 | `false` | Initial open state.                              |
-| `onOpenChange`        | `(open: boolean) => void` | —       | Called when open state changes.                  |
-| `closeOnClickOutside` | `boolean`                 | `true`  | Close when clicking the overlay.                 |
-| `closeOnEscape`       | `boolean`                 | `true`  | Close when pressing Escape.                      |
-| `lockScroll`          | `boolean`                 | `true`  | Lock body scroll while the dialog is open.       |
-| `alertDialog`         | `boolean`                 | `false` | Use `role="alertdialog"` for confirmation flows. |
-| `onPortalMounted`     | `(container: HTMLElement) => void` | — | After `dialog-portal` moves to `document.body` on open. Optional bridge for portaled UI when the app renderer cannot patch teleported DOM. |
+| Option                | Type                               | Default | Description                                                                                                                                |
+| --------------------- | ---------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `defaultOpen`         | `boolean`                          | `false` | Initial open state.                                                                                                                        |
+| `onOpenChange`        | `(open: boolean) => void`          | —       | Called when open state changes.                                                                                                            |
+| `closeOnClickOutside` | `boolean`                          | `true`  | Close when clicking the overlay.                                                                                                           |
+| `closeOnEscape`       | `boolean`                          | `true`  | Close when pressing Escape.                                                                                                                |
+| `lockScroll`          | `boolean`                          | `true`  | Lock body scroll while the dialog is open.                                                                                                 |
+| `alertDialog`         | `boolean`                          | `false` | Use `role="alertdialog"` for confirmation flows.                                                                                           |
+| `onPortalMounted`     | `(container: HTMLElement) => void` | —       | After `dialog-portal` moves to `document.body` on open. Optional bridge for portaled UI when the app renderer cannot patch teleported DOM. |
 
 Options can also be set via `data-*` attributes on the root element, using kebab-case names (e.g. `data-close-on-escape="false"`). JS options take precedence over data attributes.
 

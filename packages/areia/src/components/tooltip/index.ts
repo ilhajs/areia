@@ -350,9 +350,7 @@ export const TooltipRoot = ilha
   .render(({ input }) => renderTooltip(input));
 
 function TooltipBase(input: TooltipInput) {
-  return renderTooltip(
-    normalizeStaticChildSlots(input, ["content", "trigger", "children"]),
-  );
+  return renderTooltip(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
 }
 
 export const Tooltip = Object.assign(TooltipRoot, {

@@ -470,7 +470,8 @@ export const DropdownRoot = ilha
       collisionPadding: input.collisionPadding,
       lockScroll: input.lockScroll,
       highlightItemOnHover: input.highlightItemOnHover,
-      onPortalMounted: input.onPortalMounted as DropdownMenuPrimitive.DropdownMenuOptions["onPortalMounted"],
+      onPortalMounted:
+        input.onPortalMounted as DropdownMenuPrimitive.DropdownMenuOptions["onPortalMounted"],
     } satisfies DropdownMenuPrimitive.DropdownMenuOptions);
 
     bindSync = createOpenBindSync(input, controller);

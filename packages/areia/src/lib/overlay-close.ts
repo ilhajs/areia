@@ -1,13 +1,7 @@
 import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
-import {
-  isIlhaIsland,
-  islandCallParts,
-  render,
-  renderString,
-  withSlot,
-} from "$lib/markup";
+import { isIlhaIsland, islandCallParts, render, renderString, withSlot } from "$lib/markup";
 
 export type OverlayCloseTag = "button" | "span" | "div" | "a";
 
