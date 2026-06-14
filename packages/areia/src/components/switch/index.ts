@@ -7,6 +7,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Label } from "$components/label";
@@ -62,17 +63,6 @@ export interface SwitchVariantsProps {
 }
 
 type VariantConfig = Record<string, { classes: string; thumbClasses?: string }>;
-type Renderable = unknown;
-
-function render(value: Renderable): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
-
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
   variants: TVariants,
   value: TKey | undefined,

@@ -1,6 +1,15 @@
 import { describe, expect, it } from "bun:test";
 import ilha, { html } from "ilha";
-import { decodeMarkupEntities, hasSlot, render, renderString, withSlot } from "./markup";
+import {
+  decodeMarkupEntities,
+  hasRenderableContent,
+  hasSlot,
+  normalizeStaticChildSlots,
+  render,
+  renderString,
+  renderStringForSlots,
+  withSlot,
+} from "./markup";
 
 function markup(value: unknown): string {
   const rendered = render(value);
@@ -55,5 +64,22 @@ describe("markup", () => {
     expect(output).toContain("data-ilha-slot");
     expect(output).toContain('data-slot="popover-trigger"');
     expect(output).toContain('class="custom"');
+  });
+
+  it("detects composed slots inside Ilha islands", () => {
+    const Counter = ilha
+      .state("count", 0)
+      .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+    expect(renderStringForSlots(Counter)).toContain("data-ilha-slot");
+    expect(hasRenderableContent(Counter)).toBe(true);
+    expect(hasRenderableContent("")).toBe(false);
+  });
+
+  it("normalizeStaticChildSlots pre-renders child props", () => {
+    const frozen = normalizeStaticChildSlots({ content: { value: "<span>Hi</span>" }, keep: 1 }, [
+      "content",
+    ]);
+    expect(markup(frozen.content)).toBe("<span>Hi</span>");
+    expect(frozen.keep).toBe(1);
   });
 });

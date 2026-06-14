@@ -1,5 +1,6 @@
 import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
+import { hasRenderableContent, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -55,26 +56,6 @@ export function breadcrumbsVariants({
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-type Renderable = unknown;
-
-function render(value: Renderable): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
-
-function renderString(value: Renderable): string {
-  const rendered = render(value);
-  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
-  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
-    return String(rendered.value);
-  }
-  return String(rendered);
-}
 
 function escapeAttr(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
@@ -363,8 +344,7 @@ function BreadcrumbsBase(input: BreadcrumbsInput) {
     className: aliasedClassName,
   } = input;
 
-  const composedChildren = renderString(children);
-  const hasComposedChildren = composedChildren.trim().length > 0;
+  const hasComposedChildren = hasRenderableContent(children);
   const fullTrail = hasComposedChildren ? [] : buildFullTrail(items, loading);
   const mobileTrail = hasComposedChildren ? [] : buildMobileTrail(items, loading);
 
@@ -373,7 +353,7 @@ function BreadcrumbsBase(input: BreadcrumbsInput) {
     aria-label="breadcrumb"
   >
     ${hasComposedChildren
-      ? raw(composedChildren)
+      ? render(children)
       : html`<div class="contents sm:hidden">${render(mobileTrail)}</div>
           <div class="hidden sm:contents">${render(fullTrail)}</div>`}
     ${copyUrl != null ? BreadcrumbsClipboard({ text: copyUrl }) : ""}

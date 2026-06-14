@@ -10,6 +10,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { render, renderStringForSlots } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Icon } from "$components/icon";
@@ -21,24 +22,6 @@ export interface CollapsibleVariantsProps {}
 
 export function collapsibleVariants(_props: CollapsibleVariantsProps = {}) {
   return cn();
-}
-
-function render(value: unknown): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
-
-function renderString(value: unknown): string {
-  const rendered = render(value);
-  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
-  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
-    return String(rendered.value);
-  }
-  return String(rendered);
 }
 
 const defaultChevron = Icon({
@@ -270,7 +253,7 @@ export function CollapsibleAccordionItem(input: CollapsibleAccordionItemInput) {
 export function CollapsibleAccordionTrigger(input: CollapsibleTriggerInput = {}) {
   const trigger = CollapsibleDefaultTrigger(input);
   return html`${raw(
-    renderString(trigger).replaceAll(
+    renderStringForSlots(trigger).replaceAll(
       'data-slot="collapsible-trigger"',
       'data-slot="accordion-trigger"',
     ),

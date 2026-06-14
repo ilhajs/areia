@@ -1,5 +1,6 @@
 import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
+import { render, renderStringForSlots } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -23,28 +24,8 @@ export function layerCardVariants(_props: LayerCardVariantsProps = {}) {
   return cn(LAYER_CARD_SURFACE_CLASSES);
 }
 
-type Renderable = unknown;
-
-function render(value: Renderable): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
-
-function renderString(value: Renderable): string {
-  const rendered = render(value);
-  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
-  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
-    return String(rendered.value);
-  }
-  return String(rendered);
-}
-
-function containsLayerCardSection(value: Renderable): boolean {
-  const markup = renderString(value);
+function containsLayerCardSection(value: unknown): boolean {
+  const markup = renderStringForSlots(value);
   return (
     markup.includes('data-slot="layer-card-content"') ||
     markup.includes('data-slot="layer-card-title"')

@@ -1,6 +1,7 @@
 import { html, raw } from "ilha";
 import { Checkbox } from "$components/checkbox";
 import { cn } from "$lib/cn";
+import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -53,17 +54,6 @@ export interface TableVariantsProps {
 }
 
 type VariantConfig = Record<string, { classes: string }>;
-type Renderable = unknown;
-
-function render(value: Renderable): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
-
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
   variants: TVariants,
   value: TKey | undefined,

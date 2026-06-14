@@ -389,6 +389,9 @@ describe("child Ilha islands", () => {
         ["Dialog content", (Counter) => Dialog({ children: "Open", content: Counter })],
         ["Popover content", (Counter) => Popover({ children: "Open", content: Counter })],
         ["HoverCard content", (Counter) => HoverCard({ children: "Hover", content: Counter })],
+        ["Collapsible panel", (Counter) => Collapsible({ trigger: "Toggle", panel: Counter })],
+        ["Field children", (Counter) => Field({ children: Counter })],
+        ["LayerCard children", (Counter) => LayerCard({ children: Counter })],
       ];
 
       for (const [name, make] of cases) {

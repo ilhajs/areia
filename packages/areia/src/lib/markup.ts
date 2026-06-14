@@ -73,8 +73,42 @@ export function renderString(value: unknown): string {
   return String(value);
 }
 
+/** Like {@link renderString}, but serializes Ilha islands for `data-slot` detection. */
+export function renderStringForSlots(value: unknown): string {
+  if (value === null || value === undefined || value === false) return "";
+  if (Array.isArray(value)) return value.map(renderStringForSlots).join("");
+  if (isIlhaIsland(value) || islandCallParts(value)) {
+    return rawValue(html`${value}`) ?? "";
+  }
+  return renderString(value);
+}
+
+/** Whether `children` / `content` / similar props carry markup or live Ilha islands. */
+export function hasRenderableContent(value: unknown): boolean {
+  if (value === null || value === undefined || value === false) return false;
+  if (Array.isArray(value)) return value.some(hasRenderableContent);
+  if (isIlhaIsland(value) || islandCallParts(value)) return true;
+  const markup = rawValue(value);
+  if (markup !== undefined) return markup.trim().length > 0;
+  if (typeof value === "string") return value.trim().length > 0;
+  return true;
+}
+
+/** Pre-render child props for {@link *.Static} SSR-only entry points (freezes reactive templates). */
+export function normalizeStaticChildSlots<T extends Record<string, unknown>>(
+  input: T,
+  keys: readonly (keyof T)[],
+): T {
+  const next = { ...input };
+  for (const key of keys) {
+    const value = next[key];
+    if (value != null) next[key] = render(value) as T[keyof T];
+  }
+  return next;
+}
+
 export function hasSlot(value: unknown, slot: string) {
-  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(renderString(value));
+  return new RegExp(`\\sdata-slot=["']${slot}["']`).test(renderStringForSlots(value));
 }
 
 /** Inject data-slot and classes into serialized HTML trigger markup. */

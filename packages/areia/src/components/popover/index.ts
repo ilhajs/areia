@@ -7,7 +7,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
-import { hasSlot, render, withSlot } from "$lib/markup";
+import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -528,15 +528,6 @@ const PopoverRootIsland = ilha
   })
   .render(({ input }) => renderPopover(input));
 
-function normalizePopoverInput(input: PopoverInput = {}): PopoverInput {
-  return {
-    ...input,
-    content: input.content == null ? input.content : render(input.content),
-    trigger: input.trigger == null ? input.trigger : render(input.trigger),
-    children: input.children == null ? input.children : render(input.children),
-  };
-}
-
 const autoBindScheduled = new WeakSet<Document>();
 
 function schedulePopoverAutoBind(doc: Document | undefined = globalThis.document) {
@@ -555,16 +546,16 @@ function needsPopoverIsland(input: PopoverInput) {
 }
 
 export function PopoverRoot(input: PopoverInput = {}) {
-  const normalized = normalizePopoverInput(input);
-  if (needsPopoverIsland(input)) return PopoverRootIsland(normalized);
+  if (needsPopoverIsland(input)) return PopoverRootIsland(input);
 
+  const normalized = normalizeStaticChildSlots(input, ["content", "trigger", "children"]);
   ensurePopoverAutoBind();
   schedulePopoverAutoBind();
   return renderPopover(normalized, true);
 }
 
 function PopoverBase(input: PopoverInput = {}) {
-  return renderPopover(normalizePopoverInput(input));
+  return renderPopover(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
 }
 
 export const Popover = Object.assign(PopoverRoot, {

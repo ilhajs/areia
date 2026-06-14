@@ -1,6 +1,7 @@
 import ilha, { html, raw } from "ilha";
 import { Field as FieldPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
+import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -21,15 +22,6 @@ export type FieldInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "c
     descriptionClass?: string;
     errorClass?: string;
   };
-
-function render(value: unknown): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
 
 export function FieldLabel(input: { label?: unknown; class?: string; className?: string } = {}) {
   const { label, class: className, className: aliasedClassName } = input;

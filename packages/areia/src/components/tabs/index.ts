@@ -7,6 +7,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { hasRenderableContent, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -156,43 +157,6 @@ function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVar
   fallback: TKey,
 ) {
   return variants[value ?? fallback] ?? variants[fallback];
-}
-
-function rawValue(value: unknown): string | undefined {
-  if (typeof value === "string") return value;
-  if (
-    typeof value === "object" &&
-    value !== null &&
-    "value" in value &&
-    typeof value.value === "string"
-  ) {
-    return value.value;
-  }
-  return undefined;
-}
-
-function islandCallParts(
-  value: unknown,
-): { island: { toString?: (props?: unknown) => string }; props?: unknown } | undefined {
-  if (!value || (typeof value !== "object" && typeof value !== "function")) return undefined;
-  const symbol = Object.getOwnPropertySymbols(value).find(
-    (item) => item.description === "ilha.islandCall",
-  );
-  if (!symbol) return undefined;
-  const record = value as Record<PropertyKey, unknown>;
-  const island = record["island"];
-  if (!island || (typeof island !== "object" && typeof island !== "function")) return undefined;
-  return { island: island as { toString?: (props?: unknown) => string }, props: record["props"] };
-}
-
-function render(value: unknown): string {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render).join("");
-  const markup = rawValue(value);
-  if (markup !== undefined) return markup;
-  const islandCall = islandCallParts(value);
-  if (islandCall?.island.toString) return islandCall.island.toString(islandCall.props);
-  return String(value);
 }
 
 export function tabsVariants({
@@ -410,7 +374,7 @@ function renderTabs(input: TabsInput = {}) {
   } = input;
 
   const composedChildren = render(children);
-  const hasComposedChildren = composedChildren.trim().length > 0;
+  const hasComposedChildren = hasRenderableContent(children);
   if (tabs.length === 0 && !hasComposedChildren) return "";
 
   const boundValue = groupBindDefault(input, value ?? selectedValue ?? defaultValueProp);
@@ -454,7 +418,7 @@ function renderTabs(input: TabsInput = {}) {
         ></div>`
       : ""}
     ${hasComposedChildren
-      ? raw(composedChildren)
+      ? composedChildren
       : html`${TabsList({
           children: listChildren,
           variant,

@@ -76,6 +76,54 @@ export default ilha.render(() => (
 
 ## Examples
 
+### Search / command palette (`bind:open` + reactive body)
+
+Use a parent Ilha island for open state and query text. Pass reactive markup via the `content` prop or compose `Dialog.Content` children in the same island render — both stay live when signals change. Use `Dialog.Static` only for one-shot SSR markup without Ilha state.
+
+```tsx preview
+import ilha from "ilha";
+import { Dialog } from "areia";
+
+export default ilha
+  .state("open", false)
+  .state("query", "")
+  .derived("results", ({ state }) => {
+    const items = ["Docs", "Guide", "API"];
+    const q = state.query().toLowerCase();
+    return q
+      ? items.filter((label) => label.toLowerCase().includes(q))
+      : items;
+  })
+  .render(({ state, derived }) => (
+    <Dialog
+      {...{ "bind:open": state.open }}
+      trigger="Search"
+      contentClass="p-4"
+      content={
+        <>
+          <input
+            type="search"
+            placeholder="Search docs…"
+            value={state.query()}
+            onInput={(event) =>
+              state.query(
+                (event.currentTarget as HTMLInputElement).value,
+              )
+            }
+          />
+          <ul>
+            {derived.results().map((label) => (
+              <li key={label}>{label}</li>
+            ))}
+          </ul>
+        </>
+      }
+    />
+  ));
+```
+
+For a reusable panel, pass a child island to `content` (for example `content={SearchPanel({ query: state.query })}`). Nested islands mount inside the portaled `dialog-content` the same way as inline markup.
+
 ### Alert dialog
 
 Use `role: "alertdialog"` for confirmation flows that require explicit acknowledgment. Alert dialogs do not close on outside click by default.
@@ -178,7 +226,7 @@ export default ilha.render(() => (
 
 ### Prop shortcut
 
-For simple dialogs, pass `trigger` and `content`. Areia generates the trigger, portal, overlay, and content slots for you.
+For simple dialogs, pass `trigger` and `content`. Areia generates the trigger, portal, overlay, and content slots for you. With Ilha, keep reactive `content` (or composed `Dialog.Content` children) in the island `.render` callback so lists and inputs update when signals change; `Dialog.Static` pre-renders markup for SSR-only shortcuts.
 
 ```tsx preview
 import ilha from "ilha";

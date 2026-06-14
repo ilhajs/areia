@@ -1,18 +1,8 @@
 import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
+import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-
-type Renderable = unknown;
-
-function render(value: Renderable): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
 
 /** Visual indicator for links that open in a new tab/window. */
 export type LinkExternalIconInput = Record<string, unknown> & {

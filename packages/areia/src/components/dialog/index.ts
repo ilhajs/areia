@@ -9,7 +9,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
-import { hasSlot, render, withSlot } from "$lib/markup";
+import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -424,19 +424,10 @@ export const DialogRoot = ilha
     const controller = dialogControllers.get(root) ?? DialogPrimitive.createDialog(root);
     createOpenBindSync(input, controller)?.applyFromSignal();
   })
-  .render(({ input }) => renderDialog(normalizeDialogInput(input)));
-
-function normalizeDialogInput(input: DialogInput = {}): DialogInput {
-  return {
-    ...input,
-    content: input.content == null ? input.content : render(input.content),
-    trigger: input.trigger == null ? input.trigger : render(input.trigger),
-    children: input.children == null ? input.children : render(input.children),
-  };
-}
+  .render(({ input }) => renderDialog(input));
 
 function DialogBase(input: DialogInput = {}) {
-  return renderDialog(normalizeDialogInput(input));
+  return renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
 }
 
 export const Dialog = Object.assign(DialogRoot, {

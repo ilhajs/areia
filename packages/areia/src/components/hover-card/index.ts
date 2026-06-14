@@ -9,7 +9,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
-import { hasSlot, render, withSlot } from "$lib/markup";
+import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -401,21 +401,12 @@ const HoverCardRootIsland = ilha
   })
   .render(({ input }) => renderHoverCard(input));
 
-function normalizeHoverCardInput(input: HoverCardInput = {}): HoverCardInput {
-  return {
-    ...input,
-    content: input.content == null ? input.content : render(input.content),
-    trigger: input.trigger == null ? input.trigger : render(input.trigger),
-    children: input.children == null ? input.children : render(input.children),
-  };
-}
-
 export function HoverCardRoot(input: HoverCardInput = {}) {
-  return HoverCardRootIsland(normalizeHoverCardInput(input));
+  return HoverCardRootIsland(input);
 }
 
 function HoverCardBase(input: HoverCardInput = {}) {
-  return renderHoverCard(normalizeHoverCardInput(input));
+  return renderHoverCard(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
 }
 
 export const HoverCard = Object.assign(HoverCardRoot, {

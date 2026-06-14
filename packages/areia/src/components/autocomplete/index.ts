@@ -8,6 +8,7 @@ import {
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
+import { render, renderString } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { INPUT_DEFAULT_VARIANTS, INPUT_VARIANTS, inputVariants } from "$components/input";
@@ -29,27 +30,7 @@ export interface AutocompleteVariantsProps {
   size?: AutocompleteSize;
 }
 
-type Renderable = unknown;
-
 type VariantConfig = Record<string, { classes: string }>;
-
-function render(value: Renderable): unknown {
-  if (value === null || value === undefined || value === false) return "";
-  if (Array.isArray(value)) return value.map(render);
-  if (typeof value === "object" && "value" in value && typeof value.value === "string") {
-    return raw(value.value);
-  }
-  return value;
-}
-
-function renderString(value: Renderable): string {
-  const rendered = render(value);
-  if (Array.isArray(rendered)) return rendered.map((item) => renderString(item)).join("");
-  if (typeof rendered === "object" && rendered !== null && "value" in rendered) {
-    return String(rendered.value);
-  }
-  return String(rendered);
-}
 
 function resolveVariant<TVariants extends VariantConfig, TKey extends keyof TVariants>(
   variants: TVariants,
