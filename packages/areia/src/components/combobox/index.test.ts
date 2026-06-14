@@ -1,12 +1,6 @@
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import { Combobox, comboboxVariants } from "./index";
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
-}
 
 describe("comboboxVariants", () => {
   it("returns empty by default", () => {

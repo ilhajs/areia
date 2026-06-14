@@ -84,6 +84,8 @@ export interface HoverCardOptions {
 
   /** Callback when open state changes */
   onOpenChange?: (open: boolean) => void;
+  /** After portaled content mounts on open. */
+  onPortalMounted?: (container: HTMLElement) => void;
 }
 
 export interface HoverCardController {
@@ -154,6 +156,7 @@ export function createHoverCard(
     options.skipDelayDuration ?? getDataNumber(root, "skipDelayDuration") ?? 300;
   const closeDelay = options.closeDelay ?? getDataNumber(root, "closeDelay") ?? 300;
   const onOpenChange = options.onOpenChange;
+  const onPortalMounted = options.onPortalMounted;
   const closeOnClickOutside =
     options.closeOnClickOutside ?? getDataBool(root, "closeOnClickOutside") ?? true;
   const closeOnEscape = options.closeOnEscape ?? getDataBool(root, "closeOnEscape") ?? true;
@@ -369,6 +372,9 @@ export function createHoverCard(
 
     if (open) {
       portal.mount();
+      if (onPortalMounted) {
+        requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+      }
       content.hidden = false;
       setDataState("open");
       presence.enter();
@@ -466,6 +472,9 @@ export function createHoverCard(
 
   if (isOpen) {
     portal.mount();
+    if (onPortalMounted) {
+      requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+    }
     presence.enter();
     content.hidden = false;
     updatePosition();

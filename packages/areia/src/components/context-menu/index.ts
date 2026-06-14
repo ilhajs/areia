@@ -23,6 +23,7 @@ export type ContextMenuInput = Omit<HTMLElementProps<HTMLDivElement>, "className
     contentClassName?: string;
     onOpenChange?: (open: boolean) => void;
     onSelect?: (value: string) => void;
+    onPortalMounted?: (container: HTMLElement) => void;
   };
 
 export type ContextMenuItemInput = Omit<
@@ -169,6 +170,7 @@ export const ContextMenuRoot = ilha
         input.onOpenChange?.(open);
       },
       onSelect: input.onSelect,
+      onPortalMounted: input.onPortalMounted,
     } satisfies ContextMenuPrimitive.ContextMenuOptions);
 
     bindSync = createOpenBindSync(input, controller);

@@ -404,6 +404,7 @@ export default ilha.render(() => (
 | `closeOnClickOutside` | `boolean`                                | `true`     | Close when clicking outside the popover.                                               |
 | `closeOnEscape`       | `boolean`                                | `true`     | Close when pressing Escape.                                                            |
 | `onOpenChange`        | `(open: boolean) => void`                | -          | Called when open state changes.                                                        |
+| `onPortalMounted`     | `(container: HTMLElement) => void`       | -          | After portaled content mounts on open (Ilha bridge escape hatch). See Dialog docs, **Ilha + portaled overlays**. |
 
 ### Popover.Trigger
 

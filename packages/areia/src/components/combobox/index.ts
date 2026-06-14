@@ -741,6 +741,7 @@ export const ComboboxRoot = ilha
       required: input.required,
       side: input.side,
       sideOffset: input.sideOffset,
+      onPortalMounted: input.onPortalMounted,
     });
 
     openSync = createOpenBindSync(input, controller);

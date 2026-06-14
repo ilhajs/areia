@@ -1,12 +1,6 @@
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import { Tooltip, tooltipVariants } from "./index";
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
-}
 
 describe("tooltipVariants", () => {
   it("returns default classes", () => {

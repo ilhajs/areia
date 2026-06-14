@@ -1,18 +1,12 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import { Popover, bindPopoverRoot, popoverVariants } from "./index";
 
 try {
   GlobalRegistrator.register();
 } catch {
   // Already registered
-}
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
 }
 
 describe("popoverVariants", () => {
@@ -81,6 +75,22 @@ describe("Popover.Content", () => {
 });
 
 describe("Popover.Close", () => {
+  it("wraps icon-only children in a button when as is button", () => {
+    const output = markup(
+      Popover.Close({
+        as: "button",
+        "aria-label": "Close",
+        children: {
+          value:
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0"></path></svg>',
+        },
+      }),
+    );
+    expect(output).toContain("<button");
+    expect(output).toContain('data-slot="popover-close"');
+    expect(output).not.toMatch(/<svg[^>]*data-slot="popover-close"/);
+  });
+
   it("injects close slot into anchor children", () => {
     const output = markup(
       Popover.Close({ children: { value: '<a href="/docs" data-no-intercept>Docs</a>' } }),

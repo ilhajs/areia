@@ -44,6 +44,8 @@ export interface ComboboxOptions {
   defaultOpen?: boolean;
   /** Callback when open state changes */
   onOpenChange?: (open: boolean) => void;
+  /** After portaled popup mounts on open. */
+  onPortalMounted?: (container: HTMLElement) => void;
   /** Callback when user types in the input (not on programmatic syncs) */
   onInputValueChange?: (inputValue: string) => void;
   /** Placeholder text for the input */
@@ -164,6 +166,7 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
   const customFilter = options.filter ?? null;
   const onValueChange = options.onValueChange;
   const onOpenChange = options.onOpenChange;
+  const onPortalMounted = options.onPortalMounted;
   const onInputValueChange = options.onInputValueChange;
   let itemToStringValue = options.itemToStringValue ?? null;
 
@@ -667,6 +670,9 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
       openRenderedSide = null;
       setAria(input, "expanded", true);
       portal.mount();
+      if (onPortalMounted) {
+        requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+      }
       content.hidden = false;
       setDataState("open");
       presence.enter();

@@ -473,6 +473,33 @@ describe("Dialog", () => {
     expect(portal.parentElement).toBe(root);
   });
 
+  it("calls onPortalMounted with portal container after open", async () => {
+    document.body.innerHTML = `
+      <div data-slot="dialog" id="root">
+        <button data-slot="dialog-trigger">Open</button>
+        <div data-slot="dialog-portal" id="portal">
+          <div data-slot="dialog-overlay"></div>
+          <div data-slot="dialog-content">Content</div>
+        </div>
+      </div>
+    `;
+    const root = document.getElementById("root")!;
+    const portal = document.getElementById("portal") as HTMLElement;
+    let mounted: HTMLElement | undefined;
+
+    const controller = createDialog(root, {
+      onPortalMounted: (container) => {
+        mounted = container;
+      },
+    });
+
+    controller.open();
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+    expect(mounted).toBe(portal);
+    controller.destroy();
+  });
+
   it("handles defaultOpen with dialog-portal and restores on destroy", () => {
     document.body.innerHTML = `
       <div data-slot="dialog" id="root" data-default-open>

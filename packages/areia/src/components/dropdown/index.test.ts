@@ -1,13 +1,7 @@
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import { html } from "ilha";
 import { Dropdown, dropdownVariants } from "./index";
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
-}
 
 describe("dropdownVariants", () => {
   it("returns default item classes", () => {

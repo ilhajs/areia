@@ -29,6 +29,8 @@ export interface AlertDialogOptions {
   closeOnEscape?: boolean;
   /** Lock body scroll when open */
   lockScroll?: boolean;
+  /** After `alert-dialog-portal` mounts to `document.body` on open. */
+  onPortalMounted?: (container: HTMLElement) => void;
 }
 
 export interface AlertDialogController {
@@ -68,6 +70,7 @@ export function createAlertDialog(
     options.closeOnClickOutside ?? getDataBool(root, "closeOnClickOutside") ?? false;
   const closeOnEscape = options.closeOnEscape ?? getDataBool(root, "closeOnEscape") ?? true;
   const lockScrollOption = options.lockScroll ?? getDataBool(root, "lockScroll") ?? true;
+  const onPortalMounted = options.onPortalMounted;
 
   const trigger = getPart<HTMLElement>(root, "alert-dialog-trigger");
   const portal = getPart<HTMLElement>(root, "alert-dialog-portal");
@@ -257,6 +260,10 @@ export function createAlertDialog(
       pendingExitCount = 0;
 
       portalLifecycle?.mount();
+      if (onPortalMounted) {
+        const container = portal ?? content;
+        requestAnimationFrame(() => onPortalMounted(container));
+      }
       previousActiveElement = document.activeElement as HTMLElement;
       modalStack.open();
 

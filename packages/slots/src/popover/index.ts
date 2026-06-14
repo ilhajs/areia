@@ -63,6 +63,8 @@ export interface PopoverOptions {
   closeOnClickOutside?: boolean;
   /** Close when pressing Escape */
   closeOnEscape?: boolean;
+  /** After portaled content mounts to `document.body` on open (Ilha bridge escape hatch). */
+  onPortalMounted?: (container: HTMLElement) => void;
 }
 
 export interface PopoverController {
@@ -128,6 +130,7 @@ export function createPopover(root: Element, options: PopoverOptions = {}): Popo
   // Behavior options from root
   const defaultOpen = options.defaultOpen ?? getDataBool(root, "defaultOpen") ?? false;
   const onOpenChange = options.onOpenChange;
+  const onPortalMounted = options.onPortalMounted;
   const closeOnClickOutside =
     options.closeOnClickOutside ?? getDataBool(root, "closeOnClickOutside") ?? true;
   const closeOnEscape = options.closeOnEscape ?? getDataBool(root, "closeOnEscape") ?? true;
@@ -323,6 +326,9 @@ export function createPopover(root: Element, options: PopoverOptions = {}): Popo
 
     if (open) {
       portal.mount();
+      if (onPortalMounted) {
+        requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+      }
       content.hidden = false;
       setDataState("open");
       presence.enter();
@@ -348,6 +354,9 @@ export function createPopover(root: Element, options: PopoverOptions = {}): Popo
   // Focus first element if defaultOpen
   if (defaultOpen) {
     portal.mount();
+    if (onPortalMounted) {
+      requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+    }
     presence.enter();
     content.hidden = false;
     updatePosition();

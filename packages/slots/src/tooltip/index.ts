@@ -93,6 +93,8 @@ export interface TooltipOptions {
   portal?: boolean;
   /** Callback when visibility changes */
   onOpenChange?: (open: boolean) => void;
+  /** After portaled tooltip content mounts on show. */
+  onPortalMounted?: (container: HTMLElement) => void;
 }
 
 export interface TooltipController {
@@ -171,6 +173,7 @@ export function createTooltip(root: Element, options: TooltipOptions = {}): Tool
   const skipDelayDuration =
     options.skipDelayDuration ?? getDataNumber(root, "skipDelayDuration") ?? 300;
   const onOpenChange = options.onOpenChange;
+  const onPortalMounted = options.onPortalMounted;
   const portalOption =
     options.portal ?? getDataBool(content, "portal") ?? getDataBool(root, "portal") ?? true;
 
@@ -403,6 +406,9 @@ export function createTooltip(root: Element, options: TooltipOptions = {}): Tool
       trigger.setAttribute("aria-describedby", contentId);
       content.setAttribute("aria-hidden", "false");
       portal.mount();
+      if (onPortalMounted) {
+        requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+      }
       content.hidden = false;
       setDataState("open");
       presence.enter();

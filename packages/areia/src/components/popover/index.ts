@@ -8,6 +8,7 @@ import {
 } from "$lib/binds";
 import { cn } from "$lib/cn";
 import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
+import { renderOverlayClose } from "$lib/overlay-close";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -272,16 +273,16 @@ export function PopoverClose(input: PopoverCloseInput = {}) {
     type,
     ...props
   } = input;
-  const slottedChild = withSlot(children, "popover-close", className, aliasedClassName);
-  if (slottedChild) return slottedChild;
 
-  const tag = as;
-
-  return html`<${raw(tag)}
-    data-slot="popover-close"
-    class="${cn(className, aliasedClassName)}"
-    ${raw(toAttrs({ ...props, type: tag === "button" ? (type ?? "button") : type }))}
-  >${children}</${raw(tag)}>`;
+  return renderOverlayClose({
+    slot: "popover-close",
+    as,
+    children,
+    class: className,
+    className: aliasedClassName,
+    type,
+    props,
+  });
 }
 
 export type PopoverInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
@@ -489,6 +490,7 @@ const PopoverRootIsland = ilha
       portal: input.portal,
       side: input.side,
       sideOffset: input.sideOffset,
+      onPortalMounted: input.onPortalMounted,
     });
 
     bindSync = createOpenBindSync(input, controller);

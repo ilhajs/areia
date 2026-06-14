@@ -1,4 +1,5 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { markupValue as markup } from "$lib/test-markup";
 import { describe, expect, it } from "bun:test";
 import ilha, { html, jsxs, jsx, mount } from "ilha";
 import { Resizable } from "./index";
@@ -7,14 +8,6 @@ try {
   GlobalRegistrator.register();
 } catch {
   // Already registered by another DOM test file in the same Bun process.
-}
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-
-  return String(value);
 }
 
 describe("Resizable", () => {

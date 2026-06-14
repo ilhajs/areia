@@ -1,7 +1,7 @@
 import ilha, { html, raw } from "ilha";
 import { Tooltip as TooltipPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
-import { hasSlot, render, withSlot } from "$lib/markup";
+import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -342,6 +342,7 @@ export const TooltipRoot = ilha
       side: input.side,
       sideOffset: input.sideOffset,
       skipDelayDuration: input.skipDelayDuration,
+      onPortalMounted: input.onPortalMounted,
     });
 
     return () => controller.destroy();
@@ -349,7 +350,9 @@ export const TooltipRoot = ilha
   .render(({ input }) => renderTooltip(input));
 
 function TooltipBase(input: TooltipInput) {
-  return renderTooltip(input);
+  return renderTooltip(
+    normalizeStaticChildSlots(input, ["content", "trigger", "children"]),
+  );
 }
 
 export const Tooltip = Object.assign(TooltipRoot, {

@@ -376,6 +376,7 @@ const HoverCardRootIsland = ilha
       side: input.side,
       sideOffset: input.sideOffset,
       skipDelayDuration: input.skipDelayDuration,
+      onPortalMounted: input.onPortalMounted,
     });
 
     bindSync = createOpenBindSync(input, controller);

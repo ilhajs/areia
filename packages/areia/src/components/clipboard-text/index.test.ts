@@ -1,12 +1,6 @@
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import { ClipboardText, clipboardTextVariants } from "./index";
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
-}
 
 describe("clipboardTextVariants", () => {
   it("returns default lg classes", () => {

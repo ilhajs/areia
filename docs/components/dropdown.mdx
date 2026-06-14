@@ -319,6 +319,8 @@ Root component that manages the dropdown state.
 | `onSelect`         | `(value: string) => void`                | -          | Fires when a user selects an item.                                                    |
 | `onValueChange`    | `(value: string \| null) => void`        | -          | Fires when the radio value changes.                                                   |
 | `onValuesChange`   | `(values: string[]) => void`             | -          | Fires when checkbox values change.                                                    |
+| `onOpenChange`     | `(open: boolean) => void`                | -          | Called when open state changes.                                                       |
+| `onPortalMounted`  | `(container: HTMLElement) => void`       | -          | After portaled menu mounts on open. See Dialog docs, **Ilha + portaled overlays**.    |
 | `triggerClassName` | `string`                                 | -          | Alias for `triggerClass`.                                                             |
 | `contentClassName` | `string`                                 | -          | Alias for `contentClass`.                                                             |
 

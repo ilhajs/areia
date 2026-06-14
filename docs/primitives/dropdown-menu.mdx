@@ -307,6 +307,7 @@ interface DropdownMenuHighlightChangeDetail {
 | `defaultValue`         | `string \| null`                         | —          | Initial radio selection value.                                       |
 | `defaultValues`        | `string[]`                               | —          | Initial checkbox selection values.                                   |
 | `onOpenChange`         | `(open: boolean) => void`                | —          | Called when open state changes.                                      |
+| `onPortalMounted`      | `(container: HTMLElement) => void`       | —          | After portaled menu mounts on open.                                  |
 | `onSelect`             | `(value: string) => void`                | —          | Called when a user selects an item.                                  |
 | `onValueChange`        | `(value: string \| null) => void`        | —          | Called when the radio value changes.                                 |
 | `onValuesChange`       | `(values: string[]) => void`             | —          | Called when checkbox values change.                                  |

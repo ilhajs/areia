@@ -1,12 +1,6 @@
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import { Progress } from "./index";
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
-}
 
 describe("Progress", () => {
   it("renders progress wrapper with data-slot", () => {

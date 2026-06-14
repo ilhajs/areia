@@ -10,6 +10,7 @@ import {
 } from "$lib/binds";
 import { cn } from "$lib/cn";
 import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
+import { renderOverlayClose } from "$lib/overlay-close";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 
@@ -250,16 +251,16 @@ export function DialogClose(input: DialogCloseInput = {}) {
     type,
     ...props
   } = input;
-  const slottedChild = withSlot(children, "dialog-close", className, aliasedClassName);
-  if (slottedChild) return slottedChild;
 
-  const tag = as;
-
-  return html`<${raw(tag)}
-    data-slot="dialog-close"
-    class="${cn(className, aliasedClassName)}"
-    ${raw(toAttrs({ ...props, type: tag === "button" ? (type ?? "button") : type }))}
-  >${children}</${raw(tag)}>`;
+  return renderOverlayClose({
+    slot: "dialog-close",
+    as,
+    children,
+    class: className,
+    className: aliasedClassName,
+    type: type as string | undefined,
+    props,
+  });
 }
 
 export type DialogPortalInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
@@ -403,6 +404,7 @@ export const DialogRoot = ilha
         bindSync?.onUserChange(open);
         input.onOpenChange?.(open);
       },
+      onPortalMounted: input.onPortalMounted,
     });
 
     bindSync = createOpenBindSync(input, controller);

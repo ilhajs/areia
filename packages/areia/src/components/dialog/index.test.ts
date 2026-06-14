@@ -1,12 +1,6 @@
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import { Dialog, dialogVariants } from "./index";
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
-}
 
 describe("dialogVariants", () => {
   it("returns default base classes", () => {
@@ -92,6 +86,24 @@ describe("Dialog.Close", () => {
     expect(output).toContain('data-slot="dialog-close"');
     expect(output).toContain("data-no-intercept");
     expect(output).not.toContain("<button");
+  });
+
+  it("wraps icon-only children in a button when as is button", () => {
+    const output = markup(
+      Dialog.Close({
+        as: "button",
+        "aria-label": "Close",
+        children: {
+          value:
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0"></path></svg>',
+        },
+      }),
+    );
+    expect(output).toContain("<button");
+    expect(output).toContain('type="button"');
+    expect(output).toContain('data-slot="dialog-close"');
+    expect(output).toContain("<svg");
+    expect(output).not.toMatch(/<svg[^>]*data-slot="dialog-close"/);
   });
 });
 

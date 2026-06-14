@@ -73,6 +73,7 @@ export type DropdownInput = Omit<HTMLElementProps<HTMLDivElement>, "className" |
     triggerClassName?: string;
     contentClass?: string;
     contentClassName?: string;
+    onPortalMounted?: (container: HTMLElement) => void;
   };
 
 export type DropdownTriggerInput = Omit<HTMLElementProps<HTMLElement>, "className" | "children"> &
@@ -469,6 +470,7 @@ export const DropdownRoot = ilha
       collisionPadding: input.collisionPadding,
       lockScroll: input.lockScroll,
       highlightItemOnHover: input.highlightItemOnHover,
+      onPortalMounted: input.onPortalMounted as DropdownMenuPrimitive.DropdownMenuOptions["onPortalMounted"],
     } satisfies DropdownMenuPrimitive.DropdownMenuOptions);
 
     bindSync = createOpenBindSync(input, controller);

@@ -76,53 +76,21 @@ export default ilha.render(() => (
 
 ## Examples
 
-### Search / command palette (`bind:open` + reactive body)
+### Ilha + portaled overlays (dialog, popover, dropdown, hover-card)
 
-Use a parent Ilha island for open state and query text. Pass reactive markup via the `content` prop or compose `Dialog.Content` children in the same island render — both stay live when signals change. Use `Dialog.Static` only for one-shot SSR markup without Ilha state.
+`@areia/slots` moves portal wrappers (`dialog-portal`, popover/dropdown positioners, etc.) to `document.body` when overlays open. That subtree is **outside** the Ilha island host element. The same constraints apply to **Popover**, **Dropdown**, and **HoverCard** when `portal` is enabled (default).
 
-```tsx preview
-import ilha from "ilha";
-import { Dialog } from "areia";
+Ilha’s renderer **morphs only the island host** (`data-ilha`). After the portal is teleported, reactive updates from the owning island (bound inputs, `each(results)`, nested `data-ilha-slot` children inside `dialog-content`) may **not** reach portaled nodes. You can see a frozen snapshot (empty search field, `command-list` still `hidden`, or an unhydrated nested island placeholder).
 
-export default ilha
-  .state("open", false)
-  .state("query", "")
-  .derived("results", ({ state }) => {
-    const items = ["Docs", "Guide", "API"];
-    const q = state.query().toLowerCase();
-    return q
-      ? items.filter((label) => label.toLowerCase().includes(q))
-      : items;
-  })
-  .render(({ state, derived }) => (
-    <Dialog
-      {...{ "bind:open": state.open }}
-      trigger="Search"
-      contentClass="p-4"
-      content={
-        <>
-          <input
-            type="search"
-            placeholder="Search docs…"
-            value={state.query()}
-            onInput={(event) =>
-              state.query(
-                (event.currentTarget as HTMLInputElement).value,
-              )
-            }
-          />
-          <ul>
-            {derived.results().map((label) => (
-              <li key={label}>{label}</li>
-            ))}
-          </ul>
-        </>
-      }
-    />
-  ));
-```
+**Supported patterns today**
 
-For a reusable panel, pass a child island to `content` (for example `content={SearchPanel({ query: state.query })}`). Nested islands mount inside the portaled `dialog-content` the same way as inline markup.
+| Approach | When to use |
+| -------- | ----------- |
+| **One island owns everything** | `open`, `query`, and list markup live in a **single** parent `.render`. Prefer the shortcut `content={…}` or composed `Dialog.Content` **without** a separate child island only inside the portal. |
+| **Imperative bridge (escape hatch)** | `onPortalMounted(container)` on portaled primitives — **Dialog**, **Popover**, **Dropdown**, **HoverCard**, **Tooltip**, **ContextMenu**, **Combobox** (slots), **Select** (slots). Use to sync portaled DOM (e.g. command palette bridge). Remove when Ilha can patch teleported subtrees. |
+| **`Dialog.Static`** | SSR / docs only — not for signal-driven UI inside a portaled panel. |
+
+**Close controls:** `Dialog.Close` and `Popover.Close` with `as="button"` (default) wrap icon-only children (SVG / `Icon`) in `<button type="button" data-slot="…-close">` instead of putting the close slot on the SVG alone.
 
 ### Alert dialog
 
@@ -268,6 +236,7 @@ export default ilha.render(() => (
 | `closeOnEscape`       | `boolean`                        | `true`                             | Close when pressing Escape.                                                          |
 | `lockScroll`          | `boolean`                        | `true`                             | Lock body scroll while open.                                                         |
 | `onOpenChange`        | `(open: boolean) => void`        | —                                  | Called when open state changes.                                                      |
+| `onPortalMounted`     | `(container: HTMLElement) => void` | —                                | After portal moves to `document.body` on open. Also on Popover, Dropdown, HoverCard; AlertDialog via slots `createAlertDialog`. |
 
 ### Compound exports
 

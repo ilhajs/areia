@@ -66,6 +66,8 @@ export interface ContextMenuOptions {
   onOpenChange?: (open: boolean) => void;
   /** Callback when an item is selected */
   onSelect?: (value: string) => void;
+  /** After portaled menu content mounts on open. */
+  onPortalMounted?: (container: HTMLElement) => void;
 }
 
 export interface ContextMenuController {
@@ -172,6 +174,7 @@ export function createContextMenu(
   const collisionPadding =
     options.collisionPadding ?? getDataNumber(rootElement, "collisionPadding") ?? 8;
   const onOpenChange = options.onOpenChange;
+  const onPortalMounted = options.onPortalMounted;
   const onSelect = options.onSelect;
 
   const cleanups: Array<() => void> = [];
@@ -297,6 +300,9 @@ export function createContextMenu(
     const previousOpen = isOpen;
     isOpen = true;
     portal.mount();
+    if (onPortalMounted) {
+      requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+    }
     content.hidden = false;
     setAria(trigger, "expanded", true);
     setDataState("open");

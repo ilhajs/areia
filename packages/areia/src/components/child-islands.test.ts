@@ -1,5 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import ilha, { html, mount } from "ilha";
 import {
   Badge,
@@ -26,13 +27,6 @@ try {
   GlobalRegistrator.register();
 } catch {
   // Already registered by another DOM test file in the same Bun process.
-}
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
 }
 
 function sampleTriggerMarkup() {

@@ -162,6 +162,8 @@ export interface DropdownMenuOptions {
    * @default true
    */
   highlightItemOnHover?: boolean;
+  /** After portaled menu content mounts on open. */
+  onPortalMounted?: (container: HTMLElement) => void;
 }
 
 export interface DropdownMenuController {
@@ -364,6 +366,7 @@ export function createDropdownMenu(
 
   const defaultOpen = options.defaultOpen ?? getDataBool(root, "defaultOpen") ?? false;
   const onOpenChange = options.onOpenChange;
+  const onPortalMounted = options.onPortalMounted;
   const onSelect = options.onSelect;
   const onValueChange = options.onValueChange;
   const onValuesChange = options.onValuesChange;
@@ -884,6 +887,9 @@ export function createDropdownMenu(
       isOpen = true;
       setAria(trigger, "expanded", true);
       portal.mount();
+      if (onPortalMounted) {
+        requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+      }
       content.hidden = false;
       setDataState("open");
       presence.enter();

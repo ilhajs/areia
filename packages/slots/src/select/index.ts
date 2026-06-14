@@ -47,6 +47,8 @@ export interface SelectOptions {
   defaultOpen?: boolean;
   /** Callback when open state changes */
   onOpenChange?: (open: boolean) => void;
+  /** After portaled list content mounts on open. */
+  onPortalMounted?: (container: HTMLElement) => void;
   /** Placeholder text when no value selected */
   placeholder?: string;
   /** Disable interaction */
@@ -191,6 +193,7 @@ export function createSelect(root: Element, options: SelectOptions = {}): Select
   const name = options.name ?? getDataString(root, "name") ?? null;
   const onValueChange = options.onValueChange;
   const onOpenChange = options.onOpenChange;
+  const onPortalMounted = options.onPortalMounted;
 
   // Placement precedence: JS option > content > authored positioner > root
   const getPlacementEnum = <T extends string>(key: string, allowed: readonly T[]): T | undefined =>
@@ -786,6 +789,9 @@ export function createSelect(root: Element, options: SelectOptions = {}): Select
       isOpen = true;
       setAria(trigger, "expanded", true);
       portal.mount();
+      if (onPortalMounted) {
+        requestAnimationFrame(() => onPortalMounted(portal.container as HTMLElement));
+      }
       content.hidden = false;
       setDataState("open");
       presence.enter();

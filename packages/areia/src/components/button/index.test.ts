@@ -1,14 +1,7 @@
 import { describe, expect, it } from "bun:test";
+import { markupValue as markup } from "$lib/test-markup";
 import { html } from "ilha";
 import { Button, LinkButton, RefreshButton, buttonVariants } from "./index";
-
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-
-  return String(value);
-}
 
 describe("buttonVariants", () => {
   it("returns default secondary/base classes", () => {

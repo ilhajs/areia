@@ -31,6 +31,11 @@ export interface DialogOptions {
   lockScroll?: boolean;
   /** Use alertdialog role for blocking confirmations */
   alertDialog?: boolean;
+  /**
+   * Called after the dialog portal is moved to `document.body` on open.
+   * Escape hatch for imperative bridges when the renderer cannot patch portaled DOM (e.g. Ilha).
+   */
+  onPortalMounted?: (container: HTMLElement) => void;
 }
 
 export interface DialogController {
@@ -97,6 +102,7 @@ export function createDialog(root: Element, options: DialogOptions = {}): Dialog
   const closeOnEscape = options.closeOnEscape ?? getDataBool(root, "closeOnEscape") ?? true;
   const lockScrollOption = options.lockScroll ?? getDataBool(root, "lockScroll") ?? true;
   const alertDialog = options.alertDialog ?? getDataBool(root, "alertDialog") ?? false;
+  const onPortalMounted = options.onPortalMounted;
 
   const trigger = getPart<HTMLElement>(root, "dialog-trigger");
   const portal = getPart<HTMLElement>(root, "dialog-portal");
@@ -249,6 +255,10 @@ export function createDialog(root: Element, options: DialogOptions = {}): Dialog
 
       // Move portal to body on first open
       mountPortal();
+      if (onPortalMounted) {
+        const container = portal ?? content;
+        requestAnimationFrame(() => onPortalMounted(container));
+      }
 
       // Store current focus
       previousActiveElement = document.activeElement as HTMLElement;
