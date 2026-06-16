@@ -35,9 +35,10 @@
     },
     "packages/areia": {
       "name": "areia",
-      "version": "0.1.21",
+      "version": "0.1.26",
       "dependencies": {
         "@areia/slots": "0.1.5",
+        "alien-signals": "3.2.1",
         "clsx": "2.1.1",
         "date-fns": "4.4.0",
         "tailwind-merge": "3.6.0",

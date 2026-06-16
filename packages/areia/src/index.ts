@@ -1,3 +1,5 @@
+import "./lib/ilha-checked-auto-bind";
+
 export { Badge, badgeVariants } from "$components/badge";
 export type { BadgeInput, BadgeVariant, BadgeVariantsProps } from "$components/badge";
 export type {

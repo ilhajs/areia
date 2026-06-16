@@ -432,9 +432,16 @@ export type QueuedCheckedBind = {
   bindGroup?: GroupBindAccessor;
   /** Checkbox/switch value when using `bind:group` on a single control. */
   itemValue?: string;
+  /** Stable key for matching DOM after SSR drained the ephemeral queue. */
+  controlName?: string;
+  /** When not using `bind:checked`, wire slots toggle to island state. */
+  onCheckedChange?: (checked: boolean) => void;
+  defaultChecked?: boolean;
 };
 
 const switchCheckedBindQueueByDoc = new WeakMap<Document, QueuedCheckedBind[]>();
+/** Survives queue drain — keyed by switch/checkbox `name` (e.g. useBun). */
+const switchCheckedBindByNameByDoc = new WeakMap<Document, Map<string, QueuedCheckedBind>>();
 const checkboxCheckedBindQueueByDoc = new WeakMap<Document, QueuedCheckedBind[]>();
 
 function pushCheckedBindQueue(
@@ -462,14 +469,49 @@ function takeCheckedBindQueueFrom(
   return queue;
 }
 
+function rememberSwitchCheckedBindByName(
+  doc: Document,
+  controlName: string | undefined,
+  entry: QueuedCheckedBind,
+) {
+  if (!controlName) return;
+  const map = switchCheckedBindByNameByDoc.get(doc) ?? new Map<string, QueuedCheckedBind>();
+  map.set(controlName, entry);
+  switchCheckedBindByNameByDoc.set(doc, map);
+}
+
+export function lookupSwitchCheckedBindByName(
+  doc: Document,
+  controlName: string | undefined,
+): QueuedCheckedBind | undefined {
+  if (!controlName) return undefined;
+  return switchCheckedBindByNameByDoc.get(doc)?.get(controlName);
+}
+
 /** Register switch `bind:checked` / `bind:group` for the next switch auto-mount pass. */
 export function queueSwitchCheckedBindForAutoMount(
   binds: Partial<Pick<IlhaBindProps, "bind:checked" | "bind:group">>,
   itemValue?: string,
   doc: Document | undefined = globalThis.document,
+  controlName?: string,
+  extras?: Pick<QueuedCheckedBind, "onCheckedChange" | "defaultChecked">,
 ) {
   if (!doc) return;
-  pushCheckedBindQueue(switchCheckedBindQueueByDoc, binds, itemValue, doc);
+  const hasBind = binds["bind:checked"] != null || binds["bind:group"] != null;
+  const hasCallback = extras?.onCheckedChange != null;
+  if (!hasBind && !hasCallback) return;
+  const entry: QueuedCheckedBind = {
+    bindChecked: binds["bind:checked"],
+    bindGroup: binds["bind:group"],
+    itemValue,
+    controlName,
+    onCheckedChange: extras?.onCheckedChange,
+    defaultChecked: extras?.defaultChecked,
+  };
+  const queue = switchCheckedBindQueueByDoc.get(doc) ?? [];
+  queue.push(entry);
+  switchCheckedBindQueueByDoc.set(doc, queue);
+  rememberSwitchCheckedBindByName(doc, controlName, entry);
 }
 
 /** Register checkbox `bind:checked` / `bind:group` for the next checkbox auto-mount pass. */
@@ -495,8 +537,22 @@ export function takeSwitchCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
   return takeCheckedBindQueueFrom(switchCheckedBindQueueByDoc, doc);
 }
 
+export function restoreSwitchCheckedBindQueue(doc: Document, entries: QueuedCheckedBind[]): void {
+  if (entries.length === 0) return;
+  const queue = switchCheckedBindQueueByDoc.get(doc) ?? [];
+  queue.push(...entries);
+  switchCheckedBindQueueByDoc.set(doc, queue);
+}
+
 export function takeCheckboxCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
   return takeCheckedBindQueueFrom(checkboxCheckedBindQueueByDoc, doc);
+}
+
+export function restoreCheckboxCheckedBindQueue(doc: Document, entries: QueuedCheckedBind[]): void {
+  if (entries.length === 0) return;
+  const queue = checkboxCheckedBindQueueByDoc.get(doc) ?? [];
+  queue.push(...entries);
+  checkboxCheckedBindQueueByDoc.set(doc, queue);
 }
 
 /** @deprecated Use takeSwitchCheckedBindQueue or takeCheckboxCheckedBindQueue. */
