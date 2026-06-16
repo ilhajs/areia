@@ -1,6 +1,14 @@
-import { describe, expect, it } from "bun:test";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Tabs, tabsVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
 
 describe("tabsVariants", () => {
   it("returns base classes", () => {
@@ -77,6 +85,73 @@ describe("Tabs", () => {
     const output = markup(Tabs({ tabs: [{ value: "a", label: "A" }], class: "a", className: "b" }));
     expect(output).toContain("a");
     expect(output).toContain("b");
+  });
+
+  it("renders bind:group on parent island without nested slot", () => {
+    const Panel = ilha.state("tab", "a").render(
+      ({ state }) =>
+        html`${Tabs({
+          "bind:group": state.tab,
+          tabs: [
+            { value: "a", label: "Alpha", content: "A" },
+            { value: "b", label: "Beta", content: "B" },
+          ],
+        })}`,
+    );
+
+    const output = markup(Panel());
+    expect(output).toContain("data-ilha-bind");
+    expect(output).not.toContain("data-ilha-slot");
+    expect(output).toContain("data-areia-tabs");
+  });
+});
+
+describe("Tabs bind:group in parent island", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("updates parent signal when selecting a tab", async () => {
+    const warn = console.warn;
+    const warnings: string[] = [];
+    console.warn = (...args: unknown[]) => {
+      const msg = args.map(String).join(" ");
+      if (msg.includes("createTabs() called more than once")) warnings.push(msg);
+      warn(...args);
+    };
+
+    let readTab!: () => string;
+
+    const Panel = ilha.state("tab", "a").render(({ state }) => {
+      readTab = state.tab as () => string;
+      return html`${Tabs({
+        activationMode: "auto",
+        "bind:group": state.tab,
+        tabs: [
+          { value: "a", label: "Alpha" },
+          { value: "b", label: "Beta" },
+        ],
+      })}`;
+    });
+
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const beta = [...document.querySelectorAll('[data-slot="tabs-trigger"]')].find(
+      (el) => el.getAttribute("data-value") === "b",
+    ) as HTMLButtonElement | undefined;
+
+    beta?.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(beta?.getAttribute("data-state")).toBe("active");
+    expect(readTab()).toBe("b");
+    expect(warnings).toEqual([]);
+
+    console.warn = warn;
   });
 });
 

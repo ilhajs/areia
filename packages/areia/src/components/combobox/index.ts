@@ -2,13 +2,16 @@ import ilha, { html, raw } from "ilha";
 import { Combobox as ComboboxPrimitive } from "@areia/slots";
 import {
   applyThisBind,
+  boundElement,
   boundVoidElement,
   createGroupBindSync,
   createOpenBindSync,
   groupBindDefault,
   openBindDefault,
+  queueComboboxBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
+  takeComboboxBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -596,8 +599,28 @@ function renderItems(items: ComboboxItems) {
   });
 }
 
-function renderCombobox(input: ComboboxInput, children?: unknown[]) {
+function comboboxRootBinds(
+  binds: Partial<Record<string, unknown>>,
+): Partial<Pick<IlhaBindProps, "bind:open" | "bind:group">> {
+  return {
+    "bind:open": binds["bind:open"] as IlhaBindProps["bind:open"],
+    "bind:group": binds["bind:group"] as IlhaBindProps["bind:group"],
+  };
+}
+
+function comboboxInputBinds(binds: Partial<Record<string, unknown>>) {
+  const { "bind:open": _o, "bind:group": _g, ...rest } = binds;
+  return rest;
+}
+
+function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = false) {
   const { binds, attrs } = splitBindProps(input);
+  const rootBinds = comboboxRootBinds(binds);
+  const inputBinds = comboboxInputBinds(binds);
+
+  if (autoBind) {
+    queueComboboxBindForAutoMount(rootBinds);
+  }
   const {
     autoHighlight,
     class: className,
@@ -650,47 +673,47 @@ function renderCombobox(input: ComboboxInput, children?: unknown[]) {
   };
   const content = children ?? (items ? renderItems(items) : inputChildren);
 
-  return html`<div
-    data-slot="combobox"
-    class="${cn("relative w-full", comboboxVariants({ inputSide }), className, aliasedClassName)}"
-    ${raw(
-      inputDataAttrs({
-        autoHighlight,
-        defaultOpen,
-        defaultValue,
-        disabled,
-        name,
-        openOnFocus,
-        placeholder,
-        required,
-      }),
-    )}
-    ${raw(placementDataAttrs(placementProps))}
-  >
-    ${ComboboxTriggerInput({
-      ...inputPassthrough,
-      ...binds,
-      id,
-      name,
-      placeholder,
-      disabled,
-      required,
-      size,
-      variant: variant as "default" | "error",
-      "aria-invalid": normalizedError != null ? "true" : inputPassthrough["aria-invalid"],
-      "aria-describedby": describedBy || undefined,
-    })}
-    ${ComboboxContent({
-      ...placementProps,
-      children: ComboboxList({ children: [ComboboxEmpty(), content] }),
-    })}
-  </div>`;
+  const inner = html`${ComboboxTriggerInput({
+    ...inputPassthrough,
+    ...inputBinds,
+    id,
+    name,
+    placeholder,
+    disabled,
+    required,
+    size,
+    variant: variant as "default" | "error",
+    "aria-invalid": normalizedError != null ? "true" : inputPassthrough["aria-invalid"],
+    "aria-describedby": describedBy || undefined,
+  })}
+  ${ComboboxContent({
+    ...placementProps,
+    children: ComboboxList({ children: [ComboboxEmpty(), content] }),
+  })}`;
+
+  const openSuffix = ` data-slot="combobox" class="${cn(
+    "relative w-full",
+    comboboxVariants({ inputSide }),
+    className,
+    aliasedClassName,
+  )}"${toAttrs({ "data-areia-combobox": autoBind ? "" : undefined })}${inputDataAttrs({
+    autoHighlight,
+    defaultOpen,
+    defaultValue,
+    disabled,
+    name,
+    openOnFocus,
+    placeholder,
+    required,
+  })}${placementDataAttrs(placementProps)}`;
+
+  return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-function renderField(input: ComboboxInput, children?: unknown[]) {
+function renderField(input: ComboboxInput, children?: unknown[], autoBind = false) {
   const { label, labelTooltip: _labelTooltip, description, error } = input;
   const normalizedError = normalizeError(error);
-  const control = renderCombobox(input, children);
+  const control = renderCombobox(input, children, autoBind);
 
   if (label == null && description == null && normalizedError == null) return control;
 
@@ -702,6 +725,14 @@ function renderField(input: ComboboxInput, children?: unknown[]) {
     children: control,
   });
 }
+
+type ComboboxBindRuntime = {
+  controller: ComboboxPrimitive.ComboboxController;
+  openSync: ReturnType<typeof createOpenBindSync>;
+  groupSync: ReturnType<typeof createGroupBindSync>;
+};
+
+const comboboxBindRuntimeByHost = new WeakMap<Element, ComboboxBindRuntime>();
 
 export const ComboboxRoot = ilha
   .input<ComboboxInput>()
@@ -760,6 +791,7 @@ export const ComboboxRoot = ilha
     );
     openSync?.applyFromSignal();
     groupSync?.applyFromSignal();
+    comboboxBindRuntimeByHost.set(host, { controller, openSync, groupSync });
 
     const bindTarget =
       root.querySelector<HTMLElement>('[data-slot="combobox-input"]') ??
@@ -767,32 +799,17 @@ export const ComboboxRoot = ilha
     const cleanupThis = applyThisBind(bindTarget, input);
 
     return () => {
+      comboboxBindRuntimeByHost.delete(host);
       cleanupThis?.();
       controller.destroy();
     };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
-    const root = host.matches('[data-slot="combobox"]')
-      ? host
-      : host.querySelector('[data-slot="combobox"]');
-    if (!root) return;
-
-    const controller = ComboboxPrimitive.createCombobox(root);
-    createOpenBindSync(input, controller)?.applyFromSignal();
-    createGroupBindSync(
-      input,
-      {
-        getValue: () => controller.value,
-        setValue: (value) => {
-          if (value == null) controller.clear();
-          else if (typeof value === "string") controller.select(value);
-          else if (value[0]) controller.select(value[0]);
-          else controller.clear();
-        },
-      },
-      "single",
-    )?.applyFromSignal();
+    const runtime = comboboxBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.openSync?.applyFromSignal();
+    runtime.groupSync?.applyFromSignal();
   })
   .render(({ input }) => renderField(input));
 
@@ -804,19 +821,95 @@ function ComboboxBase(inputOrChildren: ComboboxInput | unknown[] = {}, children?
   return renderField(input, optionChildren);
 }
 
-function ComboboxInteractive(children: unknown[]): ReturnType<typeof ComboboxRoot>;
+const comboboxAutoBindScheduled = new WeakSet<Document>();
+
+type ComboboxAutoRuntime = {
+  controller: ComboboxPrimitive.ComboboxController;
+  openSync: ReturnType<typeof createOpenBindSync>;
+  groupSync: ReturnType<typeof createGroupBindSync>;
+};
+
+const comboboxAutoRuntimeByRoot = new WeakMap<Element, ComboboxAutoRuntime>();
+
+function scheduleComboboxAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || comboboxAutoBindScheduled.has(doc)) return;
+  comboboxAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    comboboxAutoBindScheduled.delete(doc);
+    const queued = takeComboboxBindQueue(doc);
+    let queueIndex = 0;
+
+    for (const root of doc.querySelectorAll<HTMLElement>(
+      '[data-areia-combobox][data-slot="combobox"]',
+    )) {
+      const existing = comboboxAutoRuntimeByRoot.get(root);
+      if (existing) {
+        existing.openSync?.applyFromSignal();
+        existing.groupSync?.applyFromSignal();
+        continue;
+      }
+
+      const entry = queued[queueIndex++];
+      let openSync: ReturnType<typeof createOpenBindSync> = null;
+      let groupSync: ReturnType<typeof createGroupBindSync> = null;
+
+      const controller = ComboboxPrimitive.createCombobox(root, {
+        onOpenChange: (open) => openSync?.onUserChange(open),
+        onValueChange: (value) => groupSync?.onUserChange(value),
+      });
+
+      if (entry?.bindOpen) {
+        openSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
+        openSync?.applyFromSignal();
+      }
+      if (entry?.bindGroup) {
+        groupSync = createGroupBindSync(
+          { "bind:group": entry.bindGroup },
+          {
+            getValue: () => controller.value,
+            setValue: (value) => {
+              if (value == null) controller.clear();
+              else if (typeof value === "string") controller.select(value);
+              else if (value[0]) controller.select(value[0]);
+              else controller.clear();
+            },
+          },
+          "single",
+        );
+        groupSync?.applyFromSignal();
+      }
+
+      comboboxAutoRuntimeByRoot.set(root, { controller, openSync, groupSync });
+    }
+  });
+}
+
+function needsComboboxIsland(input: ComboboxInput) {
+  return (
+    input.onOpenChange != null ||
+    input.onValueChange != null ||
+    input.onInputValueChange != null ||
+    input.onPortalMounted != null
+  );
+}
+
+function ComboboxInteractive(children: unknown[]): ReturnType<typeof html>;
 function ComboboxInteractive(
   input?: ComboboxInput,
   children?: unknown[],
-): ReturnType<typeof ComboboxRoot>;
+): ReturnType<typeof html> | ReturnType<typeof ComboboxRoot>;
 function ComboboxInteractive(
   inputOrChildren: ComboboxInput | unknown[] = {},
   children?: unknown[],
 ) {
-  const input = Array.isArray(inputOrChildren)
-    ? { children: inputOrChildren }
-    : { ...inputOrChildren, children: children ?? inputOrChildren.children };
-  return ComboboxRoot(input);
+  if (Array.isArray(inputOrChildren)) {
+    scheduleComboboxAutoBind();
+    return renderField({}, inputOrChildren, true);
+  }
+  const input = { ...inputOrChildren, children: children ?? inputOrChildren.children };
+  if (needsComboboxIsland(input)) return ComboboxRoot(input);
+  scheduleComboboxAutoBind();
+  return renderField(input, children, true);
 }
 
 export const Combobox = Object.assign(ComboboxInteractive, {

@@ -214,6 +214,82 @@ export function createOpenBindSync(
 
 export type GroupBindMode = "single" | "multiple";
 
+export type QueuedGroupBind = {
+  bindGroup: GroupBindAccessor;
+  mode: GroupBindMode;
+};
+
+const groupBindQueueByDoc = new WeakMap<Document, QueuedGroupBind[]>();
+
+/** Register `bind:group` for the next auto-mount of tabs/toggle-group on this document. */
+export function queueGroupBindForAutoMount(
+  bindGroup: GroupBindAccessor | undefined,
+  mode: GroupBindMode = "single",
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!bindGroup || !doc) return;
+  const queue = groupBindQueueByDoc.get(doc) ?? [];
+  queue.push({ bindGroup, mode });
+  groupBindQueueByDoc.set(doc, queue);
+}
+
+export function takeGroupBindQueue(doc: Document): QueuedGroupBind[] {
+  const queue = groupBindQueueByDoc.get(doc) ?? [];
+  groupBindQueueByDoc.delete(doc);
+  return queue;
+}
+
+export type QueuedOpenBind = {
+  bindOpen: SignalAccessor<boolean>;
+};
+
+const openBindQueueByDoc = new WeakMap<Document, QueuedOpenBind[]>();
+
+/** Register `bind:open` for the next auto-mount of overlay widgets on this document. */
+export function queueOpenBindForAutoMount(
+  bindOpen: SignalAccessor<boolean> | undefined,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!bindOpen || !doc) return;
+  const queue = openBindQueueByDoc.get(doc) ?? [];
+  queue.push({ bindOpen });
+  openBindQueueByDoc.set(doc, queue);
+}
+
+export function takeOpenBindQueue(doc: Document): QueuedOpenBind[] {
+  const queue = openBindQueueByDoc.get(doc) ?? [];
+  openBindQueueByDoc.delete(doc);
+  return queue;
+}
+
+export type QueuedComboboxBind = {
+  bindOpen?: SignalAccessor<boolean>;
+  bindGroup?: GroupBindAccessor;
+};
+
+const comboboxBindQueueByDoc = new WeakMap<Document, QueuedComboboxBind[]>();
+
+/** Register combobox `bind:open` / `bind:group` for the next auto-mount pass. */
+export function queueComboboxBindForAutoMount(
+  binds: Partial<Pick<IlhaBindProps, "bind:open" | "bind:group">>,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  if (binds["bind:open"] == null && binds["bind:group"] == null) return;
+  const queue = comboboxBindQueueByDoc.get(doc) ?? [];
+  queue.push({
+    bindOpen: binds["bind:open"],
+    bindGroup: binds["bind:group"],
+  });
+  comboboxBindQueueByDoc.set(doc, queue);
+}
+
+export function takeComboboxBindQueue(doc: Document): QueuedComboboxBind[] {
+  const queue = comboboxBindQueueByDoc.get(doc) ?? [];
+  comboboxBindQueueByDoc.delete(doc);
+  return queue;
+}
+
 export type GroupBindSync = {
   applyFromSignal: () => void;
   onUserChange: (value: string | string[] | null) => void;

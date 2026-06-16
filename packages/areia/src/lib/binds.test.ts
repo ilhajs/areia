@@ -228,7 +228,7 @@ describe("Dialog bind:open", () => {
 
     document.body.innerHTML = "";
     document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
-    mount({ App, Dialog }, { root: document.body, lazy: false });
+    mount({ App }, { root: document.body, lazy: false });
     await Promise.resolve();
 
     const content = document.querySelector('[data-slot="dialog-content"]');

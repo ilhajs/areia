@@ -4,6 +4,7 @@ import {
   boundVoidElement,
   createCheckedBindSync,
   splitBindProps,
+  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -128,7 +129,7 @@ function checkboxDataAttrs(
   });
 }
 
-function checkboxControl(input: CheckboxInput) {
+function checkboxControl(input: CheckboxInput, autoBind = false) {
   const { binds, attrs: restProps } = splitBindProps(input);
   const {
     class: className,
@@ -195,6 +196,7 @@ function checkboxControl(input: CheckboxInput) {
         "aria-label": ariaLabel,
         "aria-labelledby": ariaLabelledby,
         "aria-describedby": ariaDescribedby,
+        "data-areia-checkbox": autoBind ? "" : undefined,
       }),
     )}
   >
@@ -224,10 +226,10 @@ function checkboxControl(input: CheckboxInput) {
 }
 
 /** Single checkbox with an optional built-in label wrapper. */
-function renderCheckbox(input: CheckboxInput = {}) {
+function renderCheckbox(input: CheckboxInput = {}, autoBind = false) {
   const { label, labelTooltip, controlFirst = true, required, disabled, ...rest } = input;
   const controlId = typeof rest.id === "string" ? rest.id : undefined;
-  const control = checkboxControl({ ...rest, id: controlId, disabled, required });
+  const control = checkboxControl({ ...rest, id: controlId, disabled, required }, autoBind);
 
   if (label == null) return control;
 
@@ -336,12 +338,24 @@ export function CheckboxGroup(
   </fieldset>`;
 }
 
+type CheckboxBindRuntime = {
+  controller: CheckboxPrimitive.CheckboxController;
+  bindSync: ReturnType<typeof createCheckedBindSync>;
+};
+
+const checkboxBindRuntimeByHost = new WeakMap<Element, CheckboxBindRuntime>();
+
+function resolveCheckboxRoot(host: Element): HTMLElement | null {
+  const root = host.matches('[data-slot="checkbox"]')
+    ? host
+    : host.querySelector('[data-slot="checkbox"]');
+  return root as HTMLElement | null;
+}
+
 export const CheckboxRoot = ilha
   .input<CheckboxInput>()
   .onMount(({ host, input }) => {
-    const root = host.matches('[data-slot="checkbox"]')
-      ? host
-      : host.querySelector('[data-slot="checkbox"]');
+    const root = resolveCheckboxRoot(host);
     if (!root) return;
 
     const itemValue = typeof input.value === "string" ? input.value : undefined;
@@ -361,22 +375,45 @@ export const CheckboxRoot = ilha
 
     bindSync = createCheckedBindSync(input, controller, itemValue);
     bindSync?.applyFromSignal();
+    checkboxBindRuntimeByHost.set(host, { controller, bindSync });
 
-    return () => controller.destroy();
+    return () => {
+      checkboxBindRuntimeByHost.delete(host);
+      controller.destroy();
+    };
   })
   .effect(({ host, input }) => {
-    const root = host.matches('[data-slot="checkbox"]')
-      ? host
-      : host.querySelector('[data-slot="checkbox"]');
-    if (!root) return;
-
-    const controller = CheckboxPrimitive.createCheckbox(root);
-    const itemValue = typeof input.value === "string" ? input.value : undefined;
-    createCheckedBindSync(input, controller, itemValue)?.applyFromSignal();
+    subscribeBindProps(input);
+    const runtime = checkboxBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.bindSync?.applyFromSignal();
   })
   .render(({ input }) => renderCheckbox(input));
 
-export const Checkbox = Object.assign(CheckboxRoot, {
+const checkboxAutoBindScheduled = new WeakSet<Document>();
+const checkboxAutoBoundRoots = new WeakSet<Element>();
+
+function scheduleCheckboxAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || checkboxAutoBindScheduled.has(doc)) return;
+  checkboxAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    checkboxAutoBindScheduled.delete(doc);
+    for (const root of doc.querySelectorAll<HTMLElement>(
+      '[data-areia-checkbox][data-slot="checkbox"]',
+    )) {
+      if (checkboxAutoBoundRoots.has(root)) continue;
+      checkboxAutoBoundRoots.add(root);
+      CheckboxPrimitive.createCheckbox(root);
+    }
+  });
+}
+
+function CheckboxComponent(input: CheckboxInput = {}) {
+  scheduleCheckboxAutoBind();
+  return renderCheckbox(input, true);
+}
+
+export const Checkbox = Object.assign(CheckboxComponent, {
   Root: CheckboxRoot,
   Static: renderCheckbox,
   Control: checkboxControl,

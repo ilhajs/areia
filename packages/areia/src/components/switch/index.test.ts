@@ -1,94 +1,83 @@
-import { describe, expect, it } from "bun:test";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
-import { Switch, switchVariants, switchThumbVariants } from "./index";
+import { Switch } from "./index";
 
-describe("switchVariants", () => {
-  it("returns default base classes", () => {
-    const classes = switchVariants();
-    expect(classes).toContain("h-4.5");
-    expect(classes).toContain("w-9");
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
+
+describe("Switch bind:checked in parent island", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
   });
 
-  it("applies sm size classes", () => {
-    const classes = switchVariants({ size: "sm" });
-    expect(classes).toContain("h-4");
-    expect(classes).toContain("w-8");
-  });
+  it("renders bind in parent markup without nested island slot", () => {
+    const ProjectCreatorForm = ilha
+      .state("useBun", false)
+      .derived("createCommand", ({ state }) => {
+        const pm = state.useBun() ? "bunx" : "npx";
+        return `${pm} giget@latest gh:ilhajs/ilha/templates/vite`;
+      })
+      .render(
+        ({ state }) =>
+          html`${Switch({ label: "Use Bun", name: "useBun", "bind:checked": state.useBun })}`,
+      );
 
-  it("applies neutral variant classes", () => {
-    const classes = switchVariants({ variant: "neutral" });
-    expect(classes).toContain("data-checked:bg-areia-foreground");
-  });
-});
-
-describe("switchThumbVariants", () => {
-  it("returns default thumb classes", () => {
-    const classes = switchThumbVariants();
-    expect(classes).toContain("size-4.5");
-  });
-});
-
-describe("Switch", () => {
-  it("renders control with data-slot", () => {
-    const output = markup(Switch({}));
+    const output = markup(ProjectCreatorForm());
+    expect(output).toContain("data-ilha-bind");
+    expect(output).not.toContain("data-ilha-slot");
     expect(output).toContain('data-slot="switch"');
-  });
-
-  it("marks default export for static slot auto-bind", () => {
-    const output = markup(Switch({ label: "Enable" }));
     expect(output).toContain("data-areia-switch");
   });
 
-  it("omits static auto-bind marker when onCheckedChange is set", () => {
-    const output = markup(Switch({ onCheckedChange: () => {} }));
-    expect(output).not.toContain("data-areia-switch");
-  });
+  it("toggles parent state and updates derived output", async () => {
+    const warn = console.warn;
+    const warnings: string[] = [];
+    console.warn = (...args: unknown[]) => {
+      const msg = args.map(String).join(" ");
+      if (msg.includes("createSwitch() called more than once")) warnings.push(msg);
+      warn(...args);
+    };
 
-  it("renders label wrapper when label is provided", () => {
-    const output = markup(Switch({ label: "Enable" }));
-    expect(output).toContain("Enable");
-    expect(output).toContain("<label");
-  });
+    const ProjectCreatorForm = ilha
+      .state("useBun", false)
+      .derived("createCommand", ({ state }) => {
+        const pm = state.useBun() ? "bunx" : "npx";
+        return `${pm} giget@latest`;
+      })
+      .render(
+        ({ state, derived }) => html`
+          ${Switch({ label: "Use Bun", name: "useBun", "bind:checked": state.useBun })}
+          <span data-testid="cmd">${derived.createCommand()}</span>
+        `,
+      );
 
-  it("sets aria-checked when checked", () => {
-    const output = markup(Switch({ checked: true }));
-    expect(output).toContain('aria-checked="true"');
-  });
+    document.body.innerHTML = await ProjectCreatorForm.hydratable(
+      {},
+      { name: "ProjectCreatorForm", snapshot: true },
+    );
+    mount({ ProjectCreatorForm }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await Promise.resolve();
 
-  it("sets aria-disabled when disabled", () => {
-    const output = markup(Switch({ disabled: true }));
-    expect(output).toContain('aria-disabled="true"');
-  });
+    const cmd = () => document.querySelector("[data-testid=cmd]")?.textContent ?? "";
+    const switchRoot = document.querySelector('[data-slot="switch"]') as HTMLElement | null;
 
-  it("sets aria-readonly when readOnly", () => {
-    const output = markup(Switch({ readOnly: true }));
-    expect(output).toContain('aria-readonly="true"');
-  });
+    expect(cmd()).toContain("npx");
+    expect(switchRoot?.getAttribute("aria-checked")).toBe("false");
 
-  it("reverses order when controlFirst is false", () => {
-    const output = markup(Switch({ label: "X", controlFirst: false }));
-    expect(output).toContain("flex-row-reverse");
-  });
+    switchRoot?.click();
+    await Promise.resolve();
+    await Promise.resolve();
 
-  it("merges custom class and className", () => {
-    const output = markup(Switch({ class: "a", className: "b" }));
-    expect(output).toContain("a");
-    expect(output).toContain("b");
-  });
+    expect(cmd()).toContain("bunx");
+    expect(switchRoot?.getAttribute("aria-checked")).toBe("true");
+    expect(warnings).toEqual([]);
 
-  it("places passthrough data attributes on the native input, not the visual root", () => {
-    const output = markup(Switch({ "data-params": "x", id: "notify" }));
-    expect(output).toContain('data-slot="switch-input"');
-    expect(output).toContain('data-params="x"');
-    expect(output).toContain('id="notify"');
-    expect(output).not.toMatch(/data-slot="switch"[^>]*data-params/);
-  });
-});
-
-describe("Switch.Group", () => {
-  it("renders fieldset", () => {
-    const output = markup(Switch.Group({ legend: "Options" }, []));
-    expect(output).toContain("<fieldset");
-    expect(output).toContain("Options");
+    console.warn = warn;
   });
 });

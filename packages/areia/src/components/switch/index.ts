@@ -4,6 +4,7 @@ import {
   boundVoidElement,
   createCheckedBindSync,
   splitBindProps,
+  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -376,17 +377,29 @@ function emitSwitchChange(root: Element, checked: boolean) {
   root.dispatchEvent(new CustomEvent("switch:change", { bubbles: true, detail: { checked } }));
 }
 
+type SwitchBindRuntime = {
+  controller: SwitchPrimitive.SwitchController;
+  bindSync: ReturnType<typeof createCheckedBindSync>;
+};
+
+const switchBindRuntimeByHost = new WeakMap<Element, SwitchBindRuntime>();
+
+function resolveSwitchRoot(host: Element): HTMLElement | null {
+  const root = host.matches('[data-slot="switch"]')
+    ? host
+    : host.querySelector('[data-slot="switch"]');
+  return root as HTMLElement | null;
+}
+
 export const SwitchRoot = ilha
   .input<SwitchInput>()
   .onMount(({ host, input }) => {
-    const root = host.matches('[data-slot="switch"]')
-      ? host
-      : host.querySelector('[data-slot="switch"]');
+    const root = resolveSwitchRoot(host);
     if (!root) return;
 
     let bindSync: ReturnType<typeof createCheckedBindSync> = null;
 
-    const controller = SwitchPrimitive.createSwitch(root as HTMLElement, {
+    const controller = SwitchPrimitive.createSwitch(root, {
       defaultChecked:
         typeof input.checked === "boolean"
           ? input.checked
@@ -408,21 +421,23 @@ export const SwitchRoot = ilha
 
     bindSync = createCheckedBindSync(input, controller);
     bindSync?.applyFromSignal();
+    switchBindRuntimeByHost.set(host, { controller, bindSync });
 
-    return () => controller.destroy();
+    return () => {
+      switchBindRuntimeByHost.delete(host);
+      controller.destroy();
+    };
   })
   .effect(({ host, input }) => {
-    const root = host.matches('[data-slot="switch"]')
-      ? host
-      : host.querySelector('[data-slot="switch"]');
-    if (!root) return;
-
-    const controller = SwitchPrimitive.createSwitch(root as HTMLElement);
-    createCheckedBindSync(input, controller)?.applyFromSignal();
+    subscribeBindProps(input);
+    const runtime = switchBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.bindSync?.applyFromSignal();
   })
   .render(({ input }) => renderSwitch(input));
 
 const switchAutoBindScheduled = new WeakSet<Document>();
+const switchAutoBoundRoots = new WeakSet<Element>();
 
 function scheduleSwitchAutoBind(doc: Document | undefined = globalThis.document) {
   if (!doc || switchAutoBindScheduled.has(doc)) return;
@@ -432,15 +447,15 @@ function scheduleSwitchAutoBind(doc: Document | undefined = globalThis.document)
     for (const root of doc.querySelectorAll<HTMLElement>(
       '[data-areia-switch][data-slot="switch"]',
     )) {
+      if (switchAutoBoundRoots.has(root)) continue;
+      switchAutoBoundRoots.add(root);
       SwitchPrimitive.createSwitch(root);
     }
   });
 }
 
 function needsSwitchIsland(input: SwitchInput) {
-  if (input.onCheckedChange != null) return true;
-  const { binds } = splitBindProps(input);
-  return binds["bind:checked"] != null || binds["bind:group"] != null;
+  return input.onCheckedChange != null;
 }
 
 function SwitchComponent(input: SwitchInput = {}) {

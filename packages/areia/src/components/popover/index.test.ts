@@ -1,5 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { describe, expect, it } from "bun:test";
+import { afterEach, describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Popover, bindPopoverRoot, popoverVariants } from "./index";
 
@@ -149,5 +150,55 @@ describe("bindPopoverRoot", () => {
     const c1 = bindPopoverRoot(root);
     const c2 = bindPopoverRoot(root);
     expect(c1).toBe(c2);
+  });
+});
+
+describe("Popover bind:open in parent island", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("renders bind on parent markup without nested island slot", () => {
+    const Panel = ilha.state("open", false).render(
+      ({ state }) =>
+        html`${Popover({
+          children: "Open",
+          content: "Body",
+          "bind:open": state.open,
+        })}`,
+    );
+
+    const output = markup(Panel());
+    expect(output).toContain("data-ilha-bind");
+    expect(output).not.toContain("data-ilha-slot");
+    expect(output).toContain("data-areia-popover");
+  });
+
+  it("opens from ilha signal after hydrate", async () => {
+    let setOpen!: (value?: boolean) => boolean | void;
+
+    const Panel = ilha.state("open", false).render(({ state }) => {
+      setOpen = state.open as typeof setOpen;
+      return html`${Popover({
+        children: "Open",
+        content: "Body",
+        "bind:open": state.open,
+      })}`;
+    });
+
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
+    await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
+    await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
+    await Promise.resolve();
+
+    const content = document.querySelector('[data-slot="popover-content"]');
+    expect(content?.getAttribute("data-state")).toBe("closed");
+
+    setOpen(true);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(content?.getAttribute("data-state")).toBe("open");
   });
 });

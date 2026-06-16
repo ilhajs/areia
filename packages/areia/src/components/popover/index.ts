@@ -1,9 +1,13 @@
 import ilha, { html, raw } from "ilha";
 import { Popover as PopoverPrimitive } from "@areia/slots";
 import {
+  boundElement,
   createOpenBindSync,
   openBindDefault,
+  queueOpenBindForAutoMount,
+  splitBindProps,
   subscribeBindProps,
+  takeOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -309,6 +313,7 @@ export type PopoverInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | 
   };
 
 function renderPopover(input: PopoverInput = {}, autoBind = false) {
+  const { binds, attrs: props } = splitBindProps(input);
   const {
     align,
     alignOffset,
@@ -334,8 +339,12 @@ function renderPopover(input: PopoverInput = {}, autoBind = false) {
     triggerClass,
     triggerClassName,
     ...rootProps
-  } = input;
+  } = props as PopoverInput;
   const defaultOpen = openBindDefault(input, defaultOpenProp);
+
+  if (autoBind && binds["bind:open"] != null) {
+    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+  }
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "popover-content");
@@ -352,43 +361,41 @@ function renderPopover(input: PopoverInput = {}, autoBind = false) {
         children,
       }));
 
-  return html`<div
-    data-slot="popover"
-    class="${cn("inline-flex", className, aliasedClassName)}"
-    ${raw(toAttrs({ "data-areia-popover": autoBind }))}
-    ${raw(
-      dataAttrs({
+  const inner = html`${hasComposedContent ? composedChildren : generatedTrigger}
+  ${hasComposedContent
+    ? ""
+    : PopoverContent({
         align,
         alignOffset,
+        arrow,
         avoidCollisions,
-        closeOnClickOutside,
-        closeOnEscape,
+        class: contentClass,
+        className: contentClassName,
         collisionPadding,
-        defaultOpen,
+        children: content,
         portal,
         side,
         sideOffset,
-      }),
-    )}
-    ${raw(toAttrs(rootProps))}
-  >
-    ${hasComposedContent ? composedChildren : generatedTrigger}
-    ${hasComposedContent
-      ? ""
-      : PopoverContent({
-          align,
-          alignOffset,
-          arrow,
-          avoidCollisions,
-          class: contentClass,
-          className: contentClassName,
-          collisionPadding,
-          children: content,
-          portal,
-          side,
-          sideOffset,
-        })}
-  </div>`;
+      })}`;
+
+  const openSuffix = ` data-slot="popover" class="${cn("inline-flex", className, aliasedClassName)}"${toAttrs(
+    {
+      "data-areia-popover": autoBind ? "" : undefined,
+    },
+  )}${dataAttrs({
+    align,
+    alignOffset,
+    avoidCollisions,
+    closeOnClickOutside,
+    closeOnEscape,
+    collisionPadding,
+    defaultOpen,
+    portal,
+    side,
+    sideOffset,
+  })}${toAttrs(rootProps)}`;
+
+  return boundElement("div", binds, openSuffix, inner);
 }
 
 const autoBoundPopovers = new WeakMap<Element, PopoverPrimitive.PopoverController>();
@@ -458,6 +465,13 @@ function ensurePopoverAutoBind(doc: Document | undefined = globalThis.document) 
   );
 }
 
+type PopoverBindRuntime = {
+  controller: PopoverPrimitive.PopoverController;
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const popoverBindRuntimeByHost = new WeakMap<Element, PopoverBindRuntime>();
+
 const PopoverRootIsland = ilha
   .input<PopoverInput>()
   .onMount(({ host, input }) => {
@@ -495,6 +509,7 @@ const PopoverRootIsland = ilha
 
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
+    popoverBindRuntimeByHost.set(host, { controller, bindSync });
 
     syncArrowSide();
     const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
@@ -502,19 +517,16 @@ const PopoverRootIsland = ilha
     observer?.observe(content!, { attributes: true, attributeFilter: ["data-side"] });
 
     return () => {
+      popoverBindRuntimeByHost.delete(host);
       observer?.disconnect();
       controller.destroy();
     };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
-    const root = host.matches('[data-slot="popover"]')
-      ? host
-      : host.querySelector('[data-slot="popover"]');
-    if (!root) return;
-
-    const controller = autoBoundPopovers.get(root) ?? PopoverPrimitive.createPopover(root);
-    createOpenBindSync(input, controller)?.applyFromSignal();
+    const runtime = popoverBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.bindSync?.applyFromSignal();
   })
   .on("[data-slot='popover-content']@animationend", ({ host }) => {
     const root = host.matches('[data-slot="popover"]')
@@ -532,19 +544,51 @@ const PopoverRootIsland = ilha
 
 const autoBindScheduled = new WeakSet<Document>();
 
+type PopoverAutoRuntime = {
+  controller: PopoverPrimitive.PopoverController;
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const popoverAutoRuntimeByRoot = new WeakMap<Element, PopoverAutoRuntime>();
+
 function schedulePopoverAutoBind(doc: Document | undefined = globalThis.document) {
   if (!doc || autoBindScheduled.has(doc)) return;
   autoBindScheduled.add(doc);
   queueMicrotask(() => {
     autoBindScheduled.delete(doc);
-    for (const root of doc.querySelectorAll('[data-areia-popover][data-slot="popover"]')) {
-      bindPopoverRoot(root);
+    const queued = takeOpenBindQueue(doc);
+    let queueIndex = 0;
+
+    for (const root of doc.querySelectorAll<HTMLElement>(
+      '[data-areia-popover][data-slot="popover"]',
+    )) {
+      const trigger = root.querySelector('[data-slot="popover-trigger"]');
+      const content = root.querySelector('[data-slot="popover-content"]');
+      if (!trigger || !content) continue;
+
+      const existing = popoverAutoRuntimeByRoot.get(root);
+      if (existing) {
+        existing.bindSync?.applyFromSignal();
+        continue;
+      }
+
+      const entry = queued[queueIndex++];
+      const bindInput = entry ? { "bind:open": entry.bindOpen } : {};
+      let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
+      const controller = bindPopoverRoot(root);
+      if (entry) {
+        bindSync = createOpenBindSync(bindInput, controller);
+        bindSync?.applyFromSignal();
+      }
+
+      popoverAutoRuntimeByRoot.set(root, { controller, bindSync });
     }
   });
 }
 
 function needsPopoverIsland(input: PopoverInput) {
-  return input.onOpenChange != null || input["bind:open"] != null;
+  return input.onOpenChange != null;
 }
 
 export function PopoverRoot(input: PopoverInput = {}) {

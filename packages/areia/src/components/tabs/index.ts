@@ -1,9 +1,14 @@
 import ilha, { html, raw } from "ilha";
 import { Tabs as TabsPrimitive } from "@areia/slots";
 import {
+  boundElement,
   createGroupBindSync,
   groupBindDefault,
+  queueGroupBindForAutoMount,
+  splitBindProps,
   subscribeBindProps,
+  takeGroupBindQueue,
+  type GroupBindAccessor,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -350,7 +355,8 @@ export function TabsContent(input: TabsContentInput) {
   </div>`;
 }
 
-function renderTabs(input: TabsInput = {}) {
+function renderTabs(input: TabsInput = {}, autoBind = false) {
+  const { binds, attrs: props } = splitBindProps(input);
   const {
     tabs = [],
     children,
@@ -371,7 +377,7 @@ function renderTabs(input: TabsInput = {}) {
     variant = TABS_DEFAULT_VARIANTS.variant,
     size = TABS_DEFAULT_VARIANTS.size,
     ...rest
-  } = input;
+  } = props as TabsInput;
 
   const composedChildren = render(children);
   const hasComposedChildren = hasRenderableContent(children);
@@ -401,33 +407,41 @@ function renderTabs(input: TabsInput = {}) {
       }),
     );
 
-  return html`<div
-    data-slot="tabs"
-    data-tabs-variant="${variant}"
-    data-tabs-size="${size}"
-    class="${cn(tabsVariants({ variant, size }), className, aliasedClassName)}"
-    ${raw(toAttrs({ ...rest, "data-default-value": selected }))}
-  >
-    ${variant === "segmented"
-      ? html`<div
-          aria-hidden="true"
-          class="${cn(
-            "absolute inset-x-0 top-1/2 z-0 -translate-y-1/2 rounded-lg bg-areia-surface-muted",
-            size === "sm" ? "h-6.5 rounded-md" : "h-9",
-          )}"
-        ></div>`
-      : ""}
-    ${hasComposedChildren
-      ? composedChildren
-      : html`${TabsList({
-          children: listChildren,
-          variant,
-          size,
-          class: cn(listClass, listClassName),
-          indicatorClass: cn(indicatorClass, indicatorClassName),
-        })}
-        ${contentPanels}`}
-  </div>`;
+  const inner = html`${variant === "segmented"
+    ? html`<div
+        aria-hidden="true"
+        class="${cn(
+          "absolute inset-x-0 top-1/2 z-0 -translate-y-1/2 rounded-lg bg-areia-surface-muted",
+          size === "sm" ? "h-6.5 rounded-md" : "h-9",
+        )}"
+      ></div>`
+    : ""}
+  ${hasComposedChildren
+    ? composedChildren
+    : html`${TabsList({
+        children: listChildren,
+        variant,
+        size,
+        class: cn(listClass, listClassName),
+        indicatorClass: cn(indicatorClass, indicatorClassName),
+      })}
+      ${contentPanels}`}`;
+
+  const openSuffix = ` data-slot="tabs" data-tabs-variant="${variant}" data-tabs-size="${size}" class="${cn(
+    tabsVariants({ variant, size }),
+    className,
+    aliasedClassName,
+  )}"${toAttrs({
+    ...rest,
+    "data-default-value": selected,
+    "data-areia-tabs": autoBind ? "" : undefined,
+  })}`;
+
+  if (autoBind && binds["bind:group"] != null) {
+    queueGroupBindForAutoMount(binds["bind:group"] as GroupBindAccessor, "single");
+  }
+
+  return boundElement("div", binds, openSuffix, inner);
 }
 
 function enhanceOverflow(root: Element) {
@@ -537,12 +551,22 @@ function enhanceOverflow(root: Element) {
   };
 }
 
+type TabsBindRuntime = {
+  controller: TabsPrimitive.TabsController;
+  groupSync: ReturnType<typeof createGroupBindSync>;
+};
+
+const tabsBindRuntimeByHost = new WeakMap<Element, TabsBindRuntime>();
+
+function resolveTabsRoot(host: Element): HTMLElement | null {
+  const root = host.matches('[data-slot="tabs"]') ? host : host.querySelector('[data-slot="tabs"]');
+  return root as HTMLElement | null;
+}
+
 export const TabsRoot = ilha
   .input<TabsInput>()
   .onMount(({ host, input }) => {
-    const root = host.matches('[data-slot="tabs"]')
-      ? host
-      : host.querySelector('[data-slot="tabs"]');
+    const root = resolveTabsRoot(host);
     if (!root) return;
 
     let groupSync: ReturnType<typeof createGroupBindSync> = null;
@@ -578,35 +602,87 @@ export const TabsRoot = ilha
       "single",
     );
     groupSync?.applyFromSignal();
+    tabsBindRuntimeByHost.set(host, { controller, groupSync });
 
     return () => {
+      tabsBindRuntimeByHost.delete(host);
       cleanupOverflow();
       controller.destroy();
     };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
-    const root = host.matches('[data-slot="tabs"]')
-      ? host
-      : host.querySelector('[data-slot="tabs"]');
-    if (!root) return;
-
-    const controller = TabsPrimitive.createTabs(root);
-    createGroupBindSync(
-      input,
-      {
-        getValue: () => controller.value,
-        setValue: (value) => {
-          if (typeof value === "string") controller.select(value);
-          else if (Array.isArray(value) && value[0]) controller.select(value[0]);
-        },
-      },
-      "single",
-    )?.applyFromSignal();
+    const runtime = tabsBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.groupSync?.applyFromSignal();
   })
   .render(({ input }) => renderTabs(input));
 
-export const Tabs = Object.assign(TabsRoot, {
+const tabsAutoBindScheduled = new WeakSet<Document>();
+
+type TabsAutoRuntime = {
+  controller: TabsPrimitive.TabsController;
+  groupSync: ReturnType<typeof createGroupBindSync>;
+};
+
+const tabsAutoRuntimeByRoot = new WeakMap<Element, TabsAutoRuntime>();
+
+function scheduleTabsAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || tabsAutoBindScheduled.has(doc)) return;
+  tabsAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    tabsAutoBindScheduled.delete(doc);
+    const queued = takeGroupBindQueue(doc);
+    let queueIndex = 0;
+
+    for (const root of doc.querySelectorAll<HTMLElement>('[data-areia-tabs][data-slot="tabs"]')) {
+      const existing = tabsAutoRuntimeByRoot.get(root);
+      if (existing) {
+        existing.groupSync?.applyFromSignal();
+        continue;
+      }
+
+      const entry = queued[queueIndex++];
+      const bindInput = entry ? { "bind:group": entry.bindGroup } : {};
+      let groupSync: ReturnType<typeof createGroupBindSync> = null;
+
+      const controller = TabsPrimitive.createTabs(root, {
+        onValueChange: (value) => {
+          groupSync?.onUserChange(value);
+        },
+      });
+
+      if (entry) {
+        groupSync = createGroupBindSync(
+          bindInput,
+          {
+            getValue: () => controller.value,
+            setValue: (value) => {
+              if (typeof value === "string") controller.select(value);
+              else if (Array.isArray(value) && value[0]) controller.select(value[0]);
+            },
+          },
+          entry.mode,
+        );
+        groupSync?.applyFromSignal();
+      }
+
+      tabsAutoRuntimeByRoot.set(root, { controller, groupSync });
+    }
+  });
+}
+
+function needsTabsIsland(input: TabsInput) {
+  return input.onValueChange != null;
+}
+
+function TabsComponent(input: TabsInput = {}) {
+  if (needsTabsIsland(input)) return TabsRoot(input);
+  scheduleTabsAutoBind();
+  return renderTabs(input, true);
+}
+
+export const Tabs = Object.assign(TabsComponent, {
   Root: TabsRoot,
   Static: renderTabs,
   List: TabsList,

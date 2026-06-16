@@ -3,9 +3,13 @@ import { Dialog as DialogPrimitive } from "@areia/slots";
 
 const dialogControllers = new WeakMap<Element, DialogPrimitive.DialogController>();
 import {
+  boundElement,
   createOpenBindSync,
   openBindDefault,
+  queueOpenBindForAutoMount,
+  splitBindProps,
   subscribeBindProps,
+  takeOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -309,7 +313,8 @@ export type DialogInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "
     triggerClassName?: string;
   };
 
-function renderDialog(input: DialogInput = {}) {
+function renderDialog(input: DialogInput = {}, autoBind = false) {
+  const { binds, attrs: props } = splitBindProps(input);
   const {
     alertDialog,
     children,
@@ -334,7 +339,11 @@ function renderDialog(input: DialogInput = {}) {
     triggerClass,
     triggerClassName,
     ...rootProps
-  } = input;
+  } = props as DialogInput;
+
+  if (autoBind && binds["bind:open"] != null) {
+    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+  }
 
   const isAlertDialog = alertDialog ?? role === "alertdialog";
   const defaultOpen = openBindDefault(input, defaultOpenProp);
@@ -352,36 +361,42 @@ function renderDialog(input: DialogInput = {}) {
         children: trigger ?? children,
       }));
 
-  return html`<div
-    data-slot="dialog"
-    class="${cn("inline-flex", className, aliasedClassName)}"
-    ${raw(
-      dataAttrs({
-        alertDialog: isAlertDialog,
-        closeOnClickOutside: closeOnClickOutside ?? (isAlertDialog ? false : undefined),
-        closeOnEscape,
-        defaultOpen,
-        lockScroll,
-      }),
-    )}
-    ${raw(toAttrs(rootProps))}
-  >
-    ${hasComposedContent ? composedChildren : generatedTrigger}
-    ${hasComposedContent
-      ? ""
-      : DialogPortal({
-          class: portalClass,
-          className: portalClassName,
-          children: html`${DialogOverlay({ class: overlayClass, className: overlayClassName })}
-          ${DialogContent({
-            class: contentClass,
-            className: contentClassName,
-            children: content,
-            size,
-          })}`,
-        })}
-  </div>`;
+  const inner = html`${hasComposedContent ? composedChildren : generatedTrigger}
+  ${hasComposedContent
+    ? ""
+    : DialogPortal({
+        class: portalClass,
+        className: portalClassName,
+        children: html`${DialogOverlay({ class: overlayClass, className: overlayClassName })}
+        ${DialogContent({
+          class: contentClass,
+          className: contentClassName,
+          children: content,
+          size,
+        })}`,
+      })}`;
+
+  const openSuffix = ` data-slot="dialog" class="${cn("inline-flex", className, aliasedClassName)}"${toAttrs(
+    {
+      "data-areia-dialog": autoBind ? "" : undefined,
+    },
+  )}${dataAttrs({
+    alertDialog: isAlertDialog,
+    closeOnClickOutside: closeOnClickOutside ?? (isAlertDialog ? false : undefined),
+    closeOnEscape,
+    defaultOpen,
+    lockScroll,
+  })}${toAttrs(rootProps)}`;
+
+  return boundElement("div", binds, openSuffix, inner);
 }
+
+type DialogBindRuntime = {
+  controller: DialogPrimitive.DialogController;
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const dialogBindRuntimeByHost = new WeakMap<Element, DialogBindRuntime>();
 
 export const DialogRoot = ilha
   .input<DialogInput>()
@@ -410,29 +425,85 @@ export const DialogRoot = ilha
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
     dialogControllers.set(root, controller);
+    dialogBindRuntimeByHost.set(host, { controller, bindSync });
 
     return () => {
+      dialogBindRuntimeByHost.delete(host);
       dialogControllers.delete(root);
       controller.destroy();
     };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
-    const root = host.matches('[data-slot="dialog"]')
-      ? host
-      : host.querySelector('[data-slot="dialog"]');
-    if (!root) return;
-
-    const controller = dialogControllers.get(root) ?? DialogPrimitive.createDialog(root);
-    createOpenBindSync(input, controller)?.applyFromSignal();
+    const runtime = dialogBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.bindSync?.applyFromSignal();
   })
   .render(({ input }) => renderDialog(input));
+
+const dialogAutoBindScheduled = new WeakSet<Document>();
+
+type DialogAutoRuntime = {
+  controller: DialogPrimitive.DialogController;
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const dialogAutoRuntimeByRoot = new WeakMap<Element, DialogAutoRuntime>();
+
+function scheduleDialogAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || dialogAutoBindScheduled.has(doc)) return;
+  dialogAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    dialogAutoBindScheduled.delete(doc);
+    const queued = takeOpenBindQueue(doc);
+    let queueIndex = 0;
+
+    for (const root of doc.querySelectorAll<HTMLElement>(
+      '[data-areia-dialog][data-slot="dialog"]',
+    )) {
+      const existing = dialogAutoRuntimeByRoot.get(root);
+      if (existing) {
+        existing.bindSync?.applyFromSignal();
+        continue;
+      }
+
+      const entry = queued[queueIndex++];
+      let bindSync: ReturnType<typeof createOpenBindSync> = null;
+      const isAlert =
+        root.getAttribute("data-alert-dialog") === "true" ||
+        root.querySelector('[role="alertdialog"]') != null;
+
+      const controller = DialogPrimitive.createDialog(root, {
+        alertDialog: isAlert,
+        onOpenChange: (open) => bindSync?.onUserChange(open),
+      });
+
+      if (entry) {
+        bindSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
+        bindSync?.applyFromSignal();
+      }
+
+      dialogControllers.set(root, controller);
+      dialogAutoRuntimeByRoot.set(root, { controller, bindSync });
+    }
+  });
+}
+
+function needsDialogIsland(input: DialogInput) {
+  return input.onOpenChange != null || input.onPortalMounted != null;
+}
+
+function DialogComponent(input: DialogInput = {}) {
+  if (needsDialogIsland(input)) return DialogRoot(input);
+  scheduleDialogAutoBind();
+  return renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"]), true);
+}
 
 function DialogBase(input: DialogInput = {}) {
   return renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
 }
 
-export const Dialog = Object.assign(DialogRoot, {
+export const Dialog = Object.assign(DialogComponent, {
   Root: DialogRoot,
   Static: DialogBase,
   Trigger: DialogTrigger,
