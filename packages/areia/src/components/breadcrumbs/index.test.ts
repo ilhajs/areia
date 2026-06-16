@@ -65,6 +65,18 @@ describe("Breadcrumbs", () => {
     expect(output).toContain('aria-label="Copy link"');
   });
 
+  it("emits copy button onclick with execCommand fallback", () => {
+    const output = markup(
+      Breadcrumbs({
+        items: [{ href: "/", children: "Home" }],
+        copyUrl: "https://example.com/page",
+      }),
+    );
+    expect(output).toContain("onclick=");
+    expect(output).toContain("document.execCommand('copy')");
+    expect(output).not.toMatch(/\.catch\(function\(\)\{\}\)/);
+  });
+
   it("renders loading skeleton when loading is true", () => {
     const output = markup(
       Breadcrumbs({

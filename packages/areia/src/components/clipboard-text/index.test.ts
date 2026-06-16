@@ -50,6 +50,13 @@ describe("ClipboardText", () => {
     expect(output).toContain('data-copy-text="override"');
   });
 
+  it("emits valid inline onclick without double quotes inside attribute selectors", () => {
+    const output = markup(ClipboardText({ text: "npx foo", tooltip: true }));
+    expect(output).toContain("onclick=");
+    expect(output).not.toMatch(/onclick="[^"]*\[data-slot="/);
+    expect(output).toContain("[data-slot=\\'clipboard-text\\']");
+  });
+
   it("merges custom class and className", () => {
     const output = markup(ClipboardText({ text: "x", class: "a", className: "b" }));
     expect(output).toContain("a");

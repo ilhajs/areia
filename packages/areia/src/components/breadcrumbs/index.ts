@@ -1,4 +1,5 @@
 import { html, raw } from "ilha";
+import { BREADCRUMBS_CLIPBOARD_INLINE_ONCLICK } from "$lib/clipboard";
 import { cn } from "$lib/cn";
 import { hasRenderableContent, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
@@ -184,7 +185,7 @@ export function BreadcrumbsClipboard(input: BreadcrumbsClipboardInput) {
       className,
       aliasedClassName,
     )}"
-    onclick="var c=this.querySelector('.bc-copy-icon'),k=this.querySelector('.bc-check-icon');navigator.clipboard.writeText(this.getAttribute('data-copy-text')).then(function(){c.style.display='none';k.style.display='flex';setTimeout(function(){c.style.display='flex';k.style.display='none'},2000)}).catch(function(){})"
+    onclick="${BREADCRUMBS_CLIPBOARD_INLINE_ONCLICK}"
     data-copy-text="${escaped}"
     title="Copy link"
     aria-label="Copy link"

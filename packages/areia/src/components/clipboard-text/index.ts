@@ -4,6 +4,7 @@ import { Button, type ButtonInput, type ButtonSize } from "$components/button";
 import { Icon } from "$components/icon";
 import { inputVariants } from "$components/input";
 import { Tooltip, type TooltipSide } from "$components/tooltip";
+import { CLIPBOARD_TEXT_INLINE_ONCLICK, writeClipboard } from "$lib/clipboard";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -117,8 +118,6 @@ function srText(copiedText: string) {
   ></span>`;
 }
 
-const INLINE_COPY_HANDLER = `var b=this,r=b.closest('[data-slot="clipboard-text"]'),t=b.getAttribute('data-copy-text')||'',w=function(){var c=r&&r.querySelector('[data-slot="clipboard-text-copied-icon"]'),i=r&&r.querySelector('[data-slot="clipboard-text-copy-icon"]'),s=r&&r.querySelector('[data-slot="clipboard-text-status"]');c&&c.classList.remove('translate-y-full','opacity-0');c&&c.classList.add('translate-y-0','opacity-100');i&&i.classList.add('-translate-y-full','opacity-0');i&&i.classList.remove('opacity-100');if(s)s.textContent=b.getAttribute('data-copied-text')||'Copied';clearTimeout(b._clipboardTextTimeout);b._clipboardTextTimeout=setTimeout(function(){c&&c.classList.add('translate-y-full','opacity-0');c&&c.classList.remove('translate-y-0','opacity-100');i&&i.classList.remove('-translate-y-full','opacity-0');i&&i.classList.add('opacity-100');if(s)s.textContent=''},1500)};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(w).catch(function(){})}else{var a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='absolute';a.style.left='-9999px';document.body.appendChild(a);a.select();try{document.execCommand('copy');w()}finally{document.body.removeChild(a)}}`;
-
 function copyButton(input: {
   buttonSize: ButtonSize;
   copyAction: string;
@@ -139,7 +138,7 @@ function copyButton(input: {
     "data-slot": "clipboard-text-button",
     "data-copy-text": textToCopy,
     "data-copied-text": copiedText,
-    onclick: inlineCopy ? INLINE_COPY_HANDLER : undefined,
+    onclick: inlineCopy ? CLIPBOARD_TEXT_INLINE_ONCLICK : undefined,
     children: html`<span
         data-slot="clipboard-text-copied-icon"
         class="pointer-events-none absolute inset-0 flex translate-y-full items-center justify-center opacity-0 transition-all duration-200"
@@ -203,34 +202,6 @@ function renderClipboardText(input: ClipboardTextInput) {
       : button}
     ${srText(copiedText)}
   </div>`;
-}
-
-async function writeClipboard(text: string) {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
-  }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "absolute";
-  textarea.style.left = "-9999px";
-  document.body.appendChild(textarea);
-
-  const selection = document.getSelection();
-  const previousRange = selection?.rangeCount ? selection.getRangeAt(0) : null;
-  textarea.select();
-
-  try {
-    document.execCommand("copy");
-  } finally {
-    document.body.removeChild(textarea);
-    if (previousRange) {
-      selection?.removeAllRanges();
-      selection?.addRange(previousRange);
-    }
-  }
 }
 
 function setCopiedState(root: Element, copied: boolean) {
