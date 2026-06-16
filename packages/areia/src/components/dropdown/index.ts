@@ -4,9 +4,13 @@ import { DropdownMenu as DropdownMenuPrimitive } from "@areia/slots";
 
 const dropdownControllers = new WeakMap<Element, DropdownMenuPrimitive.DropdownMenuController>();
 import {
+  boundElement,
   createOpenBindSync,
   openBindDefault,
+  queueOpenBindForAutoMount,
+  splitBindProps,
   subscribeBindProps,
+  takeOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { Icon } from "$components/icon";
@@ -368,7 +372,8 @@ function renderItems(items: DropdownItemInput[] | undefined) {
   return items?.map((item) => DropdownItem(item)) ?? "";
 }
 
-function renderDropdown(input: DropdownInput = {}) {
+function renderDropdown(input: DropdownInput = {}, autoBind = false) {
+  const { binds, attrs: props } = splitBindProps(input);
   const {
     trigger,
     children,
@@ -399,44 +404,54 @@ function renderDropdown(input: DropdownInput = {}) {
     onValuesChange: _onValuesChange,
     variant: _variant,
     ...rest
-  } = input;
+  } = props as DropdownInput;
   const defaultOpen = openBindDefault(input, defaultOpenProp);
+
+  if (autoBind && binds["bind:open"] != null) {
+    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+  }
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "dropdown-menu-content");
 
-  return html`<div
-    data-slot="dropdown-menu"
-    class="${cn("contents", className, aliasedClassName)}"
-    ${raw(
-      toAttrs({
-        ...rest,
-        "data-default-open": defaultOpen,
-        "data-default-value": defaultValue,
-        "data-default-values": defaultValues ? JSON.stringify(defaultValues) : undefined,
-        "data-close-on-click-outside": closeOnClickOutside,
-        "data-close-on-escape": closeOnEscape,
-        "data-close-on-select": closeOnSelect,
-        "data-side": side,
-        "data-align": align,
-        "data-side-offset": sideOffset,
-        "data-align-offset": alignOffset,
-        "data-avoid-collisions": avoidCollisions,
-        "data-collision-padding": collisionPadding,
-        "data-lock-scroll": lockScroll,
-        "data-highlight-item-on-hover": highlightItemOnHover,
-      }),
-    )}
-  >
-    ${hasComposedContent
-      ? composedChildren
-      : html`${DropdownTrigger({ children: trigger, class: cn(triggerClass, triggerClassName) })}
-        ${DropdownContent({
-          children: children ?? renderItems(items),
-          class: cn(contentClass, contentClassName),
-        })}`}
-  </div>`;
+  const inner = html`${hasComposedContent
+    ? composedChildren
+    : html`${DropdownTrigger({ children: trigger, class: cn(triggerClass, triggerClassName) })}
+      ${DropdownContent({
+        children: children ?? renderItems(items),
+        class: cn(contentClass, contentClassName),
+      })}`}`;
+
+  const openSuffix = ` data-slot="dropdown-menu" class="${cn("contents", className, aliasedClassName)}"${toAttrs(
+    {
+      "data-areia-dropdown": autoBind ? "" : undefined,
+      ...rest,
+      "data-default-open": defaultOpen,
+      "data-default-value": defaultValue,
+      "data-default-values": defaultValues ? JSON.stringify(defaultValues) : undefined,
+      "data-close-on-click-outside": closeOnClickOutside,
+      "data-close-on-escape": closeOnEscape,
+      "data-close-on-select": closeOnSelect,
+      "data-side": side,
+      "data-align": align,
+      "data-side-offset": sideOffset,
+      "data-align-offset": alignOffset,
+      "data-avoid-collisions": avoidCollisions,
+      "data-collision-padding": collisionPadding,
+      "data-lock-scroll": lockScroll,
+      "data-highlight-item-on-hover": highlightItemOnHover,
+    },
+  )}`;
+
+  return boundElement("div", binds, openSuffix, inner);
 }
+
+type DropdownBindRuntime = {
+  controller: DropdownMenuPrimitive.DropdownMenuController;
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const dropdownBindRuntimeByHost = new WeakMap<Element, DropdownBindRuntime>();
 
 export const DropdownRoot = ilha
   .input<DropdownInput>()
@@ -477,27 +492,87 @@ export const DropdownRoot = ilha
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
     dropdownControllers.set(root, controller);
+    dropdownBindRuntimeByHost.set(host, { controller, bindSync });
 
     return () => {
+      dropdownBindRuntimeByHost.delete(host);
       dropdownControllers.delete(root);
       controller.destroy();
     };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
-    const root = host.matches('[data-slot="dropdown-menu"]')
-      ? host
-      : host.querySelector('[data-slot="dropdown-menu"]');
-    if (!root) return;
-
-    createOpenBindSync(
-      input,
-      dropdownControllers.get(root) ?? DropdownMenuPrimitive.createDropdownMenu(root),
-    )?.applyFromSignal();
+    const runtime = dropdownBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.bindSync?.applyFromSignal();
   })
   .render(({ input }) => renderDropdown(input));
 
-export const Dropdown = Object.assign(DropdownRoot, {
+const dropdownAutoBindScheduled = new WeakSet<Document>();
+
+type DropdownAutoRuntime = {
+  controller: DropdownMenuPrimitive.DropdownMenuController;
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const dropdownAutoRuntimeByRoot = new WeakMap<Element, DropdownAutoRuntime>();
+
+function scheduleDropdownAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || dropdownAutoBindScheduled.has(doc)) return;
+  dropdownAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    dropdownAutoBindScheduled.delete(doc);
+    const queued = takeOpenBindQueue(doc);
+    let queueIndex = 0;
+
+    for (const root of doc.querySelectorAll<HTMLElement>(
+      '[data-areia-dropdown][data-slot="dropdown-menu"]',
+    )) {
+      const trigger = root.querySelector('[data-slot="dropdown-menu-trigger"]');
+      const content = root.querySelector('[data-slot="dropdown-menu-content"]');
+      if (!trigger || !content) continue;
+
+      const existing = dropdownAutoRuntimeByRoot.get(root);
+      if (existing) {
+        existing.bindSync?.applyFromSignal();
+        continue;
+      }
+
+      const entry = queued[queueIndex++];
+      let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
+      const controller = DropdownMenuPrimitive.createDropdownMenu(root, {
+        onOpenChange: (open) => bindSync?.onUserChange(open),
+      });
+
+      if (entry) {
+        bindSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
+        bindSync?.applyFromSignal();
+      }
+
+      dropdownControllers.set(root, controller);
+      dropdownAutoRuntimeByRoot.set(root, { controller, bindSync });
+    }
+  });
+}
+
+function needsDropdownIsland(input: DropdownInput) {
+  return (
+    input.onOpenChange != null ||
+    input.onSelect != null ||
+    input.onValueChange != null ||
+    input.onValuesChange != null ||
+    input.onPortalMounted != null
+  );
+}
+
+function DropdownComponent(input: DropdownInput = {}) {
+  if (needsDropdownIsland(input)) return DropdownRoot(input);
+  scheduleDropdownAutoBind();
+  return renderDropdown(input, true);
+}
+
+export const Dropdown = Object.assign(DropdownComponent, {
   Root: DropdownRoot,
   Static: renderDropdown,
   Trigger: DropdownTrigger,

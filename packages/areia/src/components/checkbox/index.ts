@@ -3,8 +3,10 @@ import { Checkbox as CheckboxPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
   createCheckedBindSync,
+  queueCheckedBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
+  takeCheckedBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -227,6 +229,20 @@ function checkboxControl(input: CheckboxInput, autoBind = false) {
 
 /** Single checkbox with an optional built-in label wrapper. */
 function renderCheckbox(input: CheckboxInput = {}, autoBind = false) {
+  if (autoBind) {
+    const { binds } = splitBindProps(input);
+    if (binds["bind:checked"] != null || binds["bind:group"] != null) {
+      const itemValue = typeof input.value === "string" ? input.value : undefined;
+      queueCheckedBindForAutoMount(
+        {
+          "bind:checked": binds["bind:checked"] as IlhaBindProps["bind:checked"],
+          "bind:group": binds["bind:group"] as IlhaBindProps["bind:group"],
+        },
+        itemValue,
+      );
+    }
+  }
+
   const { label, labelTooltip, controlFirst = true, required, disabled, ...rest } = input;
   const controlId = typeof rest.id === "string" ? rest.id : undefined;
   const control = checkboxControl({ ...rest, id: controlId, disabled, required }, autoBind);
@@ -391,19 +407,52 @@ export const CheckboxRoot = ilha
   .render(({ input }) => renderCheckbox(input));
 
 const checkboxAutoBindScheduled = new WeakSet<Document>();
-const checkboxAutoBoundRoots = new WeakSet<Element>();
+
+type CheckboxAutoRuntime = {
+  controller: CheckboxPrimitive.CheckboxController;
+  bindSync: ReturnType<typeof createCheckedBindSync>;
+};
+
+const checkboxAutoRuntimeByRoot = new WeakMap<Element, CheckboxAutoRuntime>();
 
 function scheduleCheckboxAutoBind(doc: Document | undefined = globalThis.document) {
   if (!doc || checkboxAutoBindScheduled.has(doc)) return;
   checkboxAutoBindScheduled.add(doc);
   queueMicrotask(() => {
     checkboxAutoBindScheduled.delete(doc);
+    const queued = takeCheckedBindQueue(doc);
+    let queueIndex = 0;
+
     for (const root of doc.querySelectorAll<HTMLElement>(
       '[data-areia-checkbox][data-slot="checkbox"]',
     )) {
-      if (checkboxAutoBoundRoots.has(root)) continue;
-      checkboxAutoBoundRoots.add(root);
-      CheckboxPrimitive.createCheckbox(root);
+      const existing = checkboxAutoRuntimeByRoot.get(root);
+      if (existing) {
+        existing.bindSync?.applyFromSignal();
+        continue;
+      }
+
+      const entry = queued[queueIndex++];
+      let bindSync: ReturnType<typeof createCheckedBindSync> = null;
+      const bindInput = entry
+        ? {
+            ...(entry.bindChecked != null ? { "bind:checked": entry.bindChecked } : {}),
+            ...(entry.bindGroup != null ? { "bind:group": entry.bindGroup } : {}),
+          }
+        : {};
+
+      const controller = CheckboxPrimitive.createCheckbox(root, {
+        onCheckedChange: (checked) => {
+          bindSync?.onUserChange(checked);
+        },
+      });
+
+      if (entry && (entry.bindChecked != null || entry.bindGroup != null)) {
+        bindSync = createCheckedBindSync(bindInput, controller, entry.itemValue);
+        bindSync?.applyFromSignal();
+      }
+
+      checkboxAutoRuntimeByRoot.set(root, { controller, bindSync });
     }
   });
 }

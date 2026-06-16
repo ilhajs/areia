@@ -32,6 +32,7 @@ describe("Switch bind:checked in parent island", () => {
     expect(output).not.toContain("data-ilha-slot");
     expect(output).toContain('data-slot="switch"');
     expect(output).toContain("data-areia-switch");
+    expect(output).not.toMatch(/aria-checked="true"/);
   });
 
   it("toggles parent state and updates derived output", async () => {
@@ -61,7 +62,8 @@ describe("Switch bind:checked in parent island", () => {
       { name: "ProjectCreatorForm", snapshot: true },
     );
     mount({ ProjectCreatorForm }, { root: document.body, lazy: false });
-    await Promise.resolve();
+    await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
+    await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
     await Promise.resolve();
 
     const cmd = () => document.querySelector("[data-testid=cmd]")?.textContent ?? "";

@@ -290,6 +290,38 @@ export function takeComboboxBindQueue(doc: Document): QueuedComboboxBind[] {
   return queue;
 }
 
+export type QueuedCheckedBind = {
+  bindChecked?: SignalAccessor<boolean>;
+  bindGroup?: GroupBindAccessor;
+  /** Checkbox/switch value when using `bind:group` on a single control. */
+  itemValue?: string;
+};
+
+const checkedBindQueueByDoc = new WeakMap<Document, QueuedCheckedBind[]>();
+
+/** Register `bind:checked` / `bind:group` for the next switch/checkbox auto-mount pass. */
+export function queueCheckedBindForAutoMount(
+  binds: Partial<Pick<IlhaBindProps, "bind:checked" | "bind:group">>,
+  itemValue?: string,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  if (binds["bind:checked"] == null && binds["bind:group"] == null) return;
+  const queue = checkedBindQueueByDoc.get(doc) ?? [];
+  queue.push({
+    bindChecked: binds["bind:checked"],
+    bindGroup: binds["bind:group"],
+    itemValue,
+  });
+  checkedBindQueueByDoc.set(doc, queue);
+}
+
+export function takeCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
+  const queue = checkedBindQueueByDoc.get(doc) ?? [];
+  checkedBindQueueByDoc.delete(doc);
+  return queue;
+}
+
 export type GroupBindSync = {
   applyFromSignal: () => void;
   onUserChange: (value: string | string[] | null) => void;

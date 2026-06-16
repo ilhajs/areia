@@ -2,7 +2,15 @@ import ilha, { html, raw } from "ilha";
 import { ContextMenu as ContextMenuPrimitive } from "@areia/slots";
 
 const contextMenuControllers = new WeakMap<Element, ContextMenuPrimitive.ContextMenuController>();
-import { createOpenBindSync, subscribeBindProps, type IlhaBindProps } from "$lib/binds";
+import {
+  boundElement,
+  createOpenBindSync,
+  queueOpenBindForAutoMount,
+  splitBindProps,
+  subscribeBindProps,
+  takeOpenBindQueue,
+  type IlhaBindProps,
+} from "$lib/binds";
 import { cn } from "$lib/cn";
 import { hasSlot, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
@@ -120,7 +128,8 @@ export function ContextMenuRadioItem(input: ContextMenuItemInput = {}) {
   return renderItem(input, "radio");
 }
 
-function renderContextMenu(input: ContextMenuInput = {}) {
+function renderContextMenu(input: ContextMenuInput = {}, autoBind = false) {
+  const { binds, attrs: props } = splitBindProps(input);
   const {
     trigger,
     children,
@@ -135,22 +144,38 @@ function renderContextMenu(input: ContextMenuInput = {}) {
     onOpenChange: _onOpenChange,
     onSelect: _onSelect,
     ...rest
-  } = input;
+  } = props as ContextMenuInput;
+
+  if (autoBind && binds["bind:open"] != null) {
+    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+  }
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "context-menu-content");
 
-  return html`<div
-    data-slot="context-menu"
-    class="${cn("contents", className, aliasedClassName)}"
-    ${raw(toAttrs({ ...rest, "data-disabled": disabled, "data-close-on-select": closeOnSelect }))}
-  >
-    ${hasComposedContent
-      ? composedChildren
-      : html`${ContextMenuTrigger({ children: trigger, class: cn(triggerClass, triggerClassName) })}
-        ${ContextMenuContent({ children, class: cn(contentClass, contentClassName) })}`}
-  </div>`;
+  const inner = html`${hasComposedContent
+    ? composedChildren
+    : html`${ContextMenuTrigger({ children: trigger, class: cn(triggerClass, triggerClassName) })}
+      ${ContextMenuContent({ children, class: cn(contentClass, contentClassName) })}`}`;
+
+  const openSuffix = ` data-slot="context-menu" class="${cn("contents", className, aliasedClassName)}"${toAttrs(
+    {
+      "data-areia-context-menu": autoBind ? "" : undefined,
+      ...rest,
+      "data-disabled": disabled,
+      "data-close-on-select": closeOnSelect,
+    },
+  )}`;
+
+  return boundElement("div", binds, openSuffix, inner);
 }
+
+type ContextMenuBindRuntime = {
+  controller: ContextMenuPrimitive.ContextMenuController;
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const contextMenuBindRuntimeByHost = new WeakMap<Element, ContextMenuBindRuntime>();
 
 export const ContextMenuRoot = ilha
   .input<ContextMenuInput>()
@@ -176,27 +201,81 @@ export const ContextMenuRoot = ilha
     bindSync = createOpenBindSync(input, controller);
     bindSync?.applyFromSignal();
     contextMenuControllers.set(root, controller);
+    contextMenuBindRuntimeByHost.set(host, { controller, bindSync });
 
     return () => {
+      contextMenuBindRuntimeByHost.delete(host);
       contextMenuControllers.delete(root);
       controller.destroy();
     };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
-    const root = host.matches('[data-slot="context-menu"]')
-      ? host
-      : host.querySelector('[data-slot="context-menu"]');
-    if (!root) return;
-
-    createOpenBindSync(
-      input,
-      contextMenuControllers.get(root) ?? ContextMenuPrimitive.createContextMenu(root),
-    )?.applyFromSignal();
+    const runtime = contextMenuBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.bindSync?.applyFromSignal();
   })
   .render(({ input }) => renderContextMenu(input));
 
-export const ContextMenu = Object.assign(ContextMenuRoot, {
+const contextMenuAutoBindScheduled = new WeakSet<Document>();
+
+type ContextMenuAutoRuntime = {
+  controller: ContextMenuPrimitive.ContextMenuController;
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const contextMenuAutoRuntimeByRoot = new WeakMap<Element, ContextMenuAutoRuntime>();
+
+function scheduleContextMenuAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || contextMenuAutoBindScheduled.has(doc)) return;
+  contextMenuAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    contextMenuAutoBindScheduled.delete(doc);
+    const queued = takeOpenBindQueue(doc);
+    let queueIndex = 0;
+
+    for (const root of doc.querySelectorAll<HTMLElement>(
+      '[data-areia-context-menu][data-slot="context-menu"]',
+    )) {
+      const trigger = root.querySelector('[data-slot="context-menu-trigger"]');
+      const content = root.querySelector('[data-slot="context-menu-content"]');
+      if (!trigger || !content) continue;
+
+      const existing = contextMenuAutoRuntimeByRoot.get(root);
+      if (existing) {
+        existing.bindSync?.applyFromSignal();
+        continue;
+      }
+
+      const entry = queued[queueIndex++];
+      let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
+      const controller = ContextMenuPrimitive.createContextMenu(root, {
+        onOpenChange: (open) => bindSync?.onUserChange(open),
+      });
+
+      if (entry) {
+        bindSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
+        bindSync?.applyFromSignal();
+      }
+
+      contextMenuControllers.set(root, controller);
+      contextMenuAutoRuntimeByRoot.set(root, { controller, bindSync });
+    }
+  });
+}
+
+function needsContextMenuIsland(input: ContextMenuInput) {
+  return input.onOpenChange != null || input.onSelect != null || input.onPortalMounted != null;
+}
+
+function ContextMenuComponent(input: ContextMenuInput = {}) {
+  if (needsContextMenuIsland(input)) return ContextMenuRoot(input);
+  scheduleContextMenuAutoBind();
+  return renderContextMenu(input, true);
+}
+
+export const ContextMenu = Object.assign(ContextMenuComponent, {
   Root: ContextMenuRoot,
   Static: renderContextMenu,
   Trigger: ContextMenuTrigger,
