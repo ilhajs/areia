@@ -8,6 +8,15 @@ describe("ToggleGroup", () => {
     expect(output).toContain('data-slot="toggle-group"');
   });
 
+  it("marks default export for static slot auto-bind", () => {
+    const output = markup(
+      ToggleGroup({
+        children: ToggleGroup.Item({ value: "a", children: "A" }),
+      }),
+    );
+    expect(output).toContain("data-areia-toggle-group");
+  });
+
   it("sets data-type to single by default", () => {
     const output = markup(ToggleGroup({}));
     expect(output).toContain('data-type="single"');

@@ -3,6 +3,7 @@ import { ToggleGroup as ToggleGroupPrimitive } from "@areia/slots";
 import {
   createGroupBindSync,
   groupBindDefault,
+  splitBindProps,
   subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
@@ -90,7 +91,7 @@ function ToggleGroupItem(input: ToggleGroupItemInput = {} as ToggleGroupItemInpu
   </button>`;
 }
 
-function renderToggleGroup(input: ToggleGroupInput = {}) {
+function renderToggleGroup(input: ToggleGroupInput = {}, autoBind = false) {
   const {
     children,
     class: className,
@@ -125,6 +126,7 @@ function renderToggleGroup(input: ToggleGroupInput = {}) {
         "data-orientation": orientation,
         "data-loop": loop,
         "data-disabled": disabled,
+        "data-areia-toggle-group": autoBind ? "" : undefined,
       }),
     )}
   >
@@ -186,6 +188,33 @@ const ToggleGroupRoot = ilha
   })
   .render(({ input }) => renderToggleGroup(input));
 
+const toggleGroupAutoBindScheduled = new WeakSet<Document>();
+
+function scheduleToggleGroupAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || toggleGroupAutoBindScheduled.has(doc)) return;
+  toggleGroupAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    toggleGroupAutoBindScheduled.delete(doc);
+    for (const root of doc.querySelectorAll(
+      '[data-areia-toggle-group][data-slot="toggle-group"]',
+    )) {
+      ToggleGroupPrimitive.createToggleGroup(root);
+    }
+  });
+}
+
+function needsToggleGroupIsland(input: ToggleGroupInput) {
+  if (input.onValueChange != null) return true;
+  const { binds } = splitBindProps(input);
+  return binds["bind:group"] != null;
+}
+
+function ToggleGroupComponent(input: ToggleGroupInput = {}) {
+  if (needsToggleGroupIsland(input)) return ToggleGroupRoot(input);
+  scheduleToggleGroupAutoBind();
+  return renderToggleGroup(input, true);
+}
+
 export type ToggleGroupSeparatorInput = Omit<
   HTMLElementProps<HTMLDivElement>,
   "className" | "children"
@@ -205,7 +234,7 @@ function ToggleGroupSeparator(input: ToggleGroupSeparatorInput = {}) {
   ></div>`;
 }
 
-export const ToggleGroup = Object.assign(ToggleGroupRoot, {
+export const ToggleGroup = Object.assign(ToggleGroupComponent, {
   Root: ToggleGroupRoot,
   Static: renderToggleGroup,
   Item: ToggleGroupItem,

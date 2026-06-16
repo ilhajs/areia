@@ -29,6 +29,16 @@ describe("Toggle", () => {
     expect(output).toContain("Bold");
   });
 
+  it("marks default export for static slot auto-bind", () => {
+    const output = markup(Toggle({ children: "Bold" }));
+    expect(output).toContain("data-areia-toggle");
+  });
+
+  it("omits static auto-bind marker when onPressedChange is set", () => {
+    const output = markup(Toggle({ children: "Bold", onPressedChange: () => {} }));
+    expect(output).not.toContain("data-areia-toggle");
+  });
+
   it("sets data-default-pressed", () => {
     const output = markup(Toggle({ defaultPressed: true }));
     expect(output).toContain('data-default-pressed=""');

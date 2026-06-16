@@ -34,6 +34,16 @@ describe("Switch", () => {
     expect(output).toContain('data-slot="switch"');
   });
 
+  it("marks default export for static slot auto-bind", () => {
+    const output = markup(Switch({ label: "Enable" }));
+    expect(output).toContain("data-areia-switch");
+  });
+
+  it("omits static auto-bind marker when onCheckedChange is set", () => {
+    const output = markup(Switch({ onCheckedChange: () => {} }));
+    expect(output).not.toContain("data-areia-switch");
+  });
+
   it("renders label wrapper when label is provided", () => {
     const output = markup(Switch({ label: "Enable" }));
     expect(output).toContain("Enable");

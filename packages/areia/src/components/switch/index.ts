@@ -140,7 +140,7 @@ function dataAttrs(
   });
 }
 
-function SwitchControl(input: SwitchControlInput = {}) {
+function SwitchControl(input: SwitchControlInput = {}, autoBind = false) {
   const { binds, attrs: restProps } = splitBindProps(input);
   const {
     checked,
@@ -210,6 +210,7 @@ function SwitchControl(input: SwitchControlInput = {}) {
         "aria-label": ariaLabel,
         "aria-labelledby": ariaLabelledby,
         "aria-describedby": ariaDescribedby,
+        "data-areia-switch": autoBind ? "" : undefined,
       }),
     )}
   >
@@ -241,7 +242,7 @@ function SwitchControl(input: SwitchControlInput = {}) {
   </span>`;
 }
 
-function renderSwitch(input: SwitchInput = {}) {
+function renderSwitch(input: SwitchInput = {}, autoBind = false) {
   const {
     label,
     labelTooltip,
@@ -254,13 +255,16 @@ function renderSwitch(input: SwitchInput = {}) {
   } = input;
   const controlId = typeof id === "string" ? id : undefined;
   const ariaLabel = controlProps["aria-label"] ?? (typeof label === "string" ? label : "Switch");
-  const control = SwitchControl({
-    ...controlProps,
-    id: controlId,
-    disabled: Boolean(disabled),
-    required: typeof required === "boolean" ? required : undefined,
-    "aria-label": ariaLabel,
-  });
+  const control = SwitchControl(
+    {
+      ...controlProps,
+      id: controlId,
+      disabled: Boolean(disabled),
+      required: typeof required === "boolean" ? required : undefined,
+      "aria-label": ariaLabel,
+    },
+    autoBind,
+  );
 
   if (label == null) return control;
 
@@ -418,11 +422,38 @@ export const SwitchRoot = ilha
   })
   .render(({ input }) => renderSwitch(input));
 
+const switchAutoBindScheduled = new WeakSet<Document>();
+
+function scheduleSwitchAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || switchAutoBindScheduled.has(doc)) return;
+  switchAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    switchAutoBindScheduled.delete(doc);
+    for (const root of doc.querySelectorAll<HTMLElement>(
+      '[data-areia-switch][data-slot="switch"]',
+    )) {
+      SwitchPrimitive.createSwitch(root);
+    }
+  });
+}
+
+function needsSwitchIsland(input: SwitchInput) {
+  if (input.onCheckedChange != null) return true;
+  const { binds } = splitBindProps(input);
+  return binds["bind:checked"] != null || binds["bind:group"] != null;
+}
+
+function SwitchComponent(input: SwitchInput = {}) {
+  if (needsSwitchIsland(input)) return SwitchRoot(input);
+  scheduleSwitchAutoBind();
+  return renderSwitch(input, true);
+}
+
 function SwitchBase(input: SwitchInput = {}) {
   return renderSwitch(input);
 }
 
-export const Switch = Object.assign(SwitchRoot, {
+export const Switch = Object.assign(SwitchComponent, {
   Root: SwitchRoot,
   Static: SwitchBase,
   Item: SwitchItem,
