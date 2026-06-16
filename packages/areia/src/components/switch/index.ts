@@ -3,10 +3,11 @@ import { Switch as SwitchPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
   createCheckedBindSync,
-  queueCheckedBindForAutoMount,
+  queueSwitchCheckedBindForAutoMount,
+  runCheckedControlAutoBindAfterIlha,
   splitBindProps,
   subscribeBindProps,
-  takeCheckedBindQueue,
+  takeSwitchCheckedBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -250,7 +251,7 @@ function renderSwitch(input: SwitchInput = {}, autoBind = false) {
     const { binds } = splitBindProps(input);
     if (binds["bind:checked"] != null || binds["bind:group"] != null) {
       const itemValue = typeof input.value === "string" ? input.value : undefined;
-      queueCheckedBindForAutoMount(
+      queueSwitchCheckedBindForAutoMount(
         {
           "bind:checked": binds["bind:checked"] as IlhaBindProps["bind:checked"],
           "bind:group": binds["bind:group"] as IlhaBindProps["bind:group"],
@@ -461,45 +462,57 @@ type SwitchAutoRuntime = {
 
 const switchAutoRuntimeByRoot = new WeakMap<Element, SwitchAutoRuntime>();
 
+function mountSwitchAutoBindRoots(doc: Document) {
+  const queued = takeSwitchCheckedBindQueue(doc);
+  let queueIndex = 0;
+
+  for (const root of doc.querySelectorAll<HTMLElement>('[data-areia-switch][data-slot="switch"]')) {
+    const existing = switchAutoRuntimeByRoot.get(root);
+    if (existing) {
+      existing.bindSync?.applyFromSignal();
+      continue;
+    }
+
+    const entry = queued[queueIndex++];
+    let bindSync: ReturnType<typeof createCheckedBindSync> = null;
+    const bindInput = entry
+      ? {
+          ...(entry.bindChecked != null ? { "bind:checked": entry.bindChecked } : {}),
+          ...(entry.bindGroup != null ? { "bind:group": entry.bindGroup } : {}),
+        }
+      : {};
+
+    const hiddenInput = root.querySelector<HTMLInputElement>('[data-slot="switch-input"]');
+    const ilhaBound = hiddenInput?.hasAttribute("data-ilha-bind") ?? false;
+    const defaultChecked =
+      entry?.bindChecked != null
+        ? Boolean(entry.bindChecked())
+        : ilhaBound && hiddenInput
+          ? hiddenInput.checked
+          : undefined;
+
+    const controller = SwitchPrimitive.createSwitch(root, {
+      defaultChecked,
+      onCheckedChange: (checked) => {
+        bindSync?.onUserChange(checked);
+      },
+    });
+
+    if (entry && (entry.bindChecked != null || entry.bindGroup != null)) {
+      bindSync = createCheckedBindSync(bindInput, controller, entry.itemValue);
+      bindSync?.applyFromSignal();
+    }
+
+    switchAutoRuntimeByRoot.set(root, { controller, bindSync });
+  }
+}
+
 function scheduleSwitchAutoBind(doc: Document | undefined = globalThis.document) {
   if (!doc || switchAutoBindScheduled.has(doc)) return;
   switchAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
+  runCheckedControlAutoBindAfterIlha(doc, () => {
     switchAutoBindScheduled.delete(doc);
-    const queued = takeCheckedBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-switch][data-slot="switch"]',
-    )) {
-      const existing = switchAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.bindSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      let bindSync: ReturnType<typeof createCheckedBindSync> = null;
-      const bindInput = entry
-        ? {
-            ...(entry.bindChecked != null ? { "bind:checked": entry.bindChecked } : {}),
-            ...(entry.bindGroup != null ? { "bind:group": entry.bindGroup } : {}),
-          }
-        : {};
-
-      const controller = SwitchPrimitive.createSwitch(root, {
-        onCheckedChange: (checked) => {
-          bindSync?.onUserChange(checked);
-        },
-      });
-
-      if (entry && (entry.bindChecked != null || entry.bindGroup != null)) {
-        bindSync = createCheckedBindSync(bindInput, controller, entry.itemValue);
-        bindSync?.applyFromSignal();
-      }
-
-      switchAutoRuntimeByRoot.set(root, { controller, bindSync });
-    }
+    mountSwitchAutoBindRoots(doc);
   });
 }
 

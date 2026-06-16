@@ -6,10 +6,10 @@ import {
   boundElement,
   createOpenBindSync,
   openBindDefault,
-  queueOpenBindForAutoMount,
+  queueHoverCardOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeOpenBindQueue,
+  takeHoverCardOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -300,7 +300,9 @@ function renderHoverCard(input: HoverCardInput = {}, autoBind = false) {
   const defaultOpen = openBindDefault(input, defaultOpenProp);
 
   if (autoBind && binds["bind:open"] != null) {
-    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+    queueHoverCardOpenBindForAutoMount(
+      binds["bind:open"] as import("ilha").SignalAccessor<boolean>,
+    );
   }
 
   const composedChildren = render(children);
@@ -428,7 +430,7 @@ function scheduleHoverCardAutoBind(doc: Document | undefined = globalThis.docume
   hoverCardAutoBindScheduled.add(doc);
   queueMicrotask(() => {
     hoverCardAutoBindScheduled.delete(doc);
-    const queued = takeOpenBindQueue(doc);
+    const queued = takeHoverCardOpenBindQueue(doc);
     let queueIndex = 0;
 
     for (const root of doc.querySelectorAll<HTMLElement>(

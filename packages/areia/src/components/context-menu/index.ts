@@ -5,10 +5,10 @@ const contextMenuControllers = new WeakMap<Element, ContextMenuPrimitive.Context
 import {
   boundElement,
   createOpenBindSync,
-  queueOpenBindForAutoMount,
+  queueContextMenuOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeOpenBindQueue,
+  takeContextMenuOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -147,7 +147,9 @@ function renderContextMenu(input: ContextMenuInput = {}, autoBind = false) {
   } = props as ContextMenuInput;
 
   if (autoBind && binds["bind:open"] != null) {
-    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+    queueContextMenuOpenBindForAutoMount(
+      binds["bind:open"] as import("ilha").SignalAccessor<boolean>,
+    );
   }
 
   const composedChildren = render(children);
@@ -231,7 +233,7 @@ function scheduleContextMenuAutoBind(doc: Document | undefined = globalThis.docu
   contextMenuAutoBindScheduled.add(doc);
   queueMicrotask(() => {
     contextMenuAutoBindScheduled.delete(doc);
-    const queued = takeOpenBindQueue(doc);
+    const queued = takeContextMenuOpenBindQueue(doc);
     let queueIndex = 0;
 
     for (const root of doc.querySelectorAll<HTMLElement>(

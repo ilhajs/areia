@@ -4,10 +4,10 @@ import {
   boundElement,
   createGroupBindSync,
   groupBindDefault,
-  queueGroupBindForAutoMount,
+  queueTabsGroupBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeGroupBindQueue,
+  takeTabsGroupBindQueue,
   type GroupBindAccessor,
   type IlhaBindProps,
 } from "$lib/binds";
@@ -438,7 +438,7 @@ function renderTabs(input: TabsInput = {}, autoBind = false) {
   })}`;
 
   if (autoBind && binds["bind:group"] != null) {
-    queueGroupBindForAutoMount(binds["bind:group"] as GroupBindAccessor, "single");
+    queueTabsGroupBindForAutoMount(binds["bind:group"] as GroupBindAccessor, "single");
   }
 
   return boundElement("div", binds, openSuffix, inner);
@@ -632,7 +632,7 @@ function scheduleTabsAutoBind(doc: Document | undefined = globalThis.document) {
   tabsAutoBindScheduled.add(doc);
   queueMicrotask(() => {
     tabsAutoBindScheduled.delete(doc);
-    const queued = takeGroupBindQueue(doc);
+    const queued = takeTabsGroupBindQueue(doc);
     let queueIndex = 0;
 
     for (const root of doc.querySelectorAll<HTMLElement>('[data-areia-tabs][data-slot="tabs"]')) {

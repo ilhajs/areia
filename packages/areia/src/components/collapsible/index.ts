@@ -7,10 +7,10 @@ import {
   boundElement,
   createOpenBindSync,
   openBindDefault,
-  queueOpenBindForAutoMount,
+  queueCollapsibleOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeOpenBindQueue,
+  takeCollapsibleOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -222,7 +222,9 @@ export function CollapsibleRoot(input: CollapsibleRootInput = {}, autoBind = fal
   } = props as CollapsibleRootInput;
 
   if (autoBind && binds["bind:open"] != null) {
-    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+    queueCollapsibleOpenBindForAutoMount(
+      binds["bind:open"] as import("ilha").SignalAccessor<boolean>,
+    );
   }
 
   const openSuffix = ` data-slot="collapsible" class="${cn(
@@ -478,7 +480,7 @@ function scheduleCollapsibleAutoBind(doc: Document | undefined = globalThis.docu
   collapsibleAutoBindScheduled.add(doc);
   queueMicrotask(() => {
     collapsibleAutoBindScheduled.delete(doc);
-    const queued = takeOpenBindQueue(doc);
+    const queued = takeCollapsibleOpenBindQueue(doc);
     let queueIndex = 0;
 
     for (const root of doc.querySelectorAll<HTMLElement>(

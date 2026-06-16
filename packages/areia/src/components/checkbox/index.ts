@@ -3,10 +3,11 @@ import { Checkbox as CheckboxPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
   createCheckedBindSync,
-  queueCheckedBindForAutoMount,
+  queueCheckboxCheckedBindForAutoMount,
+  runCheckedControlAutoBindAfterIlha,
   splitBindProps,
   subscribeBindProps,
-  takeCheckedBindQueue,
+  takeCheckboxCheckedBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -233,7 +234,7 @@ function renderCheckbox(input: CheckboxInput = {}, autoBind = false) {
     const { binds } = splitBindProps(input);
     if (binds["bind:checked"] != null || binds["bind:group"] != null) {
       const itemValue = typeof input.value === "string" ? input.value : undefined;
-      queueCheckedBindForAutoMount(
+      queueCheckboxCheckedBindForAutoMount(
         {
           "bind:checked": binds["bind:checked"] as IlhaBindProps["bind:checked"],
           "bind:group": binds["bind:group"] as IlhaBindProps["bind:group"],
@@ -415,45 +416,59 @@ type CheckboxAutoRuntime = {
 
 const checkboxAutoRuntimeByRoot = new WeakMap<Element, CheckboxAutoRuntime>();
 
+function mountCheckboxAutoBindRoots(doc: Document) {
+  const queued = takeCheckboxCheckedBindQueue(doc);
+  let queueIndex = 0;
+
+  for (const root of doc.querySelectorAll<HTMLElement>(
+    '[data-areia-checkbox][data-slot="checkbox"]',
+  )) {
+    const existing = checkboxAutoRuntimeByRoot.get(root);
+    if (existing) {
+      existing.bindSync?.applyFromSignal();
+      continue;
+    }
+
+    const entry = queued[queueIndex++];
+    let bindSync: ReturnType<typeof createCheckedBindSync> = null;
+    const bindInput = entry
+      ? {
+          ...(entry.bindChecked != null ? { "bind:checked": entry.bindChecked } : {}),
+          ...(entry.bindGroup != null ? { "bind:group": entry.bindGroup } : {}),
+        }
+      : {};
+
+    const hiddenInput = root.querySelector<HTMLInputElement>('[data-slot="checkbox-input"]');
+    const ilhaBound = hiddenInput?.hasAttribute("data-ilha-bind") ?? false;
+    const defaultChecked =
+      entry?.bindChecked != null
+        ? Boolean(entry.bindChecked())
+        : ilhaBound && hiddenInput
+          ? hiddenInput.checked
+          : undefined;
+
+    const controller = CheckboxPrimitive.createCheckbox(root, {
+      defaultChecked,
+      onCheckedChange: (checked) => {
+        bindSync?.onUserChange(checked);
+      },
+    });
+
+    if (entry && (entry.bindChecked != null || entry.bindGroup != null)) {
+      bindSync = createCheckedBindSync(bindInput, controller, entry.itemValue);
+      bindSync?.applyFromSignal();
+    }
+
+    checkboxAutoRuntimeByRoot.set(root, { controller, bindSync });
+  }
+}
+
 function scheduleCheckboxAutoBind(doc: Document | undefined = globalThis.document) {
   if (!doc || checkboxAutoBindScheduled.has(doc)) return;
   checkboxAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
+  runCheckedControlAutoBindAfterIlha(doc, () => {
     checkboxAutoBindScheduled.delete(doc);
-    const queued = takeCheckedBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-checkbox][data-slot="checkbox"]',
-    )) {
-      const existing = checkboxAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.bindSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      let bindSync: ReturnType<typeof createCheckedBindSync> = null;
-      const bindInput = entry
-        ? {
-            ...(entry.bindChecked != null ? { "bind:checked": entry.bindChecked } : {}),
-            ...(entry.bindGroup != null ? { "bind:group": entry.bindGroup } : {}),
-          }
-        : {};
-
-      const controller = CheckboxPrimitive.createCheckbox(root, {
-        onCheckedChange: (checked) => {
-          bindSync?.onUserChange(checked);
-        },
-      });
-
-      if (entry && (entry.bindChecked != null || entry.bindGroup != null)) {
-        bindSync = createCheckedBindSync(bindInput, controller, entry.itemValue);
-        bindSync?.applyFromSignal();
-      }
-
-      checkboxAutoRuntimeByRoot.set(root, { controller, bindSync });
-    }
+    mountCheckboxAutoBindRoots(doc);
   });
 }
 

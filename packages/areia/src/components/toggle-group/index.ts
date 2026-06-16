@@ -4,10 +4,10 @@ import {
   boundElement,
   createGroupBindSync,
   groupBindDefault,
-  queueGroupBindForAutoMount,
+  queueToggleGroupBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeGroupBindQueue,
+  takeToggleGroupBindQueue,
   type GroupBindAccessor,
   type IlhaBindProps,
 } from "$lib/binds";
@@ -134,7 +134,7 @@ function renderToggleGroup(input: ToggleGroupInput = {}, autoBind = false) {
   })}`;
 
   if (autoBind && binds["bind:group"] != null) {
-    queueGroupBindForAutoMount(
+    queueToggleGroupBindForAutoMount(
       binds["bind:group"] as GroupBindAccessor,
       type === "multiple" ? "multiple" : "single",
     );
@@ -216,7 +216,7 @@ function scheduleToggleGroupAutoBind(doc: Document | undefined = globalThis.docu
   toggleGroupAutoBindScheduled.add(doc);
   queueMicrotask(() => {
     toggleGroupAutoBindScheduled.delete(doc);
-    const queued = takeGroupBindQueue(doc);
+    const queued = takeToggleGroupBindQueue(doc);
     let queueIndex = 0;
 
     for (const root of doc.querySelectorAll<HTMLElement>(

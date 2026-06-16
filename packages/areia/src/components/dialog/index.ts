@@ -6,10 +6,10 @@ import {
   boundElement,
   createOpenBindSync,
   openBindDefault,
-  queueOpenBindForAutoMount,
+  queueDialogOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeOpenBindQueue,
+  takeDialogOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -342,7 +342,7 @@ function renderDialog(input: DialogInput = {}, autoBind = false) {
   } = props as DialogInput;
 
   if (autoBind && binds["bind:open"] != null) {
-    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+    queueDialogOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
   }
 
   const isAlertDialog = alertDialog ?? role === "alertdialog";
@@ -455,7 +455,7 @@ function scheduleDialogAutoBind(doc: Document | undefined = globalThis.document)
   dialogAutoBindScheduled.add(doc);
   queueMicrotask(() => {
     dialogAutoBindScheduled.delete(doc);
-    const queued = takeOpenBindQueue(doc);
+    const queued = takeDialogOpenBindQueue(doc);
     let queueIndex = 0;
 
     for (const root of doc.querySelectorAll<HTMLElement>(

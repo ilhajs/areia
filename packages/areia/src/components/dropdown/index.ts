@@ -7,10 +7,10 @@ import {
   boundElement,
   createOpenBindSync,
   openBindDefault,
-  queueOpenBindForAutoMount,
+  queueDropdownOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeOpenBindQueue,
+  takeDropdownOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { Icon } from "$components/icon";
@@ -408,7 +408,7 @@ function renderDropdown(input: DropdownInput = {}, autoBind = false) {
   const defaultOpen = openBindDefault(input, defaultOpenProp);
 
   if (autoBind && binds["bind:open"] != null) {
-    queueOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
+    queueDropdownOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
   }
 
   const composedChildren = render(children);
@@ -522,7 +522,7 @@ function scheduleDropdownAutoBind(doc: Document | undefined = globalThis.documen
   dropdownAutoBindScheduled.add(doc);
   queueMicrotask(() => {
     dropdownAutoBindScheduled.delete(doc);
-    const queued = takeOpenBindQueue(doc);
+    const queued = takeDropdownOpenBindQueue(doc);
     let queueIndex = 0;
 
     for (const root of doc.querySelectorAll<HTMLElement>(

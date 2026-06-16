@@ -219,47 +219,184 @@ export type QueuedGroupBind = {
   mode: GroupBindMode;
 };
 
-const groupBindQueueByDoc = new WeakMap<Document, QueuedGroupBind[]>();
+const tabsGroupBindQueueByDoc = new WeakMap<Document, QueuedGroupBind[]>();
+const toggleGroupBindQueueByDoc = new WeakMap<Document, QueuedGroupBind[]>();
 
-/** Register `bind:group` for the next auto-mount of tabs/toggle-group on this document. */
+function pushGroupBindQueue(
+  map: WeakMap<Document, QueuedGroupBind[]>,
+  bindGroup: GroupBindAccessor | undefined,
+  mode: GroupBindMode,
+  doc: Document,
+) {
+  if (!bindGroup) return;
+  const queue = map.get(doc) ?? [];
+  queue.push({ bindGroup, mode });
+  map.set(doc, queue);
+}
+
+function takeGroupBindQueueFrom(
+  map: WeakMap<Document, QueuedGroupBind[]>,
+  doc: Document,
+): QueuedGroupBind[] {
+  const queue = map.get(doc) ?? [];
+  map.delete(doc);
+  return queue;
+}
+
+export function queueTabsGroupBindForAutoMount(
+  bindGroup: GroupBindAccessor | undefined,
+  mode: GroupBindMode = "single",
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushGroupBindQueue(tabsGroupBindQueueByDoc, bindGroup, mode, doc);
+}
+
+export function queueToggleGroupBindForAutoMount(
+  bindGroup: GroupBindAccessor | undefined,
+  mode: GroupBindMode = "single",
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushGroupBindQueue(toggleGroupBindQueueByDoc, bindGroup, mode, doc);
+}
+
+/** @deprecated Use queueTabsGroupBindForAutoMount or queueToggleGroupBindForAutoMount. */
 export function queueGroupBindForAutoMount(
   bindGroup: GroupBindAccessor | undefined,
   mode: GroupBindMode = "single",
   doc: Document | undefined = globalThis.document,
 ) {
-  if (!bindGroup || !doc) return;
-  const queue = groupBindQueueByDoc.get(doc) ?? [];
-  queue.push({ bindGroup, mode });
-  groupBindQueueByDoc.set(doc, queue);
+  queueTabsGroupBindForAutoMount(bindGroup, mode, doc);
 }
 
+export function takeTabsGroupBindQueue(doc: Document): QueuedGroupBind[] {
+  return takeGroupBindQueueFrom(tabsGroupBindQueueByDoc, doc);
+}
+
+export function takeToggleGroupBindQueue(doc: Document): QueuedGroupBind[] {
+  return takeGroupBindQueueFrom(toggleGroupBindQueueByDoc, doc);
+}
+
+/** @deprecated Use takeTabsGroupBindQueue or takeToggleGroupBindQueue. */
 export function takeGroupBindQueue(doc: Document): QueuedGroupBind[] {
-  const queue = groupBindQueueByDoc.get(doc) ?? [];
-  groupBindQueueByDoc.delete(doc);
-  return queue;
+  return takeTabsGroupBindQueue(doc);
 }
 
 export type QueuedOpenBind = {
   bindOpen: SignalAccessor<boolean>;
 };
 
-const openBindQueueByDoc = new WeakMap<Document, QueuedOpenBind[]>();
+const popoverOpenBindQueueByDoc = new WeakMap<Document, QueuedOpenBind[]>();
+const dialogOpenBindQueueByDoc = new WeakMap<Document, QueuedOpenBind[]>();
+const collapsibleOpenBindQueueByDoc = new WeakMap<Document, QueuedOpenBind[]>();
+const dropdownOpenBindQueueByDoc = new WeakMap<Document, QueuedOpenBind[]>();
+const contextMenuOpenBindQueueByDoc = new WeakMap<Document, QueuedOpenBind[]>();
+const hoverCardOpenBindQueueByDoc = new WeakMap<Document, QueuedOpenBind[]>();
 
-/** Register `bind:open` for the next auto-mount of overlay widgets on this document. */
+function pushOpenBindQueue(
+  map: WeakMap<Document, QueuedOpenBind[]>,
+  bindOpen: SignalAccessor<boolean> | undefined,
+  doc: Document,
+) {
+  if (!bindOpen) return;
+  const queue = map.get(doc) ?? [];
+  queue.push({ bindOpen });
+  map.set(doc, queue);
+}
+
+function takeOpenBindQueueFrom(
+  map: WeakMap<Document, QueuedOpenBind[]>,
+  doc: Document,
+): QueuedOpenBind[] {
+  const queue = map.get(doc) ?? [];
+  map.delete(doc);
+  return queue;
+}
+
+export function queuePopoverOpenBindForAutoMount(
+  bindOpen: SignalAccessor<boolean> | undefined,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushOpenBindQueue(popoverOpenBindQueueByDoc, bindOpen, doc);
+}
+
+export function queueDialogOpenBindForAutoMount(
+  bindOpen: SignalAccessor<boolean> | undefined,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushOpenBindQueue(dialogOpenBindQueueByDoc, bindOpen, doc);
+}
+
+export function queueCollapsibleOpenBindForAutoMount(
+  bindOpen: SignalAccessor<boolean> | undefined,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushOpenBindQueue(collapsibleOpenBindQueueByDoc, bindOpen, doc);
+}
+
+export function queueDropdownOpenBindForAutoMount(
+  bindOpen: SignalAccessor<boolean> | undefined,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushOpenBindQueue(dropdownOpenBindQueueByDoc, bindOpen, doc);
+}
+
+export function queueContextMenuOpenBindForAutoMount(
+  bindOpen: SignalAccessor<boolean> | undefined,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushOpenBindQueue(contextMenuOpenBindQueueByDoc, bindOpen, doc);
+}
+
+export function queueHoverCardOpenBindForAutoMount(
+  bindOpen: SignalAccessor<boolean> | undefined,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushOpenBindQueue(hoverCardOpenBindQueueByDoc, bindOpen, doc);
+}
+
+/** @deprecated Use the per-component queue*OpenBindForAutoMount helpers. */
 export function queueOpenBindForAutoMount(
   bindOpen: SignalAccessor<boolean> | undefined,
   doc: Document | undefined = globalThis.document,
 ) {
-  if (!bindOpen || !doc) return;
-  const queue = openBindQueueByDoc.get(doc) ?? [];
-  queue.push({ bindOpen });
-  openBindQueueByDoc.set(doc, queue);
+  queuePopoverOpenBindForAutoMount(bindOpen, doc);
 }
 
+export function takePopoverOpenBindQueue(doc: Document): QueuedOpenBind[] {
+  return takeOpenBindQueueFrom(popoverOpenBindQueueByDoc, doc);
+}
+
+export function takeDialogOpenBindQueue(doc: Document): QueuedOpenBind[] {
+  return takeOpenBindQueueFrom(dialogOpenBindQueueByDoc, doc);
+}
+
+export function takeCollapsibleOpenBindQueue(doc: Document): QueuedOpenBind[] {
+  return takeOpenBindQueueFrom(collapsibleOpenBindQueueByDoc, doc);
+}
+
+export function takeDropdownOpenBindQueue(doc: Document): QueuedOpenBind[] {
+  return takeOpenBindQueueFrom(dropdownOpenBindQueueByDoc, doc);
+}
+
+export function takeContextMenuOpenBindQueue(doc: Document): QueuedOpenBind[] {
+  return takeOpenBindQueueFrom(contextMenuOpenBindQueueByDoc, doc);
+}
+
+export function takeHoverCardOpenBindQueue(doc: Document): QueuedOpenBind[] {
+  return takeOpenBindQueueFrom(hoverCardOpenBindQueueByDoc, doc);
+}
+
+/** @deprecated Use the per-component take*OpenBindQueue helpers. */
 export function takeOpenBindQueue(doc: Document): QueuedOpenBind[] {
-  const queue = openBindQueueByDoc.get(doc) ?? [];
-  openBindQueueByDoc.delete(doc);
-  return queue;
+  return takePopoverOpenBindQueue(doc);
 }
 
 export type QueuedComboboxBind = {
@@ -297,29 +434,86 @@ export type QueuedCheckedBind = {
   itemValue?: string;
 };
 
-const checkedBindQueueByDoc = new WeakMap<Document, QueuedCheckedBind[]>();
+const switchCheckedBindQueueByDoc = new WeakMap<Document, QueuedCheckedBind[]>();
+const checkboxCheckedBindQueueByDoc = new WeakMap<Document, QueuedCheckedBind[]>();
 
-/** Register `bind:checked` / `bind:group` for the next switch/checkbox auto-mount pass. */
-export function queueCheckedBindForAutoMount(
+function pushCheckedBindQueue(
+  map: WeakMap<Document, QueuedCheckedBind[]>,
   binds: Partial<Pick<IlhaBindProps, "bind:checked" | "bind:group">>,
-  itemValue?: string,
-  doc: Document | undefined = globalThis.document,
+  itemValue: string | undefined,
+  doc: Document,
 ) {
-  if (!doc) return;
   if (binds["bind:checked"] == null && binds["bind:group"] == null) return;
-  const queue = checkedBindQueueByDoc.get(doc) ?? [];
+  const queue = map.get(doc) ?? [];
   queue.push({
     bindChecked: binds["bind:checked"],
     bindGroup: binds["bind:group"],
     itemValue,
   });
-  checkedBindQueueByDoc.set(doc, queue);
+  map.set(doc, queue);
 }
 
-export function takeCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
-  const queue = checkedBindQueueByDoc.get(doc) ?? [];
-  checkedBindQueueByDoc.delete(doc);
+function takeCheckedBindQueueFrom(
+  map: WeakMap<Document, QueuedCheckedBind[]>,
+  doc: Document,
+): QueuedCheckedBind[] {
+  const queue = map.get(doc) ?? [];
+  map.delete(doc);
   return queue;
+}
+
+/** Register switch `bind:checked` / `bind:group` for the next switch auto-mount pass. */
+export function queueSwitchCheckedBindForAutoMount(
+  binds: Partial<Pick<IlhaBindProps, "bind:checked" | "bind:group">>,
+  itemValue?: string,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushCheckedBindQueue(switchCheckedBindQueueByDoc, binds, itemValue, doc);
+}
+
+/** Register checkbox `bind:checked` / `bind:group` for the next checkbox auto-mount pass. */
+export function queueCheckboxCheckedBindForAutoMount(
+  binds: Partial<Pick<IlhaBindProps, "bind:checked" | "bind:group">>,
+  itemValue?: string,
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  pushCheckedBindQueue(checkboxCheckedBindQueueByDoc, binds, itemValue, doc);
+}
+
+/** @deprecated Use queueSwitchCheckedBindForAutoMount or queueCheckboxCheckedBindForAutoMount. */
+export function queueCheckedBindForAutoMount(
+  binds: Partial<Pick<IlhaBindProps, "bind:checked" | "bind:group">>,
+  itemValue?: string,
+  doc: Document | undefined = globalThis.document,
+) {
+  queueSwitchCheckedBindForAutoMount(binds, itemValue, doc);
+}
+
+export function takeSwitchCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
+  return takeCheckedBindQueueFrom(switchCheckedBindQueueByDoc, doc);
+}
+
+export function takeCheckboxCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
+  return takeCheckedBindQueueFrom(checkboxCheckedBindQueueByDoc, doc);
+}
+
+/** @deprecated Use takeSwitchCheckedBindQueue or takeCheckboxCheckedBindQueue. */
+export function takeCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
+  return takeSwitchCheckedBindQueue(doc);
+}
+
+/**
+ * Run switch/checkbox auto-bind after Ilha `applyTemplateBindings` has written
+ * `bind:checked` onto hidden inputs (avoids stale `embeddedInput.checked` on mount).
+ */
+export function runCheckedControlAutoBindAfterIlha(_doc: Document, run: () => void): void {
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(() => queueMicrotask(run));
+    return;
+  }
+  queueMicrotask(() => queueMicrotask(run));
 }
 
 export type GroupBindSync = {

@@ -62,7 +62,7 @@ describe("Switch bind:checked in parent island", () => {
       { name: "ProjectCreatorForm", snapshot: true },
     );
     mount({ ProjectCreatorForm }, { root: document.body, lazy: false });
-    await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
     await Promise.resolve();
 
