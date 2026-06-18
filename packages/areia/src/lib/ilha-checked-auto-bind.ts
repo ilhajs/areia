@@ -1,4 +1,5 @@
 import ilha from "ilha";
+import { ensureCheckboxCheckedAutoBindAfterIlhaMount } from "$components/checkbox/index";
 import { ensureSwitchCheckedAutoBindAfterIlhaMount } from "$components/switch/index";
 
 const ISLAND_MOUNT_INTERNAL = Symbol.for("ilha.islandMountInternal");
@@ -6,10 +7,17 @@ const AREIA_MOUNT_PATCHED = Symbol.for("areia.ilhaMountPatched");
 
 let installed = false;
 
-function scheduleSwitchAutoBindPasses(doc: Document) {
+function scheduleCheckedControlAutoBindPasses(doc: Document) {
   ensureSwitchCheckedAutoBindAfterIlhaMount(doc);
-  queueMicrotask(() => ensureSwitchCheckedAutoBindAfterIlhaMount(doc));
-  requestAnimationFrame(() => ensureSwitchCheckedAutoBindAfterIlhaMount(doc));
+  ensureCheckboxCheckedAutoBindAfterIlhaMount(doc);
+  queueMicrotask(() => {
+    ensureSwitchCheckedAutoBindAfterIlhaMount(doc);
+    ensureCheckboxCheckedAutoBindAfterIlhaMount(doc);
+  });
+  requestAnimationFrame(() => {
+    ensureSwitchCheckedAutoBindAfterIlhaMount(doc);
+    ensureCheckboxCheckedAutoBindAfterIlhaMount(doc);
+  });
 }
 
 function patchIslandRegistry(registry: Record<string, unknown>) {
@@ -38,7 +46,7 @@ function patchIslandRegistry(registry: Record<string, unknown>) {
     islandObj.mount = function (host: Element, props?: unknown) {
       const teardown = originalMount.call(island, host, props);
       const doc = host.ownerDocument ?? globalThis.document;
-      scheduleSwitchAutoBindPasses(doc);
+      scheduleCheckedControlAutoBindPasses(doc);
       return teardown;
     };
 
@@ -49,9 +57,12 @@ function patchIslandRegistry(registry: Record<string, unknown>) {
         const updateProps = handle.updateProps;
         handle.updateProps = (next?: Record<string, unknown>) => {
           updateProps(next);
-          queueMicrotask(() => ensureSwitchCheckedAutoBindAfterIlhaMount(doc));
+          queueMicrotask(() => {
+            ensureSwitchCheckedAutoBindAfterIlhaMount(doc);
+            ensureCheckboxCheckedAutoBindAfterIlhaMount(doc);
+          });
         };
-        scheduleSwitchAutoBindPasses(doc);
+        scheduleCheckedControlAutoBindPasses(doc);
         return handle;
       };
     }
@@ -59,7 +70,7 @@ function patchIslandRegistry(registry: Record<string, unknown>) {
 }
 
 /**
- * Re-run switch `bind:checked` auto-mount after Ilha `mount()` and child island updates.
+ * Re-run switch/checkbox checked auto-mount after Ilha `mount()` and child island updates.
  */
 export function installIlhaCheckedControlAutoBindHooks(): void {
   if (installed || typeof globalThis.document === "undefined") return;
@@ -72,7 +83,7 @@ export function installIlhaCheckedControlAutoBindHooks(): void {
     const result = mountAll(registry, options);
     const root = options?.root;
     const doc = root?.ownerDocument ?? globalThis.document;
-    scheduleSwitchAutoBindPasses(doc);
+    scheduleCheckedControlAutoBindPasses(doc);
     return result;
   };
 }

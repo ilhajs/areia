@@ -1,6 +1,14 @@
-import { describe, expect, it } from "bun:test";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Checkbox, checkboxVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered.
+}
 
 describe("checkboxVariants", () => {
   it("returns default classes", () => {
@@ -15,6 +23,16 @@ describe("checkboxVariants", () => {
 });
 
 describe("Checkbox", () => {
+  it("uses CheckboxRoot island when bind:checked is set", () => {
+    const Panel = ilha
+      .state("ok", false)
+      .render(({ state }) => html`${Checkbox({ label: "OK", "bind:checked": state.ok })}`);
+    const output = markup(Panel());
+    expect(output).toContain("data-ilha-bind");
+    expect(output).toContain("data-ilha-slot");
+    expect(output).not.toContain("data-areia-checkbox");
+  });
+
   it("renders control with data-slot", () => {
     const output = markup(Checkbox({}));
     expect(output).toContain('data-slot="checkbox"');
@@ -61,6 +79,42 @@ describe("Checkbox", () => {
     expect(output).toContain("data-todo-checkbox");
     expect(output).toContain('id="terms"');
     expect(output).not.toMatch(/data-slot="checkbox"[^>]*data-params/);
+  });
+
+  describe("bind:checked in nested island", () => {
+    afterEach(() => {
+      document.body.innerHTML = "";
+    });
+
+    it("updates child island signal when nested under parent page", async () => {
+      let readOk!: () => boolean;
+
+      const Child = ilha.state("ok", false).render(({ state }) => {
+        readOk = state.ok as () => boolean;
+        return html`
+          ${Checkbox({ label: "OK", "bind:checked": state.ok })}
+          <span data-testid="flag">${state.ok()}</span>
+        `;
+      });
+
+      const Page = ilha.render(() => html`<div>${Child()}</div>`);
+
+      document.body.innerHTML = await Page.hydratable({}, { name: "Page", snapshot: true });
+      mount({ Page, Child }, { root: document.body, lazy: false });
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      await Promise.resolve();
+      await Promise.resolve();
+
+      const root = document.querySelector('[data-slot="checkbox"]') as HTMLElement | null;
+      expect(readOk()).toBe(false);
+      root?.click();
+      await new Promise<void>((r) => queueMicrotask(() => r()));
+      await new Promise<void>((r) => queueMicrotask(() => r()));
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+
+      expect(readOk()).toBe(true);
+      expect(root?.getAttribute("aria-checked")).toBe("true");
+    });
   });
 });
 

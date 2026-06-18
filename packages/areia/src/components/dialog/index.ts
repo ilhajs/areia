@@ -490,7 +490,8 @@ function scheduleDialogAutoBind(doc: Document | undefined = globalThis.document)
 }
 
 function needsDialogIsland(input: DialogInput) {
-  return input.onOpenChange != null || input.onPortalMounted != null;
+  const { binds } = splitBindProps(input);
+  return input.onOpenChange != null || input.onPortalMounted != null || binds["bind:open"] != null;
 }
 
 function DialogComponent(input: DialogInput = {}) {

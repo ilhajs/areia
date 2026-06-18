@@ -9,6 +9,25 @@ Tab navigation for switching between related views or panels.
 
 `Tabs` is backed by `@areia/slots` and wires accessible tab semantics, keyboard navigation, an animated indicator, optional content panels, and horizontal overflow scrolling after mount.
 
+### Ilha `bind:group`
+
+Inside an Ilha island (including nested child islands), bind the active tab value:
+
+```tsx
+const Panel = ilha
+  .state("tab", "overview")
+  .render(({ state }) => (
+    <Tabs variant="segmented" bind:group={state.tab}>
+      <Tabs.List>
+        <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+        <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+      </Tabs.List>
+    </Tabs>
+  ));
+```
+
+`value` + `onValueChange` remains supported. Requires **ilha** `^0.8.0`.
+
 ```tsx preview twoslash
 // @errors: 2322 2686
 import ilha from "ilha";

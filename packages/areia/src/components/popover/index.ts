@@ -588,7 +588,8 @@ function schedulePopoverAutoBind(doc: Document | undefined = globalThis.document
 }
 
 function needsPopoverIsland(input: PopoverInput) {
-  return input.onOpenChange != null;
+  const { binds } = splitBindProps(input);
+  return input.onOpenChange != null || binds["bind:open"] != null;
 }
 
 export function PopoverRoot(input: PopoverInput = {}) {

@@ -170,8 +170,8 @@ describe("Popover bind:open in parent island", () => {
 
     const output = markup(Panel());
     expect(output).toContain("data-ilha-bind");
-    expect(output).not.toContain("data-ilha-slot");
-    expect(output).toContain("data-areia-popover");
+    expect(output).toContain("data-ilha-slot");
+    expect(output).not.toContain("data-areia-popover");
   });
 
   it("opens from ilha signal after hydrate", async () => {

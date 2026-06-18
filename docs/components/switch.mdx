@@ -44,6 +44,24 @@ export default ilha.render(() => (
 
 Use `Switch.Static(...)` for static markup or when you want to initialize behavior yourself. For most application usage, call `Switch(...)`.
 
+### Ilha `bind:checked`
+
+Inside an Ilha island (including nested child islands), you can bind island state without `onCheckedChange`:
+
+```tsx
+const Form = ilha
+  .state("useBun", false)
+  .render(({ state }) => (
+    <Switch
+      label="Use Bun"
+      name="useBun"
+      bind:checked={state.useBun}
+    />
+  ));
+```
+
+Requires **ilha** `^0.8.0` and a recent **areia** release. Controlled `checked` + `onCheckedChange` still works.
+
 ## Examples
 
 ### Off State

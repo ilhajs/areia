@@ -885,11 +885,14 @@ function scheduleComboboxAutoBind(doc: Document | undefined = globalThis.documen
 }
 
 function needsComboboxIsland(input: ComboboxInput) {
+  const { binds } = splitBindProps(input);
   return (
     input.onOpenChange != null ||
     input.onValueChange != null ||
     input.onInputValueChange != null ||
-    input.onPortalMounted != null
+    input.onPortalMounted != null ||
+    binds["bind:open"] != null ||
+    binds["bind:group"] != null
   );
 }
 

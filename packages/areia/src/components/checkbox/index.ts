@@ -472,7 +472,24 @@ function scheduleCheckboxAutoBind(doc: Document | undefined = globalThis.documen
   });
 }
 
+/** Re-run checkbox bind auto-mount after Ilha child islands mount. */
+export function ensureCheckboxCheckedAutoBindAfterIlhaMount(
+  doc: Document | undefined = globalThis.document,
+) {
+  if (!doc) return;
+  runCheckedControlAutoBindAfterIlha(doc, () => {
+    checkboxAutoBindScheduled.delete(doc);
+    mountCheckboxAutoBindRoots(doc);
+  });
+}
+
+function needsCheckboxIsland(input: CheckboxInput) {
+  const { binds } = splitBindProps(input);
+  return binds["bind:checked"] != null || binds["bind:group"] != null;
+}
+
 function CheckboxComponent(input: CheckboxInput = {}) {
+  if (needsCheckboxIsland(input)) return CheckboxRoot(input);
   scheduleCheckboxAutoBind();
   return renderCheckbox(input, true);
 }

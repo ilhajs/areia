@@ -106,8 +106,8 @@ function renderToggleGroup(input: ToggleGroupInput = {}, autoBind = false) {
     disabled,
     orientation = "horizontal",
     loop,
-    variant,
-    size,
+    variant: _variant,
+    size: _size,
     onValueChange: _onValueChange,
     ...rest
   } = props as ToggleGroupInput;
@@ -257,7 +257,8 @@ function scheduleToggleGroupAutoBind(doc: Document | undefined = globalThis.docu
 }
 
 function needsToggleGroupIsland(input: ToggleGroupInput) {
-  return input.onValueChange != null;
+  const { binds } = splitBindProps(input);
+  return input.onValueChange != null || binds["bind:group"] != null;
 }
 
 function ToggleGroupComponent(input: ToggleGroupInput = {}) {

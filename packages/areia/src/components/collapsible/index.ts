@@ -511,11 +511,13 @@ function scheduleCollapsibleAutoBind(doc: Document | undefined = globalThis.docu
 }
 
 function needsCollapsibleIsland(input: CollapsibleInput) {
+  const { binds } = splitBindProps(input);
   return (
     input.onOpenChange != null ||
     input.onValueChange != null ||
     Boolean(input.accordion) ||
-    Boolean(input.items?.length)
+    Boolean(input.items?.length) ||
+    binds["bind:open"] != null
   );
 }
 

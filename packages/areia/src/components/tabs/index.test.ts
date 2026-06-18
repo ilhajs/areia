@@ -87,7 +87,7 @@ describe("Tabs", () => {
     expect(output).toContain("b");
   });
 
-  it("renders bind:group on parent island without nested slot", () => {
+  it("uses TabsRoot island when bind:group is set (bind wiring in island onMount)", () => {
     const Panel = ilha.state("tab", "a").render(
       ({ state }) =>
         html`${Tabs({
@@ -101,8 +101,8 @@ describe("Tabs", () => {
 
     const output = markup(Panel());
     expect(output).toContain("data-ilha-bind");
-    expect(output).not.toContain("data-ilha-slot");
-    expect(output).toContain("data-areia-tabs");
+    expect(output).toContain("data-ilha-slot");
+    expect(output).not.toContain("data-areia-tabs");
   });
 });
 
@@ -149,6 +149,53 @@ describe("Tabs bind:group in parent island", () => {
 
     expect(beta?.getAttribute("data-state")).toBe("active");
     expect(readTab()).toBe("b");
+    expect(warnings).toEqual([]);
+
+    console.warn = warn;
+  });
+
+  it("updates child island signal when bind:group only and Tabs nested under parent page", async () => {
+    const warn = console.warn;
+    const warnings: string[] = [];
+    console.warn = (...args: unknown[]) => {
+      const msg = args.map(String).join(" ");
+      if (msg.includes("createTabs() called more than once")) warnings.push(msg);
+      warn(...args);
+    };
+
+    let readTab!: () => string;
+
+    const UsefulExtrasSnippets = ilha.state("tab", "routing").render(({ state }) => {
+      readTab = state.tab as () => string;
+      return html`${Tabs({
+        activationMode: "auto",
+        "bind:group": state.tab,
+        tabs: [
+          { value: "routing", label: "Router" },
+          { value: "store", label: "Store" },
+        ],
+      })}`;
+    });
+
+    const Page = ilha.render(
+      () => html`<section data-testid="page">${UsefulExtrasSnippets()}</section>`,
+    );
+
+    document.body.innerHTML = await Page.hydratable({}, { name: "Page", snapshot: true });
+    mount({ Page, UsefulExtrasSnippets }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const store = [...document.querySelectorAll('[data-slot="tabs-trigger"]')].find(
+      (el) => el.getAttribute("data-value") === "store",
+    ) as HTMLButtonElement | undefined;
+
+    store?.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(store?.getAttribute("data-state")).toBe("active");
+    expect(readTab()).toBe("store");
     expect(warnings).toEqual([]);
 
     console.warn = warn;

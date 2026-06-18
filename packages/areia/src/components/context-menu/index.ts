@@ -268,7 +268,13 @@ function scheduleContextMenuAutoBind(doc: Document | undefined = globalThis.docu
 }
 
 function needsContextMenuIsland(input: ContextMenuInput) {
-  return input.onOpenChange != null || input.onSelect != null || input.onPortalMounted != null;
+  const { binds } = splitBindProps(input);
+  return (
+    input.onOpenChange != null ||
+    input.onSelect != null ||
+    input.onPortalMounted != null ||
+    binds["bind:open"] != null
+  );
 }
 
 function ContextMenuComponent(input: ContextMenuInput = {}) {

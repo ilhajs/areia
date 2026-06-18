@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import ilha, { html } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { ToggleGroup } from "./index";
 
@@ -8,13 +9,21 @@ describe("ToggleGroup", () => {
     expect(output).toContain('data-slot="toggle-group"');
   });
 
-  it("marks default export for static slot auto-bind", () => {
-    const output = markup(
-      ToggleGroup({
-        children: ToggleGroup.Item({ value: "a", children: "A" }),
-      }),
+  it("uses ToggleGroupRoot island when bind:group is set", () => {
+    const Panel = ilha.state("v", "a").render(
+      ({ state }) =>
+        html`${ToggleGroup({
+          "bind:group": state.v,
+          children: [
+            ToggleGroup.Item({ value: "a", children: "A" }),
+            ToggleGroup.Item({ value: "b", children: "B" }),
+          ],
+        })}`,
     );
-    expect(output).toContain("data-areia-toggle-group");
+    const output = markup(Panel());
+    expect(output).toContain("data-ilha-bind");
+    expect(output).toContain("data-ilha-slot");
+    expect(output).not.toContain("data-areia-toggle-group");
   });
 
   it("sets data-type to single by default", () => {

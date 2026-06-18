@@ -1,5 +1,5 @@
 /** @jsxImportSource ilha */
-import { Badge, Button, ClipboardText, LayerCard, Link, LinkButton } from "areia";
+import { Badge, ClipboardText, LayerCard, LinkButton } from "areia";
 import ilha, { raw } from "ilha";
 import componentsMeta from "./components/_meta.json";
 import primitivesMeta from "./primitives/_meta.json";

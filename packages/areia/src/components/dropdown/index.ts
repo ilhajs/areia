@@ -557,12 +557,14 @@ function scheduleDropdownAutoBind(doc: Document | undefined = globalThis.documen
 }
 
 function needsDropdownIsland(input: DropdownInput) {
+  const { binds } = splitBindProps(input);
   return (
     input.onOpenChange != null ||
     input.onSelect != null ||
     input.onValueChange != null ||
     input.onValuesChange != null ||
-    input.onPortalMounted != null
+    input.onPortalMounted != null ||
+    binds["bind:open"] != null
   );
 }
 

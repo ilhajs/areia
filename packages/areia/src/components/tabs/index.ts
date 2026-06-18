@@ -673,7 +673,8 @@ function scheduleTabsAutoBind(doc: Document | undefined = globalThis.document) {
 }
 
 function needsTabsIsland(input: TabsInput) {
-  return input.onValueChange != null;
+  const { binds } = splitBindProps(input);
+  return input.onValueChange != null || binds["bind:group"] != null;
 }
 
 function TabsComponent(input: TabsInput = {}) {

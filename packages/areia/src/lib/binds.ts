@@ -144,7 +144,7 @@ export function createCheckedBindSync(
       onUserChange: (checked) => {
         const current = bindGroup();
         if (Array.isArray(current)) {
-          const arr = [...current.map(String)];
+          const arr = current.map(String);
           const idx = arr.indexOf(itemValue);
           if (checked && idx === -1) arr.push(itemValue);
           if (!checked && idx !== -1) arr.splice(idx, 1);
@@ -261,26 +261,12 @@ export function queueToggleGroupBindForAutoMount(
   pushGroupBindQueue(toggleGroupBindQueueByDoc, bindGroup, mode, doc);
 }
 
-/** @deprecated Use queueTabsGroupBindForAutoMount or queueToggleGroupBindForAutoMount. */
-export function queueGroupBindForAutoMount(
-  bindGroup: GroupBindAccessor | undefined,
-  mode: GroupBindMode = "single",
-  doc: Document | undefined = globalThis.document,
-) {
-  queueTabsGroupBindForAutoMount(bindGroup, mode, doc);
-}
-
 export function takeTabsGroupBindQueue(doc: Document): QueuedGroupBind[] {
   return takeGroupBindQueueFrom(tabsGroupBindQueueByDoc, doc);
 }
 
 export function takeToggleGroupBindQueue(doc: Document): QueuedGroupBind[] {
   return takeGroupBindQueueFrom(toggleGroupBindQueueByDoc, doc);
-}
-
-/** @deprecated Use takeTabsGroupBindQueue or takeToggleGroupBindQueue. */
-export function takeGroupBindQueue(doc: Document): QueuedGroupBind[] {
-  return takeTabsGroupBindQueue(doc);
 }
 
 export type QueuedOpenBind = {
@@ -362,14 +348,6 @@ export function queueHoverCardOpenBindForAutoMount(
   pushOpenBindQueue(hoverCardOpenBindQueueByDoc, bindOpen, doc);
 }
 
-/** @deprecated Use the per-component queue*OpenBindForAutoMount helpers. */
-export function queueOpenBindForAutoMount(
-  bindOpen: SignalAccessor<boolean> | undefined,
-  doc: Document | undefined = globalThis.document,
-) {
-  queuePopoverOpenBindForAutoMount(bindOpen, doc);
-}
-
 export function takePopoverOpenBindQueue(doc: Document): QueuedOpenBind[] {
   return takeOpenBindQueueFrom(popoverOpenBindQueueByDoc, doc);
 }
@@ -392,11 +370,6 @@ export function takeContextMenuOpenBindQueue(doc: Document): QueuedOpenBind[] {
 
 export function takeHoverCardOpenBindQueue(doc: Document): QueuedOpenBind[] {
   return takeOpenBindQueueFrom(hoverCardOpenBindQueueByDoc, doc);
-}
-
-/** @deprecated Use the per-component take*OpenBindQueue helpers. */
-export function takeOpenBindQueue(doc: Document): QueuedOpenBind[] {
-  return takePopoverOpenBindQueue(doc);
 }
 
 export type QueuedComboboxBind = {
@@ -524,15 +497,6 @@ export function queueCheckboxCheckedBindForAutoMount(
   pushCheckedBindQueue(checkboxCheckedBindQueueByDoc, binds, itemValue, doc);
 }
 
-/** @deprecated Use queueSwitchCheckedBindForAutoMount or queueCheckboxCheckedBindForAutoMount. */
-export function queueCheckedBindForAutoMount(
-  binds: Partial<Pick<IlhaBindProps, "bind:checked" | "bind:group">>,
-  itemValue?: string,
-  doc: Document | undefined = globalThis.document,
-) {
-  queueSwitchCheckedBindForAutoMount(binds, itemValue, doc);
-}
-
 export function takeSwitchCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
   return takeCheckedBindQueueFrom(switchCheckedBindQueueByDoc, doc);
 }
@@ -553,11 +517,6 @@ export function restoreCheckboxCheckedBindQueue(doc: Document, entries: QueuedCh
   const queue = checkboxCheckedBindQueueByDoc.get(doc) ?? [];
   queue.push(...entries);
   checkboxCheckedBindQueueByDoc.set(doc, queue);
-}
-
-/** @deprecated Use takeSwitchCheckedBindQueue or takeCheckboxCheckedBindQueue. */
-export function takeCheckedBindQueue(doc: Document): QueuedCheckedBind[] {
-  return takeSwitchCheckedBindQueue(doc);
 }
 
 /**

@@ -465,7 +465,8 @@ function scheduleHoverCardAutoBind(doc: Document | undefined = globalThis.docume
 }
 
 function needsHoverCardIsland(input: HoverCardInput) {
-  return input.onOpenChange != null || input.onPortalMounted != null;
+  const { binds } = splitBindProps(input);
+  return input.onOpenChange != null || input.onPortalMounted != null || binds["bind:open"] != null;
 }
 
 function HoverCardComponent(input: HoverCardInput = {}) {
