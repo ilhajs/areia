@@ -19,7 +19,7 @@
         "@types/react-dom": "^19.2.3",
         "areia": "workspace:*",
         "husky": "^9.1.7",
-        "ilha": "0.8.0",
+        "ilha": "0.8.1",
         "lucide": "^1.16.0",
         "oxfmt": "^0.51.0",
         "oxlint": "^1.66.0",
@@ -35,7 +35,7 @@
     },
     "packages/areia": {
       "name": "areia",
-      "version": "0.1.26",
+      "version": "0.1.28",
       "dependencies": {
         "@areia/slots": "0.1.5",
         "alien-signals": "3.2.1",
@@ -48,7 +48,7 @@
         "tailwindcss": "^4.3.1",
       },
       "peerDependencies": {
-        "ilha": "^0.8.0",
+        "ilha": "^0.8.1",
         "sonner": "^2.0.7",
         "tailwindcss": ">=4.0.0",
       },
@@ -570,7 +570,7 @@
 
     "husky": ["husky@9.1.7", "", { "bin": { "husky": "bin.js" } }, "sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA=="],
 
-    "ilha": ["ilha@0.8.0", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-vjm8hXkMCRTwgClwYWtTqZfF7LbfIoPOAOM7OGmx2UcDEfbhU+wpHCgHt4sMOinDjWs7PzcWOOWuQkknFNwZsw=="],
+    "ilha": ["ilha@0.8.1", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-tZevS61hGliFXC61q5tnmqBBUutO/PU9EdFgKu3UXiG5Vaym0KgPEaLAd1+T0lNF+IvnWJzQZRwpQEIWIqQ1qQ=="],
 
     "import-without-cache": ["import-without-cache@0.4.0", "", {}, "sha512-NkJQA7oZ4YHQhd2+H3BoRFKF3d/XNsiKpHZCQEMH9pDX27hQQLsTyOocyRgaIVtf8gHX3Nt3LPkR4e5EdtPAGQ=="],
 
