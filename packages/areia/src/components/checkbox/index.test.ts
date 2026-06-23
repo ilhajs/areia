@@ -115,6 +115,40 @@ describe("Checkbox", () => {
       expect(readOk()).toBe(true);
       expect(root?.getAttribute("aria-checked")).toBe("true");
     });
+
+    it("does not call createCheckbox twice when ilha effect re-runs after hydration", async () => {
+      const warn = console.warn;
+      const warnings: string[] = [];
+      console.warn = (...args: unknown[]) => {
+        const msg = args.map(String).join(" ");
+        if (msg.includes("createCheckbox() called more than once")) warnings.push(msg);
+        warn(...args);
+      };
+
+      let setOk!: (v: boolean) => void;
+
+      const Panel = ilha.state("ok", false).render(({ state }) => {
+        setOk = (v: boolean) => state.ok(v);
+        return html`
+          ${Checkbox({ label: "OK", "bind:checked": state.ok })}
+          <span data-testid="flag">${state.ok()}</span>
+        `;
+      });
+
+      document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+      mount({ Panel }, { root: document.body, lazy: false });
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+
+      setOk(true);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(warnings).toEqual([]);
+      console.warn = warn;
+    });
   });
 });
 

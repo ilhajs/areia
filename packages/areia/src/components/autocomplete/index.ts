@@ -468,6 +468,12 @@ function syncItems(root: Element, input: AutocompleteInput, query: string) {
   });
 }
 
+type AutocompleteBindRuntime = {
+  bindSync: ReturnType<typeof createOpenBindSync>;
+};
+
+const autocompleteBindRuntimeByHost = new WeakMap<Element, AutocompleteBindRuntime>();
+
 export const AutocompleteRoot = ilha
   .input<AutocompleteInput>()
   .onMount(({ host, input }) => {
@@ -496,6 +502,7 @@ export const AutocompleteRoot = ilha
     bindSync = createOpenBindSync(input, openController);
     if (openBindDefault(input, false)) openController.open();
     else bindSync?.applyFromSignal();
+    autocompleteBindRuntimeByHost.set(host, { bindSync });
 
     const highlight = (item: HTMLElement | undefined) => {
       root
@@ -571,6 +578,7 @@ export const AutocompleteRoot = ilha
     document.addEventListener("pointerdown", handleDocumentPointerDown);
 
     return () => {
+      autocompleteBindRuntimeByHost.delete(host);
       textInput.removeEventListener("input", handleInput);
       textInput.removeEventListener("focus", handleFocus);
       textInput.removeEventListener("keydown", handleKeyDown);
@@ -580,18 +588,9 @@ export const AutocompleteRoot = ilha
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
-    const root = host.matches('[data-slot="autocomplete"]')
-      ? host
-      : host.querySelector('[data-slot="autocomplete"]');
-    if (!root) return;
-
-    createOpenBindSync(input, {
-      get isOpen() {
-        return isAutocompleteOpen(root);
-      },
-      open: () => setOpen(root, true, input.onOpenChange),
-      close: () => setOpen(root, false, input.onOpenChange),
-    })?.applyFromSignal();
+    const runtime = autocompleteBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.bindSync?.applyFromSignal();
   })
   .render(({ input }) => renderField(input));
 

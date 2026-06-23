@@ -10,6 +10,12 @@ import {
   takeCheckboxCheckedBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
+import {
+  attachCheckboxAutoBindSignalEffect,
+  destroyCheckboxAutoRuntimeIfDesynced,
+  getCheckboxAutoRuntime,
+  registerCheckboxAutoRuntime,
+} from "$lib/checkbox-auto-bind-sync";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -400,21 +406,16 @@ export const CheckboxRoot = ilha
     };
   })
   .effect(({ host, input }) => {
+    // Track bind accessors so this effect re-runs when signals change.
     subscribeBindProps(input);
     const runtime = checkboxBindRuntimeByHost.get(host);
+    // onMount may run after the first effect pass — never call createCheckbox here.
     if (!runtime) return;
     runtime.bindSync?.applyFromSignal();
   })
   .render(({ input }) => renderCheckbox(input));
 
 const checkboxAutoBindScheduled = new WeakSet<Document>();
-
-type CheckboxAutoRuntime = {
-  controller: CheckboxPrimitive.CheckboxController;
-  bindSync: ReturnType<typeof createCheckedBindSync>;
-};
-
-const checkboxAutoRuntimeByRoot = new WeakMap<Element, CheckboxAutoRuntime>();
 
 function mountCheckboxAutoBindRoots(doc: Document) {
   const queued = takeCheckboxCheckedBindQueue(doc);
@@ -423,9 +424,15 @@ function mountCheckboxAutoBindRoots(doc: Document) {
   for (const root of doc.querySelectorAll<HTMLElement>(
     '[data-areia-checkbox][data-slot="checkbox"]',
   )) {
-    const existing = checkboxAutoRuntimeByRoot.get(root);
+    destroyCheckboxAutoRuntimeIfDesynced(root);
+
+    const existing = getCheckboxAutoRuntime(root);
     if (existing) {
       existing.bindSync?.applyFromSignal();
+      const input = root.querySelector<HTMLInputElement>('[data-slot="checkbox-input"]');
+      if (input && input.checked !== existing.controller.checked) {
+        existing.controller.setChecked(input.checked);
+      }
       continue;
     }
 
@@ -459,7 +466,10 @@ function mountCheckboxAutoBindRoots(doc: Document) {
       bindSync?.applyFromSignal();
     }
 
-    checkboxAutoRuntimeByRoot.set(root, { controller, bindSync });
+    registerCheckboxAutoRuntime(root, { controller, bindSync });
+    if (entry?.bindChecked) {
+      attachCheckboxAutoBindSignalEffect(root, entry.bindChecked);
+    }
   }
 }
 

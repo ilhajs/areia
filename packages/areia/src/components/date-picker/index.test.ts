@@ -1,6 +1,14 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { DatePicker, datePickerVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered.
+}
 
 describe("datePickerVariants", () => {
   it("returns base classes", () => {
@@ -64,5 +72,30 @@ describe("DatePicker", () => {
     const output = markup(DatePicker({ class: "a", className: "b" }));
     expect(output).toContain("a");
     expect(output).toContain("b");
+  });
+
+  it("reuses date bind sync when ilha effect re-runs after hydration", async () => {
+    let setDate!: (d: Date | null) => void;
+
+    const Panel = ilha.state("picked", null as Date | null).render(({ state }) => {
+      setDate = (d: Date | null) => state.picked(d);
+      return html`${DatePicker({ mode: "single", "bind:valueAsDate": state.picked })}`;
+    });
+
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const root = document.querySelector('[data-slot="date-picker"]') as HTMLElement | null;
+    expect(root).not.toBeNull();
+    expect(root?.dataset.selected ?? "").toBe("");
+
+    setDate(new Date(2024, 5, 10));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(root?.dataset.selected).toBe("2024-06-10");
   });
 });

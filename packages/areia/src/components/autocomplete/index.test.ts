@@ -1,6 +1,14 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Autocomplete, autocompleteVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered.
+}
 
 describe("autocompleteVariants", () => {
   it("returns size classes", () => {
@@ -79,6 +87,41 @@ describe("Autocomplete", () => {
     expect(output).toContain('data-params="x"');
     expect(output).toContain('name="city"');
     expect(output).not.toMatch(/data-slot="autocomplete"[^>]*data-params/);
+  });
+
+  it("keeps a single open bind sync across ilha effect re-runs after hydration", async () => {
+    let readOpen!: () => boolean;
+    let setOpen!: (v: boolean) => void;
+
+    const Panel = ilha.state("open", false).render(({ state }) => {
+      readOpen = state.open as () => boolean;
+      setOpen = (v: boolean) => state.open(v);
+      return html`${Autocomplete({
+        items: [{ value: "a", label: "Alpha" }],
+        "bind:open": state.open,
+      })}`;
+    });
+
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(readOpen()).toBe(false);
+
+    setOpen(true);
+    await Promise.resolve();
+    await Promise.resolve();
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+
+    expect(readOpen()).toBe(true);
+
+    setOpen(false);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(readOpen()).toBe(false);
   });
 });
 

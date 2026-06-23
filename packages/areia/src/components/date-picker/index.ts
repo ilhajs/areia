@@ -376,6 +376,12 @@ function syncRoot(root: HTMLElement, input: DatePickerInput) {
   }
 }
 
+type DatePickerBindRuntime = {
+  dateSync: ReturnType<typeof createDateBindSync>;
+};
+
+const datePickerBindRuntimeByHost = new WeakMap<Element, DatePickerBindRuntime>();
+
 export const DatePickerRoot = ilha
   .input<DatePickerInput>()
   .onMount(({ host, input }) => {
@@ -412,6 +418,7 @@ export const DatePickerRoot = ilha
       setDate: setSelectedDate,
     });
     dateSync?.applyFromSignal();
+    datePickerBindRuntimeByHost.set(host, { dateSync });
 
     const cleanupThis = applyThisBind(root, input);
 
@@ -450,31 +457,16 @@ export const DatePickerRoot = ilha
 
     root.addEventListener("click", handleClick);
     return () => {
+      datePickerBindRuntimeByHost.delete(host);
       cleanupThis?.();
       root.removeEventListener("click", handleClick);
     };
   })
   .effect(({ host, input }) => {
     subscribeBindProps(input);
-    const root = host.matches('[data-slot="date-picker"]')
-      ? (host as HTMLElement)
-      : host.querySelector<HTMLElement>('[data-slot="date-picker"]');
-    if (!root) return;
-
-    createDateBindSync(input, {
-      getDate: () => {
-        const selected = selectedFromDataset(root, input.mode ?? DATE_PICKER_DEFAULT_VARIANTS.mode);
-        return selected instanceof Date ? selected : null;
-      },
-      setDate: (date) => {
-        const nextInput = {
-          ...input,
-          selected: date ?? undefined,
-          month: date ?? resolveInitialMonth(input),
-        };
-        syncRoot(root, nextInput);
-      },
-    })?.applyFromSignal();
+    const runtime = datePickerBindRuntimeByHost.get(host);
+    if (!runtime) return;
+    runtime.dateSync?.applyFromSignal();
   })
   .render(({ input }) => renderDatePicker(input));
 
