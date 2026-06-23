@@ -1,6 +1,6 @@
 {
   "name": "areia",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "Vanilla TS component library for building modern web applications",
   "keywords": [
     "components",
@@ -39,7 +39,11 @@
       "import": "./dist/plugin.js",
       "default": "./dist/plugin.js"
     },
-    "./tailwind.css": "./tailwind.css"
+    "./tailwind.css": "./tailwind.css",
+    "./sonner": {
+      "types": "./dist/sonner.d.ts",
+      "import": "./dist/sonner.js"
+    }
   },
   "scripts": {
     "build": "tsc && tsdown",

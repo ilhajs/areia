@@ -167,9 +167,7 @@ export type {
   ComboboxVariantsProps,
 } from "$components/combobox";
 export { Radio, radioVariants } from "$components/radio";
-export { Toaster } from "$components/sonner";
 export { Spinner, spinnerVariants } from "$components/spinner";
-export type { ToasterInput } from "$components/sonner";
 export type { SpinnerInput, SpinnerSize, SpinnerVariantsProps } from "$components/spinner";
 export { Tooltip, tooltipVariants } from "$components/tooltip";
 export { Popover, popoverVariants } from "$components/popover";

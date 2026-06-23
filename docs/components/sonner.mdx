@@ -4,14 +4,28 @@ description: Opinionated toast notifications for short-lived feedback.
 ---
 
 Sonner provides non-blocking toast notifications using Areia's Ilha component API.
-Render Areia's `Toaster` once in your app shell, then call `toast` from [`sonner`](https://sonner.emilkowal.ski/) anywhere in client code.
+Render Areia's `Toaster` once in your app shell, then call `toast` from the same module or from the [`sonner`](https://sonner.emilkowal.ski/) peer package.
+
+Toasts are **not** included in the main `areia` bundle. Import from **`areia/sonner`** so Ilha apps that only use inputs, buttons, and layout never pull in Sonner (and its React dependency) at startup.
 
 [Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/sonner/index.ts)
 
 ## Import
 
+Install the peer dependency when you use toasts:
+
+```bash
+npm install sonner
+```
+
 ```ts
-import { Toaster } from "areia";
+import { Toaster, toast } from "areia/sonner";
+```
+
+You can also import `toast` from `"sonner"` directly; Areia's toaster subscribes to the same global toast store.
+
+```ts
+import { Toaster } from "areia/sonner";
 import { toast } from "sonner";
 ```
 
@@ -20,7 +34,7 @@ import { toast } from "sonner";
 Add the toaster once near the root of your app.
 
 ```tsx
-import { Toaster } from "areia";
+import { Toaster } from "areia/sonner";
 
 <Toaster position="bottom-right" closeButton theme="system" />;
 ```
@@ -28,7 +42,7 @@ import { Toaster } from "areia";
 ## Usage
 
 ```ts
-import { toast } from "sonner";
+import { toast } from "areia/sonner";
 
 toast.success("Project saved");
 toast.error("Something went wrong");
@@ -44,8 +58,8 @@ toast.message("Invite sent", {
 // @ts-nocheck
 // ---cut---
 import ilha from "ilha";
-import { Button, Toaster } from "areia";
-import { toast } from "sonner";
+import { Button } from "areia";
+import { Toaster, toast } from "areia/sonner";
 
 export default ilha
   .on("button@click", () => {
