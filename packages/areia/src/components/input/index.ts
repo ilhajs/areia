@@ -200,7 +200,7 @@ function renderInput(input: InputInput) {
             "data-lpignore": "true",
           }
         : {}),
-    })}" />`,
+    })} />`,
   );
 }
 
