@@ -1,6 +1,19 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
 import { markupValue as markup } from "$lib/test-markup";
 import { Dialog, dialogVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
+
+async function settle() {
+  await Promise.resolve();
+  await Promise.resolve();
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+}
 
 describe("dialogVariants", () => {
   it("returns default base classes", () => {
@@ -119,5 +132,45 @@ describe("Dialog.Description", () => {
     const output = markup(Dialog.Description({ children: "Desc" }));
     expect(output).toContain('data-slot="dialog-description"');
     expect(output).toContain("<p");
+  });
+});
+
+describe("Dialog behavior (auto-mount)", () => {
+  it("opens on trigger click and closes on Escape", async () => {
+    document.body.innerHTML = markup(Dialog({ children: "Open", content: "Hello" }));
+    await settle();
+
+    const root = document.querySelector('[data-slot="dialog"]') as HTMLElement;
+    const trigger = document.querySelector('[data-slot="dialog-trigger"]') as HTMLElement;
+    const content = document.querySelector('[data-slot="dialog-content"]') as HTMLElement;
+    expect(root.getAttribute("data-state")).toBe("closed");
+
+    trigger.click();
+    await settle();
+    expect(root.getAttribute("data-state")).toBe("open");
+    expect(content.hidden).toBe(false);
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await settle();
+    expect(root.getAttribute("data-state")).toBe("closed");
+  });
+
+  it("closes on close button click", async () => {
+    document.body.innerHTML = markup(
+      Dialog({
+        children: "Open",
+        content: [Dialog.Title({ children: "Title" }), Dialog.Close({ children: "Dismiss" })],
+      }),
+    );
+    await settle();
+
+    const root = document.querySelector('[data-slot="dialog"]') as HTMLElement;
+    (document.querySelector('[data-slot="dialog-trigger"]') as HTMLElement).click();
+    await settle();
+    expect(root.getAttribute("data-state")).toBe("open");
+
+    (document.querySelector('[data-slot="dialog-close"]') as HTMLElement).click();
+    await settle();
+    expect(root.getAttribute("data-state")).toBe("closed");
   });
 });

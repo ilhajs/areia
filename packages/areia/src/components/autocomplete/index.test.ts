@@ -125,6 +125,75 @@ describe("Autocomplete", () => {
   });
 });
 
+describe("Autocomplete behavior", () => {
+  async function mountAutocomplete() {
+    const Panel = ilha.render(
+      () =>
+        html`${Autocomplete({
+          items: [
+            { value: "alpha", label: "Alpha" },
+            { value: "beta", label: "Beta" },
+          ],
+        })}`,
+    );
+
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
+    await Promise.resolve();
+    await Promise.resolve();
+
+    return {
+      root: document.querySelector('[data-slot="autocomplete"]') as HTMLElement,
+      input: document.querySelector('[data-slot="autocomplete-input"]') as HTMLInputElement,
+      content: document.querySelector('[data-slot="autocomplete-content"]') as HTMLElement,
+    };
+  }
+
+  it("opens and filters items when typing", async () => {
+    const { input, content } = await mountAutocomplete();
+    expect(content.hidden).toBe(true);
+
+    input.value = "al";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    await Promise.resolve();
+
+    expect(content.hidden).toBe(false);
+    const items = [...document.querySelectorAll<HTMLElement>('[data-slot="autocomplete-item"]')];
+    expect(items).toHaveLength(1);
+    expect(items[0]?.dataset["value"]).toBe("alpha");
+  });
+
+  it("selects highlighted item with ArrowDown + Enter and closes", async () => {
+    const { input, content } = await mountAutocomplete();
+
+    input.value = "a";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    await Promise.resolve();
+    expect(content.hidden).toBe(false);
+
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await Promise.resolve();
+
+    expect(input.value).toBe("alpha");
+    expect(content.hidden).toBe(true);
+  });
+
+  it("closes on Escape", async () => {
+    const { input, content } = await mountAutocomplete();
+
+    input.value = "b";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    await Promise.resolve();
+    expect(content.hidden).toBe(false);
+
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await Promise.resolve();
+    expect(content.hidden).toBe(true);
+  });
+});
+
 describe("Autocomplete.Item", () => {
   it("renders with data-slot", () => {
     const output = markup(Autocomplete.Item({ value: "x", children: "X" }));

@@ -1,6 +1,36 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
 import { markupValue as markup } from "$lib/test-markup";
 import { Combobox, comboboxVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
+
+async function settle() {
+  await Promise.resolve();
+  await Promise.resolve();
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+}
+
+function mountCombobox() {
+  document.body.innerHTML = markup(
+    Combobox({
+      items: [
+        { value: "apple", label: "Apple" },
+        { value: "banana", label: "Banana" },
+      ],
+    }),
+  );
+  return {
+    root: document.querySelector('[data-slot="combobox"]') as HTMLElement,
+    input: document.querySelector('[data-slot="combobox-input"]') as HTMLInputElement,
+    trigger: document.querySelector('[data-slot="combobox-trigger"]') as HTMLElement,
+    content: document.querySelector('[data-slot="combobox-content"]') as HTMLElement,
+  };
+}
 
 describe("comboboxVariants", () => {
   it("returns empty by default", () => {
@@ -92,5 +122,51 @@ describe("Combobox.Group", () => {
   it("renders with data-slot", () => {
     const output = markup(Combobox.Group({}));
     expect(output).toContain('data-slot="combobox-group"');
+  });
+});
+
+describe("Combobox behavior (auto-mount)", () => {
+  it("opens on trigger click", async () => {
+    const { input, trigger, content } = mountCombobox();
+    await settle();
+    expect(content.hidden).toBe(true);
+
+    trigger.click();
+    await settle();
+    expect(content.hidden).toBe(false);
+    expect(input.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("filters items when typing", async () => {
+    const { input, trigger } = mountCombobox();
+    await settle();
+
+    trigger.click();
+    await settle();
+
+    input.value = "app";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    await settle();
+
+    const items = [...document.querySelectorAll<HTMLElement>('[data-slot="combobox-item"]')];
+    expect(items.find((el) => el.dataset["value"] === "apple")?.hidden).toBe(false);
+    expect(items.find((el) => el.dataset["value"] === "banana")?.hidden).toBe(true);
+  });
+
+  it("commits item label to input on item click and closes", async () => {
+    const { input, trigger, content } = mountCombobox();
+    await settle();
+
+    trigger.click();
+    await settle();
+
+    const apple = [...document.querySelectorAll<HTMLElement>('[data-slot="combobox-item"]')].find(
+      (el) => el.dataset["value"] === "apple",
+    ) as HTMLElement;
+    apple.click();
+    await settle();
+
+    expect(input.value).toBe("Apple");
+    expect(content.hidden).toBe(true);
   });
 });

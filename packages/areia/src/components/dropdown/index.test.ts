@@ -1,7 +1,20 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
 import { markupValue as markup } from "$lib/test-markup";
 import { html } from "ilha";
 import { Dropdown, dropdownVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
+
+async function settle() {
+  await Promise.resolve();
+  await Promise.resolve();
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+}
 
 describe("dropdownVariants", () => {
   it("returns default item classes", () => {
@@ -156,5 +169,51 @@ describe("Dropdown.Shortcut", () => {
     const output = markup(Dropdown.Shortcut({ children: "⌘K" }));
     expect(output).toContain('data-slot="dropdown-menu-shortcut"');
     expect(output).toContain("⌘K");
+  });
+});
+
+describe("Dropdown behavior (auto-mount)", () => {
+  it("opens on trigger click and closes on item selection", async () => {
+    document.body.innerHTML = markup(
+      Dropdown({
+        trigger: "Open",
+        items: [
+          { label: "One", value: "1" },
+          { label: "Two", value: "2" },
+        ],
+      }),
+    );
+    await settle();
+
+    const content = document.querySelector('[data-slot="dropdown-menu-content"]') as HTMLElement;
+    const trigger = document.querySelector('[data-slot="dropdown-menu-trigger"]') as HTMLElement;
+    expect(content.hidden).toBe(true);
+
+    trigger.click();
+    await settle();
+    expect(content.hidden).toBe(false);
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+
+    const item = document.querySelector('[data-slot="dropdown-menu-item"]') as HTMLElement;
+    item.click();
+    await settle();
+    expect(content.hidden).toBe(true);
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("closes on Escape key", async () => {
+    document.body.innerHTML = markup(
+      Dropdown({ trigger: "Open", items: [{ label: "One", value: "1" }] }),
+    );
+    await settle();
+
+    const content = document.querySelector('[data-slot="dropdown-menu-content"]') as HTMLElement;
+    (document.querySelector('[data-slot="dropdown-menu-trigger"]') as HTMLElement).click();
+    await settle();
+    expect(content.hidden).toBe(false);
+
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await settle();
+    expect(content.hidden).toBe(true);
   });
 });
