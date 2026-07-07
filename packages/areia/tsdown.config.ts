@@ -7,6 +7,6 @@ export default defineConfig({
     plugin: "src/tailwind/plugin.ts",
   },
   platform: "browser",
-  external: ["sonner", "react", "react-dom"],
+  external: ["sonner", "react", "react-dom", "ilha"],
   dts: true,
 });
