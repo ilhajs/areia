@@ -15,6 +15,7 @@ import { cn } from "$lib/cn";
 import { hasRenderableContent, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 export const TABS_VARIANTS = {
   variant: {
@@ -580,6 +581,7 @@ export const TabsRoot = ilha
           ? initialValue[0]
           : undefined;
 
+    stampMorphPreserve(root);
     const controller = TabsPrimitive.createTabs(root, {
       defaultValue,
       activationMode: input.activationMode ?? (input.activateOnFocus ? "auto" : "manual"),
@@ -646,6 +648,7 @@ function scheduleTabsAutoBind(doc: Document | undefined = globalThis.document) {
       const bindInput = entry ? { "bind:group": entry.bindGroup } : {};
       let groupSync: ReturnType<typeof createGroupBindSync> = null;
 
+      stampMorphPreserve(root);
       const controller = TabsPrimitive.createTabs(root, {
         onValueChange: (value) => {
           groupSync?.onUserChange(value);

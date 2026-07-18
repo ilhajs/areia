@@ -24,6 +24,7 @@ import {
   registerSwitchAutoRuntime,
   syncAllSwitchAutoBindFromNamedRegistry,
 } from "$lib/switch-auto-bind-sync";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 /** Switch size and variant definitions mapping names to their Tailwind classes. */
 export const SWITCH_VARIANTS = {
@@ -446,6 +447,7 @@ export const SwitchRoot = ilha
 
     let bindSync: ReturnType<typeof createCheckedBindSync> = null;
 
+    stampMorphPreserve(root);
     const controller = SwitchPrimitive.createSwitch(root, {
       defaultChecked:
         typeof input.checked === "boolean"
@@ -531,6 +533,7 @@ function mountSwitchAutoBindRoots(doc: Document) {
             ? hiddenInput.checked
             : undefined;
 
+    stampMorphPreserve(root);
     const controller = SwitchPrimitive.createSwitch(root, {
       defaultChecked,
       onCheckedChange: (checked) => {

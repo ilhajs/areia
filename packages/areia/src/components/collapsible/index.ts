@@ -18,6 +18,7 @@ import { render, renderStringForSlots } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Icon } from "$components/icon";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 export const COLLAPSIBLE_VARIANTS = {} as const;
 export const COLLAPSIBLE_DEFAULT_VARIANTS = {} as const;
@@ -418,6 +419,7 @@ export const CollapsibleRootIsland = ilha
       : host.querySelector('[data-slot="accordion"]');
 
     if (accordionRoot) {
+      stampMorphPreserve(accordionRoot);
       const controller = AccordionPrimitive.createAccordion(accordionRoot, {
         multiple: input.multiple,
         defaultValue: input.defaultValue ?? input.value,
@@ -438,6 +440,7 @@ export const CollapsibleRootIsland = ilha
 
     let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
+    stampMorphPreserve(root);
     const controller = CollapsiblePrimitive.createCollapsible(root, {
       defaultOpen: openBindDefault(input, input.defaultOpen ?? input.open),
       hiddenUntilFound: input.hiddenUntilFound,
@@ -495,6 +498,7 @@ function scheduleCollapsibleAutoBind(doc: Document | undefined = globalThis.docu
       const entry = queued[queueIndex++];
       let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
+      stampMorphPreserve(root);
       const controller = CollapsiblePrimitive.createCollapsible(root, {
         onOpenChange: (open) => bindSync?.onUserChange(open),
       });

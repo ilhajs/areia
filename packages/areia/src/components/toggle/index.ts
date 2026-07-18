@@ -4,6 +4,7 @@ import { cn } from "$lib/cn";
 import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 export const TOGGLE_VARIANTS = {
   variant: {
@@ -105,6 +106,7 @@ function scheduleToggleAutoBind(doc: Document | undefined = globalThis.document)
     for (const root of doc.querySelectorAll<HTMLElement>(
       '[data-areia-toggle][data-slot="toggle"]',
     )) {
+      stampMorphPreserve(root);
       TogglePrimitive.createToggle(root);
     }
   });
@@ -128,6 +130,7 @@ export const ToggleRoot = ilha
       : (host.querySelector('[data-slot="toggle"]') as HTMLElement | null);
     if (!root) return;
 
+    stampMorphPreserve(root);
     const controller = TogglePrimitive.createToggle(root, {
       defaultPressed: input.defaultPressed,
       disabled: input.disabled,

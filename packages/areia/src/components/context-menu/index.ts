@@ -15,6 +15,7 @@ import { cn } from "$lib/cn";
 import { hasSlot, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 export type ContextMenuInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   IlhaBindProps &
@@ -189,6 +190,7 @@ export const ContextMenuRoot = ilha
 
     let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
+    stampMorphPreserve(root);
     const controller = ContextMenuPrimitive.createContextMenu(root, {
       disabled: input.disabled,
       closeOnSelect: input.closeOnSelect,
@@ -252,6 +254,7 @@ function scheduleContextMenuAutoBind(doc: Document | undefined = globalThis.docu
       const entry = queued[queueIndex++];
       let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
+      stampMorphPreserve(root);
       const controller = ContextMenuPrimitive.createContextMenu(root, {
         onOpenChange: (open) => bindSync?.onUserChange(open),
       });

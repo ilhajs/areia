@@ -20,6 +20,7 @@ import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Label } from "$components/label";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 /** Checkbox variant definitions mapping variant names to their Tailwind classes. */
 export const CHECKBOX_VARIANTS = {
@@ -384,6 +385,7 @@ export const CheckboxRoot = ilha
     const itemValue = typeof input.value === "string" ? input.value : undefined;
     let bindSync: ReturnType<typeof createCheckedBindSync> = null;
 
+    stampMorphPreserve(root);
     const controller = CheckboxPrimitive.createCheckbox(root, {
       defaultChecked: typeof input.checked === "boolean" ? input.checked : undefined,
       indeterminate: typeof input.indeterminate === "boolean" ? input.indeterminate : undefined,
@@ -454,6 +456,7 @@ function mountCheckboxAutoBindRoots(doc: Document) {
           ? hiddenInput.checked
           : undefined;
 
+    stampMorphPreserve(root);
     const controller = CheckboxPrimitive.createCheckbox(root, {
       defaultChecked,
       onCheckedChange: (checked) => {

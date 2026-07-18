@@ -15,6 +15,7 @@ import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/marku
 import { renderOverlayClose } from "$lib/overlay-close";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 /** Popover side variant definitions mapping positions to their Tailwind classes. */
 export const POPOVER_VARIANTS = {
@@ -412,6 +413,7 @@ export function bindPopoverRoot(root: Element) {
   const existing = autoBoundPopovers.get(root);
   if (existing) return existing;
 
+  stampMorphPreserve(root);
   const controller = PopoverPrimitive.createPopover(root);
   syncPopoverArrowSide(root);
   autoBoundPopovers.set(root, controller);
@@ -489,6 +491,7 @@ const PopoverRootIsland = ilha
 
     let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
+    stampMorphPreserve(root);
     const controller = PopoverPrimitive.createPopover(root, {
       align: input.align,
       alignOffset: input.alignOffset,

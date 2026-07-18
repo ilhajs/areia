@@ -3,6 +3,7 @@ import { Progress as ProgressPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 export type ProgressInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   Record<string, unknown> & {
@@ -112,6 +113,7 @@ export const ProgressRoot = ilha
       : host.querySelector('[data-slot="progress"]');
     if (!root) return;
 
+    stampMorphPreserve(root);
     const controller = ProgressPrimitive.createProgress(root, {
       value: input.value,
       min: input.min,

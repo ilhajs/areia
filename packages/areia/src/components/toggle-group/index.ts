@@ -21,6 +21,7 @@ import {
   type ToggleSize,
   type ToggleVariant,
 } from "$components/toggle";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 export type ToggleGroupType = "single" | "multiple";
 
@@ -166,6 +167,7 @@ const ToggleGroupRoot = ilha
     const mode = input.type === "multiple" ? "multiple" : "single";
     let groupSync: ReturnType<typeof createGroupBindSync> = null;
 
+    stampMorphPreserve(root);
     const controller = ToggleGroupPrimitive.createToggleGroup(root, {
       defaultValue: groupBindDefault(input, input.defaultValue) ?? undefined,
       multiple: input.type === "multiple",
@@ -233,6 +235,7 @@ function scheduleToggleGroupAutoBind(doc: Document | undefined = globalThis.docu
       let groupSync: ReturnType<typeof createGroupBindSync> = null;
       const mode = entry?.mode ?? "single";
 
+      stampMorphPreserve(root);
       const controller = ToggleGroupPrimitive.createToggleGroup(root, {
         onValueChange: (value) => {
           groupSync?.onUserChange(value);

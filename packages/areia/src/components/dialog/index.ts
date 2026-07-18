@@ -17,6 +17,7 @@ import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/marku
 import { renderOverlayClose } from "$lib/overlay-close";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 /** Dialog size and role variant definitions. */
 export const DIALOG_VARIANTS = {
@@ -409,6 +410,7 @@ export const DialogRoot = ilha
     const isAlertDialog = input.alertDialog ?? input.role === "alertdialog";
     let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
+    stampMorphPreserve(root);
     const controller = DialogPrimitive.createDialog(root, {
       alertDialog: isAlertDialog,
       closeOnClickOutside: input.closeOnClickOutside ?? (isAlertDialog ? false : undefined),
@@ -473,6 +475,7 @@ function scheduleDialogAutoBind(doc: Document | undefined = globalThis.document)
         root.getAttribute("data-alert-dialog") === "true" ||
         root.querySelector('[role="alertdialog"]') != null;
 
+      stampMorphPreserve(root);
       const controller = DialogPrimitive.createDialog(root, {
         alertDialog: isAlert,
         onOpenChange: (open) => bindSync?.onUserChange(open),

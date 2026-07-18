@@ -4,6 +4,7 @@ import { cn } from "$lib/cn";
 import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 
 export type FieldInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   Record<string, unknown> & {
@@ -130,6 +131,7 @@ export const FieldRoot = ilha
       : host.querySelector('[data-slot="field"]');
     if (!root) return;
 
+    stampMorphPreserve(root);
     const controller = FieldPrimitive.createField(root, {
       name: input.name,
       disabled: input.disabled,
