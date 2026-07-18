@@ -408,16 +408,9 @@ function renderTabs(input: TabsInput = {}, autoBind = false) {
       }),
     );
 
-  const inner = html`${variant === "segmented"
-    ? html`<div
-        aria-hidden="true"
-        class="${cn(
-          "absolute inset-x-0 top-1/2 z-0 -translate-y-1/2 rounded-lg bg-areia-surface-muted",
-          size === "sm" ? "h-6.5 rounded-md" : "h-9",
-        )}"
-      ></div>`
-    : ""}
-  ${hasComposedChildren
+  // Segmented track lives inside TabsList — do not paint a root-level track here
+  // (it centers on the whole tabs root and leaves a gap above content panels).
+  const inner = html`${hasComposedChildren
     ? composedChildren
     : html`${TabsList({
         children: listChildren,

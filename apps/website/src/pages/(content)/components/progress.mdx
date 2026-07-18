@@ -1,0 +1,150 @@
+---
+title: Progress
+description: Displays task completion progress with accessible status semantics.
+order: 23
+tags: [components]
+---
+
+import { Preview } from "$lib/components/preview";
+import { Progress } from "areia";
+
+# Progress
+
+Displays task completion progress with accessible `progressbar` semantics.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/progress/index.ts)
+
+`Progress` is backed by `@areia/slots` and automatically wires the label, value, track, and indicator slots after mount.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Uploading" value={45} />\n));'
+  }
+  lang="tsx"
+>
+  <Progress label="Uploading" value={45} />
+</Preview>
+
+## Import
+
+```ts
+import { Progress } from "areia";
+```
+
+## Usage
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Loading project" value={60} />\n));'
+  }
+  lang="tsx"
+>
+  <Progress label="Loading project" value={60} />
+</Preview>
+
+## Examples
+
+### Determinate
+
+Pass a numeric `value` to render determinate progress. The indicator width is computed from `min`, `max`, and `value`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Importing data" value={72} />\n));'
+  }
+  lang="tsx"
+>
+  <Progress label="Importing data" value={72} />
+</Preview>
+
+### Indeterminate
+
+Use `value: null` when the total amount of work is unknown.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Syncing" value={null} />\n));'
+  }
+  lang="tsx"
+>
+  <Progress label="Syncing" value={null} />
+</Preview>
+
+### Custom Range
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress\n    label="Storage used"\n    min={0}\n    max={500}\n    value={125}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Progress
+    label="Storage used"
+    min={0}
+    max={500}
+    value={125}
+  />
+</Preview>
+
+### Without Value Text
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Processing" value={35} showValue={false} />\n));'
+  }
+  lang="tsx"
+>
+  <Progress label="Processing" value={35} showValue={false} />
+</Preview>
+
+### Custom Styling
+
+Use `trackClass`, `indicatorClass`, and `valueClass` to style internal parts.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress\n    label="Deployment"\n    value={80}\n    trackClass="h-3 bg-areia-surface-muted"\n    indicatorClass="bg-emerald-500"\n    valueClass="text-emerald-600"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Progress
+    label="Deployment"
+    value={80}
+    trackClass="h-3 bg-areia-surface-muted"
+    indicatorClass="bg-emerald-500"
+    valueClass="text-emerald-600"
+  />
+</Preview>
+
+## API
+
+### `Progress(input)`
+
+| Prop             | Type                              | Default | Description                                                    |
+| ---------------- | --------------------------------- | ------- | -------------------------------------------------------------- |
+| `value`          | `number \| null`                  | `null`  | Current progress value. `null` renders indeterminate progress. |
+| `min`            | `number`                          | `0`     | Minimum value.                                                 |
+| `max`            | `number`                          | `100`   | Maximum value.                                                 |
+| `label`          | `unknown`                         | —       | Visible label rendered in `data-slot="progress-label"`.        |
+| `showValue`      | `boolean`                         | `true`  | Whether to render `data-slot="progress-value"`.                |
+| `trackClass`     | `string`                          | —       | Additional classes for the track.                              |
+| `indicatorClass` | `string`                          | —       | Additional classes for the indicator.                          |
+| `valueClass`     | `string`                          | —       | Additional classes for the value text.                         |
+| `onValueChange`  | `(value: number \| null) => void` | —       | Called when the controller value changes.                      |
+
+## Slots
+
+`Progress` renders these data slots:
+
+- `progress`
+- `progress-label`
+- `progress-track`
+- `progress-indicator`
+- `progress-value`
+
+The root and parts receive status attributes from the slot controller:
+
+- `data-indeterminate`
+- `data-progressing`
+- `data-complete`
+- `data-state`

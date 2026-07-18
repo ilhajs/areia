@@ -1,0 +1,275 @@
+---
+title: Pagination
+description: Page navigation controls for paginated content.
+order: 21
+tags: [components]
+---
+
+import { Preview } from "$lib/components/preview";
+import { Pagination } from "areia";
+
+# Pagination
+
+Page navigation controls for paginated content.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/pagination/index.ts)
+
+Areia's `Pagination` renders page information, navigation controls, optional page-size selectors, and emits page-change events when used as an Ilha island with `Pagination`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={100} />\n));'
+  }
+  lang="tsx"
+>
+  <Pagination page={1} perPage={25} totalCount={100} />
+</Preview>
+
+## Import
+
+```ts
+import { Pagination } from "areia";
+```
+
+## Usage
+
+Call `Pagination(...)` when you want interactive controls. It dispatches `pagination:page-change` and calls `setPage` / `onPageChange` when controls are used.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={2} perPage={25} totalCount={250} />\n));'
+  }
+  lang="tsx"
+>
+  <Pagination page={2} perPage={25} totalCount={250} />
+</Preview>
+
+Use `Pagination.Static(...)` for static markup or when you want to wire events yourself. For most application usage, call `Pagination(...)`.
+
+## Examples
+
+### Full Controls
+
+The default pagination includes first, previous, page input, next, and last buttons.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={100} />\n));'
+  }
+  lang="tsx"
+>
+  <Pagination page={1} perPage={25} totalCount={100} />
+</Preview>
+
+### Simple Controls
+
+Use `controls: "simple"` for previous and next buttons only.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination\n    controls="simple"\n    page={5}\n    perPage={25}\n    totalCount={250}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Pagination
+    controls="simple"
+    page={5}
+    perPage={25}
+    totalCount={250}
+  />
+</Preview>
+
+### Mid-Page State
+
+Pagination in the middle of a dataset with all navigation buttons enabled.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={5} perPage={25} totalCount={250} />\n));'
+  }
+  lang="tsx"
+>
+  <Pagination page={5} perPage={25} totalCount={250} />
+</Preview>
+
+### Large Dataset
+
+Pagination handles large datasets. Use the input page selector for large page counts to avoid rendering many options.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={10000} />\n));'
+  }
+  lang="tsx"
+>
+  <Pagination page={1} perPage={25} totalCount={10000} />
+</Preview>
+
+### Custom Info Text
+
+Use `Pagination.Info` with explicit children to customize the visible text.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 3;\nconst perPage = 25;\nconst totalCount = 100;\nconst maxPage = Math.ceil(totalCount / perPage);\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info>\n      Page {page} of {maxPage}\n    </Pagination.Info>\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+## Compound Components
+
+Use the compound helpers when you need custom layout or page-size controls.
+
+### Page Size Selector
+
+`Pagination.PageSize` renders a native select for choosing page size. In island mode, changing it emits `pagination:page-size-change` and calls `onPageSizeChange` on `Pagination` when provided.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 25;\nconst totalCount = 500;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.Separator />\n    <Pagination.PageSize value={perPage} />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Custom Page Size Options
+
+Customize page-size options with the `options` prop. Defaults to `[25, 50, 100, 250]`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 10;\nconst totalCount = 100;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.PageSize\n      value={perPage}\n      options={[10, 20, 50]}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Custom Layout
+
+Arrange the helpers in any order.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 2;\nconst perPage = 50;\nconst totalCount = 400;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <div class="grow"></div>\n    <Pagination.PageSize value={perPage} />\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Dropdown Page Selector
+
+Use `pageSelector: "dropdown"` to render a select with one option per page. This is best for small page counts.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 2;\nconst perPage = 25;\nconst totalCount = 100;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n      pageSelector="dropdown"\n    />\n  </Pagination>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Internationalization
+
+Use `labels` to customize ARIA labels. Visible text can be customized with `Pagination.Info` children and the `label` prop on `Pagination.PageSize`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 25;\nconst totalCount = 100;\nconst labels = {\n  navigation: "Pagination",\n  firstPage: "Première page",\n  previousPage: "Page précédente",\n  nextPage: "Page suivante",\n  lastPage: "Dernière page",\n  pageNumber: "Numéro de page",\n  pageSize: "Taille de page",\n};\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n    labels={labels}\n  >\n    <Pagination.Info>\n      Affichage de <span class="tabular-nums">1-25</span> sur{" "}\n      <span class="tabular-nums">100</span>\n    </Pagination.Info>\n    <Pagination.PageSize\n      value={perPage}\n      label="Par page :"\n      labels={labels}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n      labels={labels}\n    />\n  </Pagination>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Listening for Changes
+
+`Pagination` dispatches DOM events when controls are used. Use these when you are not passing callback functions.
+
+```ts
+const root = document.querySelector('[data-slot="pagination"]');
+
+root?.addEventListener("pagination:page-change", (event) => {
+  const { page } = (event as CustomEvent<{ page: number }>)
+    .detail;
+  console.log(page);
+});
+
+root?.addEventListener(
+  "pagination:page-size-change",
+  (event) => {
+    const { pageSize } = (
+      event as CustomEvent<{ pageSize: number }>
+    ).detail;
+    console.log(pageSize);
+  },
+);
+```
+
+## API Reference
+
+### Pagination
+
+`Pagination` is an Ilha island. It accepts standard HTML `div` attributes plus the following props.
+
+| Prop               | Type                     | Default   | Description                              |
+| ------------------ | ------------------------ | --------- | ---------------------------------------- |
+| `page`             | `number`                 | `1`       | Current page number, 1-indexed.          |
+| `setPage`          | `(page: number) => void` | -         | Callback fired when page changes.        |
+| `onPageChange`     | `(page: number) => void` | -         | Alias callback fired when page changes.  |
+| `perPage`          | `number`                 | -         | Number of items displayed per page.      |
+| `onPageSizeChange` | `(size: number) => void` | -         | Callback fired when page size changes.   |
+| `totalCount`       | `number`                 | -         | Total number of items across all pages.  |
+| `controls`         | `"full" \| "simple"`     | `"full"`  | Control layout for the default renderer. |
+| `pageSelector`     | `"input" \| "dropdown"`  | `"input"` | Page selector style.                     |
+| `children`         | `unknown`                | -         | Compound children for custom layouts.    |
+| `labels`           | `PaginationLabels`       | English   | Labels for aria-labels.                  |
+| `class`            | `string`                 | -         | Additional CSS classes.                  |
+| `className`        | `string`                 | -         | Alias for `class`.                       |
+
+### Pagination.Info
+
+| Prop         | Type      | Default | Description                                     |
+| ------------ | --------- | ------- | ----------------------------------------------- |
+| `page`       | `number`  | `1`     | Current page.                                   |
+| `perPage`    | `number`  | -       | Page size.                                      |
+| `totalCount` | `number`  | -       | Total item count.                               |
+| `children`   | `unknown` | -       | Custom content. Defaults to `Showing X-Y of Z`. |
+| `class`      | `string`  | -       | Additional CSS classes.                         |
+| `className`  | `string`  | -       | Alias for `class`.                              |
+
+### Pagination.PageSize
+
+| Prop        | Type               | Default              | Description                      |
+| ----------- | ------------------ | -------------------- | -------------------------------- |
+| `value`     | `number`           | -                    | Current page-size value.         |
+| `options`   | `number[]`         | `[25, 50, 100, 250]` | Available page-size options.     |
+| `label`     | `unknown`          | `"Per page:"`        | Visible label before the select. |
+| `labels`    | `PaginationLabels` | English              | Aria labels.                     |
+| `name`      | `string`           | -                    | Native select name.              |
+| `class`     | `string`           | -                    | Additional CSS classes.          |
+| `className` | `string`           | -                    | Alias for `class`.               |
+
+### Pagination.Controls
+
+| Prop           | Type                             | Default   | Description             |
+| -------------- | -------------------------------- | --------- | ----------------------- |
+| `page`         | `number`                         | `1`       | Current page.           |
+| `perPage`      | `number`                         | -         | Page size.              |
+| `totalCount`   | `number`                         | -         | Total item count.       |
+| `controls`     | `"full" \| "simple"`             | `"full"`  | Control layout.         |
+| `pageSelector` | `"input" \| "dropdown"`          | `"input"` | Page selector style.    |
+| `labels`       | `PaginationLabels`               | English   | Aria labels.            |
+| `buttonSize`   | `"xs" \| "sm" \| "base" \| "lg"` | `"base"`  | Button size.            |
+| `class`        | `string`                         | -         | Additional CSS classes. |
+| `className`    | `string`                         | -         | Alias for `class`.      |
+
+### Pagination.Separator
+
+Renders a vertical separator for compound layouts. Accepts standard `div` attributes plus `class` and `className`.
+
+## Accessibility
+
+- Pagination controls are wrapped in a `nav` with an accessible label.
+- Control buttons have aria-labels for first, previous, next, and last page.
+- Default info text is wrapped in an `aria-live` region so page range updates can be announced.
+- Page input uses `aria-label` and commits on blur or Enter.

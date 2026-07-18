@@ -1,0 +1,208 @@
+---
+title: Link
+description: Displays a styled anchor for inline text links.
+order: 20
+tags: [components]
+---
+
+import { Preview } from "$lib/components/preview";
+import { Link } from "areia";
+
+# Link
+
+Displays a styled anchor for inline text links with multiple variants and an external-link icon.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/link/index.ts)
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-4 text-areia-default">\n    <Link href="#">Default inline link</Link>\n    <Link href="#" variant="current">\n      Current color link\n    </Link>\n    <Link href="#" variant="plain">\n      Plain inline link\n    </Link>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <div class="flex flex-wrap items-center gap-4 text-areia-default">
+    <Link href="#">Default inline link</Link>
+    <Link href="#" variant="current">
+      Current color link
+    </Link>
+    <Link href="#" variant="plain">
+      Plain inline link
+    </Link>
+  </div>
+</Preview>
+
+## Import
+
+```ts
+import { Link } from "areia";
+```
+
+## Usage
+
+The default `Link` renders an underlined anchor with primary color styling.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="text-areia-default">\n    Read our <Link href="/docs">documentation</Link> for more\n    details.\n  </p>\n));'
+  }
+  lang="tsx"
+>
+  <p class="text-areia-default">
+    Read our <Link href="/docs">documentation</Link> for more
+    details.
+  </p>
+</Preview>
+
+## Examples
+
+### Inline in Paragraph
+
+Links flow naturally within paragraph text with proper underline offset.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="max-w-prose text-areia-default">\n    This is a paragraph with an\n    <Link href="#">inline link</Link> that flows naturally with\n    the surrounding text. Links maintain proper underline offset\n    for readability.\n  </p>\n));'
+  }
+  lang="tsx"
+>
+  <p class="max-w-prose text-areia-default">
+    This is a paragraph with an
+    <Link href="#">inline link</Link> that flows naturally with
+    the surrounding text. Links maintain proper underline offset
+    for readability.
+  </p>
+</Preview>
+
+### External Link with Icon
+
+Use `Link.ExternalIcon` to visually indicate links that navigate away from your site. Set `external: true` to open the link in a new tab with safe `rel` defaults.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="https://kumo-ui.com" external>\n    Visit Kumo UI\n    <Link.ExternalIcon />\n  </Link>\n));'
+  }
+  lang="tsx"
+>
+  <Link href="https://kumo-ui.com" external>
+    Visit Kumo UI
+    <Link.ExternalIcon />
+  </Link>
+</Preview>
+
+### Current Variant
+
+The `current` variant inherits color from its parent. Use it for links inside colored contexts like alerts, banners, or error messages.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="text-areia-destructive-soft-foreground">\n    This error message contains a\n    <Link href="#" variant="current">\n      link\n    </Link>\n    that inherits the red color from its parent.\n  </p>\n));'
+  }
+  lang="tsx"
+>
+  <p class="text-areia-destructive-soft-foreground">
+    This error message contains a
+    <Link href="#" variant="current">
+      link
+    </Link>
+    that inherits the red color from its parent.
+  </p>
+</Preview>
+
+### Plain Variant
+
+Use `plain` when an underline would be distracting, such as navigation, menus, and footers.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <nav class="flex flex-wrap gap-4">\n    <Link href="#" variant="plain">\n      Overview\n    </Link>\n    <Link href="#" variant="plain">\n      Components\n    </Link>\n    <Link href="#" variant="plain">\n      Guides\n    </Link>\n  </nav>\n));'
+  }
+  lang="tsx"
+>
+  <nav class="flex flex-wrap gap-4">
+    <Link href="#" variant="plain">
+      Overview
+    </Link>
+    <Link href="#" variant="plain">
+      Components
+    </Link>
+    <Link href="#" variant="plain">
+      Guides
+    </Link>
+  </nav>
+</Preview>
+
+### Custom Classes
+
+Pass `class` or `className` to merge additional classes with the generated variant classes.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="#" class="font-medium decoration-dashed">\n    Custom styled link\n  </Link>\n));'
+  }
+  lang="tsx"
+>
+  <Link href="#" class="font-medium decoration-dashed">
+    Custom styled link
+  </Link>
+</Preview>
+
+## API Reference
+
+### Link
+
+Extends native anchor attributes.
+
+| Prop        | Type                               | Default    | Description                                                       |
+| ----------- | ---------------------------------- | ---------- | ----------------------------------------------------------------- |
+| `variant`   | `"inline" \| "current" \| "plain"` | `"inline"` | Visual style variant.                                             |
+| `href`      | `string`                           | -          | Link destination URL.                                             |
+| `children`  | `unknown`                          | -          | Content rendered inside the link.                                 |
+| `label`     | `unknown`                          | -          | Content rendered inside the link when `children` is not provided. |
+| `external`  | `boolean`                          | `false`    | Sets `target="_blank"` and `rel="noopener noreferrer"`.           |
+| `class`     | `string`                           | -          | Additional CSS classes merged with the generated classes.         |
+| `className` | `string`                           | -          | Alias for `class`.                                                |
+
+### Variants
+
+| Variant   | Description                                | Use Case                              |
+| --------- | ------------------------------------------ | ------------------------------------- |
+| `inline`  | Primary color with underline.              | Default for inline text links.        |
+| `current` | Inherits parent text color with underline. | Links within colored contexts.        |
+| `plain`   | Primary color without underline.           | Navigation links, menus, and footers. |
+
+### Link.ExternalIcon
+
+SVG icon component to indicate external links. It accepts arbitrary SVG attributes plus `class` and `className`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="https://example.com" external>\n    External Site\n    <Link.ExternalIcon class="size-4" />\n  </Link>\n));'
+  }
+  lang="tsx"
+>
+  <Link href="https://example.com" external>
+    External Site
+    <Link.ExternalIcon class="size-4" />
+  </Link>
+</Preview>
+
+## Design Guidelines
+
+### When to Use Each Variant
+
+- **inline**: Default choice for links within body text.
+- **current**: Links inside alerts, banners, errors, or other colored containers.
+- **plain**: Navigation menus, footers, or places where underlines are visually distracting.
+
+### External Link Indicators
+
+- Use `Link.ExternalIcon` for links that open in new tabs or leave the current site.
+- Use `external: true` to set `target="_blank"` and `rel="noopener noreferrer"`.
+- The icon is decorative and has `aria-hidden="true"`; make the link text itself descriptive.
+
+### Accessibility
+
+- Links are keyboard focusable by default.
+- Use descriptive link text and avoid vague labels like “click here”.
+- Ensure each link has an `href` when it navigates somewhere.
+- Ensure sufficient color contrast for custom classes and colored parent contexts.

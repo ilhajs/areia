@@ -1,0 +1,289 @@
+---
+title: Toggle Group
+description: "Low-level toggle group primitive that groups buttons with single or multiple selection, roving tabindex keyboard navigation, and ARIA toolbar semantics."
+order: 22
+tags: [primitives]
+---
+
+# Toggle Group
+
+A set of toggleable buttons where one or more can be pressed at a time. `ToggleGroup` supports single and multiple selection modes, roving tabindex keyboard navigation, and full ARIA attributes for assistive technology.
+
+```ts
+import { ToggleGroup } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <div data-slot="toggle-group" data-orientation="horizontal" class="win95-inset inline-flex">
+    <button data-slot="toggle-group-item" data-value="left" class="win95-button border-0 border-r border-black last:border-r-0 data-[state=on]:bg-white">
+      Left
+    </button>
+    <button data-slot="toggle-group-item" data-value="center" class="win95-button border-0 border-r border-black last:border-r-0 data-[state=on]:bg-white">
+      Center
+    </button>
+    <button data-slot="toggle-group-item" data-value="right" class="win95-button border-0 border-r border-black last:border-r-0 data-[state=on]:bg-white">
+      Right
+    </button>
+  </div>
+`;
+
+const root = document.querySelector(
+  '[data-slot="toggle-group"]',
+)!;
+const controller = ToggleGroup.createToggleGroup(root, {
+  defaultValue: "center",
+  orientation: "horizontal",
+});
+```
+
+## Import
+
+```ts
+import { ToggleGroup } from "@areia/slots";
+```
+
+## Usage
+
+Add `data-slot="toggle-group"` to a container element and place button elements inside with `data-slot="toggle-group-item"` and unique `data-value` attributes. Call `ToggleGroup.createToggleGroup(root)` to initialize the controller.
+
+```ts
+import { ToggleGroup } from "@areia/slots";
+
+// Auto-bind a single root
+const root = document.querySelector(
+  '[data-slot="toggle-group"]',
+)!;
+const controller = ToggleGroup.createToggleGroup(root, {
+  defaultValue: "bold",
+  onValueChange: (value) => {
+    console.log("Selection changed:", value);
+  },
+});
+
+// Auto-bind all unbound roots in scope
+const controllers = ToggleGroup.create();
+```
+
+## Single vs Multiple Mode
+
+By default, only one item can be selected at a time — pressing another item deselects the previous one. Toggling the selected item deselects it.
+
+Set the `multiple` option or add `data-multiple` on the root to allow multiple selections. In multiple mode, each press toggles the item independently.
+
+```html
+<!-- Single mode (default) -->
+<div data-slot="toggle-group" data-orientation="horizontal">
+  <button data-slot="toggle-group-item" data-value="left">
+    Left
+  </button>
+  <button data-slot="toggle-group-item" data-value="center">
+    Center
+  </button>
+  <button data-slot="toggle-group-item" data-value="right">
+    Right
+  </button>
+</div>
+
+<!-- Multiple mode -->
+<div
+  data-slot="toggle-group"
+  data-multiple
+  data-orientation="horizontal"
+>
+  <button data-slot="toggle-group-item" data-value="bold">
+    B
+  </button>
+  <button data-slot="toggle-group-item" data-value="italic">
+    I
+  </button>
+  <button data-slot="toggle-group-item" data-value="underline">
+    U
+  </button>
+</div>
+```
+
+## Expected Markup
+
+The controller expects a root element with `data-slot="toggle-group"` containing items with `data-slot="toggle-group-item"`.
+
+```html
+<div data-slot="toggle-group" data-orientation="horizontal">
+  <button data-slot="toggle-group-item" data-value="left">
+    Left
+  </button>
+  <button data-slot="toggle-group-item" data-value="center">
+    Center
+  </button>
+  <button
+    data-slot="toggle-group-item"
+    data-value="right"
+    disabled
+  >
+    Right
+  </button>
+</div>
+```
+
+### Data Slots
+
+| Slot                | Required | Description                                                          |
+| ------------------- | -------- | -------------------------------------------------------------------- |
+| `toggle-group`      | Yes      | Root container. Receives `role="group"`.                             |
+| `toggle-group-item` | Yes      | A toggleable button within the group. Each must have a `data-value`. |
+
+### Generated Attributes
+
+The controller writes the following attributes on initialization and updates them as state changes:
+
+| Attribute          | Element(s)                          | Description                                          |
+| ------------------ | ----------------------------------- | ---------------------------------------------------- |
+| `data-state`       | `toggle-group-item`                 | `"on"` when pressed, `"off"` when not.               |
+| `data-multiple`    | Root                                | Present when `multiple` is enabled.                  |
+| `data-value`       | Root                                | Space-separated list of currently selected values.   |
+| `data-disabled`    | Root                                | Present when the entire group is disabled.           |
+| `data-orientation` | Root, items                         | `"horizontal"` or `"vertical"`.                      |
+| `role`             | Root                                | Set to `"group"`.                                    |
+| `aria-orientation` | Root                                | `"vertical"` when vertical, omitted when horizontal. |
+| `aria-pressed`     | `toggle-group-item`                 | `"true"` when pressed, `"false"` when not.           |
+| `aria-disabled`    | Root, items                         | `"true"` when disabled, removed otherwise.           |
+| `tabindex`         | `toggle-group-item`                 | `0` on the roving focus target, `-1` on all others.  |
+| `type`             | `toggle-group-item` (if `<button>`) | Set to `"button"` to prevent form submission.        |
+
+Items without a `data-value` attribute become non-interactive: `tabindex="-1"`, `aria-disabled="true"`.
+
+## Keyboard Navigation
+
+Arrow keys move focus between items using a roving `tabindex`. The first selected item receives initial focus; if none are selected, the first enabled item gets focus.
+
+| Key                        | Behavior                                                   |
+| -------------------------- | ---------------------------------------------------------- |
+| `ArrowRight` / `ArrowDown` | Move focus to next item (next column in vertical).         |
+| `ArrowLeft` / `ArrowUp`    | Move focus to previous item (previous column in vertical). |
+| `Home`                     | Move focus to first item.                                  |
+| `End`                      | Move focus to last item.                                   |
+| `Enter` / `Space`          | Toggle the focused item.                                   |
+
+When `loop` is `true` (default), arrow navigation wraps from the last item to the first and vice versa.
+
+## Events
+
+### Outbound
+
+| Event                 | Detail                | Description                                                                          |
+| --------------------- | --------------------- | ------------------------------------------------------------------------------------ |
+| `toggle-group:change` | `{ value: string[] }` | Fired on the root when the selection changes via user interaction or the controller. |
+
+### Inbound
+
+| Event              | Detail                                                | Description                                                                                                                                        |
+| ------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `toggle-group:set` | `{ value: string \| string[] } \| string \| string[]` | Dispatch on the root to set the selection programmatically. The preferred shape is `{ value: ... }`. String and array shorthand are also accepted. |
+
+## API Reference
+
+### Options
+
+| Option          | Type                         | Default        | Description                                                                                    |
+| --------------- | ---------------------------- | -------------- | ---------------------------------------------------------------------------------------------- |
+| `defaultValue`  | `string \| string[]`         | —              | Initial selected value(s). Use a string for single mode, an array for multiple mode.           |
+| `multiple`      | `boolean`                    | `false`        | Allow more than one item to be selected at the same time.                                      |
+| `orientation`   | `"horizontal" \| "vertical"` | `"horizontal"` | Layout direction. Controls roving-focus axis and ARIA attributes.                              |
+| `loop`          | `boolean`                    | `true`         | When `true`, arrow-key navigation wraps from the last item to the first (and vice versa).      |
+| `disabled`      | `boolean`                    | `false`        | Disable the entire toggle group. Blocks user clicks, keyboard interaction, and inbound events. |
+| `onValueChange` | `(value: string[]) => void`  | —              | Called when the selected values change.                                                        |
+
+### Controller
+
+| Member            | Type                                  | Description                              |
+| ----------------- | ------------------------------------- | ---------------------------------------- |
+| `value`           | `string[]` (getter)                   | Currently selected values.               |
+| `setValue(value)` | `(value: string \| string[]) => void` | Set the selection to the given value(s). |
+| `toggle(value)`   | `(value: string) => void`             | Toggle the item identified by `value`.   |
+| `destroy()`       | `() => void`                          | Remove all event listeners and clean up. |
+
+## Controller
+
+The controller is returned by `ToggleGroup.createToggleGroup()` and provides imperative control over the toggle group's state.
+
+```ts
+import { ToggleGroup } from "@areia/slots";
+
+const root = document.querySelector(
+  '[data-slot="toggle-group"]',
+)!;
+const controller = ToggleGroup.createToggleGroup(root, {
+  defaultValue: "center",
+  onValueChange: (value) => {
+    console.log("Selection:", value);
+  },
+});
+
+// Set selection programmatically
+controller.setValue("right");
+
+// Set multiple values (requires multiple mode)
+controller.setValue(["bold", "italic"]);
+
+// Toggle a specific item
+controller.toggle("center");
+
+// Read current state
+console.log(controller.value); // ["center"]
+
+// Tear down
+controller.destroy();
+```
+
+### Listening to Events
+
+```ts
+const root = document.querySelector(
+  '[data-slot="toggle-group"]',
+)!;
+
+root.addEventListener("toggle-group:change", (event) => {
+  const { value } = event.detail;
+  console.log("Selection changed:", value);
+});
+```
+
+### Inbound Events
+
+Dispatch `toggle-group:set` on the root to set the selection from outside the controller. The event is ignored when the group is disabled.
+
+```ts
+const root = document.querySelector(
+  '[data-slot="toggle-group"]',
+)!;
+
+// Preferred shape
+root.dispatchEvent(
+  new CustomEvent("toggle-group:set", {
+    detail: { value: "bold" },
+  }),
+);
+
+// Multiple values (requires multiple mode)
+root.dispatchEvent(
+  new CustomEvent("toggle-group:set", {
+    detail: { value: ["bold", "italic"] },
+  }),
+);
+
+// String shorthand
+root.dispatchEvent(
+  new CustomEvent("toggle-group:set", {
+    detail: "left",
+  }),
+);
+```
+
+### Accessibility
+
+- The root element receives `role="group"`.
+- `aria-orientation` is set on the root when orientation is `"vertical"`.
+- Each item receives `aria-pressed="true"` or `"false"`.
+- Disabled items receive `aria-disabled="true"`.
+- Items without a `data-value` attribute are made non-interactive with `tabindex="-1"` and `aria-disabled="true"`.
+- Roving `tabindex` ensures only one item in the group is focusable at a time.
+- `Enter` and `Space` toggle the focused item via native button behavior.
+- Items that are `<button>` elements have `type="button"` set automatically to prevent unintended form submission.

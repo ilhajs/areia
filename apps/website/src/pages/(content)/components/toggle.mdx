@@ -1,0 +1,249 @@
+---
+title: Toggle
+description: A two-state button that can be either on or off.
+order: 34
+tags: [components]
+---
+
+import { Preview } from "$lib/components/preview";
+import { Toggle, ToggleGroup } from "areia";
+
+# Toggle
+
+A pressable button that toggles between pressed and unpressed states.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/toggle/index.ts)
+
+`Toggle` is backed by `@areia/slots` and wires `aria-pressed`, `data-state`, and toggle change events.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <Toggle variant="outline">Bold</Toggle>\n));'
+  }
+  lang="tsx"
+>
+  <Toggle variant="outline">Bold</Toggle>
+</Preview>
+
+## Import
+
+```ts
+import { Toggle, ToggleGroup } from "areia";
+```
+
+## Usage
+
+Use `Toggle` with optional `variant`, `size`, and `defaultPressed`. It is a single-element primitive — a `<button>` with `data-slot="toggle"`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <Toggle variant="outline">Italic</Toggle>\n));'
+  }
+  lang="tsx"
+>
+  <Toggle variant="outline">Italic</Toggle>
+</Preview>
+
+## Examples
+
+### Variants
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle>Default</Toggle>\n    <Toggle variant="outline">Outline</Toggle>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <div class="flex items-center gap-2">
+    <Toggle>Default</Toggle>
+    <Toggle variant="outline">Outline</Toggle>
+  </div>
+</Preview>
+
+### Sizes
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle size="sm" variant="outline">\n      Small\n    </Toggle>\n    <Toggle size="default" variant="outline">\n      Default\n    </Toggle>\n    <Toggle size="lg" variant="outline">\n      Large\n    </Toggle>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <div class="flex items-center gap-2">
+    <Toggle size="sm" variant="outline">
+      Small
+    </Toggle>
+    <Toggle size="default" variant="outline">
+      Default
+    </Toggle>
+    <Toggle size="lg" variant="outline">
+      Large
+    </Toggle>
+  </div>
+</Preview>
+
+### Disabled
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle disabled>Disabled</Toggle>\n    <Toggle variant="outline" disabled>\n      Disabled\n    </Toggle>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <div class="flex items-center gap-2">
+    <Toggle disabled>Disabled</Toggle>
+    <Toggle variant="outline" disabled>
+      Disabled
+    </Toggle>
+  </div>
+</Preview>
+
+### Pressed State
+
+Use `defaultPressed` to set the initial pressed state.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle defaultPressed>Pressed</Toggle>\n    <Toggle variant="outline" defaultPressed>\n      Pressed\n    </Toggle>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <div class="flex items-center gap-2">
+    <Toggle defaultPressed>Pressed</Toggle>
+    <Toggle variant="outline" defaultPressed>
+      Pressed
+    </Toggle>
+  </div>
+</Preview>
+
+### Toggle Group
+
+Use `ToggleGroup` when multiple toggles belong together as a single control.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ToggleGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ToggleGroup type="single" defaultValue="center">\n    <ToggleGroup.Item value="left" variant="outline">\n      Left\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="center" variant="outline">\n      Center\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="right" variant="outline">\n      Right\n    </ToggleGroup.Item>\n  </ToggleGroup>\n));'
+  }
+  lang="tsx"
+>
+  <ToggleGroup type="single" defaultValue="center">
+    <ToggleGroup.Item value="left" variant="outline">
+      Left
+    </ToggleGroup.Item>
+    <ToggleGroup.Item value="center" variant="outline">
+      Center
+    </ToggleGroup.Item>
+    <ToggleGroup.Item value="right" variant="outline">
+      Right
+    </ToggleGroup.Item>
+  </ToggleGroup>
+</Preview>
+
+Use `type="multiple"` to allow more than one item to be pressed at a time.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ToggleGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ToggleGroup type="multiple" defaultValue={["bold"]}>\n    <ToggleGroup.Item value="bold" variant="outline">\n      Bold\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="italic" variant="outline">\n      Italic\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="underline" variant="outline">\n      Underline\n    </ToggleGroup.Item>\n  </ToggleGroup>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Change Events
+
+Use `onPressedChange` to respond to state changes.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.state("bold", false).render(({ state }) => (\n  <div class="flex flex-col items-start gap-3">\n    <Toggle\n      variant="outline"\n      onPressedChange={(pressed) => {\n        state.bold(pressed);\n      }}\n    >\n      Bold\n    </Toggle>\n    <p class="text-sm text-areia-subtle">\n      Bold is:{" "}\n      <span class="font-medium text-areia-default">\n        {state.bold() ? "On" : "Off"}\n      </span>\n    </p>\n  </div>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+## API Reference
+
+### Toggle
+
+Root component that manages the toggle state.
+
+| Prop              | Type                         | Default     | Description                                                 |
+| ----------------- | ---------------------------- | ----------- | ----------------------------------------------------------- |
+| `children`        | `unknown`                    | —           | Content rendered inside the toggle button.                  |
+| `variant`         | `"default" \| "outline"`     | `"default"` | Visual variant. `default` is filled, `outline` is bordered. |
+| `size`            | `"sm" \| "default" \| "lg"`  | `"default"` | Size of the toggle.                                         |
+| `defaultPressed`  | `boolean`                    | `false`     | Initial pressed state.                                      |
+| `disabled`        | `boolean`                    | `false`     | Disables interaction and applies muted styling.             |
+| `onPressedChange` | `(pressed: boolean) => void` | —           | Called when the pressed state changes.                      |
+
+### ToggleGroup
+
+| Prop            | Type                         | Default        | Description                               |
+| --------------- | ---------------------------- | -------------- | ----------------------------------------- |
+| `type`          | `"single" \| "multiple"`     | `"single"`     | Selection mode.                           |
+| `defaultValue`  | `string \| string[]`         | —              | Initial selected value(s).                |
+| `orientation`   | `"horizontal" \| "vertical"` | `"horizontal"` | Layout direction for keyboard navigation. |
+| `loop`          | `boolean`                    | `true`         | Wrap keyboard focus at ends.              |
+| `disabled`      | `boolean`                    | `false`        | Disable the entire group.                 |
+| `onValueChange` | `(value: string[]) => void`  | —              | Called when the selection changes.        |
+| `children`      | `unknown`                    | —              | `ToggleGroup.Item` children.              |
+| `class`         | `string`                     | —              | Additional CSS classes.                   |
+| `className`     | `string`                     | —              | Alias for `class`.                        |
+
+### ToggleGroup.Item
+
+| Prop        | Type                        | Default     | Description                       |
+| ----------- | --------------------------- | ----------- | --------------------------------- |
+| `value`     | `string`                    | —           | Unique item value.                |
+| `variant`   | `"default" \| "outline"`    | `"default"` | Visual variant.                   |
+| `size`      | `"sm" \| "default" \| "lg"` | `"default"` | Size of the item.                 |
+| `disabled`  | `boolean`                   | `false`     | Disables this item.               |
+| `children`  | `unknown`                   | —           | Content rendered inside the item. |
+| `class`     | `string`                    | —           | Additional CSS classes.           |
+| `className` | `string`                    | —           | Alias for `class`.                |
+
+### ToggleGroup.Separator
+
+Visual divider between toggle items. Accepts standard `div` attributes plus `class` and `className`.
+
+## Slots
+
+`Toggle` renders a single data slot:
+
+- `toggle`
+
+The root receives state attributes from the slot controller:
+
+| Attribute       | Element | Description                                    |
+| --------------- | ------- | ---------------------------------------------- |
+| `data-state`    | toggle  | `"on"` when pressed, `"off"` when not pressed. |
+| `data-disabled` | toggle  | Present when toggle is disabled.               |
+| `aria-pressed`  | toggle  | `"true"` or `"false"`.                         |
+
+## Events
+
+The toggle emits custom DOM events from the root element.
+
+### Outbound
+
+| Event           | Detail                 | Description                           |
+| --------------- | ---------------------- | ------------------------------------- |
+| `toggle:change` | `{ pressed: boolean }` | Fired when the pressed state changes. |
+
+### Inbound
+
+| Event        | Detail               | Description                             |
+| ------------ | -------------------- | --------------------------------------- |
+| `toggle:set` | `{ value: boolean }` | Set the pressed state programmatically. |
+
+```ts
+const toggle = document.querySelector('[data-slot="toggle"]')!;
+
+toggle.addEventListener("toggle:change", (e) => {
+  console.log("Pressed:", e.detail.pressed);
+});
+
+// Set pressed state programmatically
+toggle.dispatchEvent(
+  new CustomEvent("toggle:set", { detail: { value: true } }),
+);
+```

@@ -91,7 +91,8 @@ export function dialogVariants({ size = DIALOG_DEFAULT_VARIANTS.size }: DialogVa
 
 function overlayVariants() {
   return cn(
-    "fixed inset-0 z-[calc(40+var(--dialog-overlay-stack-index,0))] bg-areia-recessed/80",
+    // Token already carries alpha (see --areia-overlay in tokens.ts)
+    "fixed inset-0 z-[calc(40+var(--dialog-overlay-stack-index,0))] bg-areia-overlay",
     "transition-opacity duration-150 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0",
   );
 }

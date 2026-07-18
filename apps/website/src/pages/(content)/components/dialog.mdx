@@ -1,0 +1,233 @@
+---
+title: Dialog
+description: Displays modal content over the page.
+order: 12
+tags: [components]
+---
+
+import { Preview } from "$lib/components/preview";
+import { Button, Dialog } from "areia";
+
+# Dialog
+
+Displays modal content over the page.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/dialog/index.ts)
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    trigger={<Button>Open dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <div class="grid gap-2">\n          <Dialog.Title>Edit profile</Dialog.Title>\n          <Dialog.Description>\n            Make changes to your profile. Close the dialog when\n            you are done.\n          </Dialog.Description>\n        </div>\n        <div class="flex justify-end gap-2">\n          <Dialog.Close>\n            <Button variant="secondary">Cancel</Button>\n          </Dialog.Close>\n          <Dialog.Close>\n            <Button variant="primary">Save</Button>\n          </Dialog.Close>\n        </div>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Dialog
+    trigger={<Button>Open dialog</Button>}
+    contentClass="grid gap-4 p-6"
+    content={
+      <>
+        <div class="grid gap-2">
+          <Dialog.Title>Edit profile</Dialog.Title>
+          <Dialog.Description>
+            Make changes to your profile. Close the dialog when
+            you are done.
+          </Dialog.Description>
+        </div>
+        <div class="flex justify-end gap-2">
+          <Dialog.Close>
+            <Button variant="secondary">Cancel</Button>
+          </Dialog.Close>
+          <Dialog.Close>
+            <Button variant="primary">Save</Button>
+          </Dialog.Close>
+        </div>
+      </>
+    }
+  />
+</Preview>
+
+## Import
+
+```ts
+import { Dialog } from "areia";
+```
+
+## Usage
+
+Use `Dialog` for an interactive dialog. The composition-first API accepts `Dialog.Trigger`, `Dialog.Portal`, `Dialog.Overlay`, and `Dialog.Content` as children. The `trigger` and `content` props remain available as shortcuts.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog>\n    <Dialog.Trigger>\n      <Button>Open</Button>\n    </Dialog.Trigger>\n    <Dialog.Portal>\n      <Dialog.Overlay />\n      <Dialog.Content class="grid gap-4 p-6">\n        <Dialog.Title>Dialog title</Dialog.Title>\n        <Dialog.Description>\n          Helpful supporting text for the dialog.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Close</Button>\n        </Dialog.Close>\n      </Dialog.Content>\n    </Dialog.Portal>\n  </Dialog>\n));'
+  }
+  lang="tsx"
+>
+  <Dialog>
+    <Dialog.Trigger>
+      <Button>Open</Button>
+    </Dialog.Trigger>
+    <Dialog.Portal>
+      <Dialog.Overlay />
+      <Dialog.Content class="grid gap-4 p-6">
+        <Dialog.Title>Dialog title</Dialog.Title>
+        <Dialog.Description>
+          Helpful supporting text for the dialog.
+        </Dialog.Description>
+        <Dialog.Close>
+          <Button>Close</Button>
+        </Dialog.Close>
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog>
+</Preview>
+
+## Examples
+
+### Ilha + portaled overlays (dialog, popover, dropdown, hover-card)
+
+`@areia/slots` moves portal wrappers (`dialog-portal`, popover/dropdown positioners, etc.) to `document.body` when overlays open. That subtree is **outside** the Ilha island host element. The same constraints apply to **Popover**, **Dropdown**, and **HoverCard** when `portal` is enabled (default).
+
+Ilha’s renderer **morphs only the island host** (`data-ilha`). After the portal is teleported, reactive updates from the owning island (bound inputs, `each(results)`, nested `data-ilha-slot` children inside `dialog-content`) may **not** reach portaled nodes. You can see a frozen snapshot (empty search field, `command-list` still `hidden`, or an unhydrated nested island placeholder).
+
+**Supported patterns today**
+
+| Approach                             | When to use                                                                                                                                                                                                                                                                                 |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **One island owns everything**       | `open`, `query`, and list markup live in a **single** parent `.render`. Prefer the shortcut `content={…}` or composed `Dialog.Content` **without** a separate child island only inside the portal.                                                                                          |
+| **Imperative bridge (escape hatch)** | `onPortalMounted(container)` on portaled primitives — **Dialog**, **Popover**, **Dropdown**, **HoverCard**, **Tooltip**, **ContextMenu**, **Combobox** (slots), **Select** (slots). Use to sync portaled DOM (e.g. command palette bridge). Remove when Ilha can patch teleported subtrees. |
+| **`Dialog.Static`**                  | SSR / docs only — not for signal-driven UI inside a portaled panel.                                                                                                                                                                                                                         |
+
+**Close controls:** `Dialog.Close` and `Popover.Close` with `as="button"` (default) wrap icon-only children (SVG / `Icon`) in `<button type="button" data-slot="…-close">` instead of putting the close slot on the SVG alone.
+
+### Alert dialog
+
+Use `role: "alertdialog"` for confirmation flows that require explicit acknowledgment. Alert dialogs do not close on outside click by default.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    role="alertdialog"\n    trigger={\n      <Button variant="destructive">Delete project</Button>\n    }\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <div class="grid gap-2">\n          <Dialog.Title>Delete project?</Dialog.Title>\n          <Dialog.Description>\n            This action cannot be undone. The project and all\n            related data will be permanently deleted.\n          </Dialog.Description>\n        </div>\n        <div class="flex justify-end gap-2">\n          <Dialog.Close>\n            <Button variant="secondary">Cancel</Button>\n          </Dialog.Close>\n          <Dialog.Close>\n            <Button variant="destructive">Delete</Button>\n          </Dialog.Close>\n        </div>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Dialog
+    role="alertdialog"
+    trigger={
+      <Button variant="destructive">Delete project</Button>
+    }
+    contentClass="grid gap-4 p-6"
+    content={
+      <>
+        <div class="grid gap-2">
+          <Dialog.Title>Delete project?</Dialog.Title>
+          <Dialog.Description>
+            This action cannot be undone. The project and all
+            related data will be permanently deleted.
+          </Dialog.Description>
+        </div>
+        <div class="flex justify-end gap-2">
+          <Dialog.Close>
+            <Button variant="secondary">Cancel</Button>
+          </Dialog.Close>
+          <Dialog.Close>
+            <Button variant="destructive">Delete</Button>
+          </Dialog.Close>
+        </div>
+      </>
+    }
+  />
+</Preview>
+
+### Sizes
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nconst sizes = ["sm", "base", "lg", "xl"] as const;\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap gap-2">\n    {sizes.map((size) => (\n      <Dialog\n        size={size}\n        trigger={<Button variant="secondary">{size}</Button>}\n        contentClass="grid gap-4 p-6"\n        content={\n          <>\n            <Dialog.Title>{size} dialog</Dialog.Title>\n            <Dialog.Description>\n              Dialogs constrain their minimum width by size.\n            </Dialog.Description>\n            <Dialog.Close>\n              <Button>Close</Button>\n            </Dialog.Close>\n          </>\n        }\n      />\n    ))}\n  </div>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Close behavior
+
+Configure outside-click, Escape, initial open state, and scroll locking through root options.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    closeOnClickOutside={false}\n    closeOnEscape\n    lockScroll\n    trigger={<Button>Open locked dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <Dialog.Title>Explicit close</Dialog.Title>\n        <Dialog.Description>\n          Clicking outside this dialog will not close it.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Close</Button>\n        </Dialog.Close>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Dialog
+    closeOnClickOutside={false}
+    closeOnEscape
+    lockScroll
+    trigger={<Button>Open locked dialog</Button>}
+    contentClass="grid gap-4 p-6"
+    content={
+      <>
+        <Dialog.Title>Explicit close</Dialog.Title>
+        <Dialog.Description>
+          Clicking outside this dialog will not close it.
+        </Dialog.Description>
+        <Dialog.Close>
+          <Button>Close</Button>
+        </Dialog.Close>
+      </>
+    }
+  />
+</Preview>
+
+### Prop shortcut
+
+For simple dialogs, pass `trigger` and `content`. Areia generates the trigger, portal, overlay, and content slots for you. With Ilha, keep reactive `content` (or composed `Dialog.Content` children) in the island `.render` callback so lists and inputs update when signals change; `Dialog.Static` pre-renders markup for SSR-only shortcuts.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    trigger={<Button>Open shortcut dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <Dialog.Title>Shortcut API</Dialog.Title>\n        <Dialog.Description>\n          Use props when you do not need to customize the slot\n          structure.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Done</Button>\n        </Dialog.Close>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Dialog
+    trigger={<Button>Open shortcut dialog</Button>}
+    contentClass="grid gap-4 p-6"
+    content={
+      <>
+        <Dialog.Title>Shortcut API</Dialog.Title>
+        <Dialog.Description>
+          Use props when you do not need to customize the slot
+          structure.
+        </Dialog.Description>
+        <Dialog.Close>
+          <Button>Done</Button>
+        </Dialog.Close>
+      </>
+    }
+  />
+</Preview>
+
+## API Reference
+
+### `Dialog`
+
+| Prop                  | Type                               | Default                            | Description                                                                                                                     |
+| --------------------- | ---------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `trigger`             | `unknown`                          | —                                  | Custom trigger markup.                                                                                                          |
+| `children`            | `unknown`                          | —                                  | Composed dialog slots, or trigger content when no `Dialog.Content` child is present.                                            |
+| `content`             | `unknown`                          | —                                  | Dialog panel content.                                                                                                           |
+| `size`                | `"sm" \| "base" \| "lg" \| "xl"`   | `"base"`                           | Dialog width.                                                                                                                   |
+| `role`                | `"dialog" \| "alertdialog"`        | `"dialog"`                         | Dialog semantic role.                                                                                                           |
+| `defaultOpen`         | `boolean`                          | `false`                            | Initial open state.                                                                                                             |
+| `closeOnClickOutside` | `boolean`                          | `true` (`false` for alert dialogs) | Close when clicking outside content.                                                                                            |
+| `closeOnEscape`       | `boolean`                          | `true`                             | Close when pressing Escape.                                                                                                     |
+| `lockScroll`          | `boolean`                          | `true`                             | Lock body scroll while open.                                                                                                    |
+| `onOpenChange`        | `(open: boolean) => void`          | —                                  | Called when open state changes.                                                                                                 |
+| `onPortalMounted`     | `(container: HTMLElement) => void` | —                                  | After portal moves to `document.body` on open. Also on Popover, Dropdown, HoverCard; AlertDialog via slots `createAlertDialog`. |
+
+### Compound exports
+
+- `Dialog.Trigger`
+- `Dialog.Portal`
+- `Dialog.Overlay`
+- `Dialog.Content`
+- `Dialog.Title`
+- `Dialog.Description`
+- `Dialog.Close`

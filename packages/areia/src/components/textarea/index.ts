@@ -4,7 +4,7 @@ import { cn } from "$lib/cn";
 import { splitBindProps } from "$lib/binds";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-import { Field } from "$components/field";
+import { allocateFieldControlId, Field } from "$components/field";
 
 /** Textarea size and variant definitions mapping names to their Tailwind classes. */
 export const TEXTAREA_VARIANTS = {
@@ -189,19 +189,28 @@ function renderTextarea(input: TextareaInput) {
 function TextareaBase(input: TextareaInput = {}) {
   const { label, labelTooltip: _labelTooltip, description, error, ...controlInput } = input;
   const normalizedError = normalizeError(error);
+  const needsField = label != null || description != null || normalizedError != null;
+  const controlId =
+    typeof controlInput.id === "string" && controlInput.id
+      ? controlInput.id
+      : needsField
+        ? allocateFieldControlId("areia-textarea")
+        : undefined;
   const control = renderTextarea({
     ...controlInput,
+    ...(controlId ? { id: controlId } : {}),
     error,
     "data-slot": controlInput["data-slot"] ?? "field-control",
   } as TextareaInput);
 
-  if (label == null && description == null && normalizedError == null) return renderTextarea(input);
+  if (!needsField) return renderTextarea(input);
 
   return Field.Static({
     label,
     description,
     error: normalizedError,
     invalid: normalizedError != null,
+    htmlFor: controlId,
     children: control,
   });
 }

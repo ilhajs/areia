@@ -1,0 +1,55 @@
+---
+title: Spinner
+description: A small loading indicator.
+order: 29
+tags: [components]
+---
+
+import { Preview } from "$lib/components/preview";
+import { Spinner } from "areia";
+
+# Spinner
+
+A small loading indicator for pending or in-progress states.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/spinner/index.ts)
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Spinner } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-3">\n    <Spinner size="sm" />\n    <Spinner />\n    <Spinner size="lg" />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <div class="flex items-center gap-3">
+    <Spinner size="sm" />
+    <Spinner />
+    <Spinner size="lg" />
+  </div>
+</Preview>
+
+## Import
+
+```ts
+import { Spinner } from "areia";
+```
+
+## Usage
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Spinner } from "areia";\n\nexport default ilha.render(() => (\n  <Spinner aria-label="Loading" />\n));'
+  }
+  lang="tsx"
+>
+  <Spinner aria-label="Loading" />
+</Preview>
+
+`Button` uses `Spinner` automatically when `loading` is true.
+
+## API Reference
+
+| Prop        | Type                     | Default  | Description             |
+| ----------- | ------------------------ | -------- | ----------------------- |
+| `size`      | `"sm" \| "base" \| "lg"` | `"base"` | Spinner size.           |
+| `class`     | `string`                 | -        | Additional CSS classes. |
+| `className` | `string`                 | -        | Alias for `class`.      |

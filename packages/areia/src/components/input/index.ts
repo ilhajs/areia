@@ -4,7 +4,7 @@ import { cn } from "$lib/cn";
 import { splitBindProps } from "$lib/binds";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-import { Field } from "$components/field";
+import { allocateFieldControlId, Field } from "$components/field";
 
 /** Input size and variant definitions mapping names to their Tailwind classes. */
 export const INPUT_VARIANTS = {
@@ -208,19 +208,28 @@ function renderInput(input: InputInput) {
 function InputBase(input: InputInput = {}) {
   const { label, labelTooltip: _labelTooltip, description, error, ...controlInput } = input;
   const normalizedError = normalizeError(error);
+  const needsField = label != null || description != null || normalizedError != null;
+  const controlId =
+    typeof controlInput.id === "string" && controlInput.id
+      ? controlInput.id
+      : needsField
+        ? allocateFieldControlId("areia-input")
+        : undefined;
   const control = renderInput({
     ...controlInput,
+    ...(controlId ? { id: controlId } : {}),
     error,
     "data-slot": controlInput["data-slot"] ?? "field-control",
   } as InputInput);
 
-  if (label == null && description == null && normalizedError == null) return renderInput(input);
+  if (!needsField) return renderInput(input);
 
   return Field.Static({
     label,
     description,
     error: normalizedError,
     invalid: normalizedError != null,
+    htmlFor: controlId,
     children: control,
   });
 }

@@ -6,6 +6,14 @@ import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { stampMorphPreserve } from "$lib/morph-preserve";
 
+let fieldControlSeq = 0;
+
+/** Stable unique id for pairing field labels with controls (SSR-safe). */
+export function allocateFieldControlId(prefix = "areia-field"): string {
+  fieldControlSeq += 1;
+  return `${prefix}-${fieldControlSeq}`;
+}
+
 export type FieldInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   Record<string, unknown> & {
     label?: unknown;
@@ -17,6 +25,10 @@ export type FieldInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "c
     invalid?: boolean;
     validate?: FieldPrimitive.FieldValidate;
     validationMode?: FieldPrimitive.FieldOptions["validationMode"];
+    /** Associates the label with a control id (sets `<label for>`). */
+    htmlFor?: string;
+    /** Alias for `htmlFor`. */
+    for?: string;
     class?: string;
     className?: string;
     labelClass?: string;
@@ -24,8 +36,19 @@ export type FieldInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "c
     errorClass?: string;
   };
 
-export function FieldLabel(input: { label?: unknown; class?: string; className?: string } = {}) {
-  const { label, class: className, className: aliasedClassName } = input;
+export type FieldLabelInput = {
+  label?: unknown;
+  class?: string;
+  className?: string;
+  /** Control id this label activates. */
+  htmlFor?: string;
+  /** Alias for `htmlFor`. */
+  for?: string;
+};
+
+export function FieldLabel(input: FieldLabelInput = {}) {
+  const { label, class: className, className: aliasedClassName, htmlFor, for: forAttr } = input;
+  const controlId = htmlFor ?? forAttr;
   return html`<label
     data-slot="field-label"
     class="${cn(
@@ -33,6 +56,7 @@ export function FieldLabel(input: { label?: unknown; class?: string; className?:
       className,
       aliasedClassName,
     )}"
+    ${raw(toAttrs({ for: controlId }))}
     >${render(label)}</label
   >`;
 }
@@ -96,6 +120,8 @@ function renderField(input: FieldInput = {}) {
     invalid,
     validate: _validate,
     validationMode,
+    htmlFor,
+    for: forAttr,
     class: className,
     className: aliasedClassName,
     labelClass,
@@ -103,6 +129,7 @@ function renderField(input: FieldInput = {}) {
     errorClass,
     ...rest
   } = input;
+  const controlId = htmlFor ?? forAttr;
 
   return html`<div
     data-slot="field"
@@ -117,7 +144,8 @@ function renderField(input: FieldInput = {}) {
       }),
     )}
   >
-    ${label != null ? FieldLabel({ label, class: labelClass }) : ""} ${render(children)}
+    ${label != null ? FieldLabel({ label, class: labelClass, htmlFor: controlId }) : ""}
+    ${render(children)}
     ${description != null ? FieldDescription({ description, class: descriptionClass }) : ""}
     ${error != null ? FieldError({ error, class: errorClass }) : FieldError()}
   </div>`;
