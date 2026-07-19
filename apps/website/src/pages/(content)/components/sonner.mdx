@@ -6,6 +6,7 @@ tags: [components]
 ---
 
 import { Preview } from "$lib/components/preview";
+import { SonnerDemo } from "$lib/components/sonner-demo";
 
 # Sonner
 
@@ -66,8 +67,10 @@ toast.message("Invite sent", {
     '// @ts-nocheck\n// ---cut---\nimport ilha from "ilha";\nimport { Button } from "areia";\nimport { Toaster, toast } from "areia/sonner";\n\nexport default ilha\n  .on("button@click", () => {\n    toast.success("Project saved", {\n      description: "Your changes are now live.",\n    });\n  })\n  .render(() => (\n    <div class="flex flex-col gap-4">\n      <Button variant="primary">Save project</Button>\n      <Toaster\n        position="bottom-right"\n        closeButton\n        richColors\n        theme="system"\n      />\n    </div>\n  ));'
   }
   lang="tsx"
-  codeOnly
-/>
+  size="sm"
+>
+  <SonnerDemo />
+</Preview>
 
 ## API
 

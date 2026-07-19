@@ -1,8 +1,15 @@
 import { html, raw } from "ilha";
 import { cn } from "$lib/cn";
 
-/** Decode HTML entities from ilha-serialized markup strings. */
+/**
+ * Decode HTML entities from a fully entity-escaped markup string (no literal tags).
+ *
+ * Serialized ilha markup contains literal `<` tags with correctly escaped
+ * attribute values; decoding entities inside it would corrupt attributes like
+ * `data-ilha-props`, so such strings pass through untouched.
+ */
 export function decodeMarkupEntities(markup: string): string {
+  if (markup.includes("<")) return markup;
   if (!/&(?:lt|gt|quot|#39|amp);/.test(markup)) return markup;
   return markup
     .replace(/&lt;/g, "<")

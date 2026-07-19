@@ -26,6 +26,38 @@ describe("markup", () => {
     expect(markup({ value: escaped })).toBe('<button type="button">Open</button>');
   });
 
+  it("passes serialized markup with escaped attribute values through untouched", () => {
+    const serialized =
+      '<div data-ilha-slot="p:0" data-ilha-props=\'{"label":"it&#39;s &quot;quoted&quot;"}\'>x</div>';
+    expect(decodeMarkupEntities(serialized)).toBe(serialized);
+    expect(markup({ value: serialized })).toBe(serialized);
+    expect(markup(serialized)).toBe(serialized);
+  });
+
+  it("round-trips quote-bearing data-ilha-props through render()", () => {
+    const props = { label: `it's "quoted"` };
+    const escaped = JSON.stringify({ default: props })
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+    const serialized = `<div data-slot="resizable-panel" data-ilha-slot="p:0" data-ilha-props='${escaped}'>x</div>`;
+    const output = markup({ value: serialized });
+
+    expect(output).toBe(serialized);
+    const match = /data-ilha-props='([^']*)'/.exec(output);
+    expect(match).not.toBeNull();
+    const decoded = (match as RegExpExecArray)[1]
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, "&");
+    expect(JSON.parse(decoded)).toEqual({ default: props });
+  });
+
+  it("still decodes fully-escaped markup (no literal tags)", () => {
+    const doubleEscaped = "&lt;span&gt;it&amp;#39;s fine&lt;/span&gt;";
+    expect(decodeMarkupEntities(doubleEscaped)).toBe("<span>it&#39;s fine</span>");
+  });
+
   it("unwraps serialized HTML objects", () => {
     expect(markup({ value: "<button>Open</button>" })).toBe("<button>Open</button>");
     expect(markup({ value: "<button>Open</button>" })).not.toContain("[object Object]");
