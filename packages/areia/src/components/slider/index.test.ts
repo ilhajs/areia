@@ -1,6 +1,14 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Slider } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
 
 describe("Slider", () => {
   it("renders slider wrapper with data-slot", () => {
@@ -50,5 +58,24 @@ describe("Slider", () => {
     const output = markup(Slider({ class: "a", className: "b" }));
     expect(output).toContain("a");
     expect(output).toContain("b");
+  });
+
+  it("stamps data-morph-preserve including style after mount", async () => {
+    document.body.innerHTML = "";
+    const App = ilha.render(() => html`${Slider({ value: 40, min: 0, max: 100 })}`);
+    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    const { unmount } = mount({ App }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    try {
+      const root = document.querySelector('[data-slot="slider"]');
+      expect(root).toBeTruthy();
+      const preserve = root!.getAttribute("data-morph-preserve") ?? "";
+      expect(preserve.split(/\s+/)).toContain("style");
+      expect(preserve.split(/\s+/)).toContain("data-value");
+      const thumb = root!.querySelector('[data-slot="slider-thumb"]');
+      expect((thumb?.getAttribute("data-morph-preserve") ?? "").split(/\s+/)).toContain("style");
+    } finally {
+      unmount();
+    }
   });
 });

@@ -608,9 +608,12 @@ export function createResizable(
   };
 
   const commitLayout = (next: number[]): void => {
-    if (arraysEqual(layout, next)) return;
-    layout = next;
+    const changed = !arraysEqual(layout, next);
+    if (changed) layout = next;
+    // Always write styles/ARIA — even when percentages are unchanged — so a
+    // parent morph that clobbered inline style can be repaired via setLayout(layout).
     applyLayout();
+    if (!changed) return;
     emit(root, "resizable:change", { layout: [...layout] });
     onLayoutChange?.([...layout]);
   };

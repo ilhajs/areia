@@ -4,7 +4,7 @@ import { cn } from "$lib/cn";
 import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-import { stampMorphPreserve } from "$lib/morph-preserve";
+import { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 
 /** Tooltip side variant definitions mapping positions to their Tailwind classes. */
 export const TOOLTIP_VARIANTS = {
@@ -332,7 +332,7 @@ export const TooltipRoot = ilha
       : host.querySelector('[data-slot="tooltip"]');
     if (!root) return;
 
-    stampMorphPreserve(root);
+    stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = TooltipPrimitive.createTooltip(root, {
       align: input.align,
       alignOffset: input.alignOffset,

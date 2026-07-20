@@ -26,6 +26,7 @@ import {
 } from "$lib/binds";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
+import { stampMorphPreserve } from "$lib/morph-preserve";
 import type { HTMLElementProps } from "$lib/types";
 
 export type DatePickerMode = "single" | "multiple" | "range";
@@ -389,6 +390,8 @@ export const DatePickerRoot = ilha
       ? (host as HTMLElement)
       : host.querySelector<HTMLElement>('[data-slot="date-picker"]');
     if (!root) return;
+
+    stampMorphPreserve(root);
 
     let currentInput: DatePickerInput = {
       ...input,

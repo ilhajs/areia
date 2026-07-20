@@ -10,7 +10,7 @@ import {
 import { cn } from "$lib/cn";
 import { render, renderString } from "$lib/markup";
 import { toAttrs } from "$lib/input";
-import { stampMorphPreserve } from "$lib/morph-preserve";
+import { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 import type { HTMLElementProps } from "$lib/types";
 import { INPUT_DEFAULT_VARIANTS, INPUT_VARIANTS, inputVariants } from "$components/input";
 import { Field } from "$components/field";
@@ -486,7 +486,7 @@ export const AutocompleteRoot = ilha
     const textInput = root.querySelector<HTMLInputElement>('[data-slot="autocomplete-input"]');
     if (!textInput) return;
 
-    stampMorphPreserve(root);
+    stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
 
     let bindSync: ReturnType<typeof createOpenBindSync> = null;
     let notifyOpenChange: (open: boolean) => void = () => {};

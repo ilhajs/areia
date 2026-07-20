@@ -200,6 +200,31 @@ describe("Tabs bind:group in parent island", () => {
 
     console.warn = warn;
   });
+
+  it("stamps data-morph-preserve including style after mount", async () => {
+    document.body.innerHTML = "";
+    const App = ilha.render(
+      () =>
+        html`${Tabs({
+          tabs: [
+            { value: "a", label: "Alpha", content: "A" },
+            { value: "b", label: "Beta", content: "B" },
+          ],
+        })}`,
+    );
+    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    const { unmount } = mount({ App }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    try {
+      const root = document.querySelector('[data-slot="tabs"]');
+      expect(root).toBeTruthy();
+      const preserve = root!.getAttribute("data-morph-preserve") ?? "";
+      expect(preserve.split(/\s+/)).toContain("style");
+      expect(preserve.split(/\s+/)).toContain("data-state");
+    } finally {
+      unmount();
+    }
+  });
 });
 
 describe("Tabs.Trigger", () => {

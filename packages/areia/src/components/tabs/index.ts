@@ -15,7 +15,7 @@ import { cn } from "$lib/cn";
 import { hasRenderableContent, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-import { stampMorphPreserve } from "$lib/morph-preserve";
+import { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 
 export const TABS_VARIANTS = {
   variant: {
@@ -574,7 +574,7 @@ export const TabsRoot = ilha
           ? initialValue[0]
           : undefined;
 
-    stampMorphPreserve(root);
+    stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = TabsPrimitive.createTabs(root, {
       defaultValue,
       activationMode: input.activationMode ?? (input.activateOnFocus ? "auto" : "manual"),
@@ -609,6 +609,9 @@ export const TabsRoot = ilha
     subscribeBindProps(input);
     const runtime = tabsBindRuntimeByHost.get(host);
     if (!runtime) return;
+    const root = resolveTabsRoot(host);
+    if (root) stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
+    runtime.controller.updateIndicator();
     runtime.groupSync?.applyFromSignal();
   })
   .render(({ input }) => renderTabs(input));
@@ -633,6 +636,8 @@ function scheduleTabsAutoBind(doc: Document | undefined = globalThis.document) {
     for (const root of doc.querySelectorAll<HTMLElement>('[data-areia-tabs][data-slot="tabs"]')) {
       const existing = tabsAutoRuntimeByRoot.get(root);
       if (existing) {
+        stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
+        existing.controller.updateIndicator();
         existing.groupSync?.applyFromSignal();
         continue;
       }
@@ -641,7 +646,7 @@ function scheduleTabsAutoBind(doc: Document | undefined = globalThis.document) {
       const bindInput = entry ? { "bind:group": entry.bindGroup } : {};
       let groupSync: ReturnType<typeof createGroupBindSync> = null;
 
-      stampMorphPreserve(root);
+      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
       const controller = TabsPrimitive.createTabs(root, {
         onValueChange: (value) => {
           groupSync?.onUserChange(value);

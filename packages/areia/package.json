@@ -1,6 +1,6 @@
 {
   "name": "areia",
-  "version": "0.1.41",
+  "version": "0.1.42",
   "description": "Vanilla TS component library for building modern web applications",
   "keywords": [
     "components",
@@ -50,7 +50,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@areia/slots": "0.1.6",
+    "@areia/slots": "0.1.7",
     "alien-signals": "3.2.1",
     "clsx": "2.1.1",
     "date-fns": "4.4.0",
@@ -58,8 +58,8 @@
   },
   "devDependencies": {
     "ilha": "^0.9.5",
-    "lucide": "^1.23.0",
-    "tailwindcss": "^4.3.2"
+    "lucide": "^1.25.0",
+    "tailwindcss": "^4.3.3"
   },
   "peerDependencies": {
     "ilha": "^0.9.5",

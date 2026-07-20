@@ -3,7 +3,7 @@ import { Slider as SliderPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-import { stampMorphPreserve } from "$lib/morph-preserve";
+import { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 
 export type SliderValue = number | [number, number];
 
@@ -197,7 +197,7 @@ export const SliderRoot = ilha
       : host.querySelector('[data-slot="slider"]');
     if (!root) return;
 
-    stampMorphPreserve(root);
+    stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = SliderPrimitive.createSlider(root, {
       defaultValue: input.value ?? input.defaultValue,
       min: input.min,

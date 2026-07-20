@@ -16,7 +16,7 @@ import { cn } from "$lib/cn";
 import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-import { stampMorphPreserve } from "$lib/morph-preserve";
+import { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 
 /** HoverCard side variant definitions mapping positions to their Tailwind classes. */
 export const HOVERCARD_VARIANTS = {
@@ -377,7 +377,7 @@ const HoverCardRootIsland = ilha
 
     let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
-    stampMorphPreserve(root);
+    stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = HoverCardPrimitive.createHoverCard(root, {
       align: input.align,
       alignOffset: input.alignOffset,
@@ -451,7 +451,7 @@ function scheduleHoverCardAutoBind(doc: Document | undefined = globalThis.docume
       const entry = queued[queueIndex++];
       let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
-      stampMorphPreserve(root);
+      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
       const controller = HoverCardPrimitive.createHoverCard(root, {
         onOpenChange: (open) => bindSync?.onUserChange(open),
       });

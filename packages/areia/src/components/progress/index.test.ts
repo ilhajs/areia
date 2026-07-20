@@ -1,6 +1,14 @@
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Progress } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
 
 describe("Progress", () => {
   it("renders progress wrapper with data-slot", () => {
@@ -38,5 +46,24 @@ describe("Progress", () => {
     const output = markup(Progress({ class: "a", className: "b" }));
     expect(output).toContain("a");
     expect(output).toContain("b");
+  });
+
+  it("stamps data-morph-preserve including style after mount", async () => {
+    document.body.innerHTML = "";
+    const App = ilha.render(() => html`${Progress({ value: 42, min: 0, max: 100 })}`);
+    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    const { unmount } = mount({ App }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    try {
+      const root = document.querySelector('[data-slot="progress"]');
+      expect(root).toBeTruthy();
+      const preserve = root!.getAttribute("data-morph-preserve") ?? "";
+      expect(preserve.split(/\s+/)).toContain("style");
+      expect(preserve.split(/\s+/)).toContain("aria-valuenow");
+      const indicator = root!.querySelector('[data-slot="progress-indicator"]');
+      expect((indicator?.getAttribute("data-morph-preserve") ?? "").split(/\s+/)).toContain("style");
+    } finally {
+      unmount();
+    }
   });
 });

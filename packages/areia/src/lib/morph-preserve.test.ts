@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import { stampMorphPreserve } from "./morph-preserve";
+import { mergeMorphPreserve, stampMorphPreserve } from "./morph-preserve";
 
 try {
   GlobalRegistrator.register();
@@ -66,5 +66,48 @@ describe("stampMorphPreserve", () => {
     const first = root.getAttribute("data-morph-preserve");
     stampMorphPreserve(root);
     expect(root.getAttribute("data-morph-preserve")).toBe(first);
+  });
+
+  it("merges extra controller-owned attrs (e.g. style)", () => {
+    const root = document.createElement("div");
+    root.setAttribute("data-slot", "resizable");
+    stampMorphPreserve(root, ["style"]);
+    const tokens = root.getAttribute("data-morph-preserve")!.split(/\s+/);
+    expect(tokens).toContain("style");
+    expect(tokens).toContain("data-state");
+  });
+
+  it("includes value/ARIA attrs controllers commonly own", () => {
+    const root = document.createElement("div");
+    root.setAttribute("data-slot", "slider");
+    stampMorphPreserve(root);
+    const marker = root.getAttribute("data-morph-preserve")!;
+    for (const attr of [
+      "data-value",
+      "data-dragging",
+      "aria-valuenow",
+      "aria-valuemin",
+      "aria-valuemax",
+      "data-side",
+      "data-highlighted",
+      "hidden",
+      "role",
+    ]) {
+      expect(marker.split(/\s+/)).toContain(attr);
+    }
+  });
+});
+
+describe("mergeMorphPreserve", () => {
+  it("adds required tokens to a user list", () => {
+    expect(mergeMorphPreserve("class", ["style"])).toBe("class style");
+  });
+
+  it("dedupes when style is already present", () => {
+    expect(mergeMorphPreserve("style class", ["style"])).toBe("style class");
+  });
+
+  it("handles empty user value", () => {
+    expect(mergeMorphPreserve(undefined, ["style"])).toBe("style");
   });
 });

@@ -18,7 +18,7 @@ import { cn } from "$lib/cn";
 import { hasSlot, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
-import { stampMorphPreserve } from "$lib/morph-preserve";
+import { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 
 export const DROPDOWN_VARIANTS = {
   variant: {
@@ -464,7 +464,7 @@ export const DropdownRoot = ilha
 
     let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
-    stampMorphPreserve(root);
+    stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = DropdownMenuPrimitive.createDropdownMenu(root, {
       defaultOpen: openBindDefault(input, input.defaultOpen),
       defaultValue: input.defaultValue,
@@ -543,7 +543,7 @@ function scheduleDropdownAutoBind(doc: Document | undefined = globalThis.documen
       const entry = queued[queueIndex++];
       let bindSync: ReturnType<typeof createOpenBindSync> = null;
 
-      stampMorphPreserve(root);
+      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
       const controller = DropdownMenuPrimitive.createDropdownMenu(root, {
         onOpenChange: (open) => bindSync?.onUserChange(open),
       });

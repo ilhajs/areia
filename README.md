@@ -75,6 +75,11 @@ Areia ships documented components and lower-level primitives for building produc
 - **34 components:** Badge, Banner, Breadcrumbs, Button, Checkbox, Clipboard Text, Collapsible, Combobox, Context Menu, Date Picker, Dialog, Dropdown, Field, Hover Card, Icon, Input, Label, Layer Card, Link, Pagination, Popover, Progress, Radio, Resizable, Select, Slider, Sonner, Spinner, Switch, Table, Tabs, Textarea, Toggle, Tooltip.
 - **23 primitives:** Accordion, Alert Dialog, Checkbox, Collapsible, Combobox, Command, Context Menu, Dialog, Dropdown Menu, Field, Hover Card, Navigation Menu, Popover, Progress, Radio Group, Resizable, Select, Slider, Switch, Tabs, Toggle, Toggle Group, Tooltip.
 
+## Changelog notes
+
+- **Resizable + ilha:** Panel/root/handle markup stamps `data-morph-preserve="style"` by default so dragged sizes survive parent island morphs. Missing sibling `defaultSize` values are filled from remaining % space in the group template.
+- **Morph-safe controllers:** Layout/position widgets (Slider, Progress, Tabs, Resizable, Combobox, Dropdown, Dialog, Popover, Hover Card, Tooltip, Context Menu, Collapsible/Accordion, Autocomplete) stamp `style` via `MORPH_CONTROLLER_STYLE`. Shared preserve list also covers value/ARIA attrs (`data-value`, `aria-valuenow`, `data-highlighted`, …). DatePicker stamps the shared attr set.
+
 ## Development
 
 ```bash

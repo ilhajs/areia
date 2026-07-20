@@ -177,3 +177,8 @@ controller.destroy();
 - **Touch resize**: Handles support touch events for resizing on touch devices.
 - **Keyboard resize**: When a handle is focused, arrow keys adjust adjacent panels by `keyboardResizeBy` percent. `Home` snaps to the previous panel’s minimum size; `End` snaps to its maximum size.
 - **Collapsible panels**: Panels with `data-collapsible` can be collapsed to their `data-collapsed-size` via keyboard Enter on the adjacent handle or via the controller API.
+
+## ilha morph
+
+When used through Areia’s styled `Resizable`, panel/root inline styles are morph-safe by default (`data-morph-preserve="style"`). Dragged sizes survive parent island re-renders without app-level preserve attributes.
+

@@ -3,6 +3,7 @@ import { Resizable as ResizablePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { decodeMarkupEntities, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
+import { mergeMorphPreserve, MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 import type { HTMLElementProps } from "$lib/types";
 
 export type ResizableInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
@@ -38,6 +39,7 @@ export type ResizableHandleInput = Omit<
 const RESIZABLE_PART = "__areiaResizablePart";
 const ILHA_RENDER_PART = Symbol.for("ilha.renderPart");
 
+/** Inline styles owned by the slots controller after mount. */
 type ResizablePart =
   | { [RESIZABLE_PART]: "panel"; input: ResizablePanelInput }
   | { [RESIZABLE_PART]: "handle"; input: ResizableHandleInput };
@@ -92,6 +94,63 @@ function renderChildren(value: unknown): unknown {
   return value;
 }
 
+/**
+ * When only some panels declare `defaultSize`, fill the rest with the remaining
+ * percentage so SSR/template flex-grow matches the controller's layout math
+ * (avoids flex-grow:20 vs flex-grow:1 looking like ~95/5 before hydrate).
+ */
+function normalizeResizableChildren(children: unknown): unknown {
+  const items = Array.isArray(children) ? [...children] : children == null || children === false ? [] : [children];
+  if (items.length === 0) return children;
+
+  const panelIdx: number[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (isResizablePart(item) && item[RESIZABLE_PART] === "panel") panelIdx.push(i);
+  }
+  if (panelIdx.length === 0) return children;
+
+  let assigned = 0;
+  let withSize = 0;
+  const explicit: (number | undefined)[] = panelIdx.map((idx) => {
+    const part = items[idx] as Extract<ResizablePart, { [typeof RESIZABLE_PART]: "panel" }>;
+    const d = part.input.defaultSize;
+    if (typeof d === "number" && Number.isFinite(d)) {
+      withSize += 1;
+      assigned += d;
+      return d;
+    }
+    return undefined;
+  });
+
+  const missing = panelIdx.length - withSize;
+  if (missing === 0) return children;
+
+  if (
+    withSize > 0 &&
+    typeof process !== "undefined" &&
+    process.env?.NODE_ENV !== "production"
+  ) {
+    console.warn(
+      "[areia:Resizable] Some panels omit defaultSize while others set it. " +
+        "defaultSize is a percentage of the group (sum ≈ 100). " +
+        "Missing siblings will share the remaining space in markup; prefer explicit sizes on every panel.",
+    );
+  }
+
+  const remaining = Math.max(0, 100 - assigned);
+  const each = remaining / missing;
+
+  for (let j = 0; j < panelIdx.length; j++) {
+    if (explicit[j] != null) continue;
+    const idx = panelIdx[j]!;
+    const part = items[idx] as Extract<ResizablePart, { [typeof RESIZABLE_PART]: "panel" }>;
+    items[idx] = createResizablePart("panel", { ...part.input, defaultSize: each });
+  }
+
+  return items;
+}
+
 function panelDataAttrs(
   input: Pick<
     ResizablePanelInput,
@@ -120,9 +179,14 @@ function renderResizablePanel(input: ResizablePanelInput = {}) {
     style,
     ...rest
   } = input;
+  const userPreserve = rest["data-morph-preserve"];
+  delete rest["data-morph-preserve"];
+
   const panelStyle = [
     "flex-basis:0",
     "flex-shrink:1",
+    // Prefer % defaultSize so template flex-grow matches controller layout.
+    // When omitted on a lone panel, grow 1 (fill). Group normalize fills siblings.
     `flex-grow:${defaultSize ?? 1}`,
     "overflow:hidden",
     style,
@@ -134,6 +198,7 @@ function renderResizablePanel(input: ResizablePanelInput = {}) {
     data-slot="resizable-panel"
     class="${cn("min-w-0", className, aliasedClassName)}"
     ${raw(panelDataAttrs({ defaultSize, minSize, maxSize, collapsedSize, collapsible }))}
+    data-morph-preserve="${mergeMorphPreserve(userPreserve, MORPH_CONTROLLER_STYLE)}"
     style="${panelStyle}"
     ${raw(toAttrs(rest))}
   >
@@ -143,6 +208,8 @@ function renderResizablePanel(input: ResizablePanelInput = {}) {
 
 function renderResizableHandle(input: ResizableHandleInput = {}) {
   const { withHandle, children, class: className, className: aliasedClassName, ...rest } = input;
+  const userPreserve = rest["data-morph-preserve"];
+  delete rest["data-morph-preserve"];
 
   return html`<div
     data-slot="resizable-handle"
@@ -157,6 +224,7 @@ function renderResizableHandle(input: ResizableHandleInput = {}) {
       className,
       aliasedClassName,
     )}"
+    data-morph-preserve="${mergeMorphPreserve(userPreserve, MORPH_CONTROLLER_STYLE)}"
     ${raw(toAttrs(rest))}
   >
     ${withHandle ? html`<div class="z-10 h-6 w-1 shrink-0 rounded-lg bg-areia-border"></div>` : ""}
@@ -193,6 +261,16 @@ function collectResizableRoots(scope: ParentNode): HTMLElement[] {
   return [...roots];
 }
 
+function stampResizableMorph(root: Element): void {
+  stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
+}
+
+function repairResizableLayout(controller: ResizablePrimitive.ResizableController): void {
+  // setLayout with the current layout re-writes flex styles without emitting change
+  // when percentages are unchanged (see slots commitLayout).
+  controller.setLayout(controller.layout);
+}
+
 function connectResizableTree(
   host: ParentNode,
   input: ResizableInput = {},
@@ -205,14 +283,21 @@ function connectResizableTree(
     // Unrelated DOM patches inside a resizable tree (e.g. a filtered table re-rendering)
     // trigger this via the MutationObserver below. Reconnecting would destroy the live
     // controller and recompute layout from `defaultSize`, discarding the user's drag —
-    // skip roots that already have a bound controller instead.
+    // skip roots that already have a bound controller instead, but re-stamp morph
+    // preserve and re-apply layout in case a parent morph clobbered inline styles.
     if (ResizablePrimitive.hasBinding(root)) {
       const existing = ResizablePrimitive.getBinding(root);
-      if (existing) controllers.push(existing);
+      if (existing) {
+        stampResizableMorph(root);
+        repairResizableLayout(existing);
+        controllers.push(existing);
+      }
       continue;
     }
     try {
-      controllers.push(ResizablePrimitive.reconnectResizable(root, options));
+      const controller = ResizablePrimitive.reconnectResizable(root, options);
+      stampResizableMorph(root);
+      controllers.push(controller);
     } catch {
       // Ignore groups that are mid-render without a complete panel/handle structure.
     }
@@ -236,6 +321,8 @@ function renderResizable(input: ResizableInput = {}) {
     onLayoutChange: _onLayoutChange,
     ...rest
   } = input;
+  const userPreserve = rest["data-morph-preserve"];
+  delete rest["data-morph-preserve"];
 
   return html`<div
     data-slot="resizable"
@@ -244,6 +331,7 @@ function renderResizable(input: ResizableInput = {}) {
       className,
       aliasedClassName,
     )}"
+    data-morph-preserve="${mergeMorphPreserve(userPreserve, MORPH_CONTROLLER_STYLE)}"
     ${raw(
       toAttrs({
         "data-direction": direction,
@@ -252,7 +340,7 @@ function renderResizable(input: ResizableInput = {}) {
       }),
     )}
   >
-    ${renderChildren(children)}
+    ${renderChildren(normalizeResizableChildren(children))}
   </div>`;
 }
 

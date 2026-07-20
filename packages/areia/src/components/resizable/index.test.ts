@@ -402,4 +402,373 @@ describe("Resizable", () => {
     expect(root?.querySelector('[data-slot="resizable-panel"]')).toBeTruthy();
     expect(root?.querySelector('[data-slot="resizable-handle"]')).toBeTruthy();
   });
+
+  it("stamps data-morph-preserve=style on Static root, panels, and handles", () => {
+    const output = markup(
+      Resizable.Static({
+        children: [
+          Resizable.Panel({ defaultSize: 40, children: "A" }),
+          Resizable.Handle(),
+          Resizable.Panel({ defaultSize: 60, children: "B" }),
+        ],
+      }),
+    );
+
+    expect(output).toMatch(/data-slot="resizable"[^>]*data-morph-preserve="[^"]*\bstyle\b/);
+    expect(output).toMatch(/data-slot="resizable-panel"[^>]*data-morph-preserve="[^"]*\bstyle\b/);
+    expect(output).toMatch(/data-slot="resizable-handle"[^>]*data-morph-preserve="[^"]*\bstyle\b/);
+  });
+
+  it("merges user data-morph-preserve with style", () => {
+    const output = markup(
+      Resizable.Panel({
+        defaultSize: 50,
+        "data-morph-preserve": "class",
+        children: "P",
+      }),
+    );
+    expect(output).toContain("data-morph-preserve=");
+    expect(output).toMatch(/data-morph-preserve="[^"]*\bclass\b/);
+    expect(output).toMatch(/data-morph-preserve="[^"]*\bstyle\b/);
+  });
+
+  it("fills missing sibling defaultSize so template flex-grow is coherent", () => {
+    const output = markup(
+      Resizable.Static({
+        children: [
+          Resizable.Panel({ defaultSize: 20, children: "Side" }),
+          Resizable.Handle(),
+          Resizable.Panel({ children: "Main" }),
+        ],
+      }),
+    );
+
+    expect(output).toContain("flex-grow:20");
+    expect(output).toContain("flex-grow:80");
+    expect(output).toContain('data-default-size="80"');
+  });
+
+  it("keeps dragged layout across parent island re-renders (morph-safe)", async () => {
+    document.body.innerHTML = "";
+
+    const Shell = ilha
+      .state("q", "")
+      .on("input@input", ({ state, event }) => {
+        state.q((event.target as HTMLInputElement).value);
+      })
+      .render(({ state }) =>
+        html`<div>
+          <input data-testid="q" value="${state.q}" />
+          ${
+            Resizable.Root({
+              direction: "horizontal",
+              children: [
+                Resizable.Panel({ defaultSize: 20, minSize: 10, children: "sidebar" }),
+                Resizable.Handle(),
+                Resizable.Panel({ defaultSize: 80, minSize: 10, children: "main" }),
+              ],
+            })
+          }
+        </div>`,
+      );
+
+    document.body.innerHTML = await Shell.hydratable({}, { name: "Shell", snapshot: true });
+    const { unmount } = mount({ Shell }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    try {
+      const root = document.querySelector('[data-slot="resizable"]') as HTMLElement;
+      const handle = document.querySelector('[data-slot="resizable-handle"]') as HTMLElement;
+      const panels = () =>
+        [...document.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]')];
+
+      Object.defineProperty(root, "getBoundingClientRect", {
+        configurable: true,
+        value: () =>
+          ({
+            width: 1000,
+            height: 500,
+            top: 0,
+            left: 0,
+            right: 1000,
+            bottom: 500,
+            x: 0,
+            y: 0,
+            toJSON: () => {},
+          }) as DOMRect,
+      });
+
+      // default 20/80 → drag toward 40/60 (pointer from 200 → 400 if start at 20%)
+      handle.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          clientX: 200,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+      document.body.dispatchEvent(
+        new PointerEvent("pointermove", {
+          bubbles: true,
+          clientX: 400,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+      document.body.dispatchEvent(
+        new PointerEvent("pointerup", {
+          bubbles: true,
+          clientX: 400,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+
+      const before = panels().map((p) => parseFloat(p.style.flexGrow || "0"));
+      expect(before[0]).toBeCloseTo(40, 0);
+      expect(before[1]).toBeCloseTo(60, 0);
+
+      for (const el of [root, ...panels(), handle]) {
+        expect(el.getAttribute("data-morph-preserve") ?? "").toContain("style");
+      }
+
+      const input = document.querySelector<HTMLInputElement>('[data-testid="q"]');
+      input!.value = "filter";
+      input!.dispatchEvent(new Event("input", { bubbles: true }));
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const after = panels().map((p) => parseFloat(p.style.flexGrow || "0"));
+      expect(after[0]).toBeCloseTo(before[0]!, 5);
+      expect(after[1]).toBeCloseTo(before[1]!, 5);
+    } finally {
+      unmount();
+    }
+  });
+
+  it("missing defaultSize sibling is ~20/80 after controller init and stable after re-render", async () => {
+    document.body.innerHTML = "";
+
+    const Shell = ilha
+      .state("tick", 0)
+      .on("button@click", ({ state }) => state.tick(state.tick() + 1))
+      .render(
+        ({ state }) =>
+          html`<div>
+            <button type="button">bump ${state.tick}</button>
+            ${
+              Resizable.Root({
+                direction: "horizontal",
+                children: [
+                  Resizable.Panel({ defaultSize: 20, children: "side" }),
+                  Resizable.Handle(),
+                  Resizable.Panel({ children: "main" }),
+                ],
+              })
+            }
+          </div>`,
+      );
+
+    document.body.innerHTML = await Shell.hydratable({}, { name: "Shell", snapshot: true });
+    const { unmount } = mount({ Shell }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    try {
+      const panels = () =>
+        [...document.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]')];
+      const sizes = () => panels().map((p) => parseFloat(p.style.flexGrow || "0"));
+
+      expect(sizes()[0]).toBeCloseTo(20, 0);
+      expect(sizes()[1]).toBeCloseTo(80, 0);
+
+      document.querySelector("button")?.click();
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      expect(sizes()[0]).toBeCloseTo(20, 0);
+      expect(sizes()[1]).toBeCloseTo(80, 0);
+    } finally {
+      unmount();
+    }
+  });
+
+  it("nested Resizables keep both layouts across outer re-render", async () => {
+    document.body.innerHTML = "";
+
+    const Shell = ilha
+      .state("tick", 0)
+      .on("button@click", ({ state }) => state.tick(state.tick() + 1))
+      .render(
+        ({ state }) =>
+          html`<div>
+            <button type="button">bump ${state.tick}</button>
+            ${
+              Resizable.Root({
+                direction: "horizontal",
+                children: [
+                  Resizable.Panel({ defaultSize: 30, children: "outer-a" }),
+                  Resizable.Handle(),
+                  Resizable.Panel({
+                    defaultSize: 70,
+                    children: Resizable.Root({
+                      direction: "horizontal",
+                      children: [
+                        Resizable.Panel({ defaultSize: 40, children: "inner-a" }),
+                        Resizable.Handle(),
+                        Resizable.Panel({ defaultSize: 60, children: "inner-b" }),
+                      ],
+                    }),
+                  }),
+                ],
+              })
+            }
+          </div>`,
+      );
+
+    document.body.innerHTML = await Shell.hydratable({}, { name: "Shell", snapshot: true });
+    const { unmount } = mount({ Shell }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    try {
+      const roots = [...document.querySelectorAll<HTMLElement>('[data-slot="resizable"]')];
+      expect(roots).toHaveLength(2);
+
+      const drag = (root: HTMLElement, fromX: number, toX: number) => {
+        const handle = root.querySelector('[data-slot="resizable-handle"]') as HTMLElement;
+        Object.defineProperty(root, "getBoundingClientRect", {
+          configurable: true,
+          value: () =>
+            ({
+              width: 1000,
+              height: 500,
+              top: 0,
+              left: 0,
+              right: 1000,
+              bottom: 500,
+              x: 0,
+              y: 0,
+              toJSON: () => {},
+            }) as DOMRect,
+        });
+        handle.dispatchEvent(
+          new PointerEvent("pointerdown", {
+            bubbles: true,
+            clientX: fromX,
+            pointerId: 1,
+            pointerType: "mouse",
+          }),
+        );
+        document.body.dispatchEvent(
+          new PointerEvent("pointermove", {
+            bubbles: true,
+            clientX: toX,
+            pointerId: 1,
+            pointerType: "mouse",
+          }),
+        );
+        document.body.dispatchEvent(
+          new PointerEvent("pointerup", {
+            bubbles: true,
+            clientX: toX,
+            pointerId: 1,
+            pointerType: "mouse",
+          }),
+        );
+      };
+
+      drag(roots[0]!, 300, 450);
+      drag(roots[1]!, 400, 550);
+
+      const snapshot = () =>
+        roots.map((root) =>
+          [...root.querySelectorAll<HTMLElement>(':scope > [data-slot="resizable-panel"]')].map(
+            (p) => parseFloat(p.style.flexGrow || "0"),
+          ),
+        );
+
+      const before = snapshot();
+      expect(before[0]![0]).toBeCloseTo(45, 0);
+      expect(before[1]![0]).toBeCloseTo(55, 0);
+
+      document.querySelector("button")?.click();
+      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const after = snapshot();
+      expect(after[0]![0]).toBeCloseTo(before[0]![0]!, 5);
+      expect(after[0]![1]).toBeCloseTo(before[0]![1]!, 5);
+      expect(after[1]![0]).toBeCloseTo(before[1]![0]!, 5);
+      expect(after[1]![1]).toBeCloseTo(before[1]![1]!, 5);
+    } finally {
+      unmount();
+    }
+  });
+
+  it("fires onLayoutChange after drag", async () => {
+    document.body.innerHTML = "";
+    const layouts: number[][] = [];
+
+    const Layout = ilha.render(
+      () =>
+        html`${Resizable.Root({
+          direction: "horizontal",
+          onLayoutChange: (layout) => layouts.push([...layout]),
+          children: [
+            Resizable.Panel({ defaultSize: 50, children: "L" }),
+            Resizable.Handle(),
+            Resizable.Panel({ defaultSize: 50, children: "R" }),
+          ],
+        })}`,
+    );
+
+    document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
+    const { unmount } = mount({ Layout }, { root: document.body, lazy: false });
+    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    try {
+      const root = document.querySelector('[data-slot="resizable"]') as HTMLElement;
+      const handle = document.querySelector('[data-slot="resizable-handle"]') as HTMLElement;
+      Object.defineProperty(root, "getBoundingClientRect", {
+        configurable: true,
+        value: () =>
+          ({
+            width: 1000,
+            height: 500,
+            top: 0,
+            left: 0,
+            right: 1000,
+            bottom: 500,
+            x: 0,
+            y: 0,
+            toJSON: () => {},
+          }) as DOMRect,
+      });
+
+      handle.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          clientX: 500,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+      document.body.dispatchEvent(
+        new PointerEvent("pointermove", {
+          bubbles: true,
+          clientX: 600,
+          pointerId: 1,
+          pointerType: "mouse",
+        }),
+      );
+
+      expect(layouts.length).toBeGreaterThan(0);
+      expect(layouts.at(-1)?.[0]).toBeCloseTo(60, 0);
+    } finally {
+      unmount();
+    }
+  });
 });

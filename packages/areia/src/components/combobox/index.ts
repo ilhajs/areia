@@ -20,7 +20,7 @@ import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { INPUT_VARIANTS, inputVariants } from "$components/input";
 import { Field } from "$components/field";
-import { stampMorphPreserve } from "$lib/morph-preserve";
+import { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 
 /** Combobox variant definitions. */
 export const COMBOBOX_VARIANTS = {
@@ -746,7 +746,7 @@ export const ComboboxRoot = ilha
     let openSync: ReturnType<typeof createOpenBindSync> = null;
     let groupSync: ReturnType<typeof createGroupBindSync> = null;
 
-    stampMorphPreserve(root);
+    stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = ComboboxPrimitive.createCombobox(root, {
       align: input.align,
       alignOffset: input.alignOffset,
@@ -855,7 +855,7 @@ function scheduleComboboxAutoBind(doc: Document | undefined = globalThis.documen
       let openSync: ReturnType<typeof createOpenBindSync> = null;
       let groupSync: ReturnType<typeof createGroupBindSync> = null;
 
-      stampMorphPreserve(root);
+      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
       const controller = ComboboxPrimitive.createCombobox(root, {
         onOpenChange: (open) => openSync?.onUserChange(open),
         onValueChange: (value) => groupSync?.onUserChange(value),
