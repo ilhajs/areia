@@ -113,7 +113,7 @@ function normalizeResizableChildren(children: unknown): unknown {
   let assigned = 0;
   let withSize = 0;
   const explicit: (number | undefined)[] = panelIdx.map((idx) => {
-    const part = items[idx] as Extract<ResizablePart, { [typeof RESIZABLE_PART]: "panel" }>;
+    const part = items[idx] as ResizablePart & { input: ResizablePanelInput };
     const d = part.input.defaultSize;
     if (typeof d === "number" && Number.isFinite(d)) {
       withSize += 1;
@@ -144,7 +144,7 @@ function normalizeResizableChildren(children: unknown): unknown {
   for (let j = 0; j < panelIdx.length; j++) {
     if (explicit[j] != null) continue;
     const idx = panelIdx[j]!;
-    const part = items[idx] as Extract<ResizablePart, { [typeof RESIZABLE_PART]: "panel" }>;
+    const part = items[idx] as ResizablePart & { input: ResizablePanelInput };
     items[idx] = createResizablePart("panel", { ...part.input, defaultSize: each });
   }
 
