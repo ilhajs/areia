@@ -22,10 +22,10 @@
         "@areia/slots": "workspace:*",
         "@fontsource-variable/geist": "^5.2.9",
         "@fontsource-variable/geist-mono": "^5.2.8",
-        "@ilha/router": "^0.8.5",
-        "@ilha/store": "^0.7.2",
+        "@ilha/router": "^0.8.9",
+        "@ilha/store": "^0.7.7",
         "areia": "workspace:*",
-        "ilha": "^0.9.2",
+        "ilha": "^0.9.5",
         "imprensa": "^0.1.22",
         "lucide": "^1.23.0",
         "sonner": "^2.0.7",
@@ -37,21 +37,21 @@
     },
     "packages/areia": {
       "name": "areia",
-      "version": "0.1.39",
+      "version": "0.1.40",
       "dependencies": {
-        "@areia/slots": "0.1.5",
+        "@areia/slots": "0.1.6",
         "alien-signals": "3.2.1",
         "clsx": "2.1.1",
         "date-fns": "4.4.0",
         "tailwind-merge": "3.6.0",
       },
       "devDependencies": {
-        "ilha": "^0.9.4",
+        "ilha": "^0.9.5",
         "lucide": "^1.23.0",
         "tailwindcss": "^4.3.2",
       },
       "peerDependencies": {
-        "ilha": "^0.9.4",
+        "ilha": "^0.9.5",
         "sonner": "^2.0.7",
         "tailwindcss": ">=4.0.0",
       },
@@ -61,7 +61,7 @@
     },
     "packages/slots": {
       "name": "@areia/slots",
-      "version": "0.1.5",
+      "version": "0.1.6",
     },
   },
   "packages": {
@@ -91,9 +91,9 @@
 
     "@happy-dom/global-registrator": ["@happy-dom/global-registrator@20.10.6", "", { "dependencies": { "@types/node": ">=20.0.0", "happy-dom": "^20.10.6" } }, "sha512-Nu/IjRkkNxmeG2ywWsyJSO4d1BrWTqVzxCPL+gXj0b97klhmjd6wLzt6Bx/laNpkZ3WLW7zNCqmtMIbIlahqug=="],
 
-    "@ilha/router": ["@ilha/router@0.8.8", "", { "dependencies": { "rou3": "0.9.0", "unplugin": "3.3.0" }, "peerDependencies": { "ilha": ">=0.9.4" } }, "sha512-BW0hKGs4drN+jkZUKbiznYm5OXEtV2ND7qIjxjfQgVi0qCoHt/fpg2dqUzAduRPPf86/EX8qHZQyio+zwHLteg=="],
+    "@ilha/router": ["@ilha/router@0.8.9", "", { "dependencies": { "rou3": "0.9.0", "unplugin": "3.3.0" }, "peerDependencies": { "ilha": ">=0.9.5" } }, "sha512-Sf2NZJRnI803Xc9hJgIW2flrnXh6bYl0KxJUkRjNVtYJOuv4osKScwqWgo1N6GhpUysYH6VqZCTlkS8wgQfb6g=="],
 
-    "@ilha/store": ["@ilha/store@0.7.5", "", { "peerDependencies": { "@ilha/router": ">=0.8.8", "alien-signals": "^3.2.1", "ilha": ">=0.9.4" }, "optionalPeers": ["@ilha/router", "ilha"] }, "sha512-Tx6/NJ60oykmx/mRdHezs1f+402TXCG+tdz74He711ZPRhNC3/wea+liTyUk0uk1W1X8X0IVRJX2SwWogpgFAQ=="],
+    "@ilha/store": ["@ilha/store@0.7.7", "", { "peerDependencies": { "@ilha/router": ">=0.8.9", "alien-signals": "^3.2.1", "ilha": ">=0.9.5" }, "optionalPeers": ["@ilha/router", "ilha"] }, "sha512-f3Pq7APJCLolAflNa2e9gpVQ0B1/1ekfJ/Q7JjfaUlyJRb/BOwoodS6f1SCy4oIKQD9GZz862Ya1EztDaFJP2w=="],
 
     "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.13", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA=="],
 
@@ -501,7 +501,7 @@
 
     "husky": ["husky@9.1.7", "", { "bin": { "husky": "bin.js" } }, "sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA=="],
 
-    "ilha": ["ilha@0.9.4", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-FafMoQrWQG0n1J4WdTco1+FXzr3R4RkhqNooSPdczV5fS63ZxhHFzO/ND8VbzMhFd9mPNu+AAdew7o1RbMpwbw=="],
+    "ilha": ["ilha@0.9.5", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-y+CiPmkiH45sIUifolTITOGqwldFcemohFY6q5M5y4KHRCXSOyE0aIR+jHc3kYf1FdaI+74xFDtYtRQVn1aOuA=="],
 
     "import-without-cache": ["import-without-cache@0.4.0", "", {}, "sha512-NkJQA7oZ4YHQhd2+H3BoRFKF3d/XNsiKpHZCQEMH9pDX27hQQLsTyOocyRgaIVtf8gHX3Nt3LPkR4e5EdtPAGQ=="],
 

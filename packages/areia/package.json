@@ -1,6 +1,6 @@
 {
   "name": "areia",
-  "version": "0.1.40",
+  "version": "0.1.41",
   "description": "Vanilla TS component library for building modern web applications",
   "keywords": [
     "components",
@@ -57,12 +57,12 @@
     "tailwind-merge": "3.6.0"
   },
   "devDependencies": {
-    "ilha": "^0.9.4",
+    "ilha": "^0.9.5",
     "lucide": "^1.23.0",
     "tailwindcss": "^4.3.2"
   },
   "peerDependencies": {
-    "ilha": "^0.9.4",
+    "ilha": "^0.9.5",
     "sonner": "^2.0.7",
     "tailwindcss": ">=4.0.0"
   },
