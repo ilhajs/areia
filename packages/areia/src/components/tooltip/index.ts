@@ -246,7 +246,7 @@ export type TooltipInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | 
     triggerClassName?: string;
   };
 
-function renderTooltip(input: TooltipInput) {
+function renderTooltip(input: TooltipInput, autoBind = false) {
   const {
     align,
     alignOffset,
@@ -261,6 +261,7 @@ function renderTooltip(input: TooltipInput) {
     contentClassName,
     delay,
     onOpenChange: _onOpenChange,
+    onPortalMounted: _onPortalMounted,
     portal,
     side = TOOLTIP_DEFAULT_VARIANTS.side,
     sideOffset,
@@ -303,7 +304,12 @@ function renderTooltip(input: TooltipInput) {
         skipDelayDuration,
       }),
     )}
-    ${raw(toAttrs(rootProps))}
+    ${raw(
+      toAttrs({
+        ...rootProps,
+        "data-areia-tooltip": autoBind ? "" : undefined,
+      }),
+    )}
   >
     ${hasComposedContent ? composedChildren : generatedTrigger}
     ${hasComposedContent
@@ -324,7 +330,43 @@ function renderTooltip(input: TooltipInput) {
   </div>`;
 }
 
-export const TooltipRoot = ilha
+const tooltipControllers = new WeakMap<Element, { destroy: () => void }>();
+const tooltipAutoBindScheduled = new WeakSet<Document>();
+
+function bindTooltipRoot(root: Element, options: TooltipPrimitive.TooltipOptions = {}) {
+  stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
+  tooltipControllers.get(root)?.destroy();
+  const controller = TooltipPrimitive.createTooltip(root, options);
+  tooltipControllers.set(root, controller);
+  return () => {
+    controller.destroy();
+    tooltipControllers.delete(root);
+  };
+}
+
+function scheduleTooltipAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || tooltipAutoBindScheduled.has(doc)) return;
+  tooltipAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    tooltipAutoBindScheduled.delete(doc);
+
+    for (const root of doc.querySelectorAll<HTMLElement>(
+      '[data-areia-tooltip][data-slot="tooltip"]',
+    )) {
+      const trigger = root.querySelector('[data-slot="tooltip-trigger"]');
+      const content = root.querySelector('[data-slot="tooltip-content"]');
+      if (!trigger || !content) continue;
+      if (tooltipControllers.has(root)) continue;
+      bindTooltipRoot(root);
+    }
+  });
+}
+
+function needsTooltipIsland(input: TooltipInput) {
+  return input.onOpenChange != null || input.onPortalMounted != null;
+}
+
+const TooltipRootIsland = ilha
   .input<TooltipInput>()
   .onMount(({ host, input }) => {
     const root = host.matches('[data-slot="tooltip"]')
@@ -332,8 +374,7 @@ export const TooltipRoot = ilha
       : host.querySelector('[data-slot="tooltip"]');
     if (!root) return;
 
-    stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-    const controller = TooltipPrimitive.createTooltip(root, {
+    return bindTooltipRoot(root, {
       align: input.align,
       alignOffset: input.alignOffset,
       avoidCollisions: input.avoidCollisions,
@@ -346,10 +387,17 @@ export const TooltipRoot = ilha
       skipDelayDuration: input.skipDelayDuration,
       onPortalMounted: input.onPortalMounted,
     });
-
-    return () => controller.destroy();
   })
   .render(({ input }) => renderTooltip(input));
+
+/** Prefer plain markup + auto-bind; island only when callbacks need mount props. */
+export function TooltipRoot(input: TooltipInput) {
+  if (needsTooltipIsland(input)) return TooltipRootIsland(input);
+
+  const normalized = normalizeStaticChildSlots(input, ["content", "trigger", "children"]);
+  scheduleTooltipAutoBind();
+  return renderTooltip(normalized, true);
+}
 
 function TooltipBase(input: TooltipInput) {
   return renderTooltip(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));

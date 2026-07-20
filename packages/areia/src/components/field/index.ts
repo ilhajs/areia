@@ -151,6 +151,66 @@ function renderField(input: FieldInput = {}) {
   </div>`;
 }
 
+const fieldControllers = new WeakMap<Element, { destroy: () => void }>();
+const fieldAutoBindScheduled = new WeakSet<Document>();
+
+function readFieldOptions(root: Element): FieldPrimitive.FieldOptions {
+  const el = root as HTMLElement;
+  return {
+    name: el.dataset.name,
+    disabled: el.hasAttribute("data-disabled"),
+    invalid: el.hasAttribute("data-invalid"),
+    validationMode: el.dataset.validationMode as FieldPrimitive.FieldOptions["validationMode"],
+  };
+}
+
+function bindFieldRoot(root: Element, options: FieldPrimitive.FieldOptions = {}) {
+  stampMorphPreserve(root);
+  fieldControllers.get(root)?.destroy();
+  const controller = FieldPrimitive.createField(root, {
+    ...readFieldOptions(root),
+    ...options,
+  });
+  fieldControllers.set(root, controller);
+  return () => {
+    controller.destroy();
+    fieldControllers.delete(root);
+  };
+}
+
+/** Wire `@areia/slots` field controllers for prerendered / composed field roots. */
+export function ensureFieldAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc) return;
+  for (const root of doc.querySelectorAll('[data-slot="field"]')) {
+    if (fieldControllers.has(root)) continue;
+    bindFieldRoot(root);
+  }
+}
+
+function scheduleFieldAutoBind(doc: Document | undefined = globalThis.document) {
+  if (!doc || fieldAutoBindScheduled.has(doc)) return;
+  fieldAutoBindScheduled.add(doc);
+  queueMicrotask(() => {
+    fieldAutoBindScheduled.delete(doc);
+    ensureFieldAutoBind(doc);
+  });
+}
+
+function FieldBase(input: FieldInput = {}) {
+  scheduleFieldAutoBind();
+  return renderField(input);
+}
+
+/**
+ * Field markup + controller auto-bind.
+ *
+ * Not an Ilha island: MDX island remounts only carry JSON props and would drop
+ * nested controls. Behavior lives in `@areia/slots` on the DOM; calling
+ * `Field(...)` schedules document-wide binding (Imprensa re-invokes plain
+ * components on the client for that side effect).
+ *
+ * Prefer `Field.Root` only when you need island props such as `validate`.
+ */
 export const FieldRoot = ilha
   .input<FieldInput>()
   .onMount(({ host, input }) => {
@@ -159,22 +219,23 @@ export const FieldRoot = ilha
       : host.querySelector('[data-slot="field"]');
     if (!root) return;
 
-    stampMorphPreserve(root);
-    const controller = FieldPrimitive.createField(root, {
+    return bindFieldRoot(root, {
       name: input.name,
       disabled: input.disabled,
       invalid: input.invalid,
       validate: input.validate,
       validationMode: input.validationMode,
-    } satisfies FieldPrimitive.FieldOptions);
-
-    return () => controller.destroy();
+    });
   })
-  .render(({ input }) => renderField(input));
+  .render(({ input }) => {
+    scheduleFieldAutoBind();
+    return renderField(input);
+  });
 
-export const Field = Object.assign(FieldRoot, {
+export const Field = Object.assign(FieldBase, {
   Root: FieldRoot,
-  Static: renderField,
+  /** Same as `Field(...)` — kept for existing call sites. */
+  Static: FieldBase,
   Label: FieldLabel,
   Description: FieldDescription,
   Error: FieldError,

@@ -18,6 +18,21 @@ describe("Tooltip", () => {
     expect(output).toContain('data-slot="tooltip-trigger"');
     expect(output).toContain('data-slot="tooltip-content"');
     expect(output).toContain("Tip");
+    expect(output).toContain("Hover me");
+    // Plain path (not island) so MDX keeps nested trigger markup.
+    expect(output).toContain("data-areia-tooltip");
+  });
+
+  it("keeps button trigger children in composed markup", () => {
+    const output = markup(
+      Tooltip({
+        content: "Create project",
+        children: { value: '<button type="button" aria-label="Create project">+</button>' },
+      }),
+    );
+    expect(output).toContain('aria-label="Create project"');
+    expect(output).toContain(">+</button>");
+    expect(output).toContain("data-areia-tooltip");
   });
 
   it("renders content hidden by default", () => {

@@ -456,20 +456,19 @@ describe("Resizable", () => {
       .on("input@input", ({ state, event }) => {
         state.q((event.target as HTMLInputElement).value);
       })
-      .render(({ state }) =>
-        html`<div>
-          <input data-testid="q" value="${state.q}" />
-          ${
-            Resizable.Root({
+      .render(
+        ({ state }) =>
+          html`<div>
+            <input data-testid="q" value="${state.q}" />
+            ${Resizable.Root({
               direction: "horizontal",
               children: [
                 Resizable.Panel({ defaultSize: 20, minSize: 10, children: "sidebar" }),
                 Resizable.Handle(),
                 Resizable.Panel({ defaultSize: 80, minSize: 10, children: "main" }),
               ],
-            })
-          }
-        </div>`,
+            })}
+          </div>`,
       );
 
     document.body.innerHTML = await Shell.hydratable({}, { name: "Shell", snapshot: true });
@@ -480,8 +479,9 @@ describe("Resizable", () => {
     try {
       const root = document.querySelector('[data-slot="resizable"]') as HTMLElement;
       const handle = document.querySelector('[data-slot="resizable-handle"]') as HTMLElement;
-      const panels = () =>
-        [...document.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]')];
+      const panels = () => [
+        ...document.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]'),
+      ];
 
       Object.defineProperty(root, "getBoundingClientRect", {
         configurable: true,
@@ -557,16 +557,14 @@ describe("Resizable", () => {
         ({ state }) =>
           html`<div>
             <button type="button">bump ${state.tick}</button>
-            ${
-              Resizable.Root({
-                direction: "horizontal",
-                children: [
-                  Resizable.Panel({ defaultSize: 20, children: "side" }),
-                  Resizable.Handle(),
-                  Resizable.Panel({ children: "main" }),
-                ],
-              })
-            }
+            ${Resizable.Root({
+              direction: "horizontal",
+              children: [
+                Resizable.Panel({ defaultSize: 20, children: "side" }),
+                Resizable.Handle(),
+                Resizable.Panel({ children: "main" }),
+              ],
+            })}
           </div>`,
       );
 
@@ -576,8 +574,9 @@ describe("Resizable", () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     try {
-      const panels = () =>
-        [...document.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]')];
+      const panels = () => [
+        ...document.querySelectorAll<HTMLElement>('[data-slot="resizable-panel"]'),
+      ];
       const sizes = () => panels().map((p) => parseFloat(p.style.flexGrow || "0"));
 
       expect(sizes()[0]).toBeCloseTo(20, 0);
@@ -604,26 +603,24 @@ describe("Resizable", () => {
         ({ state }) =>
           html`<div>
             <button type="button">bump ${state.tick}</button>
-            ${
-              Resizable.Root({
-                direction: "horizontal",
-                children: [
-                  Resizable.Panel({ defaultSize: 30, children: "outer-a" }),
-                  Resizable.Handle(),
-                  Resizable.Panel({
-                    defaultSize: 70,
-                    children: Resizable.Root({
-                      direction: "horizontal",
-                      children: [
-                        Resizable.Panel({ defaultSize: 40, children: "inner-a" }),
-                        Resizable.Handle(),
-                        Resizable.Panel({ defaultSize: 60, children: "inner-b" }),
-                      ],
-                    }),
+            ${Resizable.Root({
+              direction: "horizontal",
+              children: [
+                Resizable.Panel({ defaultSize: 30, children: "outer-a" }),
+                Resizable.Handle(),
+                Resizable.Panel({
+                  defaultSize: 70,
+                  children: Resizable.Root({
+                    direction: "horizontal",
+                    children: [
+                      Resizable.Panel({ defaultSize: 40, children: "inner-a" }),
+                      Resizable.Handle(),
+                      Resizable.Panel({ defaultSize: 60, children: "inner-b" }),
+                    ],
                   }),
-                ],
-              })
-            }
+                }),
+              ],
+            })}
           </div>`,
       );
 

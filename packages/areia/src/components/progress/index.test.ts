@@ -61,7 +61,9 @@ describe("Progress", () => {
       expect(preserve.split(/\s+/)).toContain("style");
       expect(preserve.split(/\s+/)).toContain("aria-valuenow");
       const indicator = root!.querySelector('[data-slot="progress-indicator"]');
-      expect((indicator?.getAttribute("data-morph-preserve") ?? "").split(/\s+/)).toContain("style");
+      expect((indicator?.getAttribute("data-morph-preserve") ?? "").split(/\s+/)).toContain(
+        "style",
+      );
     } finally {
       unmount();
     }

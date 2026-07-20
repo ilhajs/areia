@@ -3,7 +3,11 @@ import { Resizable as ResizablePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { decodeMarkupEntities, render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
-import { mergeMorphPreserve, MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
+import {
+  mergeMorphPreserve,
+  MORPH_CONTROLLER_STYLE,
+  stampMorphPreserve,
+} from "$lib/morph-preserve";
 import type { HTMLElementProps } from "$lib/types";
 
 export type ResizableInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
@@ -100,7 +104,11 @@ function renderChildren(value: unknown): unknown {
  * (avoids flex-grow:20 vs flex-grow:1 looking like ~95/5 before hydrate).
  */
 function normalizeResizableChildren(children: unknown): unknown {
-  const items = Array.isArray(children) ? [...children] : children == null || children === false ? [] : [children];
+  const items = Array.isArray(children)
+    ? [...children]
+    : children == null || children === false
+      ? []
+      : [children];
   if (items.length === 0) return children;
 
   const panelIdx: number[] = [];
@@ -126,11 +134,7 @@ function normalizeResizableChildren(children: unknown): unknown {
   const missing = panelIdx.length - withSize;
   if (missing === 0) return children;
 
-  if (
-    withSize > 0 &&
-    typeof process !== "undefined" &&
-    process.env?.NODE_ENV !== "production"
-  ) {
+  if (withSize > 0 && typeof process !== "undefined" && process.env?.NODE_ENV !== "production") {
     console.warn(
       "[areia:Resizable] Some panels omit defaultSize while others set it. " +
         "defaultSize is a percentage of the group (sum ≈ 100). " +

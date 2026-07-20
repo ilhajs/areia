@@ -16,7 +16,6 @@ Accessible resizable panel groups with keyboard support. Built on the `@areia/sl
 
 `Resizable` wires panel sizing, drag handles, keyboard navigation, and layout change events.
 
-
 ## Panel sizes and ilha morph
 
 `defaultSize` is a **percentage** of the group (values should sum to about 100). When only some panels set `defaultSize`, Areia fills missing siblings with the remaining space in markup so SSR flex-grow stays coherent (e.g. `20` + omitted → `20` / `80`, not `20` / `1`).
@@ -24,7 +23,6 @@ Accessible resizable panel groups with keyboard support. Built on the `@areia/sl
 After mount, `@areia/slots` owns each panel’s inline `style` (flex-grow percentages) and the root’s flex container styles. Under **ilha**, parent island re-renders morph the tree from template markup. Resizable stamps `data-morph-preserve="style"` on the root, panels, and handles by default (merged with any user `data-morph-preserve` tokens) so dragged sizes survive filters, loaders, and nested layout updates. You do **not** need to add `data-morph-preserve="style"` yourself.
 
 Nested groups (shell sidebar + detail split) work the same way. Persist layout across full remounts with `onLayoutChange` if you want — that is optional app state, not required for morph safety.
-
 
 <Preview
   size="lg"

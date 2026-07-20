@@ -6,7 +6,7 @@ type IconAttrs = Record<string, string | number | boolean | undefined | null>;
 
 export interface IconInput {
   /** Lucide icon node, e.g. `Info`, `TriangleAlert`, or `CircleX`. */
-  icon: IconNode;
+  icon?: IconNode;
   /** Additional CSS classes applied to the root SVG. */
   class?: string;
   className?: string;
@@ -42,6 +42,12 @@ export function Icon({
   label,
   strokeWidth = 1.75,
 }: IconInput) {
+  // Imprensa MDX auto-bind re-invokes non-island components with `{}` for side
+  // effects; tolerate a missing node so docs pages that import Icon stay quiet.
+  if (!icon || !Array.isArray(icon)) {
+    return raw("");
+  }
+
   const children = icon
     .map(([tag, attrs]) => {
       const attrString = attrsToString(attrs as IconAttrs);

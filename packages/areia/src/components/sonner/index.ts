@@ -354,18 +354,61 @@ function mountToaster(root: HTMLElement, input: ToasterInput = {}) {
   return destroy;
 }
 
-function mountAllToasters() {
-  document
+/** Mount any toaster roots present in the document that are not yet live. */
+export function ensureToastersMounted(doc: Document | undefined = globalThis.document) {
+  if (!doc) return;
+  doc
     .querySelectorAll<HTMLElement>("[data-areia-sonner-toaster]")
     .forEach((root) => !mountedRoots.has(root) && mountToaster(root));
 }
 
+function ensureToasterInDocument(doc: Document = document) {
+  ensureToastersMounted(doc);
+  if (doc.querySelector("[data-areia-sonner-toaster]")) return;
+
+  const holder = doc.createElement("div");
+  holder.innerHTML = toMarkup(
+    renderToaster({
+      position: "bottom-right",
+      theme: "system",
+      richColors: true,
+      closeButton: true,
+    }),
+  );
+  const root = holder.firstElementChild as HTMLElement | null;
+  if (!root) return;
+  doc.body.appendChild(root);
+  mountToaster(root, {
+    position: "bottom-right",
+    theme: "system",
+    richColors: true,
+    closeButton: true,
+  });
+}
+
+/** Guarantee a live toaster exists, then show a toast (docs / late SPA mounts). */
+export function showToast(
+  type: "success" | "error" | "info" | "warning" | "message" | "loading",
+  title: string,
+  options?: Parameters<typeof sonnerToast.success>[1],
+) {
+  if (typeof document !== "undefined") ensureToasterInDocument(document);
+  if (type === "message") return sonnerToast(title, options);
+  return sonnerToast[type](title, options);
+}
+
 if (typeof document !== "undefined") {
+  const boot = () => ensureToastersMounted();
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", mountAllToasters);
+    document.addEventListener("DOMContentLoaded", boot);
   } else {
-    queueMicrotask(mountAllToasters);
+    queueMicrotask(boot);
   }
+  // Layout/SPA islands often insert the toaster after the module microtask.
+  queueMicrotask(() => {
+    const observer = new MutationObserver(() => ensureToastersMounted());
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  });
 }
 
 export const ToasterRoot = ilha

@@ -218,14 +218,20 @@ function renderDay(date: Date, month: Date, input: DatePickerInput) {
   </button>`;
 }
 
-function renderMonth({ month, days }: MonthData, input: DatePickerInput) {
+function renderMonth(
+  { month, days }: MonthData,
+  input: DatePickerInput,
+  options: { showHeading: boolean } = { showHeading: true },
+) {
   const weekStartsOn = input.weekStartsOn ?? DATE_PICKER_DEFAULT_VARIANTS.weekStartsOn;
   const weekdays = weekdayHeader(weekStartsOn);
 
   return html`<section class="flex flex-col gap-3" data-date-picker-month>
-    <h3 class="text-center text-sm font-medium text-areia-default">
-      ${format(month, "MMMM yyyy")}
-    </h3>
+    ${options.showHeading
+      ? html`<h3 class="text-center text-sm font-medium text-areia-default">
+          ${format(month, "MMMM yyyy")}
+        </h3>`
+      : ""}
     <div class="grid grid-cols-7 gap-1 text-center text-xs text-areia-subtle">
       ${weekdays.map((day) => html`<div>${format(day, "EEEEE")}</div>`)}
     </div>
@@ -298,7 +304,10 @@ function renderDatePicker(input: DatePickerInput = {}) {
       })}
     </div>
     <div class="grid gap-4 ${numberOfMonths > 1 ? "sm:grid-cols-2" : ""}">
-      ${monthsFor(normalizedInput).map((monthData) => renderMonth(monthData, normalizedInput))}
+      ${monthsFor(normalizedInput).map((monthData) =>
+        // Single-month view already labels the month next to the nav buttons.
+        renderMonth(monthData, normalizedInput, { showHeading: numberOfMonths > 1 }),
+      )}
     </div>
   </div>`;
 }

@@ -91,11 +91,11 @@ Native constraint validation is read from the field control.
 
 ### Custom Validation
 
-Return a string from `validate` to mark the field invalid.
+Return a string from `validate` to mark the field invalid. Use `Field.Root` when you need island props such as `validate`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field\n    label="Email"\n    error="Enter a valid email address."\n    validationMode="onBlur"\n    validate={(value) =>\n      value.includes("@")\n        ? null\n        : "Enter a valid email address."\n    }\n  >\n    <Input\n      data-slot="field-control"\n      type="email"\n      name="email"\n      placeholder="you@example.com"\n    />\n  </Field>\n));'
+    'import ilha from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field.Root\n    label="Email"\n    error="Enter a valid email address."\n    validationMode="onBlur"\n    validate={(value) =>\n      value.includes("@")\n        ? null\n        : "Enter a valid email address."\n    }\n  >\n    <Input\n      data-slot="field-control"\n      type="email"\n      name="email"\n      placeholder="you@example.com"\n    />\n  </Field.Root>\n));'
   }
   lang="tsx"
   codeOnly
@@ -132,12 +132,12 @@ Use the part helpers when you need a custom layout.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Field, Textarea } from "areia";\n\nexport default ilha.render(() => (\n  <Field.Root>\n    <Field.Label label="Description" />\n    <Textarea\n      data-slot="field-control"\n      name="description"\n      placeholder="Describe your project..."\n    />\n    <div class="flex items-center justify-between gap-3">\n      <Field.Description description="Keep it concise." />\n      <Field.Error error="Description is required." />\n    </div>\n  </Field.Root>\n));'
+    'import ilha from "ilha";\nimport { Field, Textarea } from "areia";\n\nexport default ilha.render(() => (\n  <Field>\n    <Field.Label label="Description" />\n    <Textarea\n      data-slot="field-control"\n      name="description"\n      placeholder="Describe your project..."\n    />\n    <div class="flex items-center justify-between gap-3">\n      <Field.Description description="Keep it concise." />\n      <Field.Error error="Description is required." />\n    </div>\n  </Field>\n));'
   }
   lang="tsx"
 >
   <div class="w-full max-w-sm">
-    <Field.Root>
+    <Field>
       <Field.Label label="Description" />
       <Textarea
         data-slot="field-control"
@@ -148,7 +148,7 @@ Use the part helpers when you need a custom layout.
         <Field.Description description="Keep it concise." />
         <Field.Error error="Description is required." />
       </div>
-    </Field.Root>
+    </Field>
   </div>
 </Preview>
 
@@ -166,7 +166,7 @@ Use the part helpers when you need a custom layout.
 | `disabled`       | `boolean`                                        | `false`      | Disables the field.                         |
 | `invalid`        | `boolean`                                        | `false`      | Forces invalid state.                       |
 | `validationMode` | `"onBlur" \| "onChange" \| "onSubmit"`           | `"onBlur"`   | When validation runs.                       |
-| `validate`       | `(value, control) => string \| string[] \| null` | —            | Custom validator.                           |
+| `validate`       | `(value, control) => string \| string[] \| null` | —            | Custom validator (`Field.Root` island).     |
 
 ## Slots
 

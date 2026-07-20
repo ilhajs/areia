@@ -6,8 +6,15 @@ tags: [components]
 ---
 
 import { Preview } from "$lib/components/preview";
-import { Breadcrumbs, Icon } from "areia";
-import { Folder, House } from "lucide";
+import {
+  BreadcrumbsBasicDemo,
+  BreadcrumbsClipboardDemo,
+  BreadcrumbsCompositionDemo,
+  BreadcrumbsHeroDemo,
+  BreadcrumbsIconsDemo,
+  BreadcrumbsLoadingDemo,
+  BreadcrumbsSizesDemo,
+} from "$lib/components/breadcrumbs-demo";
 
 # Breadcrumbs
 
@@ -20,8 +27,9 @@ A navigation component that shows the current page's location within a navigatio
     'import ilha from "ilha";\nimport { House, Folder } from "lucide";\nimport { Breadcrumbs, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Breadcrumbs\n    items={[\n      {\n        href: "/",\n        children: "Home",\n        icon: <Icon icon={House} />,\n      },\n      {\n        href: "/projects",\n        children: "Projects",\n        icon: <Icon icon={Folder} />,\n      },\n      { children: "Current Project" },\n    ]}\n  />\n));'
   }
   lang="tsx"
-  codeOnly
-/>
+>
+  <BreadcrumbsHeroDemo />
+</Preview>
 
 ## Import
 
@@ -38,8 +46,9 @@ Use children for composition-first breadcrumbs, or pass an `items` array for the
     'import ilha from "ilha";\nimport { Breadcrumbs } from "areia";\n\nexport default ilha.render(() => (\n  <Breadcrumbs\n    items={[\n      { href: "/", children: "Home" },\n      { href: "/docs", children: "Docs" },\n      { children: "Breadcrumbs" },\n    ]}\n  />\n));'
   }
   lang="tsx"
-  codeOnly
-/>
+>
+  <BreadcrumbsBasicDemo />
+</Preview>
 
 ## Examples
 
@@ -52,8 +61,9 @@ A simple three-level breadcrumb trail.
     'import ilha from "ilha";\nimport { Breadcrumbs } from "areia";\n\nexport default ilha.render(() => (\n  <Breadcrumbs\n    items={[\n      { href: "/", children: "Home" },\n      { href: "/docs", children: "Docs" },\n      { children: "Breadcrumbs" },\n    ]}\n  />\n));'
   }
   lang="tsx"
-  codeOnly
-/>
+>
+  <BreadcrumbsBasicDemo />
+</Preview>
 
 ### Sizes
 
@@ -64,8 +74,9 @@ Two sizes are available: `sm` for compact UIs and `base` for the default appeara
     'import ilha from "ilha";\nimport { Breadcrumbs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-8">\n    <Breadcrumbs\n      size="sm"\n      items={[\n        { href: "/", children: "Home" },\n        { href: "/docs", children: "Docs" },\n        { children: "Small Breadcrumbs" },\n      ]}\n    />\n    <Breadcrumbs\n      size="base"\n      items={[\n        { href: "/", children: "Home" },\n        { href: "/docs", children: "Docs" },\n        { children: "Base Breadcrumbs" },\n      ]}\n    />\n  </div>\n));'
   }
   lang="tsx"
-  codeOnly
-/>
+>
+  <BreadcrumbsSizesDemo />
+</Preview>
 
 ### With Icons
 
@@ -76,8 +87,9 @@ Each item accepts an optional `icon` prop. Use the `Icon` component with any Luc
     'import ilha from "ilha";\nimport { House, Folder } from "lucide";\nimport { Breadcrumbs, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Breadcrumbs\n    items={[\n      {\n        href: "/",\n        children: "Home",\n        icon: <Icon icon={House} />,\n      },\n      {\n        href: "/projects",\n        children: "Projects",\n        icon: <Icon icon={Folder} />,\n      },\n      { children: "Current Project" },\n    ]}\n  />\n));'
   }
   lang="tsx"
-  codeOnly
-/>
+>
+  <BreadcrumbsIconsDemo />
+</Preview>
 
 ### Loading
 
@@ -88,8 +100,9 @@ Set `loading` to `true` to replace the current page label with a pulsing skeleto
     'import ilha from "ilha";\nimport { House } from "lucide";\nimport { Breadcrumbs, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Breadcrumbs\n    loading\n    items={[\n      {\n        href: "/",\n        children: "Home",\n        icon: <Icon icon={House} />,\n      },\n      { href: "/docs", children: "Docs" },\n      { children: "Loading..." },\n    ]}\n  />\n));'
   }
   lang="tsx"
-  codeOnly
-/>
+>
+  <BreadcrumbsLoadingDemo />
+</Preview>
 
 ### Clipboard
 
@@ -100,8 +113,9 @@ Provide a `copyUrl` to show a copy-to-clipboard button that appears on hover. Af
     'import ilha from "ilha";\nimport { Breadcrumbs } from "areia";\n\nexport default ilha.render(() => (\n  <Breadcrumbs\n    items={[\n      { href: "/", children: "Home" },\n      { href: "/docs", children: "Docs" },\n      { children: "Current Page" },\n    ]}\n    copyUrl="https://example.com/docs/current-page"\n  />\n));'
   }
   lang="tsx"
-  codeOnly
-/>
+>
+  <BreadcrumbsClipboardDemo />
+</Preview>
 
 ### Composition
 
@@ -113,13 +127,7 @@ Use `Breadcrumbs.Link`, `Breadcrumbs.Separator`, and `Breadcrumbs.Current` as ch
   }
   lang="tsx"
 >
-  <Breadcrumbs copyUrl="https://example.com/docs/current-page">
-    <Breadcrumbs.Link href="/">Home</Breadcrumbs.Link>
-    <Breadcrumbs.Separator />
-    <Breadcrumbs.Link href="/docs">Docs</Breadcrumbs.Link>
-    <Breadcrumbs.Separator />
-    <Breadcrumbs.Current>Current Page</Breadcrumbs.Current>
-  </Breadcrumbs>
+  <BreadcrumbsCompositionDemo />
 </Preview>
 
 ## API Reference

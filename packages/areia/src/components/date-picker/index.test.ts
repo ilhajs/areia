@@ -98,4 +98,29 @@ describe("DatePicker", () => {
 
     expect(root?.dataset.selected).toBe("2024-06-10");
   });
+
+  it("shows month label once for single-month view", () => {
+    const output = markup(
+      DatePicker.Static({
+        mode: "single",
+        defaultMonth: new Date(2026, 6, 1),
+      }),
+    );
+    const matches = output.match(/July 2026/g) ?? [];
+    expect(matches.length).toBe(1);
+    expect(output).not.toContain("<h3");
+  });
+
+  it("shows per-month headings when numberOfMonths > 1", () => {
+    const output = markup(
+      DatePicker.Static({
+        mode: "range",
+        numberOfMonths: 2,
+        defaultMonth: new Date(2026, 6, 1),
+      }),
+    );
+    expect(output).toContain("<h3");
+    expect(output).toContain("July 2026");
+    expect(output).toContain("August 2026");
+  });
 });

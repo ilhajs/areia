@@ -289,20 +289,8 @@ Use `defaultOpen` to render the popover open on mount.
     'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    defaultOpen\n    trigger={<Button>Open by default</Button>}\n    content={\n      <>\n        <Popover.Title>Hello</Popover.Title>\n        <Popover.Description>\n          This starts open.\n        </Popover.Description>\n      </>\n    }\n  />\n));'
   }
   lang="tsx"
->
-  <Popover
-    defaultOpen
-    trigger={<Button>Open by default</Button>}
-    content={
-      <>
-        <Popover.Title>Hello</Popover.Title>
-        <Popover.Description>
-          This starts open.
-        </Popover.Description>
-      </>
-    }
-  />
-</Preview>
+  codeOnly
+/>
 
 ### Dismiss Behavior
 

@@ -3,6 +3,11 @@ import { markupValue as markup } from "$lib/test-markup";
 import { Icon } from "./index";
 
 describe("Icon", () => {
+  it("returns empty markup when icon is missing (MDX auto-bind)", () => {
+    const output = markup(Icon({} as never));
+    expect(output).toBe("");
+  });
+
   it("renders an svg with aria-hidden when no label", () => {
     const output = markup(Icon({ icon: [["path", { d: "M0 0" }]] }));
     expect(output).toContain("<svg");
