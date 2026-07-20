@@ -921,6 +921,16 @@ export function reconnectResizable(
   return createResizable(root, options);
 }
 
+/** Whether `root` already has a live resizable controller bound to it. */
+export function hasBinding(root: Element): boolean {
+  return hasRootBinding(root, ROOT_BINDING_KEY);
+}
+
+/** The live controller bound to `root`, if any. */
+export function getBinding(root: Element): ResizableController | undefined {
+  return getRootBinding<ResizableController>(root, ROOT_BINDING_KEY);
+}
+
 /**
  * Find and bind all resizable groups in a scope.
  * Returns an array of controllers for programmatic access.

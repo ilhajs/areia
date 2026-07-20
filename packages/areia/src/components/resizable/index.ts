@@ -202,6 +202,15 @@ function connectResizableTree(
 
   for (const root of collectResizableRoots(host)) {
     if (root.querySelectorAll('[data-slot="resizable-panel"]').length === 0) continue;
+    // Unrelated DOM patches inside a resizable tree (e.g. a filtered table re-rendering)
+    // trigger this via the MutationObserver below. Reconnecting would destroy the live
+    // controller and recompute layout from `defaultSize`, discarding the user's drag —
+    // skip roots that already have a bound controller instead.
+    if (ResizablePrimitive.hasBinding(root)) {
+      const existing = ResizablePrimitive.getBinding(root);
+      if (existing) controllers.push(existing);
+      continue;
+    }
     try {
       controllers.push(ResizablePrimitive.reconnectResizable(root, options));
     } catch {
