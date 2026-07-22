@@ -252,6 +252,8 @@ Set `multiple` to allow selecting several values. Selected options render as rem
 
 With `name`, one hidden input is created per selected value, so a native form submits `fruits=apple&fruits=banana`.
 
+The committed selection can be bound with `bind:value` (an alias for `bind:group`). Types discriminate on `multiple`: in multiple mode `bind:value` accepts a `string[]` signal, `defaultValue` is `string[]`, and `onValueChange` receives `string[]`; in single mode they stay `string`-typed.
+
 ### Form Integration
 
 Set `name` to create a hidden input that submits the selected value with a native form.

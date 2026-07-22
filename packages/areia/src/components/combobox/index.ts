@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import ilha, { html, raw, type SignalAccessor } from "ilha";
 import { Combobox as ComboboxPrimitive } from "@areia/slots";
 import {
   applyThisBind,
@@ -88,17 +88,13 @@ export type ComboboxItems =
 
 export type ComboboxError = unknown | { message: unknown; match?: unknown };
 
-/**
- * Searchable constrained selector.
- *
- * Combobox combines a text input, a popup, and a dropdown trigger for choosing
- * from predefined options. Use Autocomplete when the user's typed text is the
- * submitted value and suggestions are merely hints.
- */
-export type ComboboxInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
+type ComboboxBaseInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   ComboboxVariantsProps &
-  Omit<ComboboxPrimitive.ComboboxOptions, "disabled" | "required" | "placeholder"> &
-  IlhaBindProps &
+  Omit<
+    ComboboxPrimitive.ComboboxOptions,
+    "disabled" | "required" | "placeholder" | "multiple" | "defaultValue" | "onValueChange"
+  > &
+  Omit<IlhaBindProps, "bind:value"> &
   Record<string, unknown> & {
     /** Label content for the combobox. Enables the field wrapper. */
     label?: unknown;
@@ -123,14 +119,43 @@ export type ComboboxInput = Omit<HTMLElementProps<HTMLDivElement>, "className" |
      * Use `onValueChange` for committed option selection.
      */
     onInputValueChange?: ComboboxPrimitive.ComboboxOptions["onInputValueChange"];
-    /** Called when the committed option value changes. */
-    onValueChange?: ComboboxPrimitive.ComboboxOptions["onValueChange"];
     /** Called when the options popup opens or closes. */
     onOpenChange?: ComboboxPrimitive.ComboboxOptions["onOpenChange"];
     /** Additional CSS classes applied to the combobox root. */
     class?: string;
     className?: string;
   };
+
+export type ComboboxSingleInput = ComboboxBaseInput & {
+  /** Single selection mode (default). */
+  multiple?: false;
+  /** Initial selected value. */
+  defaultValue?: string;
+  /** Called when the committed option value changes. */
+  onValueChange?: (value: string | null) => void;
+  /** Bind the committed selection. Alias for `bind:group`. */
+  "bind:value"?: SignalAccessor<string> | SignalAccessor<string | null>;
+};
+
+export type ComboboxMultipleInput = ComboboxBaseInput & {
+  /** Allow selecting multiple values. Selected options render as removable chips. */
+  multiple: true;
+  /** Initial selected values. */
+  defaultValue?: string[];
+  /** Called when the committed selection changes. */
+  onValueChange?: (value: string[]) => void;
+  /** Bind the committed selection. Alias for `bind:group`. */
+  "bind:value"?: SignalAccessor<string[]>;
+};
+
+/**
+ * Searchable constrained selector.
+ *
+ * Combobox combines a text input, a popup, and a dropdown trigger for choosing
+ * from predefined options. Use Autocomplete when the user's typed text is the
+ * submitted value and suggestions are merely hints.
+ */
+export type ComboboxInput = ComboboxSingleInput | ComboboxMultipleInput;
 
 function normalizeError(error: ComboboxError): unknown {
   if (error && typeof error === "object" && "message" in error) {
@@ -655,13 +680,20 @@ function comboboxRootBinds(
 ): Partial<Pick<IlhaBindProps, "bind:open" | "bind:group">> {
   return {
     "bind:open": binds["bind:open"] as IlhaBindProps["bind:open"],
-    "bind:group": binds["bind:group"] as IlhaBindProps["bind:group"],
+    // `bind:value` on the combobox root is an alias for the selection bind
+    "bind:group": (binds["bind:group"] ?? binds["bind:value"]) as IlhaBindProps["bind:group"],
   };
 }
 
 function comboboxInputBinds(binds: Partial<Record<string, unknown>>) {
-  const { "bind:open": _o, "bind:group": _g, ...rest } = binds;
+  const { "bind:open": _o, "bind:group": _g, "bind:value": _v, ...rest } = binds;
   return rest;
+}
+
+/** Coalesce `bind:value` into `bind:group` so the group-bind helpers see the selection bind. */
+function withSelectionBind<T extends Record<string, unknown>>(input: T): Record<string, unknown> {
+  if (input["bind:group"] != null || input["bind:value"] == null) return input;
+  return { ...input, "bind:group": input["bind:value"] };
 }
 
 function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = false) {
@@ -708,7 +740,10 @@ function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = f
     ...inputPassthrough
   } = attrs as ComboboxInput;
   const defaultOpen = openBindDefault(input, defaultOpenProp);
-  const defaultValue = groupBindDefault(input, defaultValueProp) as string | string[] | undefined;
+  const defaultValue = groupBindDefault(withSelectionBind(input), defaultValueProp) as
+    | string
+    | string[]
+    | undefined;
   const variant = error ? "error" : "default";
   const normalizedError = normalizeError(error);
   const describedBy =
@@ -808,7 +843,10 @@ export const ComboboxRoot = ilha
       collisionPadding: input.collisionPadding,
       defaultOpen: openBindDefault(input, input.defaultOpen),
       defaultValue:
-        (groupBindDefault(input, input.defaultValue) as string | string[] | undefined) ?? undefined,
+        (groupBindDefault(withSelectionBind(input), input.defaultValue) as
+          | string
+          | string[]
+          | undefined) ?? undefined,
       disabled: input.disabled,
       filter: input.filter,
       itemToStringValue: input.itemToStringValue,
@@ -821,7 +859,7 @@ export const ComboboxRoot = ilha
       },
       onValueChange: (value) => {
         groupSync?.onUserChange(value);
-        input.onValueChange?.(value);
+        (input.onValueChange as ComboboxPrimitive.ComboboxOptions["onValueChange"])?.(value);
       },
       openOnFocus: input.openOnFocus,
       placeholder: input.placeholder,
@@ -833,7 +871,7 @@ export const ComboboxRoot = ilha
 
     openSync = createOpenBindSync(input, controller);
     groupSync = createGroupBindSync(
-      input,
+      withSelectionBind(input),
       {
         getValue: () => (input.multiple ? [...controller.values] : controller.value),
         setValue: (value) => {
@@ -946,7 +984,8 @@ function needsComboboxIsland(input: ComboboxInput) {
     input.onInputValueChange != null ||
     input.onPortalMounted != null ||
     binds["bind:open"] != null ||
-    binds["bind:group"] != null
+    binds["bind:group"] != null ||
+    binds["bind:value"] != null
   );
 }
 

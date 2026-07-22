@@ -1,7 +1,8 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import ilha, { html, mount, type SignalAccessor } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
-import { Combobox, comboboxVariants } from "./index";
+import { Combobox, comboboxVariants, type ComboboxInput } from "./index";
 
 try {
   GlobalRegistrator.register();
@@ -219,5 +220,63 @@ describe("Combobox behavior (auto-mount)", () => {
     const chips = root.querySelectorAll<HTMLElement>('[data-slot="combobox-chip"]');
     expect(chips.length).toBe(2);
     expect(chips[0]?.textContent).toContain("Apple");
+  });
+});
+
+describe("Combobox multiple-mode types", () => {
+  it("discriminates value types on the multiple prop", () => {
+    // Type-level assertions: these must compile without casts.
+    const arraySignal = (() => ["apple"]) as SignalAccessor<string[]>;
+    const stringSignal = (() => "apple") as SignalAccessor<string>;
+
+    const multipleInput: ComboboxInput = {
+      multiple: true,
+      defaultValue: ["apple"],
+      "bind:value": arraySignal,
+      onValueChange: (next: string[]) => next,
+    };
+    const singleInput: ComboboxInput = {
+      defaultValue: "apple",
+      "bind:value": stringSignal,
+      onValueChange: (next: string | null) => next,
+    };
+
+    // @ts-expect-error single mode does not accept an array defaultValue
+    const invalid: ComboboxInput = { multiple: false, defaultValue: ["apple"] };
+
+    expect(multipleInput.multiple).toBe(true);
+    expect(singleInput.multiple).toBeUndefined();
+    expect(invalid).toBeDefined();
+  });
+
+  it("syncs bind:value with the committed selection in multiple mode", async () => {
+    let readSelected!: () => string[];
+
+    const Panel = ilha.state("selected", () => [] as string[]).render(({ state }) => {
+      readSelected = state.selected as () => string[];
+      return html`${Combobox({
+        multiple: true,
+        "bind:value": state.selected as SignalAccessor<string[]>,
+        items: [
+          { value: "apple", label: "Apple" },
+          { value: "banana", label: "Banana" },
+        ],
+      })}`;
+    });
+
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
+    await settle();
+
+    const trigger = document.querySelector('[data-slot="combobox-trigger"]') as HTMLElement;
+    trigger.click();
+    await settle();
+
+    const items = [...document.querySelectorAll<HTMLElement>('[data-slot="combobox-item"]')];
+    items.find((el) => el.dataset["value"] === "apple")?.click();
+    items.find((el) => el.dataset["value"] === "banana")?.click();
+    await settle();
+
+    expect(readSelected()).toEqual(["apple", "banana"]);
   });
 });
