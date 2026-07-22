@@ -224,6 +224,34 @@ Use `defaultValue` with the option value string to preselect an item.
   />
 </Preview>
 
+### Multiple Selection
+
+Set `multiple` to allow selecting several values. Selected options render as removable Badge chips inside the input. Clicking an item toggles its selection and keeps the popup open. The typed search text clears after each selection, and `Backspace` with an empty input removes the last selected value. `defaultValue` accepts an array, and `onValueChange` receives a `string[]`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="multi-frameworks"\n    label="Frameworks"\n    multiple\n    placeholder="Search frameworks..."\n    defaultValue={["astro", "svelte"]}\n    items={{\n      astro: "Astro",\n      next: "Next.js",\n      nuxt: "Nuxt",\n      remix: "Remix",\n      svelte: "SvelteKit",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Combobox
+    id="multi-frameworks"
+    label="Frameworks"
+    multiple
+    placeholder="Search frameworks..."
+    defaultValue={["astro", "svelte"]}
+    items={{
+      astro: "Astro",
+      next: "Next.js",
+      nuxt: "Nuxt",
+      remix: "Remix",
+      svelte: "SvelteKit",
+    }}
+  />
+</Preview>
+
+With `name`, one hidden input is created per selected value, so a native form submits `fruits=apple&fruits=banana`.
+
 ### Form Integration
 
 Set `name` to create a hidden input that submits the selected value with a native form.
@@ -417,7 +445,8 @@ For free-form values that do not need to match the list, use `itemToStringValue`
 | `items`              | `Record<string, unknown \| { label: unknown; disabled?: boolean }> \| ComboboxItemDescriptor[]` | -          | Items rendered as selectable options. Object keys are option values.        |
 | `children`           | `unknown`                                                                                       | -          | Explicit combobox content. Prefer the second `Combobox` argument.           |
 | `placeholder`        | `string`                                                                                        | -          | Placeholder text for the trigger input or trigger value.                    |
-| `defaultValue`       | `string`                                                                                        | -          | Initial selected value.                                                     |
+| `multiple`           | `boolean`                                                                                       | `false`    | Allow selecting multiple values. Items toggle and the popup stays open.     |
+| `defaultValue`       | `string \| string[]`                                                                            | -          | Initial selected value(s). Array form is for `multiple` mode.               |
 | `defaultOpen`        | `boolean`                                                                                       | `false`    | Initial open state.                                                         |
 | `disabled`           | `boolean`                                                                                       | `false`    | Disable interaction.                                                        |
 | `required`           | `boolean`                                                                                       | `false`    | Mark the field as required. When `false` with a label, shows optional text. |
@@ -426,7 +455,7 @@ For free-form values that do not need to match the list, use `itemToStringValue`
 | `autoHighlight`      | `boolean`                                                                                       | `false`    | Auto-highlight the first visible item after typing.                         |
 | `filter`             | `(inputValue: string, itemValue: string, itemLabel: string) => boolean`                         | -          | Custom filter function. Return `true` to show an item.                      |
 | `itemToStringValue`  | `(item: HTMLElement \| null, value: string \| null) => string`                                  | -          | Custom selected-value text resolver.                                        |
-| `onValueChange`      | `(value: string \| null) => void`                                                               | -          | Called when selection changes.                                              |
+| `onValueChange`      | `(value: string \| string[] \| null) => void`                                                   | -          | Called when selection changes. Receives `string[]` in `multiple` mode.      |
 | `onOpenChange`       | `(open: boolean) => void`                                                                       | -          | Called when popup opens or closes.                                          |
 | `onInputValueChange` | `(inputValue: string) => void`                                                                  | -          | Called when the user types in the input.                                    |
 | `side`               | `"top" \| "bottom"`                                                                             | `"bottom"` | Preferred popup side.                                                       |
@@ -475,7 +504,8 @@ Individual selectable option.
 | `Home`      | Move to the first visible item.                               |
 | `End`       | Move to the last visible item.                                |
 | `Enter`     | Select the highlighted item.                                  |
-| `Escape`    | Close the popup, or clear the selected value when closed.     |
+| `Escape`    | Close the popup, or clear the selected value(s) when closed.  |
+| `Backspace` | In `multiple` mode with an empty input, remove the last selected value. |
 | `Tab`       | Close the popup and continue normal tab navigation.           |
 
 ### Label Requirement
@@ -488,7 +518,7 @@ Comboboxes should have an accessible name via one of:
 
 ### Form Behavior
 
-When `name` is provided, the controller creates a hidden input with the selected value so the combobox participates in native form submission.
+When `name` is provided, the controller creates a hidden input with the selected value so the combobox participates in native form submission. In `multiple` mode, one hidden input is created per selected value.
 
 ### Error Association
 

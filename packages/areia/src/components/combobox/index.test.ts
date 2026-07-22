@@ -95,6 +95,26 @@ describe("Combobox", () => {
     expect(output).toContain("b");
   });
 
+  it("stamps data-multiple on the root when multiple is set", () => {
+    const output = markup(Combobox({ multiple: true }));
+    expect(output).toMatch(/data-slot="combobox"[^>]*data-multiple/);
+  });
+
+  it("serializes an array defaultValue as JSON in multiple mode", () => {
+    const output = markup(Combobox({ multiple: true, defaultValue: ["a", "b"] }));
+    expect(output).toContain("data-default-value");
+    expect(output).toContain("a&quot;");
+  });
+
+  it("renders a chips container and Badge chip template in multiple mode", () => {
+    const output = markup(Combobox({ multiple: true }));
+    expect(output).toContain('data-slot="combobox-chips"');
+    expect(output).toContain('data-slot="combobox-chip-template"');
+    expect(output).toContain('data-slot="combobox-chip-label"');
+    expect(output).toContain('data-slot="combobox-chip-remove"');
+    expect(output).toContain("bg-areia-surface-muted");
+  });
+
   it("places passthrough data attributes on the combobox input, not the root", () => {
     const output = markup(Combobox({ "data-params": "x", name: "country" }));
     expect(output).toContain('data-params="x"');
@@ -168,5 +188,36 @@ describe("Combobox behavior (auto-mount)", () => {
 
     expect(input.value).toBe("Apple");
     expect(content.hidden).toBe(true);
+  });
+
+  it("toggles items without closing in multiple mode", async () => {
+    document.body.innerHTML = markup(
+      Combobox({
+        multiple: true,
+        items: [
+          { value: "apple", label: "Apple" },
+          { value: "banana", label: "Banana" },
+        ],
+      }),
+    );
+    const root = document.querySelector('[data-slot="combobox"]') as HTMLElement;
+    const trigger = document.querySelector('[data-slot="combobox-trigger"]') as HTMLElement;
+    const content = document.querySelector('[data-slot="combobox-content"]') as HTMLElement;
+    await settle();
+
+    trigger.click();
+    await settle();
+
+    const items = [...document.querySelectorAll<HTMLElement>('[data-slot="combobox-item"]')];
+    items.find((el) => el.dataset["value"] === "apple")?.click();
+    items.find((el) => el.dataset["value"] === "banana")?.click();
+    await settle();
+
+    expect(content.hidden).toBe(false);
+    expect(root.getAttribute("data-value")).toBe("apple,banana");
+
+    const chips = root.querySelectorAll<HTMLElement>('[data-slot="combobox-chip"]');
+    expect(chips.length).toBe(2);
+    expect(chips[0]?.textContent).toContain("Apple");
   });
 });

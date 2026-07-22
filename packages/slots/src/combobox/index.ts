@@ -35,11 +35,35 @@ const ALIGNS = ["start", "center", "end"] as const;
 
 export type ComboboxItemToStringValue = (item: HTMLElement | null, value: string | null) => string;
 
+const parseDefaultValueDataAttribute = (
+  value: string | undefined,
+): string | string[] | undefined => {
+  if (value === undefined) return undefined;
+
+  const trimmedValue = value.trim();
+  if (!trimmedValue.startsWith("[") || !trimmedValue.endsWith("]")) {
+    return value;
+  }
+
+  try {
+    const parsed = JSON.parse(trimmedValue);
+    if (!Array.isArray(parsed)) {
+      return value;
+    }
+
+    return parsed.filter((entry): entry is string => typeof entry === "string");
+  } catch {
+    return value;
+  }
+};
+
 export interface ComboboxOptions {
-  /** Initial selected value */
-  defaultValue?: string;
-  /** Callback when value changes */
-  onValueChange?: (value: string | null) => void;
+  /** Allow selecting multiple values (default: false) */
+  multiple?: boolean;
+  /** Initial selected value(s) - string for single, string[] for multiple */
+  defaultValue?: string | string[];
+  /** Callback when value changes. Receives `string | null` in single mode, `string[]` in multiple mode. */
+  onValueChange?: (value: string | string[] | null) => void;
   /** Initial open state */
   defaultOpen?: boolean;
   /** Callback when open state changes */
@@ -81,15 +105,21 @@ export interface ComboboxOptions {
 }
 
 export interface ComboboxController {
-  /** Current selected value */
+  /** Current selected value (first selected value in multiple mode) */
   readonly value: string | null;
+  /** Current selected values (at most one entry in single mode) */
+  readonly values: readonly string[];
   /** Current input text */
   readonly inputValue: string;
   /** Current open state */
   readonly isOpen: boolean;
-  /** Select a value programmatically */
+  /** Select a value programmatically (adds to the selection in multiple mode) */
   select(value: string): void;
-  /** Clear selected value */
+  /** Deselect a value programmatically (no-op if not selected) */
+  deselect(value: string): void;
+  /** Replace the full selection programmatically */
+  setValues(values: string[]): void;
+  /** Clear selected value(s) */
   clear(): void;
   /** Open the popup */
   open(): void;
@@ -155,7 +185,13 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
   const valueSlotPlaceholder = valueSlot?.textContent?.trim() ?? "";
 
   // Resolve options: JS > data-* > defaults
-  const defaultValue = options.defaultValue ?? getDataString(root, "defaultValue") ?? null;
+  const multiple = options.multiple ?? getDataBool(root, "multiple") ?? false;
+  const rawDefaultValue =
+    options.defaultValue ?? parseDefaultValueDataAttribute(getDataString(root, "defaultValue"));
+  const defaultValues = (
+    rawDefaultValue == null ? [] : Array.isArray(rawDefaultValue) ? rawDefaultValue : [rawDefaultValue]
+  ).filter((value, index, arr) => arr.indexOf(value) === index);
+  if (!multiple && defaultValues.length > 1) defaultValues.length = 1;
   const defaultOpen = options.defaultOpen ?? getDataBool(root, "defaultOpen") ?? false;
   const placeholder = options.placeholder ?? getDataString(root, "placeholder") ?? "";
   const disabled = options.disabled ?? getDataBool(root, "disabled") ?? false;
@@ -194,7 +230,7 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
 
   // State
   let isOpen = false;
-  let currentValue: string | null = defaultValue;
+  let selectedValues: string[] = defaultValues;
   let highlightedIndex = -1;
   let keyboardMode = false;
   let openRenderedSide: Side | null = null;
@@ -213,8 +249,8 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
   let enabledVisibleItems: HTMLElement[] = [];
   let itemToEnabledIndex = new Map<HTMLElement, number>();
 
-  // Hidden input for form integration
-  let hiddenInput: HTMLInputElement | null = null;
+  // Hidden inputs for form integration (one per selected value in multiple mode)
+  let hiddenInputs: HTMLInputElement[] = [];
 
   // Portal lifecycle
   const portal = createPortalLifecycle({
@@ -280,6 +316,65 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     return item ? getItemLabel(item) : "";
   };
 
+  const isSelectedValue = (value: string | null | undefined) =>
+    value != null && selectedValues.includes(value);
+
+  // Chips: in multiple mode, selected values render into an optional
+  // combobox-chips container, cloning an optional chip <template>.
+  const chipsContainer = multiple ? getPart<HTMLElement>(root, "combobox-chips") : null;
+  const chipTemplate = multiple
+    ? root.querySelector<HTMLTemplateElement>('template[data-slot="combobox-chip-template"]')
+    : null;
+
+  const buildChip = (value: string, label: string): HTMLElement => {
+    const templateChip = chipTemplate?.content.firstElementChild;
+    let chip: HTMLElement;
+    if (templateChip instanceof HTMLElement) {
+      chip = templateChip.cloneNode(true) as HTMLElement;
+    } else {
+      chip = doc.createElement("span");
+      chip.appendChild(doc.createElement("span")).setAttribute("data-slot", "combobox-chip-label");
+      const remove = chip.appendChild(doc.createElement("button"));
+      remove.setAttribute("data-slot", "combobox-chip-remove");
+      remove.textContent = "×";
+    }
+    chip.setAttribute("data-slot", "combobox-chip");
+    chip.setAttribute("data-value", value);
+    const labelSlot = chip.querySelector<HTMLElement>('[data-slot="combobox-chip-label"]');
+    if (labelSlot) {
+      labelSlot.textContent = label;
+    } else {
+      chip.prepend(label);
+    }
+    const removeButton = chip.querySelector<HTMLElement>('[data-slot="combobox-chip-remove"]');
+    if (removeButton) {
+      if (!removeButton.hasAttribute("type")) removeButton.setAttribute("type", "button");
+      if (!removeButton.hasAttribute("tabindex")) removeButton.tabIndex = -1;
+      if (!removeButton.hasAttribute("aria-label")) {
+        removeButton.setAttribute("aria-label", `Remove ${label}`);
+      }
+      if (disabled) removeButton.setAttribute("data-disabled", "");
+    }
+    return chip;
+  };
+
+  const renderChips = () => {
+    if (!chipsContainer) return;
+    chipsContainer.textContent = "";
+    for (const value of selectedValues) {
+      chipsContainer.appendChild(buildChip(value, getLabelForValue(value) || value));
+    }
+  };
+
+  // Display text for the whole selection (comma-joined in multiple mode)
+  const getSelectionLabel = (): string => {
+    if (selectedValues.length === 0) return "";
+    return selectedValues
+      .map((value) => getLabelForValue(value))
+      .filter(Boolean)
+      .join(", ");
+  };
+
   // ARIA setup
   const inputId = ensureId(input, "combobox-input");
   const listEl = list ?? content;
@@ -340,7 +435,7 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
   // Sync native validity for required constraint
   const syncValidity = () => {
     if (!required) return;
-    input.setCustomValidity(currentValue === null ? "Please select a value" : "");
+    input.setCustomValidity(selectedValues.length === 0 ? "Please select a value" : "");
   };
 
   // Placeholder
@@ -355,15 +450,27 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     }
   }
 
-  // Form integration: strip name from visible input, create hidden input
-  if (name) {
-    if (input.name) input.removeAttribute("name");
-    hiddenInput = document.createElement("input");
-    hiddenInput.type = "hidden";
-    hiddenInput.name = name;
-    hiddenInput.value = currentValue ?? "";
-    root.appendChild(hiddenInput);
-  }
+  // Form integration: strip name from visible input, create hidden input(s)
+  const syncHiddenInputs = () => {
+    if (!name) return;
+    // Single mode always keeps one hidden input (empty value when cleared)
+    const targetValues = multiple ? selectedValues : [selectedValues[0] ?? ""];
+    while (hiddenInputs.length > targetValues.length) {
+      hiddenInputs.pop()?.remove();
+    }
+    while (hiddenInputs.length < targetValues.length) {
+      const hidden = document.createElement("input");
+      hidden.type = "hidden";
+      hidden.name = name;
+      root.appendChild(hidden);
+      hiddenInputs.push(hidden);
+    }
+    targetValues.forEach((value, index) => {
+      hiddenInputs[index]!.value = value;
+    });
+  };
+  if (name && input.name) input.removeAttribute("name");
+  syncHiddenInputs();
 
   // Default filter: case-insensitive substring
   const defaultFilter = (inputVal: string, _itemValue: string, itemLabel: string) =>
@@ -400,8 +507,7 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
       }
 
       // Mark selected
-      const itemValue = getItemValue(item);
-      syncItemSelectedState(item, itemValue === currentValue);
+      syncItemSelectedState(item, isSelectedValue(getItemValue(item)));
     }
 
     // Set groups' ARIA
@@ -689,8 +795,8 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
       applyFilter(input.value);
 
       // Highlight selected item if visible, else auto-highlight first
-      const selectedIndex = enabledVisibleItems.findIndex(
-        (el) => getItemValue(el) === currentValue,
+      const selectedIndex = enabledVisibleItems.findIndex((el) =>
+        isSelectedValue(getItemValue(el)),
       );
       if (selectedIndex >= 0) {
         updateHighlight(selectedIndex);
@@ -717,11 +823,12 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
       positionSync.stop();
       presence.exit();
 
-      if (isPopupInputMode) {
+      if (isPopupInputMode || multiple) {
+        // Multiple-mode inline input is a transient search box; chips/value slot show the selection.
         input.value = "";
       } else {
         // Restore input text to committed value's label
-        const committedLabel = getLabelForValue(currentValue);
+        const committedLabel = getLabelForValue(selectedValues[0] ?? null);
         input.value = committedLabel;
       }
 
@@ -734,21 +841,26 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     onOpenChange?.(isOpen);
   };
 
-  const updateValue = (value: string | null, init = false) => {
-    if (currentValue === value && !init) return;
+  const normalizeSelection = (values: string[]): string[] => {
+    const deduped = values.filter((value, index, arr) => arr.indexOf(value) === index);
+    return multiple ? deduped : deduped.slice(0, 1);
+  };
 
-    const oldValue = currentValue;
-    currentValue = value;
+  const sameSelection = (a: string[], b: string[]) =>
+    a.length === b.length && a.every((value, index) => value === b[index]);
+
+  const updateSelection = (values: string[], init = false) => {
+    const next = normalizeSelection(values);
+    if (sameSelection(selectedValues, next) && !init) return;
+
+    const changed = !sameSelection(selectedValues, next);
+    selectedValues = next;
     syncValidity();
+    syncHiddenInputs();
 
-    // Update hidden input
-    if (hiddenInput) {
-      hiddenInput.value = value ?? "";
-    }
-
-    // Update root data-value
-    if (value !== null) {
-      root.setAttribute("data-value", value);
+    // Update root data-value (comma-joined in multiple mode)
+    if (next.length > 0) {
+      root.setAttribute("data-value", next.join(","));
     } else {
       root.removeAttribute("data-value");
     }
@@ -758,16 +870,22 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     const items =
       allItems.length > 0 ? allItems : getParts<HTMLElement>(container, "combobox-item");
     for (const item of items) {
-      const itemValue = getItemValue(item);
-      syncItemSelectedState(item, itemValue === value);
+      syncItemSelectedState(item, isSelectedValue(getItemValue(item)));
     }
 
-    const resolvedLabel = getLabelForValue(value);
-    if (!isPopupInputMode) {
+    renderChips();
+
+    // Multiple mode: chips stand in for the placeholder once anything is selected
+    if (multiple) {
+      input.placeholder = next.length > 0 ? "" : placeholder;
+    }
+
+    const resolvedLabel = getSelectionLabel();
+    if (!isPopupInputMode && !multiple) {
       input.value = resolvedLabel;
     }
     if (valueSlot) {
-      if (value === null) {
+      if (next.length === 0) {
         valueSlot.textContent = valueSlotPlaceholder || placeholder;
         if ((valueSlot.textContent ?? "").trim().length > 0) {
           valueSlot.setAttribute("data-placeholder", "");
@@ -782,23 +900,49 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
         trigger?.removeAttribute("data-placeholder");
       }
     } else if (trigger) {
-      if (value === null) {
+      if (next.length === 0) {
         trigger.setAttribute("data-placeholder", "");
       } else {
         trigger.removeAttribute("data-placeholder");
       }
     }
 
-    if (!init && oldValue !== value) {
+    if (!init && changed) {
+      const value = multiple ? [...next] : (next[0] ?? null);
       emit(root, "combobox:change", { value });
       onValueChange?.(value);
     }
+  };
+
+  const updateValue = (value: string | string[] | null, init = false) => {
+    updateSelection(value == null ? [] : Array.isArray(value) ? value : [value], init);
   };
 
   const selectItem = (item: HTMLElement) => {
     if (isItemDisabled(item)) return;
     const value = getItemValue(item);
     if (value === undefined) return;
+
+    if (multiple) {
+      // Toggle selection and keep the popup open
+      updateSelection(
+        isSelectedValue(value)
+          ? selectedValues.filter((v) => v !== value)
+          : [...selectedValues, value],
+      );
+      // Base UI resets the search text after each selection
+      if (input.value !== "") {
+        input.value = "";
+        if (isOpen) applyFilter("");
+      }
+      if (isOpen) {
+        // Keep the highlight on the toggled item so keyboard flow continues
+        const index = itemToEnabledIndex.get(item);
+        if (index !== undefined) updateHighlight(index);
+        positionSync.update();
+      }
+      return;
+    }
 
     updateValue(value);
     updateOpenState(false);
@@ -888,9 +1032,15 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
         if (isOpen) {
           e.preventDefault();
           updateOpenState(false);
-        } else if (currentValue !== null) {
+        } else if (selectedValues.length > 0) {
           e.preventDefault();
           updateValue(null);
+        }
+        break;
+      case "Backspace":
+        // Base UI: with an empty input in multiple mode, Backspace removes the last selected value
+        if (multiple && input.value === "" && selectedValues.length > 0) {
+          updateSelection(selectedValues.slice(0, -1));
         }
         break;
       case "Tab":
@@ -962,8 +1112,12 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
   content.hidden = true;
   setDataState("closed");
 
+  if (multiple) {
+    rootElement.dataset["multiple"] = "";
+  }
+
   // Set initial value and input text
-  updateValue(currentValue, true);
+  updateSelection(selectedValues, true);
 
   // Event listeners
   cleanups.push(
@@ -996,6 +1150,28 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
           updateOpenState(true);
           input.focus();
         }
+      }),
+    );
+  }
+
+  if (chipsContainer) {
+    cleanups.push(
+      // Keep focus in the input while interacting with chips
+      on(chipsContainer, "mousedown", (e) => {
+        e.preventDefault();
+      }),
+      on(chipsContainer, "click", (e) => {
+        if (disabled || input.readOnly) return;
+        const removeButton = (e.target as HTMLElement).closest?.(
+          '[data-slot="combobox-chip-remove"]',
+        );
+        if (!removeButton || !chipsContainer.contains(removeButton)) return;
+        const value = removeButton
+          .closest('[data-slot="combobox-chip"]')
+          ?.getAttribute("data-value");
+        if (value == null) return;
+        updateSelection(selectedValues.filter((v) => v !== value));
+        if (isOpen) positionSync.update();
       }),
     );
   }
@@ -1089,14 +1265,17 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
       }
       if (detail?.itemToStringValue !== undefined) {
         itemToStringValue = detail.itemToStringValue;
-        updateValue(currentValue, true);
+        updateSelection(selectedValues, true);
       }
     }),
   );
 
   const controller: ComboboxController = {
     get value() {
-      return currentValue;
+      return selectedValues[0] ?? null;
+    },
+    get values() {
+      return [...selectedValues];
     },
     get inputValue() {
       return input.value;
@@ -1104,13 +1283,16 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     get isOpen() {
       return isOpen;
     },
-    select: (value: string) => updateValue(value),
-    clear: () => updateValue(null),
+    select: (value: string) =>
+      updateSelection(multiple ? [...selectedValues, value] : [value]),
+    deselect: (value: string) => updateSelection(selectedValues.filter((v) => v !== value)),
+    setValues: (values: string[]) => updateSelection(values),
+    clear: () => updateSelection([]),
     open: () => updateOpenState(true),
     close: () => updateOpenState(false),
     setItemToStringValue: (nextItemToStringValue: ComboboxItemToStringValue | null) => {
       itemToStringValue = nextItemToStringValue;
-      updateValue(currentValue, true);
+      updateSelection(selectedValues, true);
     },
     destroy: () => {
       isDestroyed = true;
@@ -1119,9 +1301,11 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
       portal.cleanup();
       cleanups.forEach((fn) => fn());
       cleanups.length = 0;
-      if (hiddenInput && hiddenInput.parentNode) {
-        hiddenInput.parentNode.removeChild(hiddenInput);
+      for (const hidden of hiddenInputs) {
+        hidden.remove();
       }
+      hiddenInputs = [];
+      chipsContainer?.replaceChildren();
       clearRootBinding(root, ROOT_BINDING_KEY, controller);
     },
   };

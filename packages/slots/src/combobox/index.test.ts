@@ -943,7 +943,7 @@ describe("Combobox", () => {
     });
 
     it("calls onValueChange callback", () => {
-      let selectedValue: string | null | undefined;
+      let selectedValue: string | string[] | null | undefined;
       const { items, controller } = setup({
         onValueChange: (value) => {
           selectedValue = value;
@@ -2058,6 +2058,9 @@ describe("Combobox", () => {
         get value() {
           return null;
         },
+        get values() {
+          return [];
+        },
         get inputValue() {
           return "";
         },
@@ -2065,6 +2068,8 @@ describe("Combobox", () => {
           return false;
         },
         select() {},
+        deselect() {},
+        setValues() {},
         clear() {},
         open() {},
         close() {},
@@ -2089,6 +2094,9 @@ describe("Combobox", () => {
         get value() {
           return null;
         },
+        get values() {
+          return [];
+        },
         get inputValue() {
           return "";
         },
@@ -2096,6 +2104,8 @@ describe("Combobox", () => {
           return false;
         },
         select() {},
+        deselect() {},
+        setValues() {},
         clear() {},
         open() {},
         close() {},
@@ -2866,6 +2876,250 @@ describe("Combobox", () => {
       expect(dispatchResult).toBe(false);
       expect(event.defaultPrevented).toBe(true);
       expect(document.activeElement).toBe(input);
+      controller.destroy();
+    });
+  });
+
+  describe("multiple selection mode", () => {
+    it("toggles items and keeps the popup open", () => {
+      const { items, controller } = setup({ multiple: true });
+      controller.open();
+
+      items[0]?.click();
+      expect(controller.isOpen).toBe(true);
+      expect(controller.values).toEqual(["apple"]);
+      expect(items[0]?.hasAttribute("data-selected")).toBe(true);
+
+      items[1]?.click();
+      expect(controller.values).toEqual(["apple", "banana"]);
+
+      items[0]?.click();
+      expect(controller.values).toEqual(["banana"]);
+      expect(items[0]?.hasAttribute("data-selected")).toBe(false);
+      expect(controller.isOpen).toBe(true);
+      controller.destroy();
+    });
+
+    it("stamps data-multiple and comma-joined data-value on root", () => {
+      const { root, controller } = setup({ multiple: true, defaultValue: ["apple", "banana"] });
+      expect(root.hasAttribute("data-multiple")).toBe(true);
+      expect(root.getAttribute("data-value")).toBe("apple,banana");
+
+      controller.clear();
+      expect(root.hasAttribute("data-value")).toBe(false);
+      controller.destroy();
+    });
+
+    it("reads multiple mode and JSON array default from data attributes", () => {
+      const { root, controller } = setup(
+        {},
+        `
+        <div data-slot="combobox" id="root" data-multiple data-default-value='["apple","other"]'>
+          <input data-slot="combobox-input" />
+          <div data-slot="combobox-content" hidden>
+            <div data-slot="combobox-item" data-value="apple">Apple</div>
+            <div data-slot="combobox-item" data-value="banana">Banana</div>
+            <div data-slot="combobox-item" data-value="other">Other</div>
+          </div>
+        </div>
+      `,
+      );
+      expect(controller.values).toEqual(["apple", "other"]);
+      expect(root.getAttribute("data-value")).toBe("apple,other");
+      controller.destroy();
+    });
+
+    it("calls onValueChange with an array", () => {
+      let received: string | string[] | null | undefined;
+      const { items, controller } = setup({
+        multiple: true,
+        onValueChange: (value) => {
+          received = value;
+        },
+      });
+      controller.open();
+      items[0]?.click();
+      items[2]?.click();
+      expect(received).toEqual(["apple", "other"]);
+      controller.destroy();
+    });
+
+    it("creates one hidden input per selected value", () => {
+      const { root, items, controller } = setup({ multiple: true, name: "fruits" });
+      controller.open();
+      items[0]?.click();
+      items[1]?.click();
+
+      let hidden = root.querySelectorAll<HTMLInputElement>('input[type="hidden"][name="fruits"]');
+      expect(Array.from(hidden).map((el) => el.value)).toEqual(["apple", "banana"]);
+
+      items[0]?.click();
+      hidden = root.querySelectorAll<HTMLInputElement>('input[type="hidden"][name="fruits"]');
+      expect(Array.from(hidden).map((el) => el.value)).toEqual(["banana"]);
+
+      controller.clear();
+      hidden = root.querySelectorAll<HTMLInputElement>('input[type="hidden"][name="fruits"]');
+      expect(hidden.length).toBe(0);
+      controller.destroy();
+    });
+
+    it("does not write selection labels into the inline input", async () => {
+      const { input, items, controller } = setup({ multiple: true });
+      controller.open();
+      items[0]?.click();
+      expect(input.value).toBe("");
+
+      controller.close();
+      await waitForClose();
+      expect(input.value).toBe("");
+      controller.destroy();
+    });
+
+    it("joins selected labels in the popup value slot", () => {
+      const { valueSlot, items, controller } = setupPopupInput({ multiple: true });
+      controller.open();
+      items[0]?.click();
+      items[1]?.click();
+      expect(valueSlot.textContent).toBe("Brazil, Canada");
+
+      controller.clear();
+      expect(valueSlot.textContent).toBe("Select country...");
+      controller.destroy();
+    });
+
+    it("supports select/deselect/setValues on the controller", () => {
+      const { controller } = setup({ multiple: true });
+      controller.select("apple");
+      controller.select("banana");
+      expect(controller.values).toEqual(["apple", "banana"]);
+      expect(controller.value).toBe("apple");
+
+      controller.deselect("apple");
+      expect(controller.values).toEqual(["banana"]);
+
+      controller.setValues(["other", "apple"]);
+      expect(controller.values).toEqual(["other", "apple"]);
+      controller.destroy();
+    });
+
+    it("clears the search text and re-filters after selecting an item", () => {
+      const { input, items, controller } = setup({ multiple: true });
+      controller.open();
+
+      input.value = "app";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      expect(items[1]?.hidden).toBe(true);
+
+      items[0]?.click();
+      expect(controller.values).toEqual(["apple"]);
+      expect(input.value).toBe("");
+      expect(items[1]?.hidden).toBe(false);
+      expect(items[0]?.hasAttribute("data-highlighted")).toBe(true);
+      controller.destroy();
+    });
+
+    it("Backspace with empty input removes the last selected value", () => {
+      const { input, controller } = setup({ multiple: true, defaultValue: ["apple", "banana"] });
+
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace", bubbles: true }));
+      expect(controller.values).toEqual(["apple"]);
+
+      // Backspace with text in the input edits text, not the selection
+      input.value = "x";
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace", bubbles: true }));
+      expect(controller.values).toEqual(["apple"]);
+      controller.destroy();
+    });
+
+    it("hides the placeholder while at least one value is selected", () => {
+      const { input, items, controller } = setup({ multiple: true, placeholder: "Pick fruit..." });
+      expect(input.placeholder).toBe("Pick fruit...");
+
+      controller.open();
+      items[0]?.click();
+      expect(input.placeholder).toBe("");
+
+      items[0]?.click();
+      expect(input.placeholder).toBe("Pick fruit...");
+      controller.destroy();
+    });
+
+    it("renders selected values as removable chips in a combobox-chips container", () => {
+      const { root, controller } = setup(
+        { multiple: true, defaultValue: ["apple"] },
+        `
+        <div data-slot="combobox" id="root">
+          <div data-slot="combobox-chips"></div>
+          <input data-slot="combobox-input" />
+          <div data-slot="combobox-content" hidden>
+            <div data-slot="combobox-item" data-value="apple">Apple</div>
+            <div data-slot="combobox-item" data-value="banana">Banana</div>
+          </div>
+        </div>
+      `,
+      );
+      const chips = () => root.querySelectorAll<HTMLElement>('[data-slot="combobox-chip"]');
+      expect(chips().length).toBe(1);
+      expect(chips()[0]?.getAttribute("data-value")).toBe("apple");
+      expect(chips()[0]?.textContent).toContain("Apple");
+
+      controller.select("banana");
+      expect(chips().length).toBe(2);
+
+      const remove = chips()[0]?.querySelector<HTMLElement>('[data-slot="combobox-chip-remove"]');
+      expect(remove?.getAttribute("aria-label")).toBe("Remove Apple");
+      remove?.click();
+      expect(controller.values).toEqual(["banana"]);
+      expect(chips().length).toBe(1);
+      controller.destroy();
+    });
+
+    it("clones a chip template when provided", () => {
+      const { root, controller } = setup(
+        { multiple: true, defaultValue: ["apple"] },
+        `
+        <div data-slot="combobox" id="root">
+          <div data-slot="combobox-chips"></div>
+          <template data-slot="combobox-chip-template">
+            <span class="badge">
+              <span data-slot="combobox-chip-label"></span>
+              <button data-slot="combobox-chip-remove">x</button>
+            </span>
+          </template>
+          <input data-slot="combobox-input" />
+          <div data-slot="combobox-content" hidden>
+            <div data-slot="combobox-item" data-value="apple">Apple</div>
+          </div>
+        </div>
+      `,
+      );
+      const chip = root.querySelector<HTMLElement>('[data-slot="combobox-chip"]');
+      expect(chip?.classList.contains("badge")).toBe(true);
+      expect(
+        chip?.querySelector('[data-slot="combobox-chip-label"]')?.textContent,
+      ).toBe("Apple");
+      expect(
+        chip?.querySelector('[data-slot="combobox-chip-remove"]')?.getAttribute("type"),
+      ).toBe("button");
+      controller.destroy();
+    });
+
+    it("Escape while closed clears all selected values", () => {
+      const { input, controller } = setup({ multiple: true, defaultValue: ["apple", "banana"] });
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      expect(controller.values).toEqual([]);
+      controller.destroy();
+    });
+
+    it("single mode ignores extra default values and keeps toggle-free selection", () => {
+      const { items, controller } = setup({ defaultValue: ["apple", "banana"] as never });
+      expect(controller.values).toEqual(["apple"]);
+
+      controller.open();
+      items[0]?.click();
+      // Re-selecting the same value in single mode keeps it selected and closes
+      expect(controller.value).toBe("apple");
+      expect(controller.isOpen).toBe(false);
       controller.destroy();
     });
   });

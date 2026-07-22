@@ -18,6 +18,7 @@ import { cn } from "$lib/cn";
 import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
+import { badgeVariants } from "$components/badge";
 import { INPUT_VARIANTS, inputVariants } from "$components/input";
 import { Field } from "$components/field";
 import { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
@@ -201,6 +202,7 @@ function inputDataAttrs(
     | "defaultOpen"
     | "defaultValue"
     | "disabled"
+    | "multiple"
     | "name"
     | "openOnFocus"
     | "placeholder"
@@ -210,8 +212,11 @@ function inputDataAttrs(
   return toAttrs({
     "data-auto-highlight": input.autoHighlight,
     "data-default-open": input.defaultOpen,
-    "data-default-value": input.defaultValue,
+    "data-default-value": Array.isArray(input.defaultValue)
+      ? JSON.stringify(input.defaultValue)
+      : input.defaultValue,
     "data-disabled": input.disabled,
+    "data-multiple": input.multiple,
     "data-name": input.name,
     "data-open-on-focus": input.openOnFocus,
     "data-placeholder": input.placeholder,
@@ -242,6 +247,8 @@ export type ComboboxSearchTriggerInput = Omit<
   Record<string, unknown> & {
     clearLabel?: string;
     showOptionsLabel?: string;
+    /** Render selected values as removable Badge chips inside the input (multiple mode). */
+    multiple?: boolean;
     size?: ComboboxSize;
     variant?: "default" | "error";
     class?: string;
@@ -251,11 +258,19 @@ export type ComboboxSearchTriggerInput = Omit<
 /** @deprecated Use `ComboboxSearchTriggerInput` instead. */
 export type ComboboxTriggerInputInput = ComboboxSearchTriggerInput;
 
+const multipleWrapperStyles: Record<ComboboxSize, string> = {
+  xs: "min-h-5 py-0.5",
+  sm: "min-h-6.5 py-0.5",
+  base: "min-h-9 py-1",
+  lg: "min-h-10 py-1.5",
+};
+
 export function ComboboxTriggerInput(input: ComboboxSearchTriggerInput = {}) {
   const { binds, attrs: props } = splitBindProps(input);
   const {
     clearLabel = "Clear selection",
     showOptionsLabel = "Show options",
+    multiple,
     size = COMBOBOX_DEFAULT_VARIANTS.size,
     variant = "default",
     class: className,
@@ -264,6 +279,49 @@ export function ComboboxTriggerInput(input: ComboboxSearchTriggerInput = {}) {
   } = props as ComboboxSearchTriggerInput;
   const iconStyles = triggerInputIconStyles[size];
 
+  const control = multiple
+    ? html`<div
+          class="${cn(
+            inputVariants({ size, variant }),
+            "flex h-auto w-full flex-wrap items-center",
+            variant === "error"
+              ? "focus-within:ring-[1.5px] focus-within:ring-areia-destructive/50"
+              : "focus-within:ring-[1.5px] focus-within:ring-areia-ring/50",
+            multipleWrapperStyles[size],
+            iconStyles.padding,
+          )}"
+        >
+          <div data-slot="combobox-chips" class="contents"></div>
+          ${boundVoidElement(
+            "input",
+            binds,
+            ` data-slot="combobox-input" class="min-w-16 flex-1 border-0 bg-transparent p-0 outline-none focus:ring-0 disabled:cursor-not-allowed"${toAttrs(
+              rest,
+            )} />`,
+          )}
+        </div>
+        <template data-slot="combobox-chip-template">
+          <span class="${cn(badgeVariants({ variant: "secondary" }), "gap-1 pr-0.75")}">
+            <span data-slot="combobox-chip-label"></span>
+            <button
+              type="button"
+              data-slot="combobox-chip-remove"
+              class="flex cursor-pointer rounded-full border-0 bg-transparent p-0.5 hover:bg-areia-control-hover data-disabled:pointer-events-none"
+            >
+              ${xIcon(10)}
+            </button>
+          </span>
+        </template>`
+    : boundVoidElement(
+        "input",
+        binds,
+        ` data-slot="combobox-input" class="${cn(
+          inputVariants({ size, variant }),
+          "w-full disabled:cursor-not-allowed",
+          iconStyles.padding,
+        )}"${toAttrs(rest)} />`,
+      );
+
   return html`<div
     class="${cn(
       "relative inline-block w-full max-w-xs has-disabled:cursor-not-allowed has-disabled:opacity-50",
@@ -271,15 +329,7 @@ export function ComboboxTriggerInput(input: ComboboxSearchTriggerInput = {}) {
       aliasedClassName,
     )}"
   >
-    ${boundVoidElement(
-      "input",
-      binds,
-      ` data-slot="combobox-input" class="${cn(
-        inputVariants({ size, variant }),
-        "w-full disabled:cursor-not-allowed",
-        iconStyles.padding,
-      )}"${toAttrs(rest)} />`,
-    )}
+    ${control}
     <button
       type="button"
       data-slot="combobox-clear"
@@ -639,6 +689,7 @@ function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = f
     items,
     label: _label,
     labelTooltip: _labelTooltip,
+    multiple,
     name,
     onInputValueChange: _onInputValueChange,
     onOpenChange: _onOpenChange,
@@ -657,7 +708,7 @@ function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = f
     ...inputPassthrough
   } = attrs as ComboboxInput;
   const defaultOpen = openBindDefault(input, defaultOpenProp);
-  const defaultValue = groupBindDefault(input, defaultValueProp) as string | undefined;
+  const defaultValue = groupBindDefault(input, defaultValueProp) as string | string[] | undefined;
   const variant = error ? "error" : "default";
   const normalizedError = normalizeError(error);
   const describedBy =
@@ -678,6 +729,7 @@ function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = f
     ...inputPassthrough,
     ...inputBinds,
     id,
+    multiple,
     name,
     placeholder,
     disabled,
@@ -702,6 +754,7 @@ function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = f
     defaultOpen,
     defaultValue,
     disabled,
+    multiple,
     name,
     openOnFocus,
     placeholder,
@@ -755,10 +808,11 @@ export const ComboboxRoot = ilha
       collisionPadding: input.collisionPadding,
       defaultOpen: openBindDefault(input, input.defaultOpen),
       defaultValue:
-        (groupBindDefault(input, input.defaultValue) as string | undefined) ?? undefined,
+        (groupBindDefault(input, input.defaultValue) as string | string[] | undefined) ?? undefined,
       disabled: input.disabled,
       filter: input.filter,
       itemToStringValue: input.itemToStringValue,
+      multiple: input.multiple,
       name: input.name,
       onInputValueChange: input.onInputValueChange,
       onOpenChange: (open) => {
@@ -781,15 +835,13 @@ export const ComboboxRoot = ilha
     groupSync = createGroupBindSync(
       input,
       {
-        getValue: () => controller.value,
+        getValue: () => (input.multiple ? [...controller.values] : controller.value),
         setValue: (value) => {
           if (value == null) controller.clear();
-          else if (typeof value === "string") controller.select(value);
-          else if (value[0]) controller.select(value[0]);
-          else controller.clear();
+          else controller.setValues(Array.isArray(value) ? value : [value]);
         },
       },
-      "single",
+      input.multiple ? "multiple" : "single",
     );
     openSync?.applyFromSignal();
     groupSync?.applyFromSignal();
@@ -866,18 +918,17 @@ function scheduleComboboxAutoBind(doc: Document | undefined = globalThis.documen
         openSync?.applyFromSignal();
       }
       if (entry?.bindGroup) {
+        const multiple = root.hasAttribute("data-multiple");
         groupSync = createGroupBindSync(
           { "bind:group": entry.bindGroup },
           {
-            getValue: () => controller.value,
+            getValue: () => (multiple ? [...controller.values] : controller.value),
             setValue: (value) => {
               if (value == null) controller.clear();
-              else if (typeof value === "string") controller.select(value);
-              else if (value[0]) controller.select(value[0]);
-              else controller.clear();
+              else controller.setValues(Array.isArray(value) ? value : [value]);
             },
           },
-          "single",
+          multiple ? "multiple" : "single",
         );
         groupSync?.applyFromSignal();
       }
