@@ -1,0 +1,292 @@
+---
+title: Command
+description: Fast, composable command menu with ranked fuzzy search, keyboard-first navigation, and smart result sorting.
+sidebar:
+  order: 6
+---
+
+# Command
+
+A command palette or search-driven menu that filters, ranks, and reorders items as the user types. It supports grouped items, keyboard shortcuts, vim-style bindings, pointer-free keyboard navigation, flexible ranking via keywords, and keeps the original authored DOM order when no search is active.
+
+```ts
+import { Command } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <div data-slot="command" data-label="Command Menu" class="win95-panel w-80 p-2">
+    <div data-slot="command-input-wrapper" class="mb-2">
+      <input
+        data-slot="command-input"
+        id="command-input"
+        placeholder="Search..."
+        class="win95-input w-full"
+      />
+    </div>
+    <div data-slot="command-list" class="win95-inset p-3">
+      <div data-slot="command-empty" hidden class="px-3 py-1 text-neutral-600">
+        No results found.
+      </div>
+      <div data-slot="command-group">
+        <div data-slot="command-group-heading" class="win95-label">
+          Actions
+        </div>
+        <div
+          data-slot="command-item"
+          data-value="copy"
+          data-keywords="duplicate"
+          class="win95-menu-item"
+        >
+          Copy
+          <span
+            data-slot="command-shortcut"
+            class="float-right ml-8 text-neutral-700"
+          >
+            ⌘C
+          </span>
+        </div>
+        <div
+          data-slot="command-item"
+          data-value="paste"
+          data-keywords="insert"
+          class="win95-menu-item"
+        >
+          Paste
+          <span
+            data-slot="command-shortcut"
+            class="float-right ml-8 text-neutral-700"
+          >
+            ⌘V
+          </span>
+        </div>
+      </div>
+      <div data-slot="command-separator" class="win95-separator"></div>
+      <div data-slot="command-group">
+        <div data-slot="command-group-heading" class="win95-label">
+          Navigation
+        </div>
+        <div data-slot="command-item" data-value="home" class="win95-menu-item">
+          Home
+          <span
+            data-slot="command-shortcut"
+            class="float-right ml-8 text-neutral-700"
+          >
+            ⌘H
+          </span>
+        </div>
+        <div
+          data-slot="command-item"
+          data-value="settings"
+          class="win95-menu-item"
+        >
+          Settings
+          <span
+            data-slot="command-shortcut"
+            class="float-right ml-8 text-neutral-700"
+          >
+            ⌘,
+          </span>
+        </div>
+      </div>
+      <div data-slot="command-item" data-disabled class="win95-menu-item">
+        Disabled item
+      </div>
+    </div>
+  </div>
+`;
+
+const root = document.querySelector('[data-slot="command"]')!;
+const controller = Command.createCommand(root, {
+  label: "Command Menu",
+  loop: true,
+  vimBindings: true,
+});
+```
+
+## Import
+
+```ts
+import { Command } from "@areia/slots";
+```
+
+## Usage
+
+```ts
+import { Command } from "@areia/slots";
+
+// Auto-bind a single root
+const root = document.querySelector('[data-slot="command"]');
+const controller = Command.createCommand(root, {
+  label: "Command Menu",
+  onValueChange: (value) => console.log("active item:", value),
+  onSelect: (value) => console.log("selected:", value),
+});
+
+// Auto-bind all unbound roots in scope
+const controllers = Command.create();
+```
+
+## Expected Markup
+
+The command expects a search input and a list of items. Items can be organized into groups with headings. Use `data-value` for deterministic item identification, `data-keywords` to boost ranking, `data-disabled` to disable items, and `data-force-mount` to keep filtered-out items in the DOM.
+
+```html
+<label for="command-input">Actions</label>
+<div data-slot="command" data-label="Command Menu">
+  <div data-slot="command-input-wrapper">
+    <input
+      data-slot="command-input"
+      id="command-input"
+      placeholder="Search..."
+    />
+  </div>
+  <div data-slot="command-list">
+    <div data-slot="command-empty" hidden>
+      No results found.
+    </div>
+
+    <div data-slot="command-group">
+      <div data-slot="command-group-heading">Actions</div>
+      <div
+        data-slot="command-item"
+        data-value="copy"
+        data-keywords="duplicate"
+      >
+        Copy
+        <span data-slot="command-shortcut">⌘C</span>
+      </div>
+      <div
+        data-slot="command-item"
+        data-value="paste"
+        data-keywords="insert"
+      >
+        Paste
+        <span data-slot="command-shortcut">⌘V</span>
+      </div>
+    </div>
+
+    <div data-slot="command-separator"></div>
+
+    <div data-slot="command-group">
+      <div data-slot="command-group-heading">Navigation</div>
+      <div data-slot="command-item" data-value="home">
+        Home
+        <span data-slot="command-shortcut">⌘H</span>
+      </div>
+      <div data-slot="command-item" data-value="settings">
+        Settings
+        <span data-slot="command-shortcut">⌘,</span>
+      </div>
+    </div>
+
+    <div data-slot="command-item" data-disabled>
+      Disabled item
+    </div>
+  </div>
+</div>
+```
+
+### Data Slots
+
+| Slot                    | Required | Description                                                                          |
+| ----------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `command`               | Yes      | Root container.                                                                      |
+| `command-input-wrapper` | No       | Wrapper around the search input.                                                     |
+| `command-input`         | Yes      | Search input that drives filtering and ranking.                                      |
+| `command-list`          | Yes      | Scrollable container for items, groups, separators, and the empty slot.              |
+| `command-item`          | Yes      | Selectable result item. Value is inferred from text content or set via `data-value`. |
+| `command-group`         | No       | Wraps a set of related items with a heading.                                         |
+| `command-group-heading` | No       | Non-interactive heading label for a group.                                           |
+| `command-empty`         | No       | Message shown when no items match the search.                                        |
+| `command-separator`     | No       | Visual divider between groups or items.                                              |
+| `command-shortcut`      | No       | Displays a keyboard shortcut hint; excluded from search text.                        |
+
+### Item Data Attributes
+
+| Attribute            | Description                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `data-value`         | Explicit value used for selection and events. Falls back to inferred text content.                                 |
+| `data-keywords`      | Comma or newline separated extra terms that boost the item's fuzzy-search rank without being visible in the label. |
+| `data-disabled`      | Marks the item as non-selectable.                                                                                  |
+| `data-force-mount`   | Keeps the item in the DOM even when filtered out (hidden via `hidden`).                                            |
+| `data-always-render` | Keeps the item in the DOM and visible even when filtered out.                                                      |
+
+### Generated Attributes
+
+| Attribute         | Element(s)                      | Description                                                            |
+| ----------------- | ------------------------------- | ---------------------------------------------------------------------- |
+| `data-selected`   | `command-item`                  | Present on the currently active (highlighted) item.                    |
+| `hidden`          | `command-item`, `command-group` | Toggled based on whether the item or group matches the current search. |
+| `role`            | `command-list`                  | Set to `"listbox"`.                                                    |
+| `role`            | `command-item`                  | Set to `"option"`.                                                     |
+| `role`            | `command-group`                 | Set to `"group"`.                                                      |
+| `aria-selected`   | `command-item`                  | `"true"` when selected, `"false"` otherwise.                           |
+| `aria-labelledby` | `command-group`                 | Points to the group heading `id`.                                      |
+| `aria-disabled`   | `command-item`                  | `"true"` when the item is disabled.                                    |
+
+## Events
+
+### Outbound
+
+| Event            | Detail              | Description                                                    |
+| ---------------- | ------------------- | -------------------------------------------------------------- |
+| `command:select` | `{ value: string }` | Fired on the root when an item is selected via click or Enter. |
+| `command:change` | `{ value: string }` | Fired on the root when the active (highlighted) item changes.  |
+
+### Inbound
+
+| Event         | Detail              | Description                                                   |
+| ------------- | ------------------- | ------------------------------------------------------------- |
+| `command:set` | `{ value: string }` | Dispatch on the root to programmatically set the active item. |
+
+## API Reference
+
+### Options
+
+| Option                    | Type                                                             | Default | Description                                                                                             |
+| ------------------------- | ---------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| `defaultValue`            | `string`                                                         | —       | Initial active item value.                                                                              |
+| `label`                   | `string`                                                         | —       | Accessible label announced to assistive technology. Defaults to the `data-label` attribute on the root. |
+| `shouldFilter`            | `boolean`                                                        | `true`  | Disable built-in filtering and sorting when set to `false`.                                             |
+| `loop`                    | `boolean`                                                        | `false` | Wrap arrow-key navigation from last to first item and vice versa.                                       |
+| `disablePointerSelection` | `boolean`                                                        | `false` | Ignore pointer-move events for selection, keeping interaction keyboard-only.                            |
+| `vimBindings`             | `boolean`                                                        | `true`  | Enable `Ctrl+J`, `Ctrl+K`, `Ctrl+N`, and `Ctrl+P` shortcuts for vertical navigation.                    |
+| `filter`                  | `(value: string, search: string, keywords?: string[]) => number` | —       | Custom ranking function. Return `0` to hide the item. Higher scores rank higher.                        |
+| `onValueChange`           | `(value: string \| null) => void`                                | —       | Called when the active item value changes.                                                              |
+| `onSearchChange`          | `(search: string) => void`                                       | —       | Called when the search query changes.                                                                   |
+| `onSelect`                | `(value: string) => void`                                        | —       | Called when an item is selected via click or Enter.                                                     |
+
+### Controller
+
+| Member             | Type                              | Description                                                                      |
+| ------------------ | --------------------------------- | -------------------------------------------------------------------------------- |
+| `value`            | `string \| null` (getter)         | Current active item value.                                                       |
+| `search`           | `string` (getter)                 | Current search query.                                                            |
+| `select(value)`    | `(value: string \| null) => void` | Set the active item value programmatically. Passing `null` clears the selection. |
+| `setSearch(value)` | `(search: string) => void`        | Set the search query programmatically.                                           |
+| `destroy()`        | `() => void`                      | Remove all listeners, mutation observers, and clean up.                          |
+
+## Controller
+
+The controller is returned by `Command.createCommand()` and provides imperative control over the command menu's state.
+
+```ts
+const controller = Command.createCommand(root, {
+  label: "Command Menu",
+});
+
+// Set search query programmatically
+controller.setSearch("copy");
+
+// Select an item programmatically
+controller.select("paste");
+
+// Clear selection
+controller.select(null);
+
+// Read current state
+console.log(controller.value); // "paste" | null
+console.log(controller.search); // "copy"
+
+// Clean up
+controller.destroy();
+```

@@ -3,13 +3,8 @@ import { Switch as SwitchPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
   createCheckedBindSync,
-  queueSwitchCheckedBindForAutoMount,
-  lookupSwitchCheckedBindByName,
-  restoreSwitchCheckedBindQueue,
-  runCheckedControlAutoBindAfterIlha,
   splitBindProps,
   subscribeBindProps,
-  takeSwitchCheckedBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -17,13 +12,6 @@ import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
 import { Label } from "$components/label";
-import {
-  attachSwitchAutoBindSignalEffect,
-  destroySwitchAutoRuntimeIfDesynced,
-  getSwitchAutoRuntime,
-  registerSwitchAutoRuntime,
-  syncAllSwitchAutoBindFromNamedRegistry,
-} from "$lib/switch-auto-bind-sync";
 import { stampMorphPreserve } from "$lib/morph-preserve";
 
 /** Switch size and variant definitions mapping names to their Tailwind classes. */
@@ -154,7 +142,7 @@ function dataAttrs(
   });
 }
 
-function SwitchControl(input: SwitchControlInput = {}, autoBind = false) {
+function SwitchControl(input: SwitchControlInput = {}) {
   const { binds, attrs: restProps } = splitBindProps(input);
   const {
     checked,
@@ -233,7 +221,6 @@ function SwitchControl(input: SwitchControlInput = {}, autoBind = false) {
         "aria-label": ariaLabel,
         "aria-labelledby": ariaLabelledby,
         "aria-describedby": ariaDescribedby,
-        "data-areia-switch": autoBind ? "" : undefined,
       }),
     )}
   >
@@ -265,33 +252,7 @@ function SwitchControl(input: SwitchControlInput = {}, autoBind = false) {
   </span>`;
 }
 
-function renderSwitch(input: SwitchInput = {}, autoBind = false) {
-  const { binds } = splitBindProps(input);
-  const controlName = typeof input.name === "string" ? input.name : undefined;
-
-  if (autoBind) {
-    const itemValue = typeof input.value === "string" ? input.value : undefined;
-    const hasBind = binds["bind:checked"] != null || binds["bind:group"] != null;
-    const hasCallback = input.onCheckedChange != null;
-    if (hasBind || hasCallback) {
-      queueSwitchCheckedBindForAutoMount(
-        {
-          "bind:checked": binds["bind:checked"] as IlhaBindProps["bind:checked"],
-          "bind:group": binds["bind:group"] as IlhaBindProps["bind:group"],
-        },
-        itemValue,
-        undefined,
-        controlName,
-        hasCallback
-          ? {
-              onCheckedChange: input.onCheckedChange,
-              defaultChecked: Boolean(input.checked ?? input.defaultChecked),
-            }
-          : undefined,
-      );
-    }
-  }
-
+function renderSwitch(input: SwitchInput = {}) {
   const {
     label,
     labelTooltip,
@@ -304,16 +265,13 @@ function renderSwitch(input: SwitchInput = {}, autoBind = false) {
   } = input;
   const controlId = typeof id === "string" ? id : undefined;
   const ariaLabel = controlProps["aria-label"] ?? (typeof label === "string" ? label : "Switch");
-  const control = SwitchControl(
-    {
-      ...controlProps,
-      id: controlId,
-      disabled: Boolean(disabled),
-      required: typeof required === "boolean" ? required : undefined,
-      "aria-label": ariaLabel,
-    },
-    autoBind,
-  );
+  const control = SwitchControl({
+    ...controlProps,
+    id: controlId,
+    disabled: Boolean(disabled),
+    required: typeof required === "boolean" ? required : undefined,
+    "aria-label": ariaLabel,
+  });
 
   if (label == null) return control;
 
@@ -485,118 +443,9 @@ export const SwitchRoot = ilha
   })
   .render(({ input }) => renderSwitch(input));
 
-const switchAutoBindScheduled = new WeakSet<Document>();
-
-function mountSwitchAutoBindRoots(doc: Document) {
-  const queued = takeSwitchCheckedBindQueue(doc);
-  let queueIndex = 0;
-
-  for (const root of doc.querySelectorAll<HTMLElement>('[data-areia-switch][data-slot="switch"]')) {
-    destroySwitchAutoRuntimeIfDesynced(root);
-
-    const existing = getSwitchAutoRuntime(root);
-    if (existing) {
-      existing.bindSync?.applyFromSignal();
-      const input = root.querySelector<HTMLInputElement>('[data-slot="switch-input"]');
-      if (input && input.checked !== existing.controller.checked) {
-        existing.controller.setChecked(input.checked);
-      }
-      continue;
-    }
-
-    const rootName =
-      root.getAttribute("data-name") ??
-      root.querySelector<HTMLInputElement>('[data-slot="switch-input"]')?.name;
-    let entry = queued[queueIndex++];
-    if (
-      !entry ||
-      (entry.bindChecked == null && entry.bindGroup == null && entry.onCheckedChange == null)
-    ) {
-      entry = lookupSwitchCheckedBindByName(doc, rootName ?? undefined) ?? entry;
-    }
-    let bindSync: ReturnType<typeof createCheckedBindSync> = null;
-    const bindInput = entry
-      ? {
-          ...(entry.bindChecked != null ? { "bind:checked": entry.bindChecked } : {}),
-          ...(entry.bindGroup != null ? { "bind:group": entry.bindGroup } : {}),
-        }
-      : {};
-
-    const hiddenInput = root.querySelector<HTMLInputElement>('[data-slot="switch-input"]');
-    const ilhaBound = hiddenInput?.hasAttribute("data-ilha-bind") ?? false;
-    const defaultChecked =
-      entry?.bindChecked != null
-        ? Boolean(entry.bindChecked())
-        : entry?.defaultChecked != null
-          ? entry.defaultChecked
-          : ilhaBound && hiddenInput
-            ? hiddenInput.checked
-            : undefined;
-
-    stampMorphPreserve(root);
-    const controller = SwitchPrimitive.createSwitch(root, {
-      defaultChecked,
-      onCheckedChange: (checked) => {
-        if (bindSync) bindSync.onUserChange(checked);
-        else entry?.onCheckedChange?.(checked);
-      },
-    });
-
-    if (entry && (entry.bindChecked != null || entry.bindGroup != null)) {
-      bindSync = createCheckedBindSync(bindInput, controller, entry.itemValue);
-      bindSync?.applyFromSignal();
-    }
-
-    registerSwitchAutoRuntime(root, { controller, bindSync });
-    if (entry?.bindChecked) {
-      attachSwitchAutoBindSignalEffect(root, entry.bindChecked);
-    }
-  }
-
-  syncAllSwitchAutoBindFromNamedRegistry(doc);
-
-  const unconsumed = queued.slice(queueIndex);
-  if (unconsumed.length > 0) {
-    restoreSwitchCheckedBindQueue(doc, unconsumed);
-    switchAutoBindScheduled.delete(doc);
-    scheduleSwitchAutoBind(doc);
-  }
-}
-
-/** Run switch auto-bind after Ilha child islands mount (queue may have been drained during SSR). */
-export function ensureSwitchCheckedAutoBindAfterIlhaMount(
-  doc: Document | undefined = globalThis.document,
-) {
-  if (!doc) return;
-  runCheckedControlAutoBindAfterIlha(doc, () => {
-    switchAutoBindScheduled.delete(doc);
-    mountSwitchAutoBindRoots(doc);
-  });
-}
-
-function scheduleSwitchAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || switchAutoBindScheduled.has(doc)) return;
-  switchAutoBindScheduled.add(doc);
-  runCheckedControlAutoBindAfterIlha(doc, () => {
-    switchAutoBindScheduled.delete(doc);
-    mountSwitchAutoBindRoots(doc);
-  });
-}
-
-function SwitchComponent(input: SwitchInput = {}) {
-  // Never return SwitchRoot from JSX — nested islands HTML-escape island strings.
-  // `checked` + `onCheckedChange` or `bind:checked` both use inline markup + auto-bind.
-  scheduleSwitchAutoBind();
-  return renderSwitch(input, true);
-}
-
-function SwitchBase(input: SwitchInput = {}) {
-  return renderSwitch(input);
-}
-
-export const Switch = Object.assign(SwitchComponent, {
+export const Switch = Object.assign(SwitchRoot, {
   Root: SwitchRoot,
-  Static: SwitchBase,
+  Static: renderSwitch,
   Item: SwitchItem,
   Group: SwitchGroup,
   Legend: SwitchLegend,

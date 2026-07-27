@@ -1,0 +1,237 @@
+---
+title: Tabs
+description: Tab navigation with segmented and underline styles.
+sidebar:
+  order: 33
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+  Demo6,
+  Demo7,
+  Demo8,
+  Demo9,
+} from "./tabs.demos";
+
+# Tabs
+
+Tab navigation for switching between related views or panels.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/tabs/index.ts)
+
+`Tabs` is backed by `@areia/slots` and wires accessible tab semantics, keyboard navigation, an animated indicator, optional content panels, and horizontal overflow scrolling after mount.
+
+## Ilha `bind:group`
+
+Inside an Ilha island (including nested child islands), bind the active tab value:
+
+```tsx
+const Panel = ilha
+  .state("tab", "overview")
+  .render(({ state }) => (
+    <Tabs variant="segmented" bind:group={state.tab}>
+      <Tabs.List>
+        <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+        <Tabs.Trigger value="settings">Settings</Tabs.Trigger>
+      </Tabs.List>
+    </Tabs>
+  ));
+```
+
+`value` + `onValueChange` remains supported. Requires **ilha** `^0.8.0`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-6">\n    <div>\n      <p class="mb-2 text-sm text-areia-subtle">Segmented</p>\n      <Tabs\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "analytics", label: "Analytics" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue="overview"\n      />\n    </div>\n    <div>\n      <p class="mb-2 text-sm text-areia-subtle">Underline</p>\n      <Tabs\n        variant="underline"\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "analytics", label: "Analytics" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue="overview"\n      />\n    </div>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Tabs } from "areia";
+```
+
+## Usage
+
+Call `Tabs(...)` for interactive behavior. Prefer composing `Tabs.List`, `Tabs.Trigger`, and `Tabs.Content` as children; the `tabs` array remains available as a shortcut. It initializes the tabs controller, syncs ARIA and `data-state` attributes, and emits `tabs:change` when the active tab changes.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs selectedValue="overview">\n    <Tabs.List>\n      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>\n      <Tabs.Trigger value="settings">Settings</Tabs.Trigger>\n    </Tabs.List>\n  </Tabs>\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+Use `Tabs.Static(...)` for static markup or when you want to initialize behavior yourself. For most application usage, call `Tabs(...)`.
+
+## Examples
+
+### Segmented
+
+A pill-shaped indicator slides between tabs on a subtle background.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    variant="segmented"\n    tabs={[\n      { value: "tab-1", label: "Tab 1" },\n      { value: "tab-2", label: "Tab 2" },\n      { value: "tab-3", label: "Tab 3" },\n    ]}\n    selectedValue="tab-1"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+### Underline
+
+The underline variant uses a bottom border and primary-colored indicator.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    variant="underline"\n    tabs={[\n      { value: "tab-1", label: "Tab 1" },\n      { value: "tab-2", label: "Tab 2" },\n      { value: "tab-3", label: "Tab 3" },\n    ]}\n    selectedValue="tab-1"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### Small Size
+
+Use `size="sm"` for compact tabs inside toolbars and filter rows.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-6">\n    <Tabs\n      size="sm"\n      tabs={[\n        { value: "open", label: "Open" },\n        { value: "closed", label: "Closed" },\n        { value: "all", label: "All" },\n      ]}\n      selectedValue="open"\n    />\n    <Tabs\n      variant="underline"\n      size="sm"\n      tabs={[\n        { value: "daily", label: "Daily" },\n        { value: "weekly", label: "Weekly" },\n        { value: "monthly", label: "Monthly" },\n      ]}\n      selectedValue="daily"\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### Many Tabs
+
+Segmented tabs scroll horizontally when there are more items than available space. Mouse users can drag the tab list to scroll.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <Tabs\n      tabs={[\n        { value: "overview", label: "Overview" },\n        { value: "analytics", label: "Analytics" },\n        { value: "reports", label: "Reports" },\n        { value: "notifications", label: "Notifications" },\n        { value: "settings", label: "Settings" },\n        { value: "billing", label: "Billing" },\n        { value: "security", label: "Security" },\n        { value: "integrations", label: "Integrations" },\n      ]}\n      selectedValue="overview"\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo6 client:load />
+</Preview>
+
+### Change Events
+
+Use `onValueChange` to respond when the active tab changes.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha\n  .state("activeTab", "overview")\n  .render(({ state }) => (\n    <div class="space-y-4">\n      <Tabs\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "usage", label: "Usage" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue={state.activeTab()}\n        onValueChange={(value) => {\n          state.activeTab(value);\n        }}\n      />\n      <p class="text-sm text-areia-subtle">\n        Active tab: <code>{state.activeTab}</code>\n      </p>\n    </div>\n  ));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Content Panels
+
+Compose `Tabs.Content` children for panel content. This keeps panel JSX colocated with each tab value.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs selectedValue="overview">\n    <Tabs.List>\n      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>\n      <Tabs.Trigger value="activity">Activity</Tabs.Trigger>\n      <Tabs.Trigger value="settings">Settings</Tabs.Trigger>\n    </Tabs.List>\n    <Tabs.Content value="overview">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Project health and key metrics.\n      </div>\n    </Tabs.Content>\n    <Tabs.Content value="activity">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Recent project activity appears here.\n      </div>\n    </Tabs.Content>\n    <Tabs.Content value="settings">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Workspace preferences and access controls.\n      </div>\n    </Tabs.Content>\n  </Tabs>\n));'
+  }
+  lang="tsx"
+>
+  <Demo7 client:load />
+</Preview>
+
+### Data Shortcut
+
+Use the `tabs` array for concise data-driven tabs. Pass `content` on each item to generate content panels.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    selectedValue="overview"\n    tabs={[\n      {\n        value: "overview",\n        label: "Overview",\n        content: "Overview panel",\n      },\n      {\n        value: "settings",\n        label: "Settings",\n        content: "Settings panel",\n      },\n    ]}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo8 client:load />
+</Preview>
+
+### Disabled Item
+
+Disable individual tabs with `disabled: true`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    tabs={[\n      { value: "profile", label: "Profile" },\n      { value: "team", label: "Team" },\n      { value: "billing", label: "Billing", disabled: true },\n    ]}\n    selectedValue="profile"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo9 client:load />
+</Preview>
+
+## API
+
+### `Tabs(input)`
+
+| Prop                 | Type                         | Default       | Description                                                                                  |
+| -------------------- | ---------------------------- | ------------- | -------------------------------------------------------------------------------------------- |
+| `tabs`               | `TabsItem[]`                 | `[]`          | Items rendered as tab triggers.                                                              |
+| `children`           | `unknown`                    | —             | Composed `Tabs.List`, `Tabs.Trigger`, and `Tabs.Content` markup. Takes priority over `tabs`. |
+| `value`              | `string`                     | —             | Initial active value.                                                                        |
+| `selectedValue`      | `string`                     | —             | Initial active value for uncontrolled usage.                                                 |
+| `defaultValue`       | `string`                     | —             | Alias for the initial active value.                                                          |
+| `variant`            | `"segmented" \| "underline"` | `"segmented"` | Visual style.                                                                                |
+| `size`               | `"base" \| "sm"`             | `"base"`      | Tab size.                                                                                    |
+| `activationMode`     | `"auto" \| "manual"`         | `"manual"`    | Keyboard activation mode passed to the tabs controller.                                      |
+| `activateOnFocus`    | `boolean`                    | `false`       | Uses automatic arrow-key activation when `true`.                                             |
+| `class`              | `string`                     | —             | Additional classes for the root.                                                             |
+| `className`          | `string`                     | —             | Alias for `class`.                                                                           |
+| `listClass`          | `string`                     | —             | Additional classes for the tab list.                                                         |
+| `listClassName`      | `string`                     | —             | Alias for `listClass`.                                                                       |
+| `contentClass`       | `string`                     | —             | Additional classes for every generated content panel.                                        |
+| `contentClassName`   | `string`                     | —             | Alias for `contentClass`.                                                                    |
+| `indicatorClass`     | `string`                     | —             | Additional classes for the active indicator.                                                 |
+| `indicatorClassName` | `string`                     | —             | Alias for `indicatorClass`.                                                                  |
+| `onValueChange`      | `(value: string) => void`    | —             | Called when the active tab changes.                                                          |
+
+### `TabsItem`
+
+| Property           | Type      | Required | Description                                    |
+| ------------------ | --------- | -------- | ---------------------------------------------- |
+| `value`            | `string`  | Yes      | Unique tab value.                              |
+| `label`            | `unknown` | No       | Visible tab label.                             |
+| `children`         | `unknown` | No       | Custom tab content. Takes priority over label. |
+| `content`          | `unknown` | No       | Panel content for this tab.                    |
+| `disabled`         | `boolean` | No       | Disables the tab trigger.                      |
+| `class`            | `string`  | No       | Additional classes for the trigger.            |
+| `className`        | `string`  | No       | Alias for `class`.                             |
+| `contentClass`     | `string`  | No       | Additional classes for this tab's panel.       |
+| `contentClassName` | `string`  | No       | Alias for `contentClass`.                      |
+
+## Slots
+
+`Tabs` renders these data slots:
+
+- `tabs`
+- `tabs-list`
+- `tabs-trigger`
+- `tabs-content`
+- `tabs-indicator`
+
+The root and triggers receive attributes from the tabs controller:
+
+- `data-value`
+- `data-state`
+- `aria-selected`
+- `aria-controls`
+- `tabindex`

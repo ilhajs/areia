@@ -23,20 +23,27 @@ describe("toggleVariants", () => {
 });
 
 describe("Toggle", () => {
+  it("default export is an ilha island", () => {
+    const ISLAND = Symbol.for("ilha.island");
+    expect(
+      ISLAND in Toggle ||
+        Object.getOwnPropertySymbols(Toggle).some((s) => s.description === "ilha.island"),
+    ).toBe(true);
+    expect(typeof Toggle.mount).toBe("function");
+  });
+
   it("renders button with data-slot", () => {
     const output = markup(Toggle({ children: "Bold" }));
     expect(output).toContain('data-slot="toggle"');
     expect(output).toContain("Bold");
-  });
-
-  it("marks default export for static slot auto-bind", () => {
-    const output = markup(Toggle({ children: "Bold" }));
-    expect(output).toContain("data-areia-toggle");
-  });
-
-  it("omits static auto-bind marker when onPressedChange is set", () => {
-    const output = markup(Toggle({ children: "Bold", onPressedChange: () => {} }));
     expect(output).not.toContain("data-areia-toggle");
+  });
+
+  it("Static omits island markers and data-areia attrs", () => {
+    const output = markup(Toggle.Static({ children: "Bold" }));
+    expect(output).toContain('data-slot="toggle"');
+    expect(output).not.toContain("data-areia-toggle");
+    expect(output).not.toContain("data-ilha");
   });
 
   it("sets data-default-pressed", () => {

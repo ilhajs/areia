@@ -1,0 +1,294 @@
+---
+title: Popover
+description: An accessible popup anchored to a trigger for rich, interactive content.
+sidebar:
+  order: 23
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+  Demo6,
+  Demo7,
+  Demo8,
+  Demo9,
+  Demo10,
+} from "./popover.demos";
+
+# Popover
+
+An accessible popup anchored to a trigger for rich, interactive content.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/popover/index.ts)
+
+Areia's `Popover` is built on `@data-slot/popover` and rendered as an Ilha island when you use `Popover`. It supports click triggers, dismiss on outside click or Escape, focus management, collision-aware positioning, close buttons, and optional arrows.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Bell } from "lucide";\nimport { Button, Icon, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={\n      <Button\n        shape="square"\n        icon={<Icon icon={Bell} />}\n        aria-label="Notifications"\n      />\n    }\n    content={\n      <>\n        <Popover.Title>Notifications</Popover.Title>\n        <Popover.Description>\n          You are all caught up. Good job!\n        </Popover.Description>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Popover } from "areia";
+```
+
+## Usage
+
+Call `Popover(...)` for an interactive island. Prefer composing `Popover.Trigger` and `Popover.Content` as children; the `trigger` and `content` props remain available as shortcuts.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover>\n    <Popover.Trigger>\n      <Button>Open</Button>\n    </Popover.Trigger>\n    <Popover.Content>\n      <Popover.Title>Popover Title</Popover.Title>\n      <Popover.Description>\n        Popover content goes here.\n      </Popover.Description>\n    </Popover.Content>\n  </Popover>\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+For static server-rendered markup or custom initialization, use `Popover.Static(...)`. For most application usage, call `Popover(...)`.
+
+## Popover vs Tooltip
+
+|         | Tooltip                        | Popover                                  |
+| ------- | ------------------------------ | ---------------------------------------- |
+| Purpose | Short, non-interactive labels  | Rich, interactive content containers     |
+| Content | Brief text                     | Links, buttons, forms, custom layouts    |
+| Trigger | Hover or focus                 | Click                                    |
+| ARIA    | `role="tooltip"`               | `aria-haspopup="dialog"` on the trigger  |
+| Focus   | Does not move focus into popup | Moves focus into the popover when opened |
+
+Use `Tooltip` to label an icon button or add a short explanation. Use `Popover` when users need to interact with content inside the popup.
+
+## Examples
+
+### Basic Popover
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={<Button>Open Popover</Button>}\n    content={\n      <>\n        <Popover.Title>Popover Title</Popover.Title>\n        <Popover.Description>\n          This is a basic popover with a title and description.\n        </Popover.Description>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+### With Close Button
+
+Use `Popover.Close` inside the content to close the popup.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={<Button>Open Settings</Button>}\n    content={\n      <div class="flex flex-col gap-3">\n        <div>\n          <Popover.Title>Settings</Popover.Title>\n          <Popover.Description>\n            Configure your preferences below.\n          </Popover.Description>\n        </div>\n        <Popover.Close class="w-max rounded-md bg-areia-control-background px-3 py-1.5 text-sm ring ring-areia-control-border">\n          Close\n        </Popover.Close>\n      </div>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### Positioning
+
+Use `side` to control where the popover appears relative to the trigger.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid grid-cols-2 gap-3">\n    <Popover\n      side="bottom"\n      trigger={<Button>Bottom</Button>}\n      content={\n        <>\n          <Popover.Title>Bottom</Popover.Title>\n          <Popover.Description>\n            Popover on bottom.\n          </Popover.Description>\n        </>\n      }\n    />\n    <Popover\n      side="top"\n      trigger={<Button>Top</Button>}\n      content={\n        <>\n          <Popover.Title>Top</Popover.Title>\n          <Popover.Description>\n            Popover on top.\n          </Popover.Description>\n        </>\n      }\n    />\n    <Popover\n      side="left"\n      trigger={<Button>Left</Button>}\n      content={\n        <>\n          <Popover.Title>Left</Popover.Title>\n          <Popover.Description>\n            Popover on left.\n          </Popover.Description>\n        </>\n      }\n    />\n    <Popover\n      side="right"\n      trigger={<Button>Right</Button>}\n      content={\n        <>\n          <Popover.Title>Right</Popover.Title>\n          <Popover.Description>\n            Popover on right.\n          </Popover.Description>\n        </>\n      }\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### Alignment
+
+Use `align` to align the popover along the selected side.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-3">\n    <Popover\n      align="start"\n      trigger={<Button>Start</Button>}\n      content="Start aligned"\n    />\n    <Popover\n      align="center"\n      trigger={<Button>Center</Button>}\n      content="Center aligned"\n    />\n    <Popover\n      align="end"\n      trigger={<Button>End</Button>}\n      content="End aligned"\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo6 client:load />
+</Preview>
+
+### Custom Content
+
+Popovers can contain rich content including avatars, buttons, links, and forms.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={<Button>User Profile</Button>}\n    content={\n      <div class="flex min-w-56 flex-col gap-4">\n        <div class="flex items-center gap-3">\n          <div class="flex size-9 items-center justify-center rounded-full bg-areia-surface-muted text-sm font-medium">\n            JD\n          </div>\n          <div>\n            <Popover.Title>Jane Doe</Popover.Title>\n            <Popover.Description>\n              jane@example.com\n            </Popover.Description>\n          </div>\n        </div>\n        <div class="flex gap-2">\n          <Button size="sm">Profile</Button>\n          <Popover.Close class="rounded-md px-2 text-sm text-areia-subtle hover:bg-areia-control-hover">\n            Sign Out\n          </Popover.Close>\n        </div>\n      </div>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo7 client:load />
+</Preview>
+
+### Without Arrow
+
+Set `arrow: false` to hide the decorative arrow.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    arrow={false}\n    trigger={<Button>Open</Button>}\n    content="This popover has no arrow."\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo8 client:load />
+</Preview>
+
+### Default Open
+
+Use `defaultOpen` to render the popover open on mount.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    defaultOpen\n    trigger={<Button>Open by default</Button>}\n    content={\n      <>\n        <Popover.Title>Hello</Popover.Title>\n        <Popover.Description>\n          This starts open.\n        </Popover.Description>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Dismiss Behavior
+
+Disable outside-click dismissal with `closeOnClickOutside: false`. Escape dismissal can be controlled with `closeOnEscape`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    closeOnClickOutside={false}\n    trigger={<Button>Persistent</Button>}\n    content={\n      <>\n        <Popover.Title>Persistent popover</Popover.Title>\n        <Popover.Description>\n          Click the close button to dismiss this popover.\n        </Popover.Description>\n        <Popover.Close class="mt-3 rounded-md bg-areia-control-background px-3 py-1.5 text-sm ring ring-areia-control-border">\n          Close\n        </Popover.Close>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo9 client:load />
+</Preview>
+
+### Custom Trigger
+
+Use `trigger` when you need complete control over the trigger markup. The custom trigger must include `data-slot="popover-trigger"`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={\n      <span\n        data-slot="popover-trigger"\n        tabindex="0"\n        class="inline-flex rounded-full bg-areia-surface-muted px-2 py-1 text-sm text-areia-default"\n      >\n        Beta\n      </span>\n    }\n    content="This feature is currently in beta."\n  />\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Prop Shortcut
+
+Use `trigger` and `content` for concise popovers. Areia generates the trigger and content slots for you.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={<button>Open</button>}\n    triggerAs="button"\n    content={\n      <>\n        <Popover.Title>Shortcut API</Popover.Title>\n        <Popover.Description>\n          Use props when you do not need to customize the slot\n          structure.\n        </Popover.Description>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo10 client:load />
+</Preview>
+
+## API Reference
+
+### Popover
+
+`Popover` is an Ilha island. It accepts standard HTML `div` attributes plus `@data-slot/popover` options.
+
+| Prop                  | Type                                     | Default    | Description                                                                                                      |
+| --------------------- | ---------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------- |
+| `children`            | `unknown`                                | -          | Composed popover slots, or trigger content when no `Popover.Content` child is present.                           |
+| `content`             | `unknown`                                | -          | Popover panel content.                                                                                           |
+| `trigger`             | `unknown`                                | -          | Custom trigger markup. Must include `data-slot="popover-trigger"`.                                               |
+| `triggerAs`           | `"button" \| "span" \| "div" \| "a"`     | `"span"`   | Tag used for the generated trigger.                                                                              |
+| `arrow`               | `boolean`                                | `true`     | Whether to render the decorative arrow.                                                                          |
+| `class`               | `string`                                 | -          | Additional CSS classes applied to the root.                                                                      |
+| `className`           | `string`                                 | -          | Alias for `class`.                                                                                               |
+| `triggerClass`        | `string`                                 | -          | Additional CSS classes applied to the generated trigger.                                                         |
+| `triggerClassName`    | `string`                                 | -          | Alias for `triggerClass`.                                                                                        |
+| `contentClass`        | `string`                                 | -          | Additional CSS classes applied to the content.                                                                   |
+| `contentClassName`    | `string`                                 | -          | Alias for `contentClass`.                                                                                        |
+| `defaultOpen`         | `boolean`                                | `false`    | Initial open state.                                                                                              |
+| `side`                | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side relative to the trigger.                                                                          |
+| `align`               | `"start" \| "center" \| "end"`           | `"center"` | Preferred alignment on the side axis.                                                                            |
+| `sideOffset`          | `number`                                 | `8`        | Distance from the trigger in pixels.                                                                             |
+| `alignOffset`         | `number`                                 | `0`        | Offset from the alignment edge in pixels.                                                                        |
+| `avoidCollisions`     | `boolean`                                | `true`     | Flip or shift to stay inside the viewport.                                                                       |
+| `collisionPadding`    | `number`                                 | `8`        | Viewport edge padding used for collision handling.                                                               |
+| `portal`              | `boolean`                                | `true`     | Portal content to `document.body` while open.                                                                    |
+| `closeOnClickOutside` | `boolean`                                | `true`     | Close when clicking outside the popover.                                                                         |
+| `closeOnEscape`       | `boolean`                                | `true`     | Close when pressing Escape.                                                                                      |
+| `onOpenChange`        | `(open: boolean) => void`                | -          | Called when open state changes.                                                                                  |
+| `onPortalMounted`     | `(container: HTMLElement) => void`       | -          | After portaled content mounts on open (Ilha bridge escape hatch). See Dialog docs, **Ilha + portaled overlays**. |
+
+### Popover.Trigger
+
+Generated trigger element.
+
+| Prop        | Type                                 | Default  | Description         |
+| ----------- | ------------------------------------ | -------- | ------------------- |
+| `as`        | `"button" \| "span" \| "div" \| "a"` | `"span"` | Trigger tag name.   |
+| `children`  | `unknown`                            | -        | Trigger content.    |
+| `class`     | `string`                             | -        | Additional classes. |
+| `className` | `string`                             | -        | Alias for `class`.  |
+
+### Popover.Content
+
+Popover panel. Controls positioning through placement props.
+
+| Prop        | Type                                     | Default    | Description                  |
+| ----------- | ---------------------------------------- | ---------- | ---------------------------- |
+| `children`  | `unknown`                                | -          | Panel content.               |
+| `arrow`     | `boolean`                                | `true`     | Whether to render the arrow. |
+| `side`      | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side styling.      |
+| `align`     | `"start" \| "center" \| "end"`           | `"center"` | Preferred alignment.         |
+| `class`     | `string`                                 | -          | Additional classes.          |
+| `className` | `string`                                 | -          | Alias for `class`.           |
+
+### Popover.Title and Popover.Description
+
+`Popover.Title` renders an `h3` styled for popover headings. `Popover.Description` renders a subdued paragraph.
+
+### Popover.Close
+
+Close control. The data-slot controller closes the popover when this element is clicked.
+
+| Prop        | Type                                 | Default    | Description         |
+| ----------- | ------------------------------------ | ---------- | ------------------- |
+| `as`        | `"button" \| "span" \| "div" \| "a"` | `"button"` | Close tag name.     |
+| `children`  | `unknown`                            | `"Close"`  | Close content.      |
+| `class`     | `string`                             | -          | Additional classes. |
+| `className` | `string`                             | -          | Alias for `class`.  |
+
+## Accessibility
+
+### Behavior
+
+- Trigger click toggles the popover.
+- Pressing `Escape` closes the popover and returns focus to the trigger.
+- Clicking outside closes the popover by default.
+- Focus moves into the popover when opened.
+- `Popover.Close` provides an explicit close target inside interactive content.
+
+### ARIA
+
+The controller automatically handles:
+
+- `aria-haspopup="dialog"` on the trigger.
+- `aria-controls` linking the trigger to the content.
+- `aria-expanded` on the trigger.
+- Stable generated IDs for content when needed.
+
+### Keyboard Navigation
+
+| Key               | Action                         |
+| ----------------- | ------------------------------ |
+| `Enter` / `Space` | Toggle popover on the trigger. |
+| `Escape`          | Close the popover.             |

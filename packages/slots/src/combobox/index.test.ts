@@ -345,6 +345,17 @@ describe("Combobox", () => {
       controller.destroy();
     });
 
+    it("shows all items when reopening with the committed selection label", () => {
+      const { input, items, controller } = setup({ defaultValue: "banana" });
+      expect(input.value).toBe("Banana");
+
+      controller.open();
+      expect(items[0]?.hidden).toBe(false);
+      expect(items[1]?.hidden).toBe(false);
+      expect(items[2]?.hidden).toBe(false);
+      controller.destroy();
+    });
+
     it("shows empty message when no items match", () => {
       const { input, emptySlot, controller } = setup();
       controller.open();
@@ -2823,6 +2834,44 @@ describe("Combobox", () => {
       controller.destroy();
     });
 
+    it("resets filter when clearing while popup is closed after a filtered select", () => {
+      const { root, input, items, controller } = setup({ defaultValue: "apple" }, clearButtonHtml);
+      const clearButton = root.querySelector('[data-slot="combobox-clear"]') as HTMLButtonElement;
+
+      controller.open();
+      input.value = "ban";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      const banana = Array.from(items).find((item) => item.getAttribute("data-value") === "banana");
+      banana!.click();
+      expect(controller.value).toBe("banana");
+      expect(controller.isOpen).toBe(false);
+
+      clearButton.click();
+
+      expect(controller.value).toBe(null);
+      expect(input.value).toBe("");
+      expect(controller.isOpen).toBe(false);
+      expect(
+        Array.from(items)
+          .filter((item) => !item.hidden)
+          .map((item) => item.getAttribute("data-value")),
+      ).toEqual(["apple", "banana", "other", "disabled"]);
+      controller.destroy();
+    });
+
+    it("opens on pointerdown when input is already focused after clear", () => {
+      const { root, input, controller } = setup({ defaultValue: "apple" }, clearButtonHtml);
+      const clearButton = root.querySelector('[data-slot="combobox-clear"]') as HTMLButtonElement;
+
+      clearButton.click();
+      expect(controller.isOpen).toBe(false);
+      expect(document.activeElement).toBe(input);
+
+      input.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+      expect(controller.isOpen).toBe(true);
+      controller.destroy();
+    });
+
     it("does nothing when combobox is disabled", () => {
       const { root, input, controller } = setup(
         { defaultValue: "apple", disabled: true },
@@ -3095,12 +3144,10 @@ describe("Combobox", () => {
       );
       const chip = root.querySelector<HTMLElement>('[data-slot="combobox-chip"]');
       expect(chip?.classList.contains("badge")).toBe(true);
-      expect(
-        chip?.querySelector('[data-slot="combobox-chip-label"]')?.textContent,
-      ).toBe("Apple");
-      expect(
-        chip?.querySelector('[data-slot="combobox-chip-remove"]')?.getAttribute("type"),
-      ).toBe("button");
+      expect(chip?.querySelector('[data-slot="combobox-chip-label"]')?.textContent).toBe("Apple");
+      expect(chip?.querySelector('[data-slot="combobox-chip-remove"]')?.getAttribute("type")).toBe(
+        "button",
+      );
       controller.destroy();
     });
 

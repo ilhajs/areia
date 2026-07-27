@@ -1,0 +1,65 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import { LinkButton } from "../components/ui/link-button";
+import { LandingHero } from "../components/landing/LandingHero";
+import { KitchenSinkGrid } from "../components/landing/kitchen-sink";
+import { Toaster } from "areia/sonner";
+import { config } from "virtual:nimbus/config";
+
+const description =
+  "Handcrafted UI for Ilha — import first, eject later. Vanilla TypeScript components with Tailwind-native theming.";
+---
+
+<BaseLayout title={config.title} description={description}>
+  <div class="bg-background text-foreground flex min-h-screen flex-col">
+    <Header showSidebar={false} />
+    <Toaster client:load position="bottom-right" theme="system" richColors closeButton />
+
+    <main class="flex-1">
+      <LandingHero client:load />
+
+      <section class="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div class="mb-8 flex flex-wrap items-end justify-between gap-4 sm:mb-10">
+          <div class="max-w-2xl space-y-2">
+            <h2 class="text-xl font-semibold tracking-tight sm:text-2xl">Try the full set</h2>
+            <p class="text-muted-foreground text-sm leading-relaxed sm:text-[0.9375rem]">
+              Every Areia component in one place — click around, then open a title when you want the
+              full API and examples.
+            </p>
+          </div>
+          <LinkButton href="/components/getting-started" variant="outline" class="shrink-0">
+            Getting started
+          </LinkButton>
+        </div>
+
+        <KitchenSinkGrid client:load />
+      </section>
+    </main>
+
+    <footer
+      class="border-border text-muted-foreground mt-auto border-t px-5 py-8 text-sm leading-relaxed sm:px-6 sm:py-10"
+    >
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <p>
+          Areia — handcrafted UI for{" "}
+          <a href="https://ilha.build" class="text-foreground hover:underline">Ilha</a>.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="/components/getting-started" class="hover:text-foreground transition-colors"
+            >Docs</a
+          >
+          <a
+            href="https://github.com/ilhajs/areia"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-foreground transition-colors">GitHub</a
+          >
+          <a href="/slots/accordion" class="hover:text-foreground transition-colors">Slots</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</BaseLayout>

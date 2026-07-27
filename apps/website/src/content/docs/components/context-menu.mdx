@@ -1,0 +1,129 @@
+---
+title: Context Menu
+description: Opens a menu at the pointer on right click or touch long press.
+sidebar:
+  order: 10
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+} from "./context-menu.demos";
+
+# Context Menu
+
+Opens a menu at the pointer on right click or touch long press. Use context menus for actions related to a region, item, or surface.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/context-menu/index.ts)
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ContextMenu } from "areia";\n\nexport default ilha.render(() => (\n  <ContextMenu\n    trigger={\n      <div class="rounded-lg border border-dashed border-areia-border p-8 text-center text-areia-subtle">\n        Right click here\n      </div>\n    }\n  >\n    <ContextMenu.Item value="copy" label="Copy" />\n    <ContextMenu.Item value="paste" label="Paste" />\n  </ContextMenu>\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { ContextMenu } from "areia";
+```
+
+## Usage
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ContextMenu } from "areia";\n\nexport default ilha.render(() => (\n  <ContextMenu>\n    <ContextMenu.Trigger>\n      <button class="rounded-lg bg-areia-control-background px-3 py-2 ring ring-areia-control-border">\n        Right click me\n      </button>\n    </ContextMenu.Trigger>\n    <ContextMenu.Content>\n      <ContextMenu.Item value="rename" label="Rename" />\n      <ContextMenu.Item value="duplicate" label="Duplicate" />\n      <ContextMenu.Item value="delete" label="Delete" />\n    </ContextMenu.Content>\n  </ContextMenu>\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+## Examples
+
+### Basic Menu
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ContextMenu } from "areia";\n\nexport default ilha.render(() => (\n  <ContextMenu\n    trigger={\n      <div class="rounded-lg bg-areia-surface-muted p-6 text-areia-default">\n        Right click this card\n      </div>\n    }\n  >\n    <ContextMenu.Item value="open" label="Open" />\n    <ContextMenu.Item value="copy-link" label="Copy link" />\n    <ContextMenu.Item value="archive" label="Archive" />\n  </ContextMenu>\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+### Checkbox Item
+
+Set `closeOnSelect: false` when menu items should toggle without closing immediately.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ContextMenu } from "areia";\n\nexport default ilha.render(() => (\n  <ContextMenu\n    closeOnSelect={false}\n    trigger={\n      <div class="rounded-lg border border-areia-border p-6">\n        Right click for view options\n      </div>\n    }\n  >\n    <ContextMenu.CheckboxItem\n      value="show-hidden"\n      label="Show hidden files"\n    />\n    <ContextMenu.CheckboxItem\n      value="show-sidebar"\n      label="Show sidebar"\n      checked\n    />\n  </ContextMenu>\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### Disabled Item
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ContextMenu } from "areia";\n\nexport default ilha.render(() => (\n  <ContextMenu\n    trigger={\n      <div class="rounded-lg bg-areia-surface-muted p-6">\n        Right click\n      </div>\n    }\n  >\n    <ContextMenu.Item value="cut" label="Cut" />\n    <ContextMenu.Item value="paste" label="Paste" disabled />\n  </ContextMenu>\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### Selection Callback
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ContextMenu } from "areia";\n\nexport default ilha.render(() => (\n  <ContextMenu\n    onSelect={(value) => console.log("selected", value)}\n    trigger={\n      <div class="rounded-lg border border-areia-border p-6">\n        Right click and select an action\n      </div>\n    }\n  >\n    <ContextMenu.Item value="copy" label="Copy" />\n    <ContextMenu.Item value="share" label="Share" />\n  </ContextMenu>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+## API
+
+### `ContextMenu(input)`
+
+| Prop               | Type                      | Default | Description                                                                         |
+| ------------------ | ------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `trigger`          | `unknown`                 | —       | Region that opens the menu on right click or long press.                            |
+| `children`         | `unknown`                 | —       | Composed menu slots, or item markup when no `ContextMenu.Content` child is present. |
+| `disabled`         | `boolean`                 | `false` | Disables opening the menu.                                                          |
+| `closeOnSelect`    | `boolean`                 | `true`  | Whether selecting an item closes the menu.                                          |
+| `onOpenChange`     | `(open: boolean) => void` | —       | Called when the menu opens or closes.                                               |
+| `onSelect`         | `(value: string) => void` | —       | Called when an item is selected.                                                    |
+| `triggerClassName` | `string`                  | —       | Alias for `triggerClass`.                                                           |
+| `contentClassName` | `string`                  | —       | Alias for `contentClass`.                                                           |
+
+### `ContextMenu.Item(input)`
+
+| Prop       | Type      | Description                  |
+| ---------- | --------- | ---------------------------- |
+| `value`    | `string`  | Value emitted when selected. |
+| `label`    | `unknown` | Visible item content.        |
+| `disabled` | `boolean` | Prevents selection.          |
+
+## Slots
+
+`ContextMenu` renders these data slots:
+
+- `context-menu`
+- `context-menu-trigger`
+- `context-menu-content`
+- `context-menu-item`
+- `context-menu-checkbox-item`
+- `context-menu-radio-item`
+
+The controller adds attributes such as `data-open`, `data-closed`, `data-highlighted`, `data-checked`, and `data-state` as the menu changes state.

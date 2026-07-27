@@ -1,4 +1,4 @@
-import ilha, { html, raw, type SignalAccessor } from "ilha";
+import ilha, { html, raw, untrack, type SignalAccessor } from "ilha";
 import { Combobox as ComboboxPrimitive } from "@areia/slots";
 import {
   applyThisBind,
@@ -8,10 +8,8 @@ import {
   createOpenBindSync,
   groupBindDefault,
   openBindDefault,
-  queueComboboxBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeComboboxBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -675,16 +673,6 @@ function renderItems(items: ComboboxItems) {
   });
 }
 
-function comboboxRootBinds(
-  binds: Partial<Record<string, unknown>>,
-): Partial<Pick<IlhaBindProps, "bind:open" | "bind:group">> {
-  return {
-    "bind:open": binds["bind:open"] as IlhaBindProps["bind:open"],
-    // `bind:value` on the combobox root is an alias for the selection bind
-    "bind:group": (binds["bind:group"] ?? binds["bind:value"]) as IlhaBindProps["bind:group"],
-  };
-}
-
 function comboboxInputBinds(binds: Partial<Record<string, unknown>>) {
   const { "bind:open": _o, "bind:group": _g, "bind:value": _v, ...rest } = binds;
   return rest;
@@ -696,14 +684,14 @@ function withSelectionBind<T extends Record<string, unknown>>(input: T): Record<
   return { ...input, "bind:group": input["bind:value"] };
 }
 
-function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = false) {
+function renderCombobox(input: ComboboxInput, children?: unknown[]) {
   const { binds, attrs } = splitBindProps(input);
-  const rootBinds = comboboxRootBinds(binds);
+  // Open/selection binds stay off the template — createOpenBindSync /
+  // createGroupBindSync bridge them. A template bind remorphs this island when
+  // those signals change; while the list is portaled that recreates items in the
+  // empty host slot and duplicates them after restore.
   const inputBinds = comboboxInputBinds(binds);
 
-  if (autoBind) {
-    queueComboboxBindForAutoMount(rootBinds);
-  }
   const {
     autoHighlight,
     class: className,
@@ -739,11 +727,14 @@ function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = f
     sideOffset,
     ...inputPassthrough
   } = attrs as ComboboxInput;
-  const defaultOpen = openBindDefault(input, defaultOpenProp);
-  const defaultValue = groupBindDefault(withSelectionBind(input), defaultValueProp) as
-    | string
-    | string[]
-    | undefined;
+  // Read bind defaults without tracking — a tracked read re-renders (and remorphs)
+  // on every selection change. While the list is portaled, that remorph recreates
+  // items in the empty host slot and duplicates the popup contents after restore.
+  const defaultOpen = untrack(() => openBindDefault(input, defaultOpenProp));
+  const defaultValue = untrack(
+    () =>
+      groupBindDefault(withSelectionBind(input), defaultValueProp) as string | string[] | undefined,
+  );
   const variant = error ? "error" : "default";
   const normalizedError = normalizeError(error);
   const describedBy =
@@ -784,7 +775,7 @@ function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = f
     comboboxVariants({ inputSide }),
     className,
     aliasedClassName,
-  )}"${toAttrs({ "data-areia-combobox": autoBind ? "" : undefined })}${inputDataAttrs({
+  )}"${inputDataAttrs({
     autoHighlight,
     defaultOpen,
     defaultValue,
@@ -796,13 +787,13 @@ function renderCombobox(input: ComboboxInput, children?: unknown[], autoBind = f
     required,
   })}${placementDataAttrs(placementProps)}`;
 
-  return boundElement("div", rootBinds, openSuffix, inner);
+  return boundElement("div", {}, openSuffix, inner);
 }
 
-function renderField(input: ComboboxInput, children?: unknown[], autoBind = false) {
+function renderField(input: ComboboxInput, children?: unknown[]) {
   const { label, labelTooltip: _labelTooltip, description, error } = input;
   const normalizedError = normalizeError(error);
-  const control = renderCombobox(input, children, autoBind);
+  const control = renderCombobox(input, children);
 
   if (label == null && description == null && normalizedError == null) return control;
 
@@ -913,102 +904,7 @@ function ComboboxBase(inputOrChildren: ComboboxInput | unknown[] = {}, children?
   return renderField(input, optionChildren);
 }
 
-const comboboxAutoBindScheduled = new WeakSet<Document>();
-
-type ComboboxAutoRuntime = {
-  controller: ComboboxPrimitive.ComboboxController;
-  openSync: ReturnType<typeof createOpenBindSync>;
-  groupSync: ReturnType<typeof createGroupBindSync>;
-};
-
-const comboboxAutoRuntimeByRoot = new WeakMap<Element, ComboboxAutoRuntime>();
-
-function scheduleComboboxAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || comboboxAutoBindScheduled.has(doc)) return;
-  comboboxAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    comboboxAutoBindScheduled.delete(doc);
-    const queued = takeComboboxBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-combobox][data-slot="combobox"]',
-    )) {
-      const existing = comboboxAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.openSync?.applyFromSignal();
-        existing.groupSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      let openSync: ReturnType<typeof createOpenBindSync> = null;
-      let groupSync: ReturnType<typeof createGroupBindSync> = null;
-
-      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-      const controller = ComboboxPrimitive.createCombobox(root, {
-        onOpenChange: (open) => openSync?.onUserChange(open),
-        onValueChange: (value) => groupSync?.onUserChange(value),
-      });
-
-      if (entry?.bindOpen) {
-        openSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
-        openSync?.applyFromSignal();
-      }
-      if (entry?.bindGroup) {
-        const multiple = root.hasAttribute("data-multiple");
-        groupSync = createGroupBindSync(
-          { "bind:group": entry.bindGroup },
-          {
-            getValue: () => (multiple ? [...controller.values] : controller.value),
-            setValue: (value) => {
-              if (value == null) controller.clear();
-              else controller.setValues(Array.isArray(value) ? value : [value]);
-            },
-          },
-          multiple ? "multiple" : "single",
-        );
-        groupSync?.applyFromSignal();
-      }
-
-      comboboxAutoRuntimeByRoot.set(root, { controller, openSync, groupSync });
-    }
-  });
-}
-
-function needsComboboxIsland(input: ComboboxInput) {
-  const { binds } = splitBindProps(input);
-  return (
-    input.onOpenChange != null ||
-    input.onValueChange != null ||
-    input.onInputValueChange != null ||
-    input.onPortalMounted != null ||
-    binds["bind:open"] != null ||
-    binds["bind:group"] != null ||
-    binds["bind:value"] != null
-  );
-}
-
-function ComboboxInteractive(children: unknown[]): ReturnType<typeof html>;
-function ComboboxInteractive(
-  input?: ComboboxInput,
-  children?: unknown[],
-): ReturnType<typeof html> | ReturnType<typeof ComboboxRoot>;
-function ComboboxInteractive(
-  inputOrChildren: ComboboxInput | unknown[] = {},
-  children?: unknown[],
-) {
-  if (Array.isArray(inputOrChildren)) {
-    scheduleComboboxAutoBind();
-    return renderField({}, inputOrChildren, true);
-  }
-  const input = { ...inputOrChildren, children: children ?? inputOrChildren.children };
-  if (needsComboboxIsland(input)) return ComboboxRoot(input);
-  scheduleComboboxAutoBind();
-  return renderField(input, children, true);
-}
-
-export const Combobox = Object.assign(ComboboxInteractive, {
+export const Combobox = Object.assign(ComboboxRoot, {
   Root: ComboboxRoot,
   Static: ComboboxBase,
   TriggerInput: ComboboxTriggerInput,

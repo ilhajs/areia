@@ -1,13 +1,11 @@
-import ilha, { html, raw } from "ilha";
+import ilha, { html, raw, untrack } from "ilha";
 import { Popover as PopoverPrimitive } from "@areia/slots";
 import {
   boundElement,
   createOpenBindSync,
   openBindDefault,
-  queuePopoverOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takePopoverOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -313,7 +311,7 @@ export type PopoverInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | 
     triggerClassName?: string;
   };
 
-function renderPopover(input: PopoverInput = {}, autoBind = false) {
+function renderPopover(input: PopoverInput = {}) {
   const { binds, attrs: props } = splitBindProps(input);
   const {
     align,
@@ -341,11 +339,10 @@ function renderPopover(input: PopoverInput = {}, autoBind = false) {
     triggerClassName,
     ...rootProps
   } = props as PopoverInput;
-  const defaultOpen = openBindDefault(input, defaultOpenProp);
-
-  if (autoBind && binds["bind:open"] != null) {
-    queuePopoverOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
-  }
+  // Open is bridged by createOpenBindSync — don't track bind:open in render or put it
+  // on the template. Remorphing while content is portaled recreates the host slot empty.
+  const defaultOpen = untrack(() => openBindDefault(input, defaultOpenProp));
+  const { "bind:open": _open, ...rootBinds } = binds;
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "popover-content");
@@ -379,28 +376,25 @@ function renderPopover(input: PopoverInput = {}, autoBind = false) {
         sideOffset,
       })}`;
 
-  const openSuffix = ` data-slot="popover" class="${cn("inline-flex", className, aliasedClassName)}"${toAttrs(
+  const openSuffix = ` data-slot="popover" class="${cn("inline-flex", className, aliasedClassName)}"${dataAttrs(
     {
-      "data-areia-popover": autoBind ? "" : undefined,
+      align,
+      alignOffset,
+      avoidCollisions,
+      closeOnClickOutside,
+      closeOnEscape,
+      collisionPadding,
+      defaultOpen,
+      portal,
+      side,
+      sideOffset,
     },
-  )}${dataAttrs({
-    align,
-    alignOffset,
-    avoidCollisions,
-    closeOnClickOutside,
-    closeOnEscape,
-    collisionPadding,
-    defaultOpen,
-    portal,
-    side,
-    sideOffset,
-  })}${toAttrs(rootProps)}`;
+  )}${toAttrs(rootProps)}`;
 
-  return boundElement("div", binds, openSuffix, inner);
+  return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-const autoBoundPopovers = new WeakMap<Element, PopoverPrimitive.PopoverController>();
-const autoBindDocuments = new WeakSet<Document>();
+const boundPopovers = new WeakMap<Element, PopoverPrimitive.PopoverController>();
 
 function syncPopoverArrowSide(root: Element): void {
   const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
@@ -410,61 +404,14 @@ function syncPopoverArrowSide(root: Element): void {
 }
 
 export function bindPopoverRoot(root: Element) {
-  const existing = autoBoundPopovers.get(root);
+  const existing = boundPopovers.get(root);
   if (existing) return existing;
 
   stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
   const controller = PopoverPrimitive.createPopover(root);
   syncPopoverArrowSide(root);
-  autoBoundPopovers.set(root, controller);
+  boundPopovers.set(root, controller);
   return controller;
-}
-
-function rootFromPopoverEventTarget(target: Element | null) {
-  const localRoot = target?.closest?.('[data-areia-popover][data-slot="popover"]');
-  if (localRoot) return localRoot;
-
-  const content = target?.closest?.('[data-slot="popover-content"]');
-  const contentId = content?.getAttribute("id");
-  if (!content || !contentId) return null;
-  return (
-    content.ownerDocument.querySelector(
-      `[data-areia-popover][data-slot="popover"] [data-slot="popover-trigger"][aria-controls="${contentId}"]`,
-    ) ??
-    content.ownerDocument.querySelector(
-      `[data-areia-popover][data-slot="popover"] [data-slot="popover-close"][aria-controls="${contentId}"]`,
-    )
-  )?.closest('[data-areia-popover][data-slot="popover"]');
-}
-
-function ensurePopoverAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || autoBindDocuments.has(doc)) return;
-  autoBindDocuments.add(doc);
-
-  doc.addEventListener(
-    "click",
-    (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      const root = rootFromPopoverEventTarget(target);
-      if (!root) return;
-
-      const trigger = target?.closest?.('[data-slot="popover-trigger"]');
-      const close = target?.closest?.('[data-slot="popover-close"]');
-      if (!trigger && !close) return;
-
-      const wasBound = autoBoundPopovers.has(root);
-      const controller = bindPopoverRoot(root);
-      if (wasBound) return;
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      if (trigger) controller.toggle();
-      else controller.close();
-
-      syncPopoverArrowSide(root);
-    },
-    true,
-  );
 }
 
 type PopoverBindRuntime = {
@@ -474,7 +421,7 @@ type PopoverBindRuntime = {
 
 const popoverBindRuntimeByHost = new WeakMap<Element, PopoverBindRuntime>();
 
-const PopoverRootIsland = ilha
+export const PopoverRoot = ilha
   .input<PopoverInput>()
   .onMount(({ host, input }) => {
     const root = host.matches('[data-slot="popover"]')
@@ -543,66 +490,9 @@ const PopoverRootIsland = ilha
       : host.querySelector('[data-slot="popover"]');
     if (root) syncPopoverArrowSide(root);
   })
-  .render(({ input }) => renderPopover(input));
-
-const autoBindScheduled = new WeakSet<Document>();
-
-type PopoverAutoRuntime = {
-  controller: PopoverPrimitive.PopoverController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const popoverAutoRuntimeByRoot = new WeakMap<Element, PopoverAutoRuntime>();
-
-function schedulePopoverAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || autoBindScheduled.has(doc)) return;
-  autoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    autoBindScheduled.delete(doc);
-    const queued = takePopoverOpenBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-popover][data-slot="popover"]',
-    )) {
-      const trigger = root.querySelector('[data-slot="popover-trigger"]');
-      const content = root.querySelector('[data-slot="popover-content"]');
-      if (!trigger || !content) continue;
-
-      const existing = popoverAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.bindSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      const bindInput = entry ? { "bind:open": entry.bindOpen } : {};
-      let bindSync: ReturnType<typeof createOpenBindSync> = null;
-
-      const controller = bindPopoverRoot(root);
-      if (entry) {
-        bindSync = createOpenBindSync(bindInput, controller);
-        bindSync?.applyFromSignal();
-      }
-
-      popoverAutoRuntimeByRoot.set(root, { controller, bindSync });
-    }
-  });
-}
-
-function needsPopoverIsland(input: PopoverInput) {
-  const { binds } = splitBindProps(input);
-  return input.onOpenChange != null || binds["bind:open"] != null;
-}
-
-export function PopoverRoot(input: PopoverInput = {}) {
-  if (needsPopoverIsland(input)) return PopoverRootIsland(input);
-
-  const normalized = normalizeStaticChildSlots(input, ["content", "trigger", "children"]);
-  ensurePopoverAutoBind();
-  schedulePopoverAutoBind();
-  return renderPopover(normalized, true);
-}
+  .render(({ input }) =>
+    renderPopover(normalizeStaticChildSlots(input, ["content", "trigger", "children"])),
+  );
 
 function PopoverBase(input: PopoverInput = {}) {
   return renderPopover(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));

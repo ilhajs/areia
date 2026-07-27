@@ -1,0 +1,48 @@
+{
+  "name": "@areia/form",
+  "version": "0.1.0",
+  "description": "Schema-driven, auto-generating form components for Areia",
+  "license": "MIT",
+  "author": "Ryuz <ryuzer@proton.me>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilhajs/areia.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "browser": {
+    "process": false
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && tsdown",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "alien-signals": "3.2.1"
+  },
+  "devDependencies": {
+    "@areia/slots": "workspace:*",
+    "@standard-schema/spec": "^1.0.0",
+    "areia": "workspace:*",
+    "ilha": "^0.9.5"
+  },
+  "peerDependencies": {
+    "@areia/slots": ">=0.1.9",
+    "@standard-schema/spec": ">=1.0.0",
+    "areia": ">=0.2.2",
+    "ilha": ">=0.9.5"
+  },
+  "peerDependenciesMeta": {
+    "@standard-schema/spec": {
+      "optional": true
+    }
+  }
+}

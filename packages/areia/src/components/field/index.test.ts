@@ -3,6 +3,19 @@ import { markupValue as markup } from "$lib/test-markup";
 import { Field } from "./index";
 
 describe("Field", () => {
+  it("is an ilha island by default", () => {
+    const islandKey = Symbol.for("ilha.island");
+    expect((Field as unknown as Record<symbol, unknown>)[islandKey]).toBeTruthy();
+    expect(typeof Field.mount).toBe("function");
+    expect((Field.Static as unknown as Record<symbol, unknown>)[islandKey]).toBeFalsy();
+  });
+
+  it("Static returns plain markup without island markers", () => {
+    const output = markup(Field.Static({ children: "Content" }));
+    expect(output).toContain('data-slot="field"');
+    expect(output).not.toContain("data-ilha");
+  });
+
   it("renders field wrapper with data-slot", () => {
     const output = markup(Field.Static({ children: "Content" }));
     expect(output).toContain('data-slot="field"');

@@ -4,11 +4,8 @@ import {
   boundElement,
   createGroupBindSync,
   groupBindDefault,
-  queueToggleGroupBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeToggleGroupBindQueue,
-  type GroupBindAccessor,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -96,7 +93,7 @@ function ToggleGroupItem(input: ToggleGroupItemInput = {} as ToggleGroupItemInpu
   </button>`;
 }
 
-function renderToggleGroup(input: ToggleGroupInput = {}, autoBind = false) {
+function renderToggleGroup(input: ToggleGroupInput = {}) {
   const { binds, attrs: props } = splitBindProps(input);
   const {
     children,
@@ -131,15 +128,7 @@ function renderToggleGroup(input: ToggleGroupInput = {}, autoBind = false) {
     "data-orientation": orientation,
     "data-loop": loop,
     "data-disabled": disabled,
-    "data-areia-toggle-group": autoBind ? "" : undefined,
   })}`;
-
-  if (autoBind && binds["bind:group"] != null) {
-    queueToggleGroupBindForAutoMount(
-      binds["bind:group"] as GroupBindAccessor,
-      type === "multiple" ? "multiple" : "single",
-    );
-  }
 
   return boundElement("div", binds, openSuffix, render(children));
 }
@@ -204,72 +193,6 @@ const ToggleGroupRoot = ilha
   })
   .render(({ input }) => renderToggleGroup(input));
 
-const toggleGroupAutoBindScheduled = new WeakSet<Document>();
-
-type ToggleGroupAutoRuntime = {
-  controller: ToggleGroupPrimitive.ToggleGroupController;
-  groupSync: ReturnType<typeof createGroupBindSync>;
-};
-
-const toggleGroupAutoRuntimeByRoot = new WeakMap<Element, ToggleGroupAutoRuntime>();
-
-function scheduleToggleGroupAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || toggleGroupAutoBindScheduled.has(doc)) return;
-  toggleGroupAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    toggleGroupAutoBindScheduled.delete(doc);
-    const queued = takeToggleGroupBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-toggle-group][data-slot="toggle-group"]',
-    )) {
-      const existing = toggleGroupAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.groupSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      const bindInput = entry ? { "bind:group": entry.bindGroup } : {};
-      let groupSync: ReturnType<typeof createGroupBindSync> = null;
-      const mode = entry?.mode ?? "single";
-
-      stampMorphPreserve(root);
-      const controller = ToggleGroupPrimitive.createToggleGroup(root, {
-        onValueChange: (value) => {
-          groupSync?.onUserChange(value);
-        },
-      });
-
-      if (entry) {
-        groupSync = createGroupBindSync(
-          bindInput,
-          {
-            getValue: () => controller.value,
-            setValue: (value) => controller.setValue(value ?? []),
-          },
-          mode,
-        );
-        groupSync?.applyFromSignal();
-      }
-
-      toggleGroupAutoRuntimeByRoot.set(root, { controller, groupSync });
-    }
-  });
-}
-
-function needsToggleGroupIsland(input: ToggleGroupInput) {
-  const { binds } = splitBindProps(input);
-  return input.onValueChange != null || binds["bind:group"] != null;
-}
-
-function ToggleGroupComponent(input: ToggleGroupInput = {}) {
-  if (needsToggleGroupIsland(input)) return ToggleGroupRoot(input);
-  scheduleToggleGroupAutoBind();
-  return renderToggleGroup(input, true);
-}
-
 export type ToggleGroupSeparatorInput = Omit<
   HTMLElementProps<HTMLDivElement>,
   "className" | "children"
@@ -289,7 +212,7 @@ function ToggleGroupSeparator(input: ToggleGroupSeparatorInput = {}) {
   ></div>`;
 }
 
-export const ToggleGroup = Object.assign(ToggleGroupComponent, {
+export const ToggleGroup = Object.assign(ToggleGroupRoot, {
   Root: ToggleGroupRoot,
   Static: renderToggleGroup,
   Item: ToggleGroupItem,

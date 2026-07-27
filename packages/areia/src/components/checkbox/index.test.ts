@@ -23,7 +23,16 @@ describe("checkboxVariants", () => {
 });
 
 describe("Checkbox", () => {
-  it("uses CheckboxRoot island when bind:checked is set", () => {
+  it("default export is an ilha island", () => {
+    const ISLAND = Symbol.for("ilha.island");
+    expect(
+      ISLAND in Checkbox ||
+        Object.getOwnPropertySymbols(Checkbox).some((s) => s.description === "ilha.island"),
+    ).toBe(true);
+    expect(typeof Checkbox.mount).toBe("function");
+  });
+
+  it("uses bind:checked on the island", () => {
     const Panel = ilha
       .state("ok", false)
       .render(({ state }) => html`${Checkbox({ label: "OK", "bind:checked": state.ok })}`);
@@ -36,6 +45,14 @@ describe("Checkbox", () => {
   it("renders control with data-slot", () => {
     const output = markup(Checkbox({}));
     expect(output).toContain('data-slot="checkbox"');
+    expect(output).not.toContain("data-areia-checkbox");
+  });
+
+  it("Static omits island markers and data-areia attrs", () => {
+    const output = markup(Checkbox.Static({}));
+    expect(output).toContain('data-slot="checkbox"');
+    expect(output).not.toContain("data-areia-checkbox");
+    expect(output).not.toContain("data-ilha");
   });
 
   it("renders label wrapper when label is provided", () => {

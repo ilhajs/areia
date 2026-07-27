@@ -3,11 +3,28 @@ import { markupValue as markup } from "$lib/test-markup";
 import { Collapsible } from "./index";
 
 describe("Collapsible", () => {
+  it("default export is an ilha island", () => {
+    const ISLAND = Symbol.for("ilha.island");
+    expect(
+      ISLAND in Collapsible ||
+        Object.getOwnPropertySymbols(Collapsible).some((s) => s.description === "ilha.island"),
+    ).toBe(true);
+    expect(typeof Collapsible.mount).toBe("function");
+  });
+
   it("renders trigger and panel", () => {
     const output = markup(Collapsible({ trigger: "Toggle", panel: "Content" }));
     expect(output).toContain('data-slot="collapsible"');
     expect(output).toContain('data-slot="collapsible-trigger"');
     expect(output).toContain('data-slot="collapsible-content"');
+    expect(output).not.toContain("data-areia-collapsible");
+  });
+
+  it("Static omits island markers and data-areia attrs", () => {
+    const output = markup(Collapsible.Static({ trigger: "Toggle", panel: "Content" }));
+    expect(output).toContain('data-slot="collapsible"');
+    expect(output).not.toContain("data-areia-collapsible");
+    expect(output).not.toContain("data-ilha");
   });
 
   it("renders accordion when items are provided", () => {

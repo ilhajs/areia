@@ -2,8 +2,7 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
 import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
-import { ensureSwitchCheckedAutoBindAfterIlhaMount, Switch } from "./index";
-import "$lib/ilha-checked-auto-bind";
+import { Switch } from "./index";
 
 try {
   GlobalRegistrator.register();
@@ -11,12 +10,36 @@ try {
   // Already registered by another DOM test file in the same Bun process.
 }
 
+describe("Switch", () => {
+  it("default export is an ilha island", () => {
+    const ISLAND = Symbol.for("ilha.island");
+    expect(
+      ISLAND in Switch ||
+        Object.getOwnPropertySymbols(Switch).some((s) => s.description === "ilha.island"),
+    ).toBe(true);
+    expect(typeof Switch.mount).toBe("function");
+  });
+
+  it("renders switch markup without data-areia attrs", () => {
+    const output = markup(Switch({ label: "Use Bun", name: "useBun" }));
+    expect(output).toContain('data-slot="switch"');
+    expect(output).not.toContain("data-areia-switch");
+  });
+
+  it("Static omits island markers and data-areia attrs", () => {
+    const output = markup(Switch.Static({ label: "Use Bun" }));
+    expect(output).toContain('data-slot="switch"');
+    expect(output).not.toContain("data-areia-switch");
+    expect(output).not.toContain("data-ilha");
+  });
+});
+
 describe("Switch in ilha island", () => {
   afterEach(() => {
     document.body.innerHTML = "";
   });
 
-  it("inlines switch markup for bind:checked (no nested SwitchRoot slot — avoids JSX HTML escape)", () => {
+  it("nests Switch island with bind:checked under a parent island", () => {
     const ProjectCreatorForm = ilha
       .state("useBun", false)
       .derived("createCommand", ({ state }) => {
@@ -31,20 +54,17 @@ describe("Switch in ilha island", () => {
     const output = markup(ProjectCreatorForm());
     expect(output).toContain("data-ilha-bind");
     expect(output).toContain('data-slot="switch"');
-    expect(output).toContain("data-areia-switch");
+    expect(output).not.toContain("data-areia-switch");
     expect(output).not.toContain("&lt;label");
     expect(output).not.toMatch(/aria-checked="true"/);
   });
 
-  it("toggles with checked + onCheckedChange (no data-ilha-bind)", async () => {
+  it("toggles with checked + onCheckedChange", async () => {
     const ProjectCreatorForm = ilha
       .state("useBun", false)
       .derived("createCommand", ({ state }) => {
         const pm = state.useBun() ? "bunx" : "npx";
         return `${pm} giget@latest`;
-      })
-      .on("input[name=useBunCb]@change", ({ state, event }) => {
-        state.useBun((event.target as HTMLInputElement).checked);
       })
       .render(
         ({ state, derived }) => html`
@@ -63,17 +83,15 @@ describe("Switch in ilha island", () => {
       { name: "ProjectCreatorForm", snapshot: true },
     );
     mount({ ProjectCreatorForm }, { root: document.body, lazy: false });
-    ensureSwitchCheckedAutoBindAfterIlhaMount();
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
     await new Promise<void>((r) => queueMicrotask(() => r()));
-    ensureSwitchCheckedAutoBindAfterIlhaMount();
 
     const cmd = () => document.querySelector("[data-testid=cmd]")?.textContent ?? "";
     const switchRoot = document.querySelector('[data-slot="switch"]') as HTMLElement | null;
     const input = document.querySelector("[name=useBunCb]") as HTMLInputElement | null;
 
     expect(input?.hasAttribute("data-ilha-bind")).toBe(false);
-    expect(switchRoot?.hasAttribute("data-areia-switch")).toBe(true);
+    expect(switchRoot?.hasAttribute("data-areia-switch")).toBe(false);
     expect(cmd()).toContain("npx");
     switchRoot?.click();
     await Promise.resolve();

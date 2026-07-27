@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import ilha, { html, mount, type SignalAccessor } from "ilha";
+import ilha, { html, mount, signal, type SignalAccessor } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Combobox, comboboxVariants, type ComboboxInput } from "./index";
 
@@ -16,15 +16,22 @@ async function settle() {
   await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 }
 
-function mountCombobox() {
-  document.body.innerHTML = markup(
-    Combobox({
-      items: [
-        { value: "apple", label: "Apple" },
-        { value: "banana", label: "Banana" },
-      ],
-    }),
+async function mountCombobox(input: ComboboxInput = {}) {
+  const Panel = ilha.render(
+    () =>
+      html`${Combobox({
+        items: [
+          { value: "apple", label: "Apple" },
+          { value: "banana", label: "Banana" },
+        ],
+        ...input,
+      })}`,
   );
+
+  document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+  mount({ Panel }, { root: document.body, lazy: false });
+  await settle();
+
   return {
     root: document.querySelector('[data-slot="combobox"]') as HTMLElement,
     input: document.querySelector('[data-slot="combobox-input"]') as HTMLInputElement,
@@ -41,6 +48,21 @@ describe("comboboxVariants", () => {
 });
 
 describe("Combobox", () => {
+  it("is an ilha island by default", () => {
+    const islandKey = Symbol.for("ilha.island");
+    expect((Combobox as unknown as Record<symbol, unknown>)[islandKey]).toBeTruthy();
+    expect(typeof Combobox.mount).toBe("function");
+    expect((Combobox.Static as unknown as Record<symbol, unknown>)[islandKey]).toBeFalsy();
+    expect(markup(Combobox({}))).not.toContain("data-areia-combobox");
+  });
+
+  it("Static returns plain markup without auto-bind markers", () => {
+    const output = markup(Combobox.Static({}));
+    expect(output).toContain('data-slot="combobox"');
+    expect(output).not.toContain("data-areia-combobox");
+    expect(output).not.toContain("data-ilha");
+  });
+
   it("renders wrapper with data-slot", () => {
     const output = markup(Combobox({}));
     expect(output).toContain('data-slot="combobox"');
@@ -146,10 +168,9 @@ describe("Combobox.Group", () => {
   });
 });
 
-describe("Combobox behavior (auto-mount)", () => {
+describe("Combobox behavior", () => {
   it("opens on trigger click", async () => {
-    const { input, trigger, content } = mountCombobox();
-    await settle();
+    const { input, trigger, content } = await mountCombobox();
     expect(content.hidden).toBe(true);
 
     trigger.click();
@@ -159,8 +180,7 @@ describe("Combobox behavior (auto-mount)", () => {
   });
 
   it("filters items when typing", async () => {
-    const { input, trigger } = mountCombobox();
-    await settle();
+    const { input, trigger } = await mountCombobox();
 
     trigger.click();
     await settle();
@@ -175,8 +195,7 @@ describe("Combobox behavior (auto-mount)", () => {
   });
 
   it("commits item label to input on item click and closes", async () => {
-    const { input, trigger, content } = mountCombobox();
-    await settle();
+    const { input, trigger, content } = await mountCombobox();
 
     trigger.click();
     await settle();
@@ -192,19 +211,7 @@ describe("Combobox behavior (auto-mount)", () => {
   });
 
   it("toggles items without closing in multiple mode", async () => {
-    document.body.innerHTML = markup(
-      Combobox({
-        multiple: true,
-        items: [
-          { value: "apple", label: "Apple" },
-          { value: "banana", label: "Banana" },
-        ],
-      }),
-    );
-    const root = document.querySelector('[data-slot="combobox"]') as HTMLElement;
-    const trigger = document.querySelector('[data-slot="combobox-trigger"]') as HTMLElement;
-    const content = document.querySelector('[data-slot="combobox-content"]') as HTMLElement;
-    await settle();
+    const { root, trigger, content } = await mountCombobox({ multiple: true });
 
     trigger.click();
     await settle();
@@ -220,6 +227,61 @@ describe("Combobox behavior (auto-mount)", () => {
     const chips = root.querySelectorAll<HTMLElement>('[data-slot="combobox-chip"]');
     expect(chips.length).toBe(2);
     expect(chips[0]?.textContent).toContain("Apple");
+  });
+
+  it("filters after clear → pick → clear with bind:value (no remorph duplicates)", async () => {
+    const selected = signal<string | null>("apple");
+    const Panel = ilha.render(
+      () =>
+        html`${Combobox({
+          label: "Fruit",
+          placeholder: "Search fruit...",
+          "bind:value": selected,
+          items: {
+            apple: "Apple",
+            banana: "Banana",
+            cherry: "Cherry",
+          },
+        })}`,
+    );
+
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
+    await settle();
+
+    const input = document.querySelector('[data-slot="combobox-input"]') as HTMLInputElement;
+    const content = document.querySelector('[data-slot="combobox-content"]') as HTMLElement;
+    const clear = document.querySelector('[data-slot="combobox-clear"]') as HTMLButtonElement;
+
+    clear.click();
+    await settle();
+
+    input.value = "ban";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    await settle();
+
+    const banana = [...document.querySelectorAll<HTMLElement>('[data-slot="combobox-item"]')].find(
+      (el) => el.dataset["value"] === "banana" && !el.hidden,
+    );
+    banana?.click();
+    await settle();
+    expect(selected()).toBe("banana");
+    expect(document.querySelectorAll('[data-slot="combobox-item"]').length).toBe(3);
+
+    clear.click();
+    await settle();
+    expect(selected()).toBe(null);
+
+    input.value = "c";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    await settle();
+
+    expect(content.hidden).toBe(false);
+    expect(document.querySelectorAll('[data-slot="combobox-item"]').length).toBe(3);
+    const visible = [...document.querySelectorAll<HTMLElement>('[data-slot="combobox-item"]')]
+      .filter((el) => !el.hidden)
+      .map((el) => el.dataset["value"]);
+    expect(visible).toEqual(["cherry"]);
   });
 });
 
@@ -252,17 +314,19 @@ describe("Combobox multiple-mode types", () => {
   it("syncs bind:value with the committed selection in multiple mode", async () => {
     let readSelected!: () => string[];
 
-    const Panel = ilha.state("selected", () => [] as string[]).render(({ state }) => {
-      readSelected = state.selected as () => string[];
-      return html`${Combobox({
-        multiple: true,
-        "bind:value": state.selected as SignalAccessor<string[]>,
-        items: [
-          { value: "apple", label: "Apple" },
-          { value: "banana", label: "Banana" },
-        ],
-      })}`;
-    });
+    const Panel = ilha
+      .state("selected", () => [] as string[])
+      .render(({ state }) => {
+        readSelected = state.selected as () => string[];
+        return html`${Combobox({
+          multiple: true,
+          "bind:value": state.selected as SignalAccessor<string[]>,
+          items: [
+            { value: "apple", label: "Apple" },
+            { value: "banana", label: "Banana" },
+          ],
+        })}`;
+      });
 
     document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
     mount({ Panel }, { root: document.body, lazy: false });

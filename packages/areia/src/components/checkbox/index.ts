@@ -3,19 +3,10 @@ import { Checkbox as CheckboxPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
   createCheckedBindSync,
-  queueCheckboxCheckedBindForAutoMount,
-  runCheckedControlAutoBindAfterIlha,
   splitBindProps,
   subscribeBindProps,
-  takeCheckboxCheckedBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
-import {
-  attachCheckboxAutoBindSignalEffect,
-  destroyCheckboxAutoRuntimeIfDesynced,
-  getCheckboxAutoRuntime,
-  registerCheckboxAutoRuntime,
-} from "$lib/checkbox-auto-bind-sync";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import type { HTMLElementProps } from "$lib/types";
@@ -139,7 +130,7 @@ function checkboxDataAttrs(
   });
 }
 
-function checkboxControl(input: CheckboxInput, autoBind = false) {
+function checkboxControl(input: CheckboxInput) {
   const { binds, attrs: restProps } = splitBindProps(input);
   const {
     class: className,
@@ -206,7 +197,6 @@ function checkboxControl(input: CheckboxInput, autoBind = false) {
         "aria-label": ariaLabel,
         "aria-labelledby": ariaLabelledby,
         "aria-describedby": ariaDescribedby,
-        "data-areia-checkbox": autoBind ? "" : undefined,
       }),
     )}
   >
@@ -236,24 +226,10 @@ function checkboxControl(input: CheckboxInput, autoBind = false) {
 }
 
 /** Single checkbox with an optional built-in label wrapper. */
-function renderCheckbox(input: CheckboxInput = {}, autoBind = false) {
-  if (autoBind) {
-    const { binds } = splitBindProps(input);
-    if (binds["bind:checked"] != null || binds["bind:group"] != null) {
-      const itemValue = typeof input.value === "string" ? input.value : undefined;
-      queueCheckboxCheckedBindForAutoMount(
-        {
-          "bind:checked": binds["bind:checked"] as IlhaBindProps["bind:checked"],
-          "bind:group": binds["bind:group"] as IlhaBindProps["bind:group"],
-        },
-        itemValue,
-      );
-    }
-  }
-
+function renderCheckbox(input: CheckboxInput = {}) {
   const { label, labelTooltip, controlFirst = true, required, disabled, ...rest } = input;
   const controlId = typeof rest.id === "string" ? rest.id : undefined;
-  const control = checkboxControl({ ...rest, id: controlId, disabled, required }, autoBind);
+  const control = checkboxControl({ ...rest, id: controlId, disabled, required });
 
   if (label == null) return control;
 
@@ -417,97 +393,7 @@ export const CheckboxRoot = ilha
   })
   .render(({ input }) => renderCheckbox(input));
 
-const checkboxAutoBindScheduled = new WeakSet<Document>();
-
-function mountCheckboxAutoBindRoots(doc: Document) {
-  const queued = takeCheckboxCheckedBindQueue(doc);
-  let queueIndex = 0;
-
-  for (const root of doc.querySelectorAll<HTMLElement>(
-    '[data-areia-checkbox][data-slot="checkbox"]',
-  )) {
-    destroyCheckboxAutoRuntimeIfDesynced(root);
-
-    const existing = getCheckboxAutoRuntime(root);
-    if (existing) {
-      existing.bindSync?.applyFromSignal();
-      const input = root.querySelector<HTMLInputElement>('[data-slot="checkbox-input"]');
-      if (input && input.checked !== existing.controller.checked) {
-        existing.controller.setChecked(input.checked);
-      }
-      continue;
-    }
-
-    const entry = queued[queueIndex++];
-    let bindSync: ReturnType<typeof createCheckedBindSync> = null;
-    const bindInput = entry
-      ? {
-          ...(entry.bindChecked != null ? { "bind:checked": entry.bindChecked } : {}),
-          ...(entry.bindGroup != null ? { "bind:group": entry.bindGroup } : {}),
-        }
-      : {};
-
-    const hiddenInput = root.querySelector<HTMLInputElement>('[data-slot="checkbox-input"]');
-    const ilhaBound = hiddenInput?.hasAttribute("data-ilha-bind") ?? false;
-    const defaultChecked =
-      entry?.bindChecked != null
-        ? Boolean(entry.bindChecked())
-        : ilhaBound && hiddenInput
-          ? hiddenInput.checked
-          : undefined;
-
-    stampMorphPreserve(root);
-    const controller = CheckboxPrimitive.createCheckbox(root, {
-      defaultChecked,
-      onCheckedChange: (checked) => {
-        bindSync?.onUserChange(checked);
-      },
-    });
-
-    if (entry && (entry.bindChecked != null || entry.bindGroup != null)) {
-      bindSync = createCheckedBindSync(bindInput, controller, entry.itemValue);
-      bindSync?.applyFromSignal();
-    }
-
-    registerCheckboxAutoRuntime(root, { controller, bindSync });
-    if (entry?.bindChecked) {
-      attachCheckboxAutoBindSignalEffect(root, entry.bindChecked);
-    }
-  }
-}
-
-function scheduleCheckboxAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || checkboxAutoBindScheduled.has(doc)) return;
-  checkboxAutoBindScheduled.add(doc);
-  runCheckedControlAutoBindAfterIlha(doc, () => {
-    checkboxAutoBindScheduled.delete(doc);
-    mountCheckboxAutoBindRoots(doc);
-  });
-}
-
-/** Re-run checkbox bind auto-mount after Ilha child islands mount. */
-export function ensureCheckboxCheckedAutoBindAfterIlhaMount(
-  doc: Document | undefined = globalThis.document,
-) {
-  if (!doc) return;
-  runCheckedControlAutoBindAfterIlha(doc, () => {
-    checkboxAutoBindScheduled.delete(doc);
-    mountCheckboxAutoBindRoots(doc);
-  });
-}
-
-function needsCheckboxIsland(input: CheckboxInput) {
-  const { binds } = splitBindProps(input);
-  return binds["bind:checked"] != null || binds["bind:group"] != null;
-}
-
-function CheckboxComponent(input: CheckboxInput = {}) {
-  if (needsCheckboxIsland(input)) return CheckboxRoot(input);
-  scheduleCheckboxAutoBind();
-  return renderCheckbox(input, true);
-}
-
-export const Checkbox = Object.assign(CheckboxComponent, {
+export const Checkbox = Object.assign(CheckboxRoot, {
   Root: CheckboxRoot,
   Static: renderCheckbox,
   Control: checkboxControl,

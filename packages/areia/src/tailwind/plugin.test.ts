@@ -10,16 +10,44 @@ const pkgRoot = join(here, "../..");
 
 describe("areia tailwind plugin", () => {
   it("exports a tailwind plugin handler with theme mappings", () => {
-    const config = plugin.config as {
+    // With `withOptions`, `plugin` is a function that returns an object with `handler` and `config`.
+    const instance = (plugin as any).__isOptionsFunction ? (plugin as any)() : plugin;
+
+    const config = instance.config as {
       theme?: { extend?: { colors?: Record<string, string>; textColor?: Record<string, string> } };
       content?: string[];
     };
 
-    expect(typeof plugin.handler).toBe("function");
+    expect(typeof instance.handler).toBe("function");
     expect(config.theme?.extend?.colors?.["areia-background"]).toBe("var(--areia-background)");
     expect(config.theme?.extend?.textColor?.["areia-subtle"]).toBe("var(--areia-text-subtle)");
     expect(config.content?.[0]).toBe(`${import.meta.dirname}/**/*.js`);
     expect(config.content?.[1]).toBe("./node_modules/areia/dist/**/*.js");
+  });
+
+  it("supports custom dark mode selector via options", () => {
+    const instance = (plugin as any)({ darkModeSelector: '[data-mode="dark"]' });
+    const addedBases: any[] = [];
+    const addedVariants: any[] = [];
+
+    const mockAddBase = (base: any) => addedBases.push(base);
+    const mockAddVariant = (name: string, definition: string) =>
+      addedVariants.push({ name, definition });
+
+    instance.handler({
+      addBase: mockAddBase,
+      addVariant: mockAddVariant,
+      theme: () => ({}),
+      e: (x: string) => x,
+    } as any);
+
+    expect(addedBases.length).toBe(1);
+    expect(addedBases[0][":root"]).toBeDefined();
+    expect(addedBases[0]['[data-mode="dark"]']).toBeDefined();
+
+    expect(addedVariants.length).toBe(1);
+    expect(addedVariants[0].name).toBe("dark");
+    expect(addedVariants[0].definition).toBe('&:where([data-mode="dark"], [data-mode="dark"] *)');
   });
 
   it("defines light and dark design tokens", () => {

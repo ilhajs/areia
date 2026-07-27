@@ -189,7 +189,11 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
   const rawDefaultValue =
     options.defaultValue ?? parseDefaultValueDataAttribute(getDataString(root, "defaultValue"));
   const defaultValues = (
-    rawDefaultValue == null ? [] : Array.isArray(rawDefaultValue) ? rawDefaultValue : [rawDefaultValue]
+    rawDefaultValue == null
+      ? []
+      : Array.isArray(rawDefaultValue)
+        ? rawDefaultValue
+        : [rawDefaultValue]
   ).filter((value, index, arr) => arr.indexOf(value) === index);
   if (!multiple && defaultValues.length > 1) defaultValues.length = 1;
   const defaultOpen = options.defaultOpen ?? getDataBool(root, "defaultOpen") ?? false;
@@ -791,8 +795,14 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
         input.value = "";
       }
 
-      // Apply current filter
-      applyFilter(input.value);
+      // The inline input doubles as the committed-value display. When it still
+      // shows the selected label (user hasn't typed a query), show every item —
+      // filtering by the full label would hide every other suggestion.
+      const committedLabel =
+        !isPopupInputMode && !multiple ? getLabelForValue(selectedValues[0] ?? null) : "";
+      const filterQuery =
+        !isPopupInputMode && !multiple && input.value === committedLabel ? "" : input.value;
+      applyFilter(filterQuery);
 
       // Highlight selected item if visible, else auto-highlight first
       const selectedIndex = enabledVisibleItems.findIndex((el) =>
@@ -884,6 +894,13 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     if (!isPopupInputMode && !multiple) {
       input.value = resolvedLabel;
     }
+
+    // Clearing the selection must unhide items even while the popup is closed.
+    // Otherwise a prior filter query leaves matches stuck `hidden` until reopen.
+    if (!init && next.length === 0) {
+      if (allItems.length === 0) cacheItems();
+      applyFilter("");
+    }
     if (valueSlot) {
       if (next.length === 0) {
         valueSlot.textContent = valueSlotPlaceholder || placeholder;
@@ -961,10 +978,12 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     input.value = "";
     clearHighlight();
 
-    if (isOpen) {
-      applyFilter(input.value);
-      positionSync.update();
-    }
+    // Always reset item visibility — if we only re-filter while open, a
+    // filter → select → clear (closed) sequence leaves every non-match `hidden`,
+    // so the next open/type pass looks like "no suggestions".
+    if (allItems.length === 0) cacheItems();
+    applyFilter("");
+    if (isOpen) positionSync.update();
 
     const shouldSuppressFocusOpen = doc.activeElement !== input;
     suppressOpenOnNextFocus = shouldSuppressFocusOpen;
@@ -1133,6 +1152,11 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     ),
     on(input, "pointerdown", () => {
       openOnNextFocusFromPointer = true;
+      // Clear focuses the input without opening. A second click then does not
+      // fire `focus`, so open here when the input is already focused and closed.
+      if (openOnFocus && !isOpen && !disabled && doc.activeElement === input) {
+        updateOpenState(true);
+      }
     }),
     on(input, "input", handleInput),
     on(input, "keydown", handleKeydown),
@@ -1283,8 +1307,7 @@ export function createCombobox(root: Element, options: ComboboxOptions = {}): Co
     get isOpen() {
       return isOpen;
     },
-    select: (value: string) =>
-      updateSelection(multiple ? [...selectedValues, value] : [value]),
+    select: (value: string) => updateSelection(multiple ? [...selectedValues, value] : [value]),
     deselect: (value: string) => updateSelection(selectedValues.filter((v) => v !== value)),
     setValues: (values: string[]) => updateSelection(values),
     clear: () => updateSelection([]),

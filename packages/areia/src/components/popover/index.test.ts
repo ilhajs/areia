@@ -19,12 +19,29 @@ describe("popoverVariants", () => {
   });
 });
 
+const ISLAND = Symbol.for("ilha.island");
+const isIsland = (v: unknown) =>
+  typeof v === "function" &&
+  (ISLAND in v || Object.getOwnPropertySymbols(v).some((s) => s.description === "ilha.island"));
+
 describe("Popover", () => {
+  it("default export is an ilha island", () => {
+    expect(isIsland(Popover)).toBe(true);
+    expect(typeof Popover.mount).toBe("function");
+  });
+
   it("renders trigger and content", () => {
     const output = markup(Popover({ children: "Open", content: "Hello" }));
     expect(output).toContain('data-slot="popover"');
     expect(output).toContain('data-slot="popover-trigger"');
     expect(output).toContain('data-slot="popover-content"');
+    expect(output).not.toContain("data-areia-popover");
+  });
+
+  it("Static returns plain markup without auto-bind markers", () => {
+    const output = markup(Popover.Static({ children: "Open", content: "Hello" }));
+    expect(output).toContain('data-slot="popover"');
+    expect(output).not.toContain("data-areia-popover");
   });
 
   it("renders content hidden by default", () => {
@@ -121,7 +138,7 @@ describe("Popover.Description", () => {
 describe("bindPopoverRoot", () => {
   function makeRoot() {
     const div = document.createElement("div");
-    div.innerHTML = markup(Popover({ children: "Open", content: "Hello" }));
+    div.innerHTML = markup(Popover.Static({ children: "Open", content: "Hello" }));
     const root = div.querySelector('[data-slot="popover"]') as Element;
     document.body.appendChild(div);
     return root;
@@ -158,7 +175,7 @@ describe("Popover bind:open in parent island", () => {
     document.body.innerHTML = "";
   });
 
-  it("renders bind on parent markup without nested island slot", () => {
+  it("keeps bind:open off the template (bridged by createOpenBindSync)", () => {
     const Panel = ilha.state("open", false).render(
       ({ state }) =>
         html`${Popover({
@@ -169,8 +186,10 @@ describe("Popover bind:open in parent island", () => {
     );
 
     const output = markup(Panel());
-    expect(output).toContain("data-ilha-bind");
+    // Open stays off the SSR template so remorphs don't recreate portaled content.
+    expect(output).not.toContain("data-ilha-bind");
     expect(output).toContain("data-ilha-slot");
+    expect(output).toContain('data-slot="popover"');
     expect(output).not.toContain("data-areia-popover");
   });
 

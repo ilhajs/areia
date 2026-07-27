@@ -1,7 +1,7 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
 import { markupValue as markup } from "$lib/test-markup";
-import { html } from "ilha";
+import ilha, { html, mount } from "ilha";
 import { Dropdown, dropdownVariants } from "./index";
 
 try {
@@ -28,12 +28,29 @@ describe("dropdownVariants", () => {
   });
 });
 
+const ISLAND = Symbol.for("ilha.island");
+const isIsland = (v: unknown) =>
+  typeof v === "function" &&
+  (ISLAND in v || Object.getOwnPropertySymbols(v).some((s) => s.description === "ilha.island"));
+
 describe("Dropdown", () => {
+  it("default export is an ilha island", () => {
+    expect(isIsland(Dropdown)).toBe(true);
+    expect(typeof Dropdown.mount).toBe("function");
+  });
+
   it("renders trigger and content", () => {
     const output = markup(Dropdown({ trigger: "Open", children: "Hello" }));
     expect(output).toContain('data-slot="dropdown-menu"');
     expect(output).toContain('data-slot="dropdown-menu-trigger"');
     expect(output).toContain('data-slot="dropdown-menu-content"');
+    expect(output).not.toContain("data-areia-dropdown");
+  });
+
+  it("Static returns plain markup without auto-bind markers", () => {
+    const output = markup(Dropdown.Static({ trigger: "Open", children: "Hello" }));
+    expect(output).toContain('data-slot="dropdown-menu"');
+    expect(output).not.toContain("data-areia-dropdown");
   });
 
   it("renders content hidden by default", () => {
@@ -172,18 +189,22 @@ describe("Dropdown.Shortcut", () => {
   });
 });
 
-describe("Dropdown behavior (auto-mount)", () => {
-  it("opens on trigger click and closes on item selection", async () => {
-    document.body.innerHTML = markup(
-      Dropdown({
-        trigger: "Open",
-        items: [
-          { label: "One", value: "1" },
-          { label: "Two", value: "2" },
-        ],
-      }),
-    );
+describe("Dropdown behavior (island mount)", () => {
+  async function mountDropdown(input: Parameters<typeof Dropdown>[0]) {
+    const Panel = ilha.render(() => html`${Dropdown(input)}`);
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
     await settle();
+  }
+
+  it("opens on trigger click and closes on item selection", async () => {
+    await mountDropdown({
+      trigger: "Open",
+      items: [
+        { label: "One", value: "1" },
+        { label: "Two", value: "2" },
+      ],
+    });
 
     const content = document.querySelector('[data-slot="dropdown-menu-content"]') as HTMLElement;
     const trigger = document.querySelector('[data-slot="dropdown-menu-trigger"]') as HTMLElement;
@@ -202,10 +223,7 @@ describe("Dropdown behavior (auto-mount)", () => {
   });
 
   it("closes on Escape key", async () => {
-    document.body.innerHTML = markup(
-      Dropdown({ trigger: "Open", items: [{ label: "One", value: "1" }] }),
-    );
-    await settle();
+    await mountDropdown({ trigger: "Open", items: [{ label: "One", value: "1" }] });
 
     const content = document.querySelector('[data-slot="dropdown-menu-content"]') as HTMLElement;
     (document.querySelector('[data-slot="dropdown-menu-trigger"]') as HTMLElement).click();

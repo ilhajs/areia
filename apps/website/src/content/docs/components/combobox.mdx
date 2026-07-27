@@ -1,0 +1,369 @@
+---
+title: Combobox
+description: A searchable select component for filtering and choosing from a list of options.
+sidebar:
+  order: 9
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+  Demo6,
+  Demo7,
+  Demo8,
+  Demo9,
+  Demo10,
+  Demo11,
+  Demo12,
+  Demo13,
+  Demo14,
+} from "./combobox.demos";
+
+# Combobox
+
+A searchable select component for filtering and choosing from a list of options.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/combobox/index.ts)
+
+Areia's `Combobox` is built on `@data-slot/combobox` and rendered as an Ilha island when you use `Combobox`. It supports keyboard navigation, filtering, form integration, disabled options, grouped items, and field helpers for labels, descriptions, and errors.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="fruit"\n    label="Fruit"\n    placeholder="Search fruit..."\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n      date: "Date",\n      elderberry: "Elderberry",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Combobox } from "areia";
+```
+
+## Usage
+
+Call `Combobox(...)` for an interactive island. The root renders the combobox markup and initializes the `@data-slot/combobox` controller after mount.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="ilha-topic"\n    label="Ilha topic"\n    placeholder="Search Ilha topics..."\n    items={{\n      islands: "Islands",\n      signals: "Signals",\n      jsx: "JSX rendering",\n      html: "html literals",\n      hydration: "Hydration",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+For static server-rendered markup without mounting behavior, use `Combobox.Static(...)`. For most application usage, call `Combobox(...)`.
+
+## Examples
+
+### Basic
+
+A combobox with a visible label and searchable options.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="basic-fruit"\n    label="Fruit"\n    placeholder="Choose a fruit"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n      date: "Date",\n      elderberry: "Elderberry",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+### Sizes
+
+Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nconst items = {\n  apple: "Apple",\n  banana: "Banana",\n  cherry: "Cherry",\n};\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Combobox\n      size="xs"\n      placeholder="Extra small"\n      items={items}\n    />\n    <Combobox size="sm" placeholder="Small" items={items} />\n    <Combobox size="base" placeholder="Base" items={items} />\n    <Combobox size="lg" placeholder="Large" items={items} />\n  </div>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### With Description
+
+The `label`, `description`, and `error` props enable the built-in field wrapper.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="region"\n    label="Region"\n    description="Choose the region closest to your users."\n    placeholder="Search regions..."\n    items={{\n      iad: "Washington, D.C.",\n      sfo: "San Francisco",\n      lhr: "London",\n      fra: "Frankfurt",\n      nrt: "Tokyo",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### With Error
+
+Pass `error` as a string for simple validation messages. Error styling is automatically applied when `error` is truthy.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="database-error"\n    label="Database"\n    required\n    error="Select a database before continuing."\n    placeholder="Search databases..."\n    items={{\n      postgres: "PostgreSQL",\n      mysql: "MySQL",\n      mongodb: "MongoDB",\n      redis: "Redis",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### Disabled
+
+Set `disabled` to prevent interaction.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    label="Fruit"\n    placeholder="Search fruit..."\n    disabled\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo6 client:load />
+</Preview>
+
+### Disabled Items
+
+Use item descriptor objects to disable individual options. Disabled rows are skipped during keyboard navigation and cannot be selected.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="plans"\n    label="Plan"\n    placeholder="Search plans..."\n    items={{\n      free: "Free",\n      pro: "Pro",\n      business: { label: "Business", disabled: true },\n      enterprise: { label: "Enterprise", disabled: true },\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo7 client:load />
+</Preview>
+
+### Default Value
+
+Use `defaultValue` with the option value string to preselect an item.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="default-database"\n    label="Database"\n    defaultValue="postgres"\n    items={{\n      postgres: "PostgreSQL",\n      mysql: "MySQL",\n      mongodb: "MongoDB",\n      redis: "Redis",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo8 client:load />
+</Preview>
+
+### Multiple Selection
+
+Set `multiple` to allow selecting several values. Selected options render as removable Badge chips inside the input. Clicking an item toggles its selection and keeps the popup open. The typed search text clears after each selection, and `Backspace` with an empty input removes the last selected value. `defaultValue` accepts an array, and `onValueChange` receives a `string[]`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="multi-frameworks"\n    label="Frameworks"\n    multiple\n    placeholder="Search frameworks..."\n    defaultValue={["astro", "svelte"]}\n    items={{\n      astro: "Astro",\n      next: "Next.js",\n      nuxt: "Nuxt",\n      remix: "Remix",\n      svelte: "SvelteKit",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo9 client:load />
+</Preview>
+
+With `name`, one hidden input is created per selected value, so a native form submits `fruits=apple&fruits=banana`.
+
+The committed selection can be bound with `bind:value` (an alias for `bind:group`). Types discriminate on `multiple`: in multiple mode `bind:value` accepts a `string[]` signal, `defaultValue` is `string[]`, and `onValueChange` receives `string[]`; in single mode they stay `string`-typed.
+
+### Form Integration
+
+Set `name` to create a hidden input that submits the selected value with a native form.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <form class="flex w-full max-w-sm flex-col gap-3">\n    <Combobox\n      id="form-fruit"\n      name="fruit"\n      label="Fruit"\n      required\n      placeholder="Search fruit..."\n      items={{\n        apple: "Apple",\n        banana: "Banana",\n        cherry: "Cherry",\n      }}\n    />\n    <Button type="submit">Submit</Button>\n  </form>\n));'
+  }
+  lang="tsx"
+>
+  <Demo10 client:load />
+</Preview>
+
+### Custom Items
+
+Use explicit child markup when you need custom labels, grouping, separators, or item attributes.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="custom-items"\n    label="Runtime"\n    placeholder="Search runtimes..."\n  >\n    <Combobox.Item value="bun" label="Bun">\n      <span class="font-medium">Bun</span>\n      <span class="text-areia-subtle"> JavaScript runtime</span>\n    </Combobox.Item>\n    <Combobox.Item value="node" label="Node.js">\n      <span class="font-medium">Node.js</span>\n      <span class="text-areia-subtle"> JavaScript runtime</span>\n    </Combobox.Item>\n    <Combobox.Item value="deno" label="Deno">\n      <span class="font-medium">Deno</span>\n      <span class="text-areia-subtle"> TypeScript runtime</span>\n    </Combobox.Item>\n  </Combobox>\n));'
+  }
+  lang="tsx"
+>
+  <Demo11 client:load />
+</Preview>
+
+### Grouped Items
+
+Use `Combobox.Group` and `Combobox.GroupLabel` to organize related options.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="grouped-location"\n    label="Location"\n    placeholder="Search locations..."\n  >\n    <Combobox.Group>\n      <Combobox.GroupLabel>North America</Combobox.GroupLabel>\n      <Combobox.Item value="iad">\n        Washington, D.C.\n      </Combobox.Item>\n      <Combobox.Item value="sfo">San Francisco</Combobox.Item>\n    </Combobox.Group>\n    <Combobox.Group>\n      <Combobox.GroupLabel>Europe</Combobox.GroupLabel>\n      <Combobox.Item value="lhr">London</Combobox.Item>\n      <Combobox.Item value="fra">Frankfurt</Combobox.Item>\n    </Combobox.Group>\n  </Combobox>\n));'
+  }
+  lang="tsx"
+>
+  <Demo12 client:load />
+</Preview>
+
+### Search Input Inside Popup
+
+Use the low-level parts to render a select-like trigger with a separate search input inside the popup. This composition returns static markup; initialize it with `createCombobox` yourself if you are not using `Combobox`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nconst items = [\n  <Combobox.Item value="go" label="Go" children="🐹 Go" />,\n  <Combobox.Item\n    value="rust"\n    label="Rust"\n    children="🦀 Rust"\n  />,\n  <Combobox.Item\n    value="ts"\n    label="TypeScript"\n    children="🔷 TypeScript"\n  />,\n];\n\nexport default ilha.render(() => (\n  <Combobox\n    id="language-inside"\n    label="Language"\n    placeholder="Select language"\n  >\n    <Combobox.TriggerValue placeholder="Select language" />\n    <Combobox.Content>\n      <Combobox.Input placeholder="Search languages..." />\n      <Combobox.List>\n        <Combobox.Empty />\n        {items}\n      </Combobox.List>\n    </Combobox.Content>\n  </Combobox>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Open on Focus and Auto Highlight
+
+`openOnFocus` opens the popup when the input receives intentional focus. `autoHighlight` highlights the first matching item after typing.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="quick-search"\n    label="Quick search"\n    placeholder="Start typing..."\n    openOnFocus\n    autoHighlight\n    items={{\n      dashboard: "Dashboard",\n      settings: "Settings",\n      billing: "Billing",\n      support: "Support",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo13 client:load />
+</Preview>
+
+### Autocomplete Behavior
+
+Combobox supports autocomplete-style filtering natively. As the user types, the dropdown filters visible items automatically using the built-in substring matcher. Provide `items` and the controller handles narrowing without re-rendering.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="autocomplete"\n    label="Language"\n    placeholder="Start typing..."\n    openOnFocus\n    items={{\n      rust: "Rust",\n      ruby: "Ruby",\n      react: "React",\n      python: "Python",\n      php: "PHP",\n      perl: "Perl",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo14 client:load />
+</Preview>
+
+For a custom filter, pass a `filter` function instead of re-rendering with filtered items.
+
+```ts
+filter={(inputValue, itemValue, itemLabel) =>
+  itemLabel.toLowerCase().startsWith(inputValue.toLowerCase())
+}
+```
+
+Use `onInputValueChange` to read the typed text for side effects like remote fetching. Do not use it to drive re-renders of the item list — the controller already filters internally.
+
+For free-form values that do not need to match the list, use `itemToStringValue` to control how the selected text is displayed, or treat the input value as the committed value when the user submits the form without selecting an item.
+
+### Dropdown Height
+
+`Combobox.Content` defaults to `24rem` or the available viewport height, whichever is smaller. Pass `class` or `className` when composing the low-level content yourself.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nconst items = {\n  one: "One",\n  two: "Two",\n  three: "Three",\n  four: "Four",\n  five: "Five",\n};\n\nexport default ilha.render(() => (\n  <Combobox\n    id="short-dropdown"\n    label="Short dropdown"\n    placeholder="Search..."\n  >\n    <Combobox.TriggerInput placeholder="Search..." />\n    <Combobox.Content class="max-h-40">\n      <Combobox.List>\n        <Combobox.Empty />\n        {Object.entries(items).map(([value, label]) => (\n          <Combobox.Item value={value}>{label}</Combobox.Item>\n        ))}\n      </Combobox.List>\n    </Combobox.Content>\n  </Combobox>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+## API Reference
+
+### Combobox
+
+`Combobox` is an Ilha island. It accepts standard HTML `div` attributes plus `@data-slot/combobox` options and Areia field props.
+
+| Prop                 | Type                                                                                            | Default    | Description                                                                 |
+| -------------------- | ----------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------- |
+| `class`              | `string`                                                                                        | -          | Additional CSS classes applied to the combobox root.                        |
+| `className`          | `string`                                                                                        | -          | Alias for `class`.                                                          |
+| `size`               | `"xs" \| "sm" \| "base" \| "lg"`                                                                | `"base"`   | Size of the trigger input. Matches Input component sizes.                   |
+| `inputSide`          | `"right" \| "top"`                                                                              | `"right"`  | Styling hook for chip/input layouts.                                        |
+| `label`              | `unknown`                                                                                       | -          | Label content. Enables the field wrapper.                                   |
+| `labelTooltip`       | `string`                                                                                        | -          | Tooltip text rendered as a native `title` on the label.                     |
+| `description`        | `unknown`                                                                                       | -          | Helper text displayed below the combobox.                                   |
+| `error`              | `unknown \| { message: unknown; match?: unknown }`                                              | -          | Error message. When truthy, error styling is automatically applied.         |
+| `items`              | `Record<string, unknown \| { label: unknown; disabled?: boolean }> \| ComboboxItemDescriptor[]` | -          | Items rendered as selectable options. Object keys are option values.        |
+| `children`           | `unknown`                                                                                       | -          | Explicit combobox content. Prefer the second `Combobox` argument.           |
+| `placeholder`        | `string`                                                                                        | -          | Placeholder text for the trigger input or trigger value.                    |
+| `multiple`           | `boolean`                                                                                       | `false`    | Allow selecting multiple values. Items toggle and the popup stays open.     |
+| `defaultValue`       | `string \| string[]`                                                                            | -          | Initial selected value(s). Array form is for `multiple` mode.               |
+| `defaultOpen`        | `boolean`                                                                                       | `false`    | Initial open state.                                                         |
+| `disabled`           | `boolean`                                                                                       | `false`    | Disable interaction.                                                        |
+| `required`           | `boolean`                                                                                       | `false`    | Mark the field as required. When `false` with a label, shows optional text. |
+| `name`               | `string`                                                                                        | -          | Form field name. Creates a hidden input for submission.                     |
+| `openOnFocus`        | `boolean`                                                                                       | `true`     | Open the popup when the input receives intentional focus.                   |
+| `autoHighlight`      | `boolean`                                                                                       | `false`    | Auto-highlight the first visible item after typing.                         |
+| `filter`             | `(inputValue: string, itemValue: string, itemLabel: string) => boolean`                         | -          | Custom filter function. Return `true` to show an item.                      |
+| `itemToStringValue`  | `(item: HTMLElement \| null, value: string \| null) => string`                                  | -          | Custom selected-value text resolver.                                        |
+| `onValueChange`      | `(value: string \| string[] \| null) => void`                                                   | -          | Called when selection changes. Receives `string[]` in `multiple` mode.      |
+| `onOpenChange`       | `(open: boolean) => void`                                                                       | -          | Called when popup opens or closes.                                          |
+| `onInputValueChange` | `(inputValue: string) => void`                                                                  | -          | Called when the user types in the input.                                    |
+| `side`               | `"top" \| "bottom"`                                                                             | `"bottom"` | Preferred popup side.                                                       |
+| `align`              | `"start" \| "center" \| "end"`                                                                  | `"start"`  | Popup alignment relative to the trigger.                                    |
+| `sideOffset`         | `number`                                                                                        | `4`        | Distance from the trigger in pixels.                                        |
+| `alignOffset`        | `number`                                                                                        | `0`        | Offset from the aligned edge in pixels.                                     |
+| `avoidCollisions`    | `boolean`                                                                                       | `true`     | Adjust popup position to stay inside the viewport.                          |
+| `collisionPadding`   | `number`                                                                                        | `8`        | Viewport edge padding used for collision detection.                         |
+
+### Combobox.Item
+
+Individual selectable option.
+
+| Prop        | Type      | Default | Description                                       |
+| ----------- | --------- | ------- | ------------------------------------------------- |
+| `value`     | `string`  | -       | Submitted and selected value for the item.        |
+| `children`  | `unknown` | -       | Visible item content.                             |
+| `label`     | `string`  | -       | Text used for filtering when children are custom. |
+| `disabled`  | `boolean` | -       | Whether the item cannot be selected.              |
+| `class`     | `string`  | -       | Additional CSS classes.                           |
+| `className` | `string`  | -       | Alias for `class`.                                |
+
+### Additional Sub-components
+
+| Component               | Description                                           |
+| ----------------------- | ----------------------------------------------------- |
+| `Combobox.TriggerInput` | Input trigger with clear and dropdown buttons.        |
+| `Combobox.TriggerValue` | Button trigger that displays the selected value.      |
+| `Combobox.Content`      | Popup container for the input and list.               |
+| `Combobox.Input`        | Search input for popup-input composition.             |
+| `Combobox.List`         | Scrollable list wrapper.                              |
+| `Combobox.Empty`        | Empty state shown when no items match.                |
+| `Combobox.Group`        | Group container for related items.                    |
+| `Combobox.GroupLabel`   | Visible label for a group.                            |
+| `Combobox.Separator`    | Visual separator between groups/items.                |
+| `Combobox.Chip`         | Visual chip helper for custom multi-value interfaces. |
+
+## Accessibility
+
+### Keyboard Navigation
+
+| Key         | Action                                                                  |
+| ----------- | ----------------------------------------------------------------------- |
+| `ArrowDown` | Open the popup when closed, or move to the next visible item.           |
+| `ArrowUp`   | Open the popup when closed, or move to the previous item.               |
+| `Home`      | Move to the first visible item.                                         |
+| `End`       | Move to the last visible item.                                          |
+| `Enter`     | Select the highlighted item.                                            |
+| `Escape`    | Close the popup, or clear the selected value(s) when closed.            |
+| `Backspace` | In `multiple` mode with an empty input, remove the last selected value. |
+| `Tab`       | Close the popup and continue normal tab navigation.                     |
+
+### Label Requirement
+
+Comboboxes should have an accessible name via one of:
+
+- `label` prop
+- `aria-label` on a custom `Combobox.TriggerInput`
+- `aria-labelledby` for custom label association
+
+### Form Behavior
+
+When `name` is provided, the controller creates a hidden input with the selected value so the combobox participates in native form submission. In `multiple` mode, one hidden input is created per selected value.
+
+### Error Association
+
+When an `id` is provided, descriptions and error messages are automatically associated with the combobox field wrapper using `aria-describedby`.

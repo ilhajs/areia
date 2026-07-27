@@ -1,0 +1,260 @@
+---
+title: Input
+description: A text input field for user input with built-in label, description, and error support.
+sidebar:
+  order: 18
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+  Demo6,
+  Demo7,
+  Demo8,
+  Demo9,
+  Demo10,
+  Demo11,
+  Demo12,
+  Demo13,
+  Demo14,
+} from "./input.demos";
+
+# Input
+
+A styled text input control. When you pass `label`, `description`, or `error`, `Input` delegates to `Field` for accessible labeling, descriptions, validation messaging, and field state attributes.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/input/index.ts)
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    label="Email"\n    placeholder="you@example.com"\n    type="email"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Input } from "areia";
+```
+
+## Usage
+
+### With Built-in Field
+
+Use the `label` prop to enable the `Field` wrapper with label, description, and error support.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="email"\n    label="Email"\n    description="We\'ll only use this for account notifications."\n    placeholder="you@example.com"\n    type="email"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+### Bare Input
+
+For custom form layouts, use `Input` without `label`. Provide `aria-label` or `aria-labelledby` for accessibility. Use `Input.Static(...)` when composing a raw input inside `Field` manually.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    aria-label="Search"\n    placeholder="Search..."\n    type="search"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+## Examples
+
+### With Label and Description
+
+The `label` prop enables the `Field` wrapper with automatic vertical layout.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="project-name"\n    label="Project name"\n    description="Use a short, memorable name."\n    placeholder="My Ilha app"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### With Error
+
+Pass `error` as a string for simple error messages. Error styling is automatically applied when the `error` prop is truthy.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="email-error"\n    label="Email"\n    placeholder="you@example.com"\n    type="email"\n    value="not-an-email"\n    error="Enter a valid email address."\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### With Validation Object
+
+Pass `error` as an object with a `message` property when you want to keep validation metadata near the field.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="username"\n    label="Username"\n    required\n    placeholder="areia-user"\n    error={{\n      message: "Username is required.",\n      match: "valueMissing",\n    }}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo6 client:load />
+</Preview>
+
+### Input Sizes
+
+Four sizes are available: `xs`, `sm`, `base`, and `lg`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Input\n      size="xs"\n      aria-label="Extra small input"\n      placeholder="Extra small"\n    />\n    <Input\n      size="sm"\n      aria-label="Small input"\n      placeholder="Small"\n    />\n    <Input\n      size="base"\n      aria-label="Base input"\n      placeholder="Base"\n    />\n    <Input\n      size="lg"\n      aria-label="Large input"\n      placeholder="Large"\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo7 client:load />
+</Preview>
+
+### Disabled
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input label="Email" placeholder="you@example.com" disabled />\n));'
+  }
+  lang="tsx"
+>
+  <Demo8 client:load />
+</Preview>
+
+### Optional Field
+
+Set `required: false` to show optional text after the label.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="website"\n    label="Website"\n    required={false}\n    placeholder="https://example.com"\n    type="url"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo9 client:load />
+</Preview>
+
+### With Label Tooltip
+
+Use `labelTooltip` to add additional context via a native `title` attribute on the label.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="team-name"\n    label="Team name"\n    labelTooltip="This name is visible to everyone in your workspace."\n    placeholder="Design systems"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo10 client:load />
+</Preview>
+
+### Rich Label
+
+The `label` prop accepts Ilha markup for richer formatting.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="billing-email"\n    label={\n      <>\n        Email for <strong>billing</strong>\n      </>\n    }\n    required\n    placeholder="billing@example.com"\n    type="email"\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo11 client:load />
+</Preview>
+
+### Bare Input with Error
+
+Error messages and descriptions can render without a visible label. Use `aria-label` to keep the input accessible.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="search-error"\n    aria-label="Search"\n    placeholder="Search..."\n    description="Search by name or ID."\n    error="Search is currently unavailable."\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo12 client:load />
+</Preview>
+
+### Input Types
+
+Supports standard HTML input types such as `text`, `email`, `password`, `number`, `tel`, and `url`.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Input\n      label="Email"\n      type="email"\n      placeholder="you@example.com"\n    />\n    <Input\n      label="Password"\n      type="password"\n      placeholder="••••••••"\n    />\n    <Input label="Team size" type="number" placeholder="12" />\n    <Input\n      label="Website"\n      type="url"\n      placeholder="https://example.com"\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo13 client:load />
+</Preview>
+
+### Password Manager Overlays
+
+Set `passwordManagerIgnore` on non-credential inputs that password managers might incorrectly classify as login fields.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    label="Project slug"\n    placeholder="my-ilha-app"\n    passwordManagerIgnore\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo14 client:load />
+</Preview>
+
+## API Reference
+
+`Input` accepts standard HTML input attributes plus the following props.
+
+| Prop                    | Type                                               | Default     | Description                                                                       |
+| ----------------------- | -------------------------------------------------- | ----------- | --------------------------------------------------------------------------------- |
+| `label`                 | `unknown`                                          | -           | Label content for the input. Enables the field wrapper.                           |
+| `labelTooltip`          | `string`                                           | -           | Tooltip text rendered as a native title on the label text.                        |
+| `description`           | `unknown`                                          | -           | Helper text displayed below the input.                                            |
+| `error`                 | `unknown \| { message: unknown; match?: unknown }` | -           | Error message. When truthy, error styling is automatically applied.               |
+| `passwordManagerIgnore` | `boolean`                                          | -           | Suppress browser extension password manager overlays on non-credential inputs.    |
+| `size`                  | `"xs" \| "sm" \| "base" \| "lg"`                   | `"base"`    | Input size.                                                                       |
+| `variant`               | `"default" \| "error"`                             | `"default"` | Visual variant. Explicit `variant` takes precedence over automatic error styling. |
+| `class`                 | `string`                                           | -           | Additional CSS classes applied to the input.                                      |
+| `className`             | `string`                                           | -           | Alias for `class`.                                                                |
+
+### Validation Error Types
+
+When using `error` as an object, the `match` property can mirror HTML5 `ValidityState` keys.
+
+| Match             | Description                                                    |
+| ----------------- | -------------------------------------------------------------- |
+| `valueMissing`    | Required field is empty.                                       |
+| `typeMismatch`    | Value does not match the input type, such as an invalid email. |
+| `patternMismatch` | Value does not match the `pattern` attribute.                  |
+| `tooShort`        | Value is shorter than `minLength`.                             |
+| `tooLong`         | Value is longer than `maxLength`.                              |
+| `rangeUnderflow`  | Value is less than `min`.                                      |
+| `rangeOverflow`   | Value is greater than `max`.                                   |
+| `true`            | Always show the error, useful for server-side validation.      |
+
+## Accessibility
+
+### Label Requirement
+
+Inputs should have an accessible name via one of:
+
+- `label` prop
+- `placeholder` plus `aria-label` for bare inputs
+- `aria-labelledby` for custom label association
+
+### Error Association
+
+When an `id` is provided, descriptions and error messages are automatically associated with the input using `aria-describedby`.

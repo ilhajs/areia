@@ -87,7 +87,23 @@ describe("Tabs", () => {
     expect(output).toContain("b");
   });
 
-  it("uses TabsRoot island when bind:group is set (bind wiring in island onMount)", () => {
+  it("default export is an ilha island", () => {
+    const ISLAND = Symbol.for("ilha.island");
+    expect(
+      ISLAND in Tabs ||
+        Object.getOwnPropertySymbols(Tabs).some((s) => s.description === "ilha.island"),
+    ).toBe(true);
+    expect(typeof Tabs.mount).toBe("function");
+  });
+
+  it("Static omits island markers and data-areia attrs", () => {
+    const output = markup(Tabs.Static({ tabs: [{ value: "a", label: "A" }] }));
+    expect(output).toContain('data-slot="tabs"');
+    expect(output).not.toContain("data-areia-tabs");
+    expect(output).not.toContain("data-ilha");
+  });
+
+  it("uses bind:group on the island", () => {
     const Panel = ilha.state("tab", "a").render(
       ({ state }) =>
         html`${Tabs({

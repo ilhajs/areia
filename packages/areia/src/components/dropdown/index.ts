@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import ilha, { html, raw, untrack } from "ilha";
 import { Check } from "lucide";
 import { DropdownMenu as DropdownMenuPrimitive } from "@areia/slots";
 
@@ -7,10 +7,8 @@ import {
   boundElement,
   createOpenBindSync,
   openBindDefault,
-  queueDropdownOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeDropdownOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { Icon } from "$components/icon";
@@ -373,7 +371,7 @@ function renderItems(items: DropdownItemInput[] | undefined) {
   return items?.map((item) => DropdownItem(item)) ?? "";
 }
 
-function renderDropdown(input: DropdownInput = {}, autoBind = false) {
+function renderDropdown(input: DropdownInput = {}) {
   const { binds, attrs: props } = splitBindProps(input);
   const {
     trigger,
@@ -406,11 +404,10 @@ function renderDropdown(input: DropdownInput = {}, autoBind = false) {
     variant: _variant,
     ...rest
   } = props as DropdownInput;
-  const defaultOpen = openBindDefault(input, defaultOpenProp);
-
-  if (autoBind && binds["bind:open"] != null) {
-    queueDropdownOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
-  }
+  // Open is bridged by createOpenBindSync — don't track bind:open in render or put it
+  // on the template. Remorphing while content is portaled recreates the host slot empty.
+  const defaultOpen = untrack(() => openBindDefault(input, defaultOpenProp));
+  const { "bind:open": _open, ...rootBinds } = binds;
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "dropdown-menu-content");
@@ -425,7 +422,6 @@ function renderDropdown(input: DropdownInput = {}, autoBind = false) {
 
   const openSuffix = ` data-slot="dropdown-menu" class="${cn("contents", className, aliasedClassName)}"${toAttrs(
     {
-      "data-areia-dropdown": autoBind ? "" : undefined,
       ...rest,
       "data-default-open": defaultOpen,
       "data-default-value": defaultValue,
@@ -444,7 +440,7 @@ function renderDropdown(input: DropdownInput = {}, autoBind = false) {
     },
   )}`;
 
-  return boundElement("div", binds, openSuffix, inner);
+  return boundElement("div", rootBinds, openSuffix, inner);
 }
 
 type DropdownBindRuntime = {
@@ -510,74 +506,7 @@ export const DropdownRoot = ilha
   })
   .render(({ input }) => renderDropdown(input));
 
-const dropdownAutoBindScheduled = new WeakSet<Document>();
-
-type DropdownAutoRuntime = {
-  controller: DropdownMenuPrimitive.DropdownMenuController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const dropdownAutoRuntimeByRoot = new WeakMap<Element, DropdownAutoRuntime>();
-
-function scheduleDropdownAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || dropdownAutoBindScheduled.has(doc)) return;
-  dropdownAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    dropdownAutoBindScheduled.delete(doc);
-    const queued = takeDropdownOpenBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-dropdown][data-slot="dropdown-menu"]',
-    )) {
-      const trigger = root.querySelector('[data-slot="dropdown-menu-trigger"]');
-      const content = root.querySelector('[data-slot="dropdown-menu-content"]');
-      if (!trigger || !content) continue;
-
-      const existing = dropdownAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.bindSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      let bindSync: ReturnType<typeof createOpenBindSync> = null;
-
-      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-      const controller = DropdownMenuPrimitive.createDropdownMenu(root, {
-        onOpenChange: (open) => bindSync?.onUserChange(open),
-      });
-
-      if (entry) {
-        bindSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
-        bindSync?.applyFromSignal();
-      }
-
-      dropdownControllers.set(root, controller);
-      dropdownAutoRuntimeByRoot.set(root, { controller, bindSync });
-    }
-  });
-}
-
-function needsDropdownIsland(input: DropdownInput) {
-  const { binds } = splitBindProps(input);
-  return (
-    input.onOpenChange != null ||
-    input.onSelect != null ||
-    input.onValueChange != null ||
-    input.onValuesChange != null ||
-    input.onPortalMounted != null ||
-    binds["bind:open"] != null
-  );
-}
-
-function DropdownComponent(input: DropdownInput = {}) {
-  if (needsDropdownIsland(input)) return DropdownRoot(input);
-  scheduleDropdownAutoBind();
-  return renderDropdown(input, true);
-}
-
-export const Dropdown = Object.assign(DropdownComponent, {
+export const Dropdown = Object.assign(DropdownRoot, {
   Root: DropdownRoot,
   Static: renderDropdown,
   Trigger: DropdownTrigger,

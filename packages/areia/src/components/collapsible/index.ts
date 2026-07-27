@@ -7,10 +7,8 @@ import {
   boundElement,
   createOpenBindSync,
   openBindDefault,
-  queueCollapsibleOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeCollapsibleOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -209,7 +207,7 @@ export function CollapsibleDefaultPanel(input: CollapsiblePanelInput = {}) {
   });
 }
 
-export function CollapsibleRoot(input: CollapsibleRootInput = {}, autoBind = false) {
+export function CollapsibleRoot(input: CollapsibleRootInput = {}) {
   const { binds, attrs: props } = splitBindProps(input);
   const {
     children,
@@ -222,18 +220,11 @@ export function CollapsibleRoot(input: CollapsibleRootInput = {}, autoBind = fal
     ...rest
   } = props as CollapsibleRootInput;
 
-  if (autoBind && binds["bind:open"] != null) {
-    queueCollapsibleOpenBindForAutoMount(
-      binds["bind:open"] as import("ilha").SignalAccessor<boolean>,
-    );
-  }
-
   const openSuffix = ` data-slot="collapsible" class="${cn(
     collapsibleVariants(),
     className,
     aliasedClassName,
   )}"${toAttrs({
-    "data-areia-collapsible": autoBind ? "" : undefined,
     ...rest,
     "data-default-open": defaultOpen,
     "data-hidden-until-found": hiddenUntilFound,
@@ -355,7 +346,7 @@ export function CollapsibleAccordion(input: CollapsibleAccordionInput = {}) {
   </div>`;
 }
 
-function renderCollapsible(input: CollapsibleInput = {}, autoBind = false) {
+function renderCollapsible(input: CollapsibleInput = {}) {
   const {
     trigger,
     panel,
@@ -387,22 +378,19 @@ function renderCollapsible(input: CollapsibleInput = {}, autoBind = false) {
     });
   }
 
-  return CollapsibleRoot(
-    {
-      ...rest,
-      defaultOpen: openBindDefault(
-        input,
-        defaultOpen ?? (typeof input.open === "boolean" ? input.open : undefined),
-      ),
-      hiddenUntilFound,
-      class: cn(className, aliasedClassName),
-      children: children ?? [
-        CollapsibleDefaultTrigger({ children: trigger ?? "Toggle" }),
-        CollapsibleDefaultPanel({ children: panel }),
-      ],
-    },
-    autoBind,
-  );
+  return CollapsibleRoot({
+    ...rest,
+    defaultOpen: openBindDefault(
+      input,
+      defaultOpen ?? (typeof input.open === "boolean" ? input.open : undefined),
+    ),
+    hiddenUntilFound,
+    class: cn(className, aliasedClassName),
+    children: children ?? [
+      CollapsibleDefaultTrigger({ children: trigger ?? "Toggle" }),
+      CollapsibleDefaultPanel({ children: panel }),
+    ],
+  });
 }
 
 type CollapsibleBindRuntime = {
@@ -469,69 +457,7 @@ export const CollapsibleRootIsland = ilha
   })
   .render(({ input }) => renderCollapsible(input));
 
-const collapsibleAutoBindScheduled = new WeakSet<Document>();
-
-type CollapsibleAutoRuntime = {
-  controller: CollapsiblePrimitive.CollapsibleController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const collapsibleAutoRuntimeByRoot = new WeakMap<Element, CollapsibleAutoRuntime>();
-
-function scheduleCollapsibleAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || collapsibleAutoBindScheduled.has(doc)) return;
-  collapsibleAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    collapsibleAutoBindScheduled.delete(doc);
-    const queued = takeCollapsibleOpenBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-collapsible][data-slot="collapsible"]',
-    )) {
-      const existing = collapsibleAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.bindSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      let bindSync: ReturnType<typeof createOpenBindSync> = null;
-
-      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-      const controller = CollapsiblePrimitive.createCollapsible(root, {
-        onOpenChange: (open) => bindSync?.onUserChange(open),
-      });
-
-      if (entry) {
-        bindSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
-        bindSync?.applyFromSignal();
-      }
-
-      collapsibleControllers.set(root, controller);
-      collapsibleAutoRuntimeByRoot.set(root, { controller, bindSync });
-    }
-  });
-}
-
-function needsCollapsibleIsland(input: CollapsibleInput) {
-  const { binds } = splitBindProps(input);
-  return (
-    input.onOpenChange != null ||
-    input.onValueChange != null ||
-    Boolean(input.accordion) ||
-    Boolean(input.items?.length) ||
-    binds["bind:open"] != null
-  );
-}
-
-function CollapsibleComponent(input: CollapsibleInput = {}) {
-  if (needsCollapsibleIsland(input)) return CollapsibleRootIsland(input);
-  scheduleCollapsibleAutoBind();
-  return renderCollapsible(input, true);
-}
-
-export const Collapsible = Object.assign(CollapsibleComponent, {
+export const Collapsible = Object.assign(CollapsibleRootIsland, {
   Root: CollapsibleRootIsland,
   RootIsland: CollapsibleRootIsland,
   Static: renderCollapsible,

@@ -1,0 +1,276 @@
+---
+title: Button
+description: Displays a button or a component that looks like a button.
+sidebar:
+  order: 5
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+  Demo6,
+  Demo7,
+  Demo8,
+  Demo9,
+  Demo10,
+  Demo11,
+  Demo12,
+  Demo13,
+  Demo14,
+  Demo15,
+  Demo16,
+  Demo17,
+} from "./button.demos";
+
+# Button
+
+Displays a button or a component that looks like a button.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/button/index.ts)
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-2">\n    <Button variant="secondary">Button</Button>\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add"\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Button, ButtonGroup } from "areia";
+```
+
+## Usage
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary">Click me</Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+## Examples
+
+### Variants
+
+#### Primary
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="primary">Primary</Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+#### Secondary
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary">Secondary</Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+#### Ghost
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="ghost">Ghost</Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+#### Destructive
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="destructive">Destructive</Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo6 client:load />
+</Preview>
+
+#### Outline
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="outline">Outline</Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo7 client:load />
+</Preview>
+
+#### Secondary Destructive
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary-destructive">\n    Secondary Destructive\n  </Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo8 client:load />
+</Preview>
+
+### Sizes
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button size="xs" variant="secondary">\n      Extra Small\n    </Button>\n    <Button size="sm" variant="secondary">\n      Small\n    </Button>\n    <Button size="base" variant="secondary">\n      Base\n    </Button>\n    <Button size="lg" variant="secondary">\n      Large\n    </Button>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo9 client:load />
+</Preview>
+
+### With Icon
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary" icon={<Icon icon={Plus} />}>\n    Create Ilha app\n  </Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo10 client:load />
+</Preview>
+
+### Icon Only
+
+For icon-only buttons, use `shape="square"` or `shape="circle"` with the `icon` prop. Always include `aria-label` for accessibility — without visible text, screen readers need the label to convey the button’s purpose.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n    />\n    <Button\n      variant="secondary"\n      shape="circle"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo11 client:load />
+</Preview>
+
+### Loading State
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="primary" loading>\n    Loading...\n  </Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo12 client:load />
+</Preview>
+
+### Disabled State
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary" disabled>\n    Disabled\n  </Button>\n));'
+  }
+  lang="tsx"
+>
+  <Demo13 client:load />
+</Preview>
+
+### Title
+
+Use the native `title` attribute when additional context helps the user understand the action.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button variant="secondary" title="Create a new Ilha app">\n      Create Ilha app\n    </Button>\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n      title="Add item"\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo14 client:load />
+</Preview>
+
+### Button Group
+
+Use `ButtonGroup` to visually join related buttons or controls.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Bold, Italic, Underline } from "lucide";\nimport { Button, ButtonGroup, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <ButtonGroup aria-label="Text formatting">\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Bold} />}\n      aria-label="Bold"\n    />\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Italic} />}\n      aria-label="Italic"\n    />\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Underline} />}\n      aria-label="Underline"\n    />\n  </ButtonGroup>\n));'
+  }
+  lang="tsx"
+>
+  <Demo15 client:load />
+</Preview>
+
+Use `orientation="vertical"` for stacked groups, `ButtonGroup.Text` for text segments, and `ButtonGroup.Separator` to separate controls.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Button, ButtonGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ButtonGroup>\n    <Button variant="outline">Back</Button>\n    <ButtonGroup.Separator />\n    <ButtonGroup.Text>Page 1</ButtonGroup.Text>\n    <ButtonGroup.Separator />\n    <Button variant="outline">Next</Button>\n  </ButtonGroup>\n));'
+  }
+  lang="tsx"
+>
+  <Demo16 client:load />
+</Preview>
+
+### Link as Button
+
+Use `LinkButton` when the interaction should navigate somewhere but still look like a button. Use `Button` for in-place actions like submitting, opening, or toggling UI.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { ExternalLink } from "lucide";\nimport { LinkButton, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <LinkButton href="/components/link" variant="secondary">\n      Read Link docs\n    </LinkButton>\n    <LinkButton\n      href="https://ilha.build/"\n      variant="ghost"\n      icon={<Icon icon={ExternalLink} />}\n      external\n    >\n      Ilha Docs\n    </LinkButton>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo17 client:load />
+</Preview>
+
+## API Reference
+
+| Prop        | Type                                                                                           | Default       | Description                                               |
+| ----------- | ---------------------------------------------------------------------------------------------- | ------------- | --------------------------------------------------------- |
+| `shape`     | `"base" \| "square" \| "circle"`                                                               | `"base"`      | Controls the button shape.                                |
+| `size`      | `"xs" \| "sm" \| "base" \| "lg"`                                                               | `"base"`      | Controls button height, padding, gap, and text size.      |
+| `variant`   | `"primary" \| "secondary" \| "ghost" \| "destructive" \| "secondary-destructive" \| "outline"` | `"secondary"` | Controls the visual style.                                |
+| `children`  | `unknown`                                                                                      | -             | Content rendered inside the button.                       |
+| `class`     | `string`                                                                                       | -             | Additional CSS classes merged with the generated classes. |
+| `className` | `string`                                                                                       | -             | Alias for `class`.                                        |
+| `icon`      | `unknown`                                                                                      | -             | Markup rendered before the label.                         |
+| `loading`   | `boolean`                                                                                      | -             | Shows a loading spinner and disables interaction.         |
+| `title`     | `string`                                                                                       | -             | Native tooltip text.                                      |
+| `disabled`  | `boolean`                                                                                      | -             | Disables the button.                                      |
+| `name`      | `string`                                                                                       | -             | Native button name attribute.                             |
+| `type`      | `"submit" \| "reset" \| "button"`                                                              | `"button"`    | Native button type attribute.                             |
+| `value`     | `string \| string[] \| number`                                                                 | -             | Native button value attribute.                            |
+
+### ButtonGroup
+
+| Prop          | Type                         | Default        | Description                         |
+| ------------- | ---------------------------- | -------------- | ----------------------------------- |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Layout direction for grouped items. |
+| `children`    | `unknown`                    | -              | Grouped controls.                   |
+| `class`       | `string`                     | -              | Additional CSS classes.             |
+| `className`   | `string`                     | -              | Alias for `class`.                  |
+
+### ButtonGroup.Text
+
+Text segment for use inside `ButtonGroup`. Accepts standard `div` attributes plus `children`, `class`, and `className`.
+
+### ButtonGroup.Separator
+
+Separator segment for use inside `ButtonGroup`.
+
+| Prop          | Type                         | Default      | Description             |
+| ------------- | ---------------------------- | ------------ | ----------------------- |
+| `orientation` | `"horizontal" \| "vertical"` | `"vertical"` | Separator orientation.  |
+| `class`       | `string`                     | -            | Additional CSS classes. |
+| `className`   | `string`                     | -            | Alias for `class`.      |

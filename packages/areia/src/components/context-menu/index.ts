@@ -5,10 +5,8 @@ const contextMenuControllers = new WeakMap<Element, ContextMenuPrimitive.Context
 import {
   boundElement,
   createOpenBindSync,
-  queueContextMenuOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeContextMenuOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -129,7 +127,7 @@ export function ContextMenuRadioItem(input: ContextMenuItemInput = {}) {
   return renderItem(input, "radio");
 }
 
-function renderContextMenu(input: ContextMenuInput = {}, autoBind = false) {
+function renderContextMenu(input: ContextMenuInput = {}) {
   const { binds, attrs: props } = splitBindProps(input);
   const {
     trigger,
@@ -147,11 +145,9 @@ function renderContextMenu(input: ContextMenuInput = {}, autoBind = false) {
     ...rest
   } = props as ContextMenuInput;
 
-  if (autoBind && binds["bind:open"] != null) {
-    queueContextMenuOpenBindForAutoMount(
-      binds["bind:open"] as import("ilha").SignalAccessor<boolean>,
-    );
-  }
+  // Open is bridged by createOpenBindSync — don't put bind:open on the template.
+  // Remorphing while content is portaled recreates the host slot empty.
+  const { "bind:open": _open, ...rootBinds } = binds;
 
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "context-menu-content");
@@ -163,14 +159,13 @@ function renderContextMenu(input: ContextMenuInput = {}, autoBind = false) {
 
   const openSuffix = ` data-slot="context-menu" class="${cn("contents", className, aliasedClassName)}"${toAttrs(
     {
-      "data-areia-context-menu": autoBind ? "" : undefined,
       ...rest,
       "data-disabled": disabled,
       "data-close-on-select": closeOnSelect,
     },
   )}`;
 
-  return boundElement("div", binds, openSuffix, inner);
+  return boundElement("div", rootBinds, openSuffix, inner);
 }
 
 type ContextMenuBindRuntime = {
@@ -221,72 +216,7 @@ export const ContextMenuRoot = ilha
   })
   .render(({ input }) => renderContextMenu(input));
 
-const contextMenuAutoBindScheduled = new WeakSet<Document>();
-
-type ContextMenuAutoRuntime = {
-  controller: ContextMenuPrimitive.ContextMenuController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const contextMenuAutoRuntimeByRoot = new WeakMap<Element, ContextMenuAutoRuntime>();
-
-function scheduleContextMenuAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || contextMenuAutoBindScheduled.has(doc)) return;
-  contextMenuAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    contextMenuAutoBindScheduled.delete(doc);
-    const queued = takeContextMenuOpenBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-context-menu][data-slot="context-menu"]',
-    )) {
-      const trigger = root.querySelector('[data-slot="context-menu-trigger"]');
-      const content = root.querySelector('[data-slot="context-menu-content"]');
-      if (!trigger || !content) continue;
-
-      const existing = contextMenuAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.bindSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      let bindSync: ReturnType<typeof createOpenBindSync> = null;
-
-      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-      const controller = ContextMenuPrimitive.createContextMenu(root, {
-        onOpenChange: (open) => bindSync?.onUserChange(open),
-      });
-
-      if (entry) {
-        bindSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
-        bindSync?.applyFromSignal();
-      }
-
-      contextMenuControllers.set(root, controller);
-      contextMenuAutoRuntimeByRoot.set(root, { controller, bindSync });
-    }
-  });
-}
-
-function needsContextMenuIsland(input: ContextMenuInput) {
-  const { binds } = splitBindProps(input);
-  return (
-    input.onOpenChange != null ||
-    input.onSelect != null ||
-    input.onPortalMounted != null ||
-    binds["bind:open"] != null
-  );
-}
-
-function ContextMenuComponent(input: ContextMenuInput = {}) {
-  if (needsContextMenuIsland(input)) return ContextMenuRoot(input);
-  scheduleContextMenuAutoBind();
-  return renderContextMenu(input, true);
-}
-
-export const ContextMenu = Object.assign(ContextMenuComponent, {
+export const ContextMenu = Object.assign(ContextMenuRoot, {
   Root: ContextMenuRoot,
   Static: renderContextMenu,
   Trigger: ContextMenuTrigger,

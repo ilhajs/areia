@@ -1,0 +1,278 @@
+---
+title: Radio
+description: A control that allows the user to select one option from a set.
+sidebar:
+  order: 25
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+  Demo6,
+  Demo7,
+  Demo8,
+  Demo9,
+  Demo10,
+  Demo11,
+  Demo12,
+  Demo13,
+  Demo14,
+} from "./radio.demos";
+
+# Radio
+
+A control that allows the user to select one option from a set. Radio items are usually rendered inside a `Radio.Group`.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/radio/index.ts)
+
+Areia's `Radio` uses DOM primitives: native radio inputs, labels, fieldsets, and legends.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Notification preference"\n    name="notification-basic"\n    value="email"\n  >\n    <Radio.Item\n      label="Email"\n      value="email"\n      name="notification-basic"\n      checked\n    />\n    <Radio.Item\n      label="SMS"\n      value="sms"\n      name="notification-basic"\n    />\n    <Radio.Item\n      label="Push"\n      value="push"\n      name="notification-basic"\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Radio } from "areia";
+```
+
+## Usage
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Contact method"\n    name="contact"\n    value="email"\n  >\n    <Radio.Item\n      label="Email"\n      value="email"\n      name="contact"\n      checked\n    />\n    <Radio.Item label="Phone" value="phone" name="contact" />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+## Examples
+
+### Default Vertical
+
+Radio groups display vertically by default. Each radio has a label displayed to its right.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Account type"\n    name="account-type"\n    value="personal"\n  >\n    <Radio.Item\n      label="Personal"\n      value="personal"\n      name="account-type"\n      checked\n    />\n    <Radio.Item label="Team" value="team" name="account-type" />\n    <Radio.Item\n      label="Enterprise"\n      value="enterprise"\n      name="account-type"\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+### Horizontal
+
+Use `orientation: "horizontal"` for inline layouts. Items wrap when there is not enough space.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Size"\n    name="size"\n    orientation="horizontal"\n    value="md"\n  >\n    <Radio.Item label="Small" value="sm" name="size" />\n    <Radio.Item label="Medium" value="md" name="size" checked />\n    <Radio.Item label="Large" value="lg" name="size" />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### With Description
+
+Add helper text below the radio items using the `description` prop.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Build mode"\n    name="build-mode"\n    description="Choose how Areia should generate your output."\n    value="standard"\n  >\n    <Radio.Item\n      label="Standard"\n      value="standard"\n      name="build-mode"\n      checked\n    />\n    <Radio.Item\n      label="Optimized"\n      value="optimized"\n      name="build-mode"\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### Control Position
+
+Use `controlPosition: "end"` to place labels before radio buttons.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Options"\n    name="control-position"\n    controlPosition="end"\n    value="a"\n  >\n    <Radio.Item\n      label="Option A"\n      value="a"\n      name="control-position"\n      checked\n      controlPosition="end"\n    />\n    <Radio.Item\n      label="Option B"\n      value="b"\n      name="control-position"\n      controlPosition="end"\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo6 client:load />
+</Preview>
+
+### Radio Card
+
+Use `appearance: "card"` on the group and items to display each option as a selectable card. Combine it with the `description` prop on each item for richer content.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Plan"\n    name="plan-card"\n    appearance="card"\n    value="free"\n  >\n    <Radio.Item\n      label="Free"\n      description="For personal or hobby projects."\n      value="free"\n      name="plan-card"\n      appearance="card"\n      checked\n    />\n    <Radio.Item\n      label="Pro"\n      description="For professional websites and applications."\n      value="pro"\n      name="plan-card"\n      appearance="card"\n    />\n    <Radio.Item\n      label="Team"\n      description="For teams that collaborate on multiple projects."\n      value="team"\n      name="plan-card"\n      appearance="card"\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo7 client:load />
+</Preview>
+
+### Radio Card Control on the Left
+
+Use `controlPosition: "start"` on card radio items to place the radio control on the left of the label and description.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Plan"\n    name="plan-card-start"\n    appearance="card"\n    controlPosition="start"\n    value="free"\n  >\n    <Radio.Item\n      label="Free"\n      description="For personal or hobby projects."\n      value="free"\n      name="plan-card-start"\n      appearance="card"\n      controlPosition="start"\n      checked\n    />\n    <Radio.Item\n      label="Pro"\n      description="For professional websites."\n      value="pro"\n      name="plan-card-start"\n      appearance="card"\n      controlPosition="start"\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo8 client:load />
+</Preview>
+
+### Rich Label Content
+
+The `label` prop on `Radio.Item` accepts Ilha markup, so you can embed badges or other markup alongside the text.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Badge, Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Plan"\n    name="rich-plan"\n    appearance="card"\n    value="pro"\n  >\n    <Radio.Item\n      label={\n        <span class="flex items-center gap-2">\n          Free\n          <Badge variant="secondary">$0</Badge>\n        </span>\n      }\n      description="For personal or hobby projects."\n      value="free"\n      name="rich-plan"\n      appearance="card"\n    />\n    <Radio.Item\n      label={\n        <span class="flex items-center gap-2">\n          Pro\n          <Badge variant="success">Popular</Badge>\n        </span>\n      }\n      description="For professional websites."\n      value="pro"\n      name="rich-plan"\n      appearance="card"\n      checked\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo9 client:load />
+</Preview>
+
+### Radio Card Horizontal
+
+Combine `appearance: "card"` with `orientation: "horizontal"` for a side-by-side card layout.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Plan"\n    name="plan-horizontal"\n    orientation="horizontal"\n    appearance="card"\n    value="free"\n  >\n    <Radio.Item\n      label="Free"\n      value="free"\n      name="plan-horizontal"\n      appearance="card"\n      checked\n    />\n    <Radio.Item\n      label="Pro"\n      value="pro"\n      name="plan-horizontal"\n      appearance="card"\n    />\n    <Radio.Item\n      label="Team"\n      value="team"\n      name="plan-horizontal"\n      appearance="card"\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo10 client:load />
+</Preview>
+
+### With Error
+
+Show validation errors at the group level using the `error` prop.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group\n    legend="Payment method"\n    name="payment"\n    error="Please select a payment method."\n  >\n    <Radio.Item\n      label="Card"\n      value="card"\n      name="payment"\n      variant="error"\n    />\n    <Radio.Item\n      label="Bank transfer"\n      value="bank"\n      name="payment"\n      variant="error"\n    />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo11 client:load />
+</Preview>
+
+### Disabled
+
+Disable the entire group or individual items.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-6">\n    <Radio.Group\n      legend="Disabled group"\n      name="disabled-group"\n      disabled\n      value="email"\n    >\n      <Radio.Item\n        label="Email"\n        value="email"\n        name="disabled-group"\n        checked\n        disabled\n      />\n      <Radio.Item\n        label="SMS"\n        value="sms"\n        name="disabled-group"\n        disabled\n      />\n    </Radio.Group>\n    <Radio.Group\n      legend="Disabled item"\n      name="disabled-item"\n      value="email"\n    >\n      <Radio.Item\n        label="Email"\n        value="email"\n        name="disabled-item"\n        checked\n      />\n      <Radio.Item\n        label="SMS"\n        value="sms"\n        name="disabled-item"\n        disabled\n      />\n    </Radio.Group>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo12 client:load />
+</Preview>
+
+### Visually Hidden Legend
+
+Use `Radio.Legend` with `class: "sr-only"` to keep the legend accessible to screen readers while hiding it visually.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <p class="text-base font-medium text-areia-default">\n      Paths\n    </p>\n    <Radio.Group>\n      <Radio.Legend label="Paths" class="sr-only" />\n      <Radio.Item\n        label="Allow all paths"\n        value="all"\n        name="paths"\n        checked\n      />\n      <Radio.Item\n        label="Specific paths"\n        value="specific"\n        name="paths"\n      />\n    </Radio.Group>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo13 client:load />
+</Preview>
+
+### Custom Legend Styling
+
+Use `Radio.Legend` when you need custom typography, colors, or layout instead of the `legend` string prop.
+
+<Preview
+  code={
+    'import ilha from "ilha";\nimport { Radio } from "areia";\n\nexport default ilha.render(() => (\n  <Radio.Group>\n    <Radio.Legend\n      label="Notification preference"\n      class="text-sm uppercase tracking-wide text-areia-subtle"\n    />\n    <Radio.Item\n      label="Email"\n      value="email"\n      name="custom-legend"\n      checked\n    />\n    <Radio.Item label="SMS" value="sms" name="custom-legend" />\n  </Radio.Group>\n));'
+  }
+  lang="tsx"
+>
+  <Demo14 client:load />
+</Preview>
+
+## API Reference
+
+### Radio.Group
+
+Container for radio buttons with legend, description, and error support.
+
+| Prop              | Type                         | Default      | Description                                                                             |
+| ----------------- | ---------------------------- | ------------ | --------------------------------------------------------------------------------------- |
+| `legend`          | `unknown`                    | -            | Legend content for the group.                                                           |
+| first argument    | `unknown[]`                  | -            | Radio item markup when no group props are needed.                                       |
+| second argument   | `unknown[]`                  | -            | Radio item markup, usually `Radio.Item(...)` calls.                                     |
+| `orientation`     | `"vertical" \| "horizontal"` | `"vertical"` | Layout direction of the radio items.                                                    |
+| `appearance`      | `"default" \| "card"`        | `"default"`  | Visual appearance used for group layout. Pass the same value to items for card styling. |
+| `error`           | `unknown`                    | -            | Error message for the group.                                                            |
+| `description`     | `unknown`                    | -            | Helper text for the group.                                                              |
+| `disabled`        | `boolean`                    | -            | Whether all controls in the fieldset are disabled.                                      |
+| `controlPosition` | `"start" \| "end"`           | -            | Position of the radio control relative to the label.                                    |
+| `name`            | `string`                     | -            | Native form submission name for grouped radio items.                                    |
+| `class`           | `string`                     | -            | Additional CSS classes.                                                                 |
+| `className`       | `string`                     | -            | Alias for `class`.                                                                      |
+
+### Radio.Legend
+
+Composable legend sub-component for `Radio.Group`. Use it instead of the `legend` prop when you need custom legend styling.
+
+| Prop        | Type      | Default | Description             |
+| ----------- | --------- | ------- | ----------------------- |
+| `label`     | `unknown` | -       | Legend content.         |
+| `class`     | `string`  | -       | Additional CSS classes. |
+| `className` | `string`  | -       | Alias for `class`.      |
+
+### Radio.Item
+
+Individual radio button within `Radio.Group`.
+
+| Prop              | Type                   | Default     | Description                                                                |
+| ----------------- | ---------------------- | ----------- | -------------------------------------------------------------------------- |
+| `label`           | `unknown`              | -           | Label content displayed next to radio.                                     |
+| `description`     | `unknown`              | -           | Description text displayed below the label when using card appearance.     |
+| `value`           | `string`               | -           | Native radio value.                                                        |
+| `name`            | `string`               | -           | Native radio group name. Radios with the same name are mutually exclusive. |
+| `checked`         | `boolean`              | -           | Whether the radio is initially checked.                                    |
+| `disabled`        | `boolean`              | -           | Whether the radio is disabled.                                             |
+| `variant`         | `"default" \| "error"` | `"default"` | Visual variant.                                                            |
+| `appearance`      | `"default" \| "card"`  | `"default"` | Visual appearance.                                                         |
+| `controlPosition` | `"start" \| "end"`     | -           | Position of the radio control relative to the label.                       |
+| `class`           | `string`               | -           | Additional CSS classes for the label wrapper.                              |
+| `className`       | `string`               | -           | Alias for `class`.                                                         |
+
+## Accessibility
+
+### Semantic HTML
+
+`Radio.Group` uses semantic `<fieldset>` and `<legend>` elements for proper grouping and screen reader announcement.
+
+### Keyboard Navigation
+
+Because Areia radio items use native `<input type="radio">`, browsers provide standard keyboard behavior. Tab moves focus to and from the radio group, arrow keys move between radios in the same named group, and Space selects the focused option.
+
+### Screen Readers
+
+Each radio is announced with its label and selection state. The group legend provides context for all options.

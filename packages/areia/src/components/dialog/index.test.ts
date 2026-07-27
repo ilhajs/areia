@@ -1,5 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
+import ilha, { html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Dialog, dialogVariants } from "./index";
 
@@ -28,13 +29,30 @@ describe("dialogVariants", () => {
   });
 });
 
+const ISLAND = Symbol.for("ilha.island");
+const isIsland = (v: unknown) =>
+  typeof v === "function" &&
+  (ISLAND in v || Object.getOwnPropertySymbols(v).some((s) => s.description === "ilha.island"));
+
 describe("Dialog", () => {
+  it("default export is an ilha island", () => {
+    expect(isIsland(Dialog)).toBe(true);
+    expect(typeof Dialog.mount).toBe("function");
+  });
+
   it("renders trigger and content", () => {
     const output = markup(Dialog({ children: "Open", content: "Hello" }));
     expect(output).toContain('data-slot="dialog"');
     expect(output).toContain('data-slot="dialog-trigger"');
     expect(output).toContain('data-slot="dialog-content"');
     expect(output).toContain("Hello");
+    expect(output).not.toContain("data-areia-dialog");
+  });
+
+  it("Static returns plain markup without auto-bind markers", () => {
+    const output = markup(Dialog.Static({ children: "Open", content: "Hello" }));
+    expect(output).toContain('data-slot="dialog"');
+    expect(output).not.toContain("data-areia-dialog");
   });
 
   it("renders content hidden by default", () => {
@@ -135,10 +153,16 @@ describe("Dialog.Description", () => {
   });
 });
 
-describe("Dialog behavior (auto-mount)", () => {
-  it("opens on trigger click and closes on Escape", async () => {
-    document.body.innerHTML = markup(Dialog({ children: "Open", content: "Hello" }));
+describe("Dialog behavior (island mount)", () => {
+  async function mountDialog(input: Parameters<typeof Dialog>[0]) {
+    const Panel = ilha.render(() => html`${Dialog(input)}`);
+    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    mount({ Panel }, { root: document.body, lazy: false });
     await settle();
+  }
+
+  it("opens on trigger click and closes on Escape", async () => {
+    await mountDialog({ children: "Open", content: "Hello" });
 
     const root = document.querySelector('[data-slot="dialog"]') as HTMLElement;
     const trigger = document.querySelector('[data-slot="dialog-trigger"]') as HTMLElement;
@@ -156,13 +180,10 @@ describe("Dialog behavior (auto-mount)", () => {
   });
 
   it("closes on close button click", async () => {
-    document.body.innerHTML = markup(
-      Dialog({
-        children: "Open",
-        content: [Dialog.Title({ children: "Title" }), Dialog.Close({ children: "Dismiss" })],
-      }),
-    );
-    await settle();
+    await mountDialog({
+      children: "Open",
+      content: [Dialog.Title({ children: "Title" }), Dialog.Close({ children: "Dismiss" })],
+    });
 
     const root = document.querySelector('[data-slot="dialog"]') as HTMLElement;
     (document.querySelector('[data-slot="dialog-trigger"]') as HTMLElement).click();

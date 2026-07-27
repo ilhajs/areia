@@ -1,0 +1,339 @@
+---
+title: Radio Group
+description: A set of checkable buttons where only one can be selected at a time.
+sidebar:
+  order: 15
+---
+
+# Radio Group
+
+A group of radio buttons built on `role="radiogroup"`. Generates hidden native `<input type="radio">` elements for form submission, supports keyboard navigation via arrow keys, and handles form reset.
+
+```ts
+import { RadioGroup } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <div data-slot="radio-group" data-name="plan" class="grid gap-2">
+    <label>
+      <span data-slot="radio-group-item" data-value="starter" class="win95-check mr-2 rounded-full">
+        <span data-slot="radio-group-indicator" class="hidden win95-check-mark rounded-full data-[checked]:block"></span>
+      </span>
+      Starter
+    </label>
+    <label>
+      <span data-slot="radio-group-item" data-value="pro" class="win95-check mr-2 rounded-full">
+        <span data-slot="radio-group-indicator" class="hidden win95-check-mark rounded-full data-[checked]:block"></span>
+      </span>
+      Pro
+    </label>
+    <label>
+      <span data-slot="radio-group-item" data-value="enterprise" class="win95-check mr-2 rounded-full">
+        <span data-slot="radio-group-indicator" class="hidden win95-check-mark rounded-full data-[checked]:block"></span>
+      </span>
+      Enterprise
+    </label>
+  </div>
+`;
+
+const root = document.querySelector(
+  '[data-slot="radio-group"]',
+)!;
+const controller = RadioGroup.createRadioGroup(root, {
+  name: "plan",
+  defaultValue: "starter",
+});
+```
+
+## Import
+
+```ts
+import { RadioGroup } from "@areia/slots";
+```
+
+## Usage
+
+Call `createRadioGroup` with the root element and optional configuration. The primitive reads slot attributes from the DOM and manages selection state, keyboard navigation, and form integration.
+
+```ts
+import { RadioGroup } from "@areia/slots";
+
+const root = document.querySelector<HTMLElement>(
+  '[data-slot="radio-group"]',
+)!;
+if (!root) throw new Error("No root element found");
+
+const controller = RadioGroup.createRadioGroup(root, {
+  name: "plan",
+  defaultValue: "starter",
+});
+
+// Listen for state changes
+root.addEventListener("radio-group:change", (e) => {
+  console.log(e.detail.value);
+});
+
+// Programmatic control
+controller.select("pro");
+// controller.clear();
+// controller.destroy();
+```
+
+### Auto-bind
+
+Use the `create` helper to discover and bind every unattached root in a scope.
+
+```ts
+import { RadioGroup } from "@areia/slots";
+
+const controllers = RadioGroup.create(document);
+// controllers.forEach((c) => { ... });
+```
+
+## Expected Markup
+
+The primitive expects the following slot structure. Each `radio-group-item` requires a `data-value` attribute that identifies it for selection and form submission.
+
+```html
+<div data-slot="radio-group" data-name="plan">
+  <label>
+    <span data-slot="radio-group-item" data-value="starter">
+      <span data-slot="radio-group-indicator"></span>
+    </span>
+    Starter
+  </label>
+
+  <label>
+    <span data-slot="radio-group-item" data-value="pro">
+      <span data-slot="radio-group-indicator"></span>
+    </span>
+    Pro
+  </label>
+
+  <label>
+    <span data-slot="radio-group-item" data-value="enterprise">
+      <span data-slot="radio-group-indicator"></span>
+    </span>
+    Enterprise
+  </label>
+</div>
+```
+
+Wrapping each item in a `<label>` is recommended — the controller detects wrapping labels and `label[for]` associations so that clicking the label text selects the corresponding radio.
+
+### Items Without Indicators
+
+The `radio-group-indicator` slot is optional. Items work without it:
+
+```html
+<div data-slot="radio-group" data-name="plan">
+  <button data-slot="radio-group-item" data-value="starter">
+    Starter
+  </button>
+  <button data-slot="radio-group-item" data-value="pro">
+    Pro
+  </button>
+</div>
+```
+
+When an item is a native `<button>`, the controller automatically sets `type="button"` to prevent form interference.
+
+### Generated Hidden Inputs
+
+The controller creates a visually hidden native `<input type="radio">` for each item and inserts it immediately after the item element:
+
+```html
+<input
+  type="radio"
+  tabindex="-1"
+  aria-hidden="true"
+  data-radio-group-generated="input"
+  style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;pointer-events:none"
+/>
+```
+
+These hidden inputs participate in standard form submission and `FormData`.
+
+### Data Slots
+
+| Slot                    | Required | Description                                                  |
+| ----------------------- | -------- | ------------------------------------------------------------ |
+| `radio-group`           | Yes      | Root element. Receives `role="radiogroup"` and ARIA attrs.   |
+| `radio-group-item`      | Yes      | A selectable radio item. Must have a `data-value` attribute. |
+| `radio-group-indicator` | No       | Visual indicator shown when the item is checked.             |
+
+### Generated Attributes
+
+#### Root (`radio-group`)
+
+| Attribute       | Values              | Description                                                |
+| --------------- | ------------------- | ---------------------------------------------------------- |
+| `role`          | `"radiogroup"`      | ARIA radiogroup role.                                      |
+| `data-value`    | `string`            | Currently selected value. Absent when no item is selected. |
+| `data-disabled` | (present)           | Present when the entire group is disabled.                 |
+| `data-readonly` | (present)           | Present when the entire group is read-only.                |
+| `data-required` | (present)           | Present when the group is required.                        |
+| `aria-disabled` | `"true"` or removed | Reflects disabled state.                                   |
+| `aria-readonly` | `"true"` or removed | Reflects read-only state.                                  |
+| `aria-required` | `"true"` or removed | Reflects required state.                                   |
+
+#### Items (`radio-group-item`)
+
+| Attribute         | Values               | Description                                                                         |
+| ----------------- | -------------------- | ----------------------------------------------------------------------------------- |
+| `role`            | `"radio"`            | ARIA radio role.                                                                    |
+| `data-checked`    | (present)            | Present when the item is selected.                                                  |
+| `data-unchecked`  | (present)            | Present when the item is not selected.                                              |
+| `data-disabled`   | (present)            | Present when the item is disabled (group-level or item-level).                      |
+| `data-readonly`   | (present)            | Present when the group is read-only.                                                |
+| `data-required`   | (present)            | Present when the group is required.                                                 |
+| `aria-checked`    | `"true"` / `"false"` | Reflects selection state.                                                           |
+| `aria-disabled`   | `"true"` or removed  | Reflects disabled state.                                                            |
+| `aria-readonly`   | `"true"` or removed  | Reflects read-only state.                                                           |
+| `aria-required`   | `"true"` or removed  | Reflects required state.                                                            |
+| `aria-labelledby` | ID refs              | Merged from wrapping `<label>` and `label[for]` associations.                       |
+| `tabindex`        | `0` / `-1`           | The checked enabled item (or first enabled item) receives `0`; others receive `-1`. |
+
+#### Indicators (`radio-group-indicator`)
+
+| Attribute        | Values    | Description                                |
+| ---------------- | --------- | ------------------------------------------ |
+| `data-checked`   | (present) | Mirrors the parent item's checked state.   |
+| `data-unchecked` | (present) | Mirrors the parent item's unchecked state. |
+| `data-disabled`  | (present) | Mirrors the parent item's disabled state.  |
+| `data-readonly`  | (present) | Mirrors the group's read-only state.       |
+| `data-required`  | (present) | Mirrors the group's required state.        |
+
+## Events
+
+All events are dispatched from the root element (`data-slot="radio-group"`).
+
+### Outbound
+
+| Event                | Detail                      | Description                            |
+| -------------------- | --------------------------- | -------------------------------------- |
+| `radio-group:change` | `{ value: string \| null }` | Fires when the selected value changes. |
+
+#### `radio-group:change`
+
+```ts
+interface RadioGroupChangeDetail {
+  value: string | null;
+}
+```
+
+| Field   | Description                                                       |
+| ------- | ----------------------------------------------------------------- |
+| `value` | The newly selected value, or `null` if the selection was cleared. |
+
+### Inbound
+
+| Event             | Detail                        | Description                                         |
+| ----------------- | ----------------------------- | --------------------------------------------------- |
+| `radio-group:set` | `{ value: string } \| string` | Set the selected value from outside the controller. |
+
+Dispatch `radio-group:set` on the root to select a radio item without a controller reference. Pass `null` to clear the selection.
+
+```ts
+const root = document.querySelector<HTMLElement>(
+  '[data-slot="radio-group"]',
+)!;
+
+// Select a value via detail object
+root?.dispatchEvent(
+  new CustomEvent("radio-group:set", {
+    bubbles: true,
+    detail: { value: "pro" },
+  }),
+);
+
+// Or with a string shorthand
+root?.dispatchEvent(
+  new CustomEvent("radio-group:set", {
+    bubbles: true,
+    detail: "pro",
+  }),
+);
+
+// Clear selection
+root?.dispatchEvent(
+  new CustomEvent("radio-group:set", {
+    bubbles: true,
+    detail: { value: null },
+  }),
+);
+```
+
+`radio-group:set` is silently ignored when the group is `disabled` or `readOnly`.
+
+## API Reference
+
+### Options
+
+`RadioGroup.createRadioGroup(root, options)`
+
+| Option          | Type                              | Default | Description                                                  |
+| --------------- | --------------------------------- | ------- | ------------------------------------------------------------ |
+| `defaultValue`  | `string`                          | —       | Value of the initially selected item.                        |
+| `name`          | `string`                          | —       | Form field name applied to all generated radio inputs.       |
+| `disabled`      | `boolean`                         | `false` | Disable user interaction and form submission for all items.  |
+| `readOnly`      | `boolean`                         | `false` | Prevent user interaction while keeping programmatic control. |
+| `required`      | `boolean`                         | `false` | Require a selected value for native form validation.         |
+| `onValueChange` | `(value: string \| null) => void` | —       | Called when the selected value changes.                      |
+
+Options can also be set via `data-*` attributes on the root element (e.g. `data-default-value="starter"`, `data-name="plan"`, `data-disabled="true"`). JS options take precedence over data attributes.
+
+### Controller
+
+| Member          | Type                      | Description                                                                |
+| --------------- | ------------------------- | -------------------------------------------------------------------------- |
+| `value`         | `string \| null` (getter) | Currently selected value.                                                  |
+| `select(value)` | `(value: string) => void` | Select the item with the given value. Invalid values are silently ignored. |
+| `clear()`       | `() => void`              | Clear the current selection.                                               |
+| `destroy()`     | `() => void`              | Remove listeners, generated inputs, and clean up.                          |
+
+## Controller
+
+The controller is the imperative handle returned by `createRadioGroup`. Use it for programmatic control when you need to select or clear radio items from application logic.
+
+```ts
+import { RadioGroup } from "@areia/slots";
+
+const root = document.querySelector<HTMLElement>(
+  '[data-slot="radio-group"]',
+)!;
+if (!root) throw new Error("No root element");
+
+const ctrl = RadioGroup.createRadioGroup(root, {
+  name: "plan",
+  defaultValue: "starter",
+});
+
+// Read state
+console.log(ctrl.value); // "starter"
+
+// Select an item
+ctrl.select("pro");
+console.log(ctrl.value); // "pro"
+
+// Invalid values are silently ignored
+ctrl.select("nonexistent");
+console.log(ctrl.value); // still "pro"
+
+// Clear the selection
+ctrl.clear();
+console.log(ctrl.value); // null
+
+// Tear down all listeners and clean up
+ctrl.destroy();
+```
+
+### Behavior
+
+- **Roving tabindex**: The checked enabled item (or first enabled item when nothing is checked) receives `tabindex="0"`. All other items receive `tabindex="-1"`. Arrow keys move focus and selection together.
+- **Keyboard navigation**: `ArrowRight` / `ArrowDown` move to the next enabled item. `ArrowLeft` / `ArrowUp` move to the previous enabled item. `Home` / `End` jump to the first / last enabled item. `Space` and `Enter` select the focused item.
+- **Form integration**: Hidden native `<input type="radio">` elements are generated for each item and participate in `FormData` and standard form submission. The `name` option is applied to all generated inputs. Form `reset` restores the initial selection.
+- **Item disabling**: Items can be disabled individually via `disabled`, `data-disabled`, or `aria-disabled="true"` on the item element. The group-level `disabled` option disables all items.
+- **Wrapping labels**: The controller detects `<label>` wrappers around items and `label[for]` associations. Clicking an associated label selects the corresponding item.
+- **Invalid items**: Items without a `data-value` attribute receive `tabindex="-1"` and `aria-disabled="true"` and are excluded from selection.
+- **Deduplication**: Calling `RadioGroup.createRadioGroup()` more than once on the same root returns the existing controller. Destroy it first if you need to rebind with new options.
+- **Auto-bind**: The `create()` function discovers all `[data-slot="radio-group"]` elements in a scope and binds any that are not already bound.

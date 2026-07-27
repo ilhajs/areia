@@ -66,7 +66,7 @@ function toggleDataAttrs(input: Pick<ToggleInput, "defaultPressed" | "disabled">
   });
 }
 
-function renderToggle(input: ToggleInput = {}, autoBind = false) {
+function renderToggle(input: ToggleInput = {}) {
   const {
     defaultPressed,
     disabled,
@@ -88,38 +88,11 @@ function renderToggle(input: ToggleInput = {}, autoBind = false) {
       toAttrs({
         ...rest,
         disabled: disabled || undefined,
-        "data-areia-toggle": autoBind ? "" : undefined,
       }),
     )}
   >
     ${render(children)}
   </button>`;
-}
-
-const toggleAutoBindScheduled = new WeakSet<Document>();
-
-function scheduleToggleAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || toggleAutoBindScheduled.has(doc)) return;
-  toggleAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    toggleAutoBindScheduled.delete(doc);
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-toggle][data-slot="toggle"]',
-    )) {
-      stampMorphPreserve(root);
-      TogglePrimitive.createToggle(root);
-    }
-  });
-}
-
-function needsToggleIsland(input: ToggleInput) {
-  return input.onPressedChange != null;
-}
-
-function ToggleComponent(input: ToggleInput = {}) {
-  if (needsToggleIsland(input)) return ToggleRoot(input);
-  scheduleToggleAutoBind();
-  return renderToggle(input, true);
 }
 
 export const ToggleRoot = ilha
@@ -141,7 +114,7 @@ export const ToggleRoot = ilha
   })
   .render(({ input }) => renderToggle(input));
 
-export const Toggle = Object.assign(ToggleComponent, {
+export const Toggle = Object.assign(ToggleRoot, {
   Root: ToggleRoot,
   Static: renderToggle,
 });

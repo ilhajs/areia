@@ -11,16 +11,29 @@ describe("tooltipVariants", () => {
   });
 });
 
+const ISLAND = Symbol.for("ilha.island");
+const isIsland = (v: unknown) =>
+  typeof v === "function" &&
+  (ISLAND in v || Object.getOwnPropertySymbols(v).some((s) => s.description === "ilha.island"));
+
 describe("Tooltip", () => {
-  it("renders trigger and content", () => {
+  it("default export is an ilha island", () => {
+    expect(isIsland(Tooltip)).toBe(true);
+    expect(typeof Tooltip.mount).toBe("function");
     const output = markup(Tooltip({ content: "Tip", children: "Hover me" }));
     expect(output).toContain('data-slot="tooltip"');
     expect(output).toContain('data-slot="tooltip-trigger"');
     expect(output).toContain('data-slot="tooltip-content"');
     expect(output).toContain("Tip");
     expect(output).toContain("Hover me");
-    // Plain path (not island) so MDX keeps nested trigger markup.
-    expect(output).toContain("data-areia-tooltip");
+    expect(output).not.toContain("data-areia-tooltip");
+  });
+
+  it("Static returns plain markup without auto-bind markers", () => {
+    const output = markup(Tooltip.Static({ content: "Tip", children: "Hover me" }));
+    expect(output).toContain('data-slot="tooltip"');
+    expect(output).not.toContain("data-areia-tooltip");
+    expect(output).not.toContain("data-ilha");
   });
 
   it("keeps button trigger children in composed markup", () => {
@@ -32,7 +45,7 @@ describe("Tooltip", () => {
     );
     expect(output).toContain('aria-label="Create project"');
     expect(output).toContain(">+</button>");
-    expect(output).toContain("data-areia-tooltip");
+    expect(output).not.toContain("data-areia-tooltip");
   });
 
   it("renders content hidden by default", () => {

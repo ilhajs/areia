@@ -152,7 +152,6 @@ function renderField(input: FieldInput = {}) {
 }
 
 const fieldControllers = new WeakMap<Element, { destroy: () => void }>();
-const fieldAutoBindScheduled = new WeakSet<Document>();
 
 function readFieldOptions(root: Element): FieldPrimitive.FieldOptions {
   const el = root as HTMLElement;
@@ -178,39 +177,10 @@ function bindFieldRoot(root: Element, options: FieldPrimitive.FieldOptions = {})
   };
 }
 
-/** Wire `@areia/slots` field controllers for prerendered / composed field roots. */
-export function ensureFieldAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc) return;
-  for (const root of doc.querySelectorAll('[data-slot="field"]')) {
-    if (fieldControllers.has(root)) continue;
-    bindFieldRoot(root);
-  }
-}
-
-function scheduleFieldAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || fieldAutoBindScheduled.has(doc)) return;
-  fieldAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    fieldAutoBindScheduled.delete(doc);
-    ensureFieldAutoBind(doc);
-  });
-}
-
 function FieldBase(input: FieldInput = {}) {
-  scheduleFieldAutoBind();
   return renderField(input);
 }
 
-/**
- * Field markup + controller auto-bind.
- *
- * Not an Ilha island: MDX island remounts only carry JSON props and would drop
- * nested controls. Behavior lives in `@areia/slots` on the DOM; calling
- * `Field(...)` schedules document-wide binding (Imprensa re-invokes plain
- * components on the client for that side effect).
- *
- * Prefer `Field.Root` only when you need island props such as `validate`.
- */
 export const FieldRoot = ilha
   .input<FieldInput>()
   .onMount(({ host, input }) => {
@@ -227,14 +197,10 @@ export const FieldRoot = ilha
       validationMode: input.validationMode,
     });
   })
-  .render(({ input }) => {
-    scheduleFieldAutoBind();
-    return renderField(input);
-  });
+  .render(({ input }) => renderField(input));
 
-export const Field = Object.assign(FieldBase, {
+export const Field = Object.assign(FieldRoot, {
   Root: FieldRoot,
-  /** Same as `Field(...)` — kept for existing call sites. */
   Static: FieldBase,
   Label: FieldLabel,
   Description: FieldDescription,

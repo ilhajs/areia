@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import ilha, { html, raw, untrack } from "ilha";
 import { Dialog as DialogPrimitive } from "@areia/slots";
 
 const dialogControllers = new WeakMap<Element, DialogPrimitive.DialogController>();
@@ -6,10 +6,8 @@ import {
   boundElement,
   createOpenBindSync,
   openBindDefault,
-  queueDialogOpenBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeDialogOpenBindQueue,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -315,7 +313,7 @@ export type DialogInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "
     triggerClassName?: string;
   };
 
-function renderDialog(input: DialogInput = {}, autoBind = false) {
+function renderDialog(input: DialogInput = {}) {
   const { binds, attrs: props } = splitBindProps(input);
   const {
     alertDialog,
@@ -343,12 +341,11 @@ function renderDialog(input: DialogInput = {}, autoBind = false) {
     ...rootProps
   } = props as DialogInput;
 
-  if (autoBind && binds["bind:open"] != null) {
-    queueDialogOpenBindForAutoMount(binds["bind:open"] as import("ilha").SignalAccessor<boolean>);
-  }
-
   const isAlertDialog = alertDialog ?? role === "alertdialog";
-  const defaultOpen = openBindDefault(input, defaultOpenProp);
+  // Open is bridged by createOpenBindSync — don't track bind:open in render or put it
+  // on the template. Remorphing while content is portaled recreates the host slot empty.
+  const defaultOpen = untrack(() => openBindDefault(input, defaultOpenProp));
+  const { "bind:open": _open, ...rootBinds } = binds;
   const composedChildren = render(children);
   const hasComposedContent = hasSlot(children, "dialog-content");
   const hasComposedTrigger = hasSlot(children, "dialog-trigger");
@@ -378,19 +375,17 @@ function renderDialog(input: DialogInput = {}, autoBind = false) {
         })}`,
       })}`;
 
-  const openSuffix = ` data-slot="dialog" class="${cn("inline-flex", className, aliasedClassName)}"${toAttrs(
+  const openSuffix = ` data-slot="dialog" class="${cn("inline-flex", className, aliasedClassName)}"${dataAttrs(
     {
-      "data-areia-dialog": autoBind ? "" : undefined,
+      alertDialog: isAlertDialog,
+      closeOnClickOutside: closeOnClickOutside ?? (isAlertDialog ? false : undefined),
+      closeOnEscape,
+      defaultOpen,
+      lockScroll,
     },
-  )}${dataAttrs({
-    alertDialog: isAlertDialog,
-    closeOnClickOutside: closeOnClickOutside ?? (isAlertDialog ? false : undefined),
-    closeOnEscape,
-    defaultOpen,
-    lockScroll,
-  })}${toAttrs(rootProps)}`;
+  )}${toAttrs(rootProps)}`;
 
-  return boundElement("div", binds, openSuffix, inner);
+  return boundElement("div", rootBinds, openSuffix, inner);
 }
 
 type DialogBindRuntime = {
@@ -442,73 +437,15 @@ export const DialogRoot = ilha
     if (!runtime) return;
     runtime.bindSync?.applyFromSignal();
   })
-  .render(({ input }) => renderDialog(input));
-
-const dialogAutoBindScheduled = new WeakSet<Document>();
-
-type DialogAutoRuntime = {
-  controller: DialogPrimitive.DialogController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const dialogAutoRuntimeByRoot = new WeakMap<Element, DialogAutoRuntime>();
-
-function scheduleDialogAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || dialogAutoBindScheduled.has(doc)) return;
-  dialogAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    dialogAutoBindScheduled.delete(doc);
-    const queued = takeDialogOpenBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>(
-      '[data-areia-dialog][data-slot="dialog"]',
-    )) {
-      const existing = dialogAutoRuntimeByRoot.get(root);
-      if (existing) {
-        existing.bindSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      let bindSync: ReturnType<typeof createOpenBindSync> = null;
-      const isAlert =
-        root.getAttribute("data-alert-dialog") === "true" ||
-        root.querySelector('[role="alertdialog"]') != null;
-
-      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-      const controller = DialogPrimitive.createDialog(root, {
-        alertDialog: isAlert,
-        onOpenChange: (open) => bindSync?.onUserChange(open),
-      });
-
-      if (entry) {
-        bindSync = createOpenBindSync({ "bind:open": entry.bindOpen }, controller);
-        bindSync?.applyFromSignal();
-      }
-
-      dialogControllers.set(root, controller);
-      dialogAutoRuntimeByRoot.set(root, { controller, bindSync });
-    }
-  });
-}
-
-function needsDialogIsland(input: DialogInput) {
-  const { binds } = splitBindProps(input);
-  return input.onOpenChange != null || input.onPortalMounted != null || binds["bind:open"] != null;
-}
-
-function DialogComponent(input: DialogInput = {}) {
-  if (needsDialogIsland(input)) return DialogRoot(input);
-  scheduleDialogAutoBind();
-  return renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"]), true);
-}
+  .render(({ input }) =>
+    renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"])),
+  );
 
 function DialogBase(input: DialogInput = {}) {
   return renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
 }
 
-export const Dialog = Object.assign(DialogComponent, {
+export const Dialog = Object.assign(DialogRoot, {
   Root: DialogRoot,
   Static: DialogBase,
   Trigger: DialogTrigger,

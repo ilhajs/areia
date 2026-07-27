@@ -11,12 +11,29 @@ describe("hoverCardVariants", () => {
   });
 });
 
+const ISLAND = Symbol.for("ilha.island");
+const isIsland = (v: unknown) =>
+  typeof v === "function" &&
+  (ISLAND in v || Object.getOwnPropertySymbols(v).some((s) => s.description === "ilha.island"));
+
 describe("HoverCard", () => {
+  it("default export is an ilha island", () => {
+    expect(isIsland(HoverCard)).toBe(true);
+    expect(typeof HoverCard.mount).toBe("function");
+  });
+
   it("renders trigger and content", () => {
     const output = markup(HoverCard({ children: "Hover", content: "Hello" }));
     expect(output).toContain('data-slot="hover-card"');
     expect(output).toContain('data-slot="hover-card-trigger"');
     expect(output).toContain('data-slot="hover-card-content"');
+    expect(output).not.toContain("data-areia-hover-card");
+  });
+
+  it("Static returns plain markup without auto-bind markers", () => {
+    const output = markup(HoverCard.Static({ children: "Hover", content: "Hello" }));
+    expect(output).toContain('data-slot="hover-card"');
+    expect(output).not.toContain("data-areia-hover-card");
   });
 
   it("renders content hidden by default", () => {

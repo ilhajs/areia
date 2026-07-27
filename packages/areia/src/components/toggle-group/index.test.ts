@@ -4,12 +4,29 @@ import { markupValue as markup } from "$lib/test-markup";
 import { ToggleGroup } from "./index";
 
 describe("ToggleGroup", () => {
+  it("default export is an ilha island", () => {
+    const ISLAND = Symbol.for("ilha.island");
+    expect(
+      ISLAND in ToggleGroup ||
+        Object.getOwnPropertySymbols(ToggleGroup).some((s) => s.description === "ilha.island"),
+    ).toBe(true);
+    expect(typeof ToggleGroup.mount).toBe("function");
+  });
+
   it("renders wrapper with data-slot", () => {
     const output = markup(ToggleGroup({}));
     expect(output).toContain('data-slot="toggle-group"');
+    expect(output).not.toContain("data-areia-toggle-group");
   });
 
-  it("uses ToggleGroupRoot island when bind:group is set", () => {
+  it("Static omits island markers and data-areia attrs", () => {
+    const output = markup(ToggleGroup.Static({}));
+    expect(output).toContain('data-slot="toggle-group"');
+    expect(output).not.toContain("data-areia-toggle-group");
+    expect(output).not.toContain("data-ilha");
+  });
+
+  it("uses bind:group on the island", () => {
     const Panel = ilha.state("v", "a").render(
       ({ state }) =>
         html`${ToggleGroup({

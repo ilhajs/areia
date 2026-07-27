@@ -4,11 +4,8 @@ import {
   boundElement,
   createGroupBindSync,
   groupBindDefault,
-  queueTabsGroupBindForAutoMount,
   splitBindProps,
   subscribeBindProps,
-  takeTabsGroupBindQueue,
-  type GroupBindAccessor,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -356,7 +353,7 @@ export function TabsContent(input: TabsContentInput) {
   </div>`;
 }
 
-function renderTabs(input: TabsInput = {}, autoBind = false) {
+function renderTabs(input: TabsInput = {}) {
   const { binds, attrs: props } = splitBindProps(input);
   const {
     tabs = [],
@@ -428,12 +425,7 @@ function renderTabs(input: TabsInput = {}, autoBind = false) {
   )}"${toAttrs({
     ...rest,
     "data-default-value": selected,
-    "data-areia-tabs": autoBind ? "" : undefined,
   })}`;
-
-  if (autoBind && binds["bind:group"] != null) {
-    queueTabsGroupBindForAutoMount(binds["bind:group"] as GroupBindAccessor, "single");
-  }
 
   return boundElement("div", binds, openSuffix, inner);
 }
@@ -616,75 +608,7 @@ export const TabsRoot = ilha
   })
   .render(({ input }) => renderTabs(input));
 
-const tabsAutoBindScheduled = new WeakSet<Document>();
-
-type TabsAutoRuntime = {
-  controller: TabsPrimitive.TabsController;
-  groupSync: ReturnType<typeof createGroupBindSync>;
-};
-
-const tabsAutoRuntimeByRoot = new WeakMap<Element, TabsAutoRuntime>();
-
-function scheduleTabsAutoBind(doc: Document | undefined = globalThis.document) {
-  if (!doc || tabsAutoBindScheduled.has(doc)) return;
-  tabsAutoBindScheduled.add(doc);
-  queueMicrotask(() => {
-    tabsAutoBindScheduled.delete(doc);
-    const queued = takeTabsGroupBindQueue(doc);
-    let queueIndex = 0;
-
-    for (const root of doc.querySelectorAll<HTMLElement>('[data-areia-tabs][data-slot="tabs"]')) {
-      const existing = tabsAutoRuntimeByRoot.get(root);
-      if (existing) {
-        stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-        existing.controller.updateIndicator();
-        existing.groupSync?.applyFromSignal();
-        continue;
-      }
-
-      const entry = queued[queueIndex++];
-      const bindInput = entry ? { "bind:group": entry.bindGroup } : {};
-      let groupSync: ReturnType<typeof createGroupBindSync> = null;
-
-      stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-      const controller = TabsPrimitive.createTabs(root, {
-        onValueChange: (value) => {
-          groupSync?.onUserChange(value);
-        },
-      });
-
-      if (entry) {
-        groupSync = createGroupBindSync(
-          bindInput,
-          {
-            getValue: () => controller.value,
-            setValue: (value) => {
-              if (typeof value === "string") controller.select(value);
-              else if (Array.isArray(value) && value[0]) controller.select(value[0]);
-            },
-          },
-          entry.mode,
-        );
-        groupSync?.applyFromSignal();
-      }
-
-      tabsAutoRuntimeByRoot.set(root, { controller, groupSync });
-    }
-  });
-}
-
-function needsTabsIsland(input: TabsInput) {
-  const { binds } = splitBindProps(input);
-  return input.onValueChange != null || binds["bind:group"] != null;
-}
-
-function TabsComponent(input: TabsInput = {}) {
-  if (needsTabsIsland(input)) return TabsRoot(input);
-  scheduleTabsAutoBind();
-  return renderTabs(input, true);
-}
-
-export const Tabs = Object.assign(TabsComponent, {
+export const Tabs = Object.assign(TabsRoot, {
   Root: TabsRoot,
   Static: renderTabs,
   List: TabsList,
