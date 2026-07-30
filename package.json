@@ -11,7 +11,6 @@
     "fmt": "oxfmt",
     "prepare": "husky",
     "test": "bun run --parallel --filter './packages/*' test",
-    "test:browser": "playwright test",
     "docs:dev": "bun run --filter @areia/website dev",
     "docs:build": "bun run --filter @areia/website build",
     "docs:preview": "bun run --filter @areia/website preview"
@@ -20,7 +19,6 @@
     "@happy-dom/global-registrator": "^20.10.6",
     "@ilha/router": "^0.8.9",
     "@ilha/store": "^0.7.7",
-    "@playwright/test": "^1.52.0",
     "@standard-schema/spec": "^1.1.0",
     "@types/bun": "^1.3.14",
     "areia": "workspace:*",
