@@ -280,7 +280,7 @@ function connectResizableTree(
   input: ResizableInput = {},
 ): (() => void) | undefined {
   const options = resizableOptions(input);
-  const controllers: ResizablePrimitive.ResizableController[] = [];
+  const ownedControllers: ResizablePrimitive.ResizableController[] = [];
 
   for (const root of collectResizableRoots(host)) {
     if (root.querySelectorAll('[data-slot="resizable-panel"]').length === 0) continue;
@@ -294,25 +294,36 @@ function connectResizableTree(
       if (existing) {
         stampResizableMorph(root);
         repairResizableLayout(existing);
-        controllers.push(existing);
       }
       continue;
     }
     try {
       const controller = ResizablePrimitive.reconnectResizable(root, options);
       stampResizableMorph(root);
-      controllers.push(controller);
+      ownedControllers.push(controller);
     } catch {
       // Ignore groups that are mid-render without a complete panel/handle structure.
     }
   }
 
-  if (controllers.length === 0) return undefined;
-  return () => controllers.forEach((controller) => controller.destroy());
+  if (ownedControllers.length === 0) return undefined;
+  return () => ownedControllers.forEach((controller) => controller.destroy());
 }
 
-function scheduleConnectResizableTree(host: ParentNode, input: ResizableInput = {}) {
-  queueMicrotask(() => connectResizableTree(host, input));
+function scheduleConnectResizableTree(host: ParentNode, input: ResizableInput = {}): () => void {
+  let cancelled = false;
+  let cleanup: (() => void) | undefined;
+
+  queueMicrotask(() => {
+    if (cancelled || (host instanceof Node && !host.isConnected)) return;
+    cleanup = connectResizableTree(host, input);
+  });
+
+  return () => {
+    if (cancelled) return;
+    cancelled = true;
+    cleanup?.();
+  };
 }
 
 function renderResizable(input: ResizableInput = {}) {
@@ -350,21 +361,8 @@ function renderResizable(input: ResizableInput = {}) {
 
 export const ResizablePanelGroupRoot = ilha
   .input<ResizableInput>()
-  .onMount(({ host, input }) => {
-    let cancelled = false;
-    let cleanup: (() => void) | undefined;
-    queueMicrotask(() => {
-      if (cancelled) return;
-      cleanup = connectResizableTree(host, input);
-    });
-    return () => {
-      cancelled = true;
-      cleanup?.();
-    };
-  })
-  .effect(({ host, input }) => {
-    scheduleConnectResizableTree(host, input);
-  })
+  .onMount(({ host, input }) => scheduleConnectResizableTree(host, input))
+  .effect(({ host, input }) => scheduleConnectResizableTree(host, input))
   .render(({ input }) => renderResizable(input));
 
 function autoMountResizable(scope: ParentNode = document) {

@@ -83,7 +83,7 @@ export function createFormState<T extends Record<string, unknown>>(
   };
 
   const reset = () => {
-    values(deepClone(frozen));
+    values(() => deepClone(frozen));
     errorsSignal({});
   };
 

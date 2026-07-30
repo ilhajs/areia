@@ -330,7 +330,10 @@ export function createCheckbox(root: Element, options: CheckboxOptions = {}): Ch
     }
   };
 
+  let isDestroyed = false;
+
   const updateState = (checked: boolean, indeterminate = false, emitChange = true) => {
+    if (isDestroyed) return;
     const nextChecked = Boolean(checked);
     const nextIndeterminate = Boolean(indeterminate);
     if (currentChecked === nextChecked && currentIndeterminate === nextIndeterminate) {
@@ -375,6 +378,7 @@ export function createCheckbox(root: Element, options: CheckboxOptions = {}): Ch
     cleanups.push(
       on(nearestForm, "reset", () => {
         queueMicrotask(() => {
+          if (isDestroyed) return;
           updateState(hiddenInput.checked, hiddenInput.indeterminate, false);
         });
       }),
@@ -470,6 +474,8 @@ export function createCheckbox(root: Element, options: CheckboxOptions = {}): Ch
       updateState(Boolean(checked), Boolean(indeterminate)),
     setIndeterminate: (indeterminate) => updateState(currentChecked, Boolean(indeterminate), false),
     destroy: () => {
+      if (isDestroyed) return;
+      isDestroyed = true;
       cleanups.forEach((fn) => fn());
       cleanups.length = 0;
       if (!embeddedInput) hiddenInput.remove();

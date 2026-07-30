@@ -2,20 +2,26 @@ import { describe, expect, it, beforeEach } from "bun:test";
 import { createCheckbox, create } from "./index";
 import { clearRootBinding, setRootBinding } from "../core";
 
+function setBody(markup: string) {
+  const parsed = new DOMParser().parseFromString(markup, "text/html");
+  document.body.replaceChildren(...parsed.body.childNodes);
+}
+
 describe("Checkbox", () => {
   const ROOT_BINDING_KEY = "@areia/slots:Checkbox";
 
   const setup = (options: Parameters<typeof createCheckbox>[1] = {}, html?: string) => {
-    document.body.innerHTML =
+    setBody(
       html ??
-      `
-      <label>
-        <span data-slot="checkbox" id="root" data-name="terms" data-value="yes">
-          <span data-slot="checkbox-indicator">✓</span>
-        </span>
-        Accept terms
-      </label>
-    `;
+        `
+        <label>
+          <span data-slot="checkbox" id="root" data-name="terms" data-value="yes">
+            <span data-slot="checkbox-indicator">✓</span>
+          </span>
+          Accept terms
+        </label>
+      `,
+    );
     const root = document.getElementById("root")!;
     const indicator = root.querySelector('[data-slot="checkbox-indicator"]') as HTMLElement;
     const controller = createCheckbox(root, options);
@@ -25,7 +31,7 @@ describe("Checkbox", () => {
   };
 
   beforeEach(() => {
-    document.body.innerHTML = "";
+    document.body.replaceChildren();
   });
 
   it("initializes unchecked with ARIA, data attributes, and generated input", () => {
@@ -143,10 +149,10 @@ describe("Checkbox", () => {
   });
 
   it("create() binds all checkbox roots and skips already bound roots", () => {
-    document.body.innerHTML = `
+    setBody(`
       <span data-slot="checkbox" id="a"></span>
       <span data-slot="checkbox" id="b"></span>
-    `;
+    `);
 
     const controllers = create();
     expect(controllers).toHaveLength(2);
@@ -167,8 +173,36 @@ describe("Checkbox", () => {
     clearRootBinding(root, ROOT_BINDING_KEY, foreignController);
   });
 
+  it("does not run a queued form reset after destroy", async () => {
+    const { root, controller } = setup(
+      { defaultChecked: true },
+      `<form><span data-slot="checkbox" id="root"></span></form>`,
+    );
+    const form = root.closest("form")!;
+
+    form.reset();
+    controller.destroy();
+    root.setAttribute("aria-checked", "sentinel");
+    await Promise.resolve();
+
+    expect(root.getAttribute("aria-checked")).toBe("sentinel");
+  });
+
+  it("makes destroy and post-destroy mutators idempotent no-ops", () => {
+    const { root, controller } = setup();
+
+    controller.destroy();
+    controller.destroy();
+    controller.check();
+    controller.toggle();
+    root.dispatchEvent(new CustomEvent("checkbox:set", { detail: { checked: true } }));
+
+    expect(root.getAttribute("aria-checked")).toBe("false");
+    expect(root.querySelector('[data-checkbox-generated="input"]')).toBeNull();
+  });
+
   it("reuses an embedded SSR input and preserves passthrough data attributes", () => {
-    document.body.innerHTML = `
+    setBody(`
       <span data-slot="checkbox" id="root" data-name="terms" data-value="yes">
         <input
           type="checkbox"
@@ -180,7 +214,7 @@ describe("Checkbox", () => {
         />
         <span data-slot="checkbox-indicator">✓</span>
       </span>
-    `;
+    `);
     const root = document.getElementById("root")!;
     const embedded = root.querySelector('[data-slot="checkbox-input"]') as HTMLInputElement;
     const controller = createCheckbox(root);

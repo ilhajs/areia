@@ -1,4 +1,5 @@
 import { html, raw } from "ilha";
+import type { RawHtml } from "ilha";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
 import { isIlhaIsland, islandCallParts, render, renderString, withSlot } from "$lib/markup";
@@ -26,7 +27,7 @@ export function renderOverlayClose(input: {
   children?: unknown;
   class?: string;
   className?: string;
-  type?: string;
+  type?: string | RawHtml;
   props?: Record<string, unknown>;
 }): ReturnType<typeof html> {
   const {

@@ -38,7 +38,7 @@ npm install sonner
 import ilha from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(() => <Button variant="primary">Create project</Button>);
+export default ilha(() => <Button variant="primary">Create project</Button>);
 ```
 
 Areia also works with Ilha's html literal style:
@@ -47,7 +47,7 @@ Areia also works with Ilha's html literal style:
 import ilha, { html } from "ilha";
 import { Button } from "areia";
 
-export default ilha.render(
+export default ilha(
   () => html`
     <div class="flex gap-2">
       ${Button({ variant: "primary", children: "Save" })}

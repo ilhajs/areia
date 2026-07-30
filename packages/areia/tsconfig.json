@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "ilha",
     "paths": {
+      "@areia/slots": ["../slots/src/index.ts"],
       "areia": ["./src/index.ts"],
       "$lib/*": ["./src/lib/*"],
       "$components/*": ["./src/components/*"]

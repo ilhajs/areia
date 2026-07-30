@@ -1,8 +1,9 @@
 import { html, raw } from "ilha";
+import { jsx } from "ilha/jsx-runtime";
 import { cn } from "$lib/cn";
 import { render } from "$lib/markup";
 import { toAttrs } from "$lib/input";
-import type { HTMLElementProps } from "$lib/types";
+import type { HTMLElementProps, HTMLElementPropsWithEvents } from "$lib/types";
 import { Spinner } from "$components/spinner";
 
 /** Button variant definitions mapping shape, size, and variant names to their Tailwind classes. */
@@ -238,7 +239,10 @@ export const ButtonGroup = Object.assign(ButtonGroupRoot, {
   Separator: ButtonGroupSeparator,
 });
 
-export type ButtonInput = Omit<HTMLElementProps<HTMLButtonElement>, "className" | "children"> &
+export type ButtonInput = Omit<
+  HTMLElementPropsWithEvents<HTMLButtonElement>,
+  "className" | "children"
+> &
   ButtonVariantsProps &
   Record<string, unknown> & {
     /** Content rendered inside the button. */
@@ -275,15 +279,17 @@ export function Button(input: ButtonInput = {}) {
     aliasedClassName,
   );
 
-  const button = html`<button
-    type="${type ?? "button"}"
-    data-variant="${variant}"
-    class="${classes}"
-    ${raw(toAttrs({ ...rest, disabled: Boolean(loading || disabled) }))}
-  >
-    ${loading ? Spinner({ size: size === "lg" ? "lg" : "base" }) : render(icon)}
-    ${children != null ? html`<span class="contents">${render(children)}</span>` : ""}
-  </button>`;
+  const button = jsx("button", {
+    ...rest,
+    type: type ?? "button",
+    "data-variant": variant,
+    class: classes,
+    disabled: Boolean(loading || disabled),
+    children: [
+      loading ? Spinner({ size: size === "lg" ? "lg" : "base" }) : render(icon),
+      children != null ? html`<span class="contents">${render(children)}</span>` : "",
+    ],
+  });
 
   if (title == null || title === "") return button;
 
@@ -297,7 +303,10 @@ export function Button(input: ButtonInput = {}) {
   </span>`;
 }
 
-export type LinkButtonInput = Omit<HTMLElementProps<HTMLAnchorElement>, "className" | "children"> &
+export type LinkButtonInput = Omit<
+  HTMLElementPropsWithEvents<HTMLAnchorElement>,
+  "className" | "children"
+> &
   ButtonVariantsProps &
   Record<string, unknown> & {
     children?: unknown;
@@ -320,24 +329,19 @@ export function LinkButton(input: LinkButtonInput = {}) {
     ...rest
   } = input;
 
-  return html`<a
-    data-variant="${variant}"
-    class="${cn(
+  return jsx("a", {
+    ...rest,
+    target: external ? "_blank" : rest.target,
+    rel: external ? "noopener noreferrer" : rest.rel,
+    "data-variant": variant,
+    class: cn(
       buttonVariants({ variant, size, shape }),
       "flex items-center no-underline!",
       className,
       aliasedClassName,
-    )}"
-    ${raw(
-      toAttrs({
-        ...rest,
-        target: external ? "_blank" : rest.target,
-        rel: external ? "noopener noreferrer" : rest.rel,
-      }),
-    )}
-  >
-    ${render(icon)}${render(children)}
-  </a>`;
+    ),
+    children: [render(icon), render(children)],
+  });
 }
 
 function refreshIcon(size: ButtonSize = "base", loading?: boolean) {

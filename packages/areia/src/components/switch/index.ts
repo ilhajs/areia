@@ -264,7 +264,12 @@ function renderSwitch(input: SwitchInput = {}) {
     ...controlProps
   } = input;
   const controlId = typeof id === "string" ? id : undefined;
-  const ariaLabel = controlProps["aria-label"] ?? (typeof label === "string" ? label : "Switch");
+  const ariaLabel =
+    typeof controlProps["aria-label"] === "string"
+      ? controlProps["aria-label"]
+      : typeof label === "string"
+        ? label
+        : "Switch";
   const control = SwitchControl({
     ...controlProps,
     id: controlId,
@@ -419,7 +424,7 @@ export const SwitchRoot = ilha
       name: typeof input.name === "string" ? input.name : undefined,
       value: typeof input.value === "string" ? input.value : undefined,
       uncheckedValue: typeof input.uncheckedValue === "string" ? input.uncheckedValue : undefined,
-      onCheckedChange: (checked) => {
+      onCheckedChange: (checked: boolean) => {
         bindSync?.onUserChange(checked);
         input.onCheckedChange?.(checked);
         emitSwitchChange(root, checked);

@@ -88,12 +88,12 @@ export function SinkCard(props: {
 }
 
 const ToastDemo = ilha
-  .on("button@click", async () => {
+  .action("show", async () => {
     const { toast } = await import("areia/sonner");
     toast.success("Saved", { description: "Kitchen sink toast demo." });
   })
-  .render(() => (
-    <Button variant="secondary" type="button">
+  .render(({ action }) => (
+    <Button variant="secondary" type="button" onclick={action.show}>
       Show toast
     </Button>
   ));

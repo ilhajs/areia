@@ -47,6 +47,10 @@ jobs:
         run: bun run build
       - name: Test
         run: bun run test
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
+      - name: Browser regressions
+        run: bun run test:browser
       - name: Publish nightly release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: bunx pkg-pr-new publish './packages/*'

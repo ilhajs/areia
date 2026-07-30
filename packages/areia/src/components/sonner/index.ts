@@ -16,7 +16,12 @@ export type ToasterInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | 
   };
 
 type ToastRecord = ToastT | ToastToDismiss;
-type ToastMethod = (...args: unknown[]) => unknown;
+
+export const toast: typeof sonnerToast = Object.assign((message: string | unknown, data?: any) => {
+  const id = sonnerToast(message as any, data);
+  queueMicrotask(() => patchedToasts.forEach((callback) => callback()));
+  return id;
+}, sonnerToast);
 
 const patchedToasts = new Set<() => void>();
 let unpatchToast: (() => void) | undefined;
@@ -32,17 +37,16 @@ function subscribeToSonner(listener: () => void) {
       "error",
       "custom",
       "message",
-      "promise",
       "dismiss",
       "loading",
     ] as const;
-    const originals = new Map<string, ToastMethod>();
+    const originals = new Map<string, any>();
     const notify = () => queueMicrotask(() => patchedToasts.forEach((callback) => callback()));
 
     const patch = (key: string) => {
-      const original = (sonnerToast as unknown as Record<string, ToastMethod>)[key];
+      const original = (sonnerToast as any)[key];
       originals.set(key, original);
-      (sonnerToast as unknown as Record<string, ToastMethod>)[key] = (...args: unknown[]) => {
+      (toast as any)[key] = (...args: unknown[]) => {
         const result = original(...args);
         notify();
         return result;
@@ -50,10 +54,26 @@ function subscribeToSonner(listener: () => void) {
     };
 
     methods.forEach(patch);
+
+    // promise needs special handling to trigger render on resolution
+    const originalPromise = sonnerToast.promise;
+    originals.set("promise", originalPromise);
+    toast.promise = (...args: any[]) => {
+      const result = (originalPromise as any)(...args);
+      notify();
+      if (args[0] && typeof args[0].then === "function") {
+        args[0].then(notify, notify);
+      } else if (result && typeof result.then === "function") {
+        result.then(notify, notify);
+      } else if (result && typeof result.unwrap === "function") {
+        result.unwrap().then(notify, notify);
+      }
+      return result;
+    };
+
     unpatchToast = () => {
       for (const [key, original] of originals) {
-        if (key === "default") continue;
-        (sonnerToast as unknown as Record<string, ToastMethod>)[key] = original;
+        (toast as any)[key] = original;
       }
       unpatchToast = undefined;
     };
@@ -90,10 +110,10 @@ function positionClasses(position: string) {
   );
 }
 
-function ensureSonnerStyles() {
-  if (typeof document === "undefined" || document.getElementById("areia-sonner-styles")) return;
+function ensureSonnerStyles(doc: Document) {
+  if (doc.getElementById("areia-sonner-styles")) return;
 
-  const style = document.createElement("style");
+  const style = doc.createElement("style");
   style.id = "areia-sonner-styles";
   style.textContent = `
     [data-areia-sonner-toast] {
@@ -140,7 +160,7 @@ function ensureSonnerStyles() {
       }
     }
   `;
-  document.head.appendChild(style);
+  doc.head.appendChild(style);
 }
 
 function renderToaster(input: ToasterInput = {}) {
@@ -188,9 +208,15 @@ function renderToaster(input: ToasterInput = {}) {
 function readInput(root: HTMLElement, fallback: ToasterInput = {}): ToasterInput {
   return {
     ...fallback,
+    position: fallback.position ?? (root.getAttribute("data-position") as any) ?? undefined,
+    theme: fallback.theme ?? (root.getAttribute("data-theme") as any) ?? undefined,
+    class: fallback.class ?? root.className,
     closeButton: fallback.closeButton ?? root.hasAttribute("data-close-button"),
     duration: fallback.duration ?? numberAttr(root, "data-duration"),
     visibleToasts: fallback.visibleToasts ?? numberAttr(root, "data-visible-toasts"),
+    gap: fallback.gap ?? numberAttr(root, "data-gap"),
+    richColors: fallback.richColors ?? root.hasAttribute("data-rich-colors"),
+    expand: fallback.expand ?? root.hasAttribute("data-expand"),
   };
 }
 
@@ -256,19 +282,244 @@ function toastMarkup(toastItem: ToastT, defaults: ToasterInput) {
   </div>`;
 }
 
-const mountedRoots = new WeakMap<HTMLElement, () => void>();
+const DOCUMENT_RUNTIME = Symbol.for("areia.sonner.document-runtime");
+const DOCUMENT_RUNTIME_VERSION = 1;
+const DEFAULT_INPUT: ToasterInput = {
+  position: "bottom-right",
+  theme: "system",
+  richColors: true,
+  closeButton: true,
+};
 
-function mountToaster(root: HTMLElement, input: ToasterInput = {}) {
-  mountedRoots.get(root)?.();
-  ensureSonnerStyles();
+type OwnerRegistration = {
+  input: ToasterInput;
+};
 
-  const originalParent = root.parentNode;
-  const originalNextSibling = root.nextSibling;
-  if (root.parentElement !== document.body) document.body.appendChild(root);
+type DocumentRuntime = {
+  version: typeof DOCUMENT_RUNTIME_VERSION;
+  doc: Document;
+  root: HTMLElement;
+  owners: Map<HTMLElement, OwnerRegistration>;
+  registerOwner: (owner: HTMLElement, input?: ToasterInput) => () => void;
+  render: () => void;
+  destroy: () => void;
+  destroyed: boolean;
+};
 
+type RuntimeDocument = Document & {
+  [DOCUMENT_RUNTIME]?: DocumentRuntime;
+};
+
+function runtimeFor(doc: Document): DocumentRuntime | undefined {
+  const runtime = (doc as RuntimeDocument)[DOCUMENT_RUNTIME];
+  return runtime?.version === DOCUMENT_RUNTIME_VERSION && !runtime.destroyed ? runtime : undefined;
+}
+
+function setRuntime(doc: Document, runtime: DocumentRuntime | undefined) {
+  const target = doc as RuntimeDocument;
+  if (runtime) {
+    Object.defineProperty(target, DOCUMENT_RUNTIME, {
+      value: runtime,
+      configurable: true,
+    });
+  } else {
+    delete target[DOCUMENT_RUNTIME];
+  }
+}
+
+function attributeValue(value: unknown): string {
+  if (typeof value === "object" && value !== null && "value" in value) {
+    return String(value.value);
+  }
+  return String(value);
+}
+
+function applyRootInput(root: HTMLElement, input: ToasterInput) {
+  const {
+    class: className,
+    className: aliasedClassName,
+    id,
+    position = "bottom-right",
+    theme = "light",
+    richColors,
+    expand,
+    duration,
+    visibleToasts,
+    closeButton,
+    gap,
+    ...props
+  } = input;
+
+  while (root.attributes.length > 0) root.removeAttribute(root.attributes[0]!.name);
+  root.id = attributeValue(id ?? "sonner-toaster");
+  root.setAttribute("data-slot", "sonner-toaster");
+  root.setAttribute("data-areia-sonner-toaster", "");
+  root.setAttribute("data-theme", String(theme));
+  root.setAttribute("data-position", position);
+  root.className = cn(
+    "fixed z-[2147483647] flex flex-col gap-3 pointer-events-none",
+    positionClasses(position),
+    className,
+    aliasedClassName,
+  );
+
+  const optionalAttributes: Record<string, unknown> = {
+    ...props,
+    "data-rich-colors": richColors,
+    "data-expand": expand,
+    "data-duration": duration,
+    "data-visible-toasts": visibleToasts,
+    "data-close-button": closeButton,
+    "data-gap": gap,
+  };
+  for (const [rawName, value] of Object.entries(optionalAttributes)) {
+    if (
+      value == null ||
+      value === false ||
+      typeof value === "function" ||
+      rawName.startsWith("bind:") ||
+      rawName.toLowerCase().startsWith("on")
+    ) {
+      continue;
+    }
+    const name = rawName === "className" ? "class" : rawName === "htmlFor" ? "for" : rawName;
+    if (!/^[A-Za-z_:][A-Za-z0-9:._-]*$/.test(name) || name === "style") continue;
+    root.setAttribute(name, value === true ? "" : attributeValue(value));
+  }
+}
+
+function toasterElement(doc: Document, input: ToasterInput): HTMLElement {
+  const root = doc.createElement("div");
+  applyRootInput(root, input);
+  return root;
+}
+
+function appendToastContent(parent: HTMLElement, value: unknown) {
+  const resolved = typeof value === "function" ? value() : value;
+  if (resolved == null || typeof resolved === "boolean") return;
+  if (Array.isArray(resolved)) {
+    resolved.forEach((item) => appendToastContent(parent, item));
+    return;
+  }
+  if (resolved instanceof parent.ownerDocument.defaultView!.Node) {
+    parent.appendChild(resolved);
+    return;
+  }
+  if (typeof resolved === "object" && "value" in resolved) {
+    const parsed = new parent.ownerDocument.defaultView!.DOMParser().parseFromString(
+      String(resolved.value),
+      "text/html",
+    );
+    parent.append(...parsed.body.childNodes);
+    return;
+  }
+  parent.append(String(resolved));
+}
+
+function createToastElement(doc: Document, toastItem: ToastT, defaults: ToasterInput) {
+  const type = toastItem.type ?? "normal";
+  const closeButton = toastItem.closeButton ?? defaults.closeButton;
+  const position = toastItem.position ?? defaults.position ?? "bottom-right";
+  const toast = doc.createElement("div");
+  toast.setAttribute("data-areia-sonner-toast", "");
+  toast.setAttribute("data-toast-id", String(toastItem.id));
+  toast.setAttribute("data-position", position);
+  toast.setAttribute("data-type", type);
+  toast.setAttribute("data-state", "open");
+  toast.className = cn(
+    "pointer-events-auto grid min-w-80 max-w-[calc(100vw-2rem)] gap-1 rounded-lg border border-areia-border bg-areia-background px-4 py-3 text-areia-default shadow-lg",
+    type === "success" && "border-green-500",
+    type === "error" && "border-red-500",
+    type === "warning" && "border-yellow-500",
+    type === "info" && "border-blue-500",
+    toastItem.className,
+  );
+
+  const row = doc.createElement("div");
+  row.className = "flex items-start gap-3";
+  if (toastItem.icon) {
+    const icon = doc.createElement("div");
+    appendToastContent(icon, toastItem.icon);
+    row.appendChild(icon);
+  }
+  const content = doc.createElement("div");
+  content.className = "min-w-0 flex-1";
+  const title = doc.createElement("div");
+  title.className = "font-medium";
+  appendToastContent(title, toastItem.title);
+  content.appendChild(title);
+  if (toastItem.description) {
+    const description = doc.createElement("div");
+    description.className = cn("text-sm text-areia-subtle", toastItem.descriptionClassName);
+    appendToastContent(description, toastItem.description);
+    content.appendChild(description);
+  }
+  row.appendChild(content);
+  if (closeButton) {
+    const close = doc.createElement("button");
+    close.type = "button";
+    close.setAttribute("data-areia-sonner-close", String(toastItem.id));
+    close.className = "text-areia-subtle hover:text-areia-default";
+    close.textContent = "×";
+    row.appendChild(close);
+  }
+  toast.appendChild(row);
+  return toast;
+}
+
+function createDocumentRuntime(doc: Document): DocumentRuntime {
+  ensureSonnerStyles(doc);
+
+  const root = toasterElement(doc, DEFAULT_INPUT);
+  doc.body.appendChild(root);
+
+  const owners = new Map<HTMLElement, OwnerRegistration>();
+  const ownerRecords = new WeakMap<HTMLElement, OwnerRegistration>();
   const timers = new Map<string, ReturnType<typeof setTimeout>>();
   const removalTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  const dismissTimers = new Map<string, ReturnType<typeof setTimeout>>();
   const renderedToasts = new Map<string, string>();
+  let activeInput: ToasterInput = DEFAULT_INPUT;
+  let observer: MutationObserver | undefined;
+
+  const runtime: DocumentRuntime = {
+    version: DOCUMENT_RUNTIME_VERSION,
+    doc,
+    root,
+    owners,
+    registerOwner: () => () => {},
+    render: () => {},
+    destroy: () => {},
+    destroyed: false,
+  };
+
+  const ensureRootConnected = () => {
+    if (!root.isConnected || root.parentElement !== doc.body) doc.body.appendChild(root);
+  };
+
+  const resolveInput = () => {
+    for (const [owner] of owners) {
+      if (!owner.isConnected) owners.delete(owner);
+    }
+    const latest = [...owners.values()].at(-1);
+    activeInput = latest?.input ?? DEFAULT_INPUT;
+    applyRootInput(root, activeInput);
+  };
+
+  const scheduleDismiss = (id: string | number) => {
+    const key = String(id);
+    clearTimeout(dismissTimers.get(key));
+    dismissTimers.set(
+      key,
+      setTimeout(() => {
+        dismissTimers.delete(key);
+        if (!runtime.destroyed) {
+          const originalId = sonnerToast.getToasts().find((t) => String(t.id) === key)?.id ?? id;
+          sonnerToast.dismiss(originalId);
+        }
+      }, EXIT_DURATION),
+    );
+  };
 
   const remove = (id: string | number) => {
     const key = String(id);
@@ -283,16 +534,18 @@ function mountToaster(root: HTMLElement, input: ToasterInput = {}) {
     removalTimers.set(
       key,
       setTimeout(() => {
+        removalTimers.delete(key);
+        if (runtime.destroyed || !root.contains(toast)) return;
         toast.remove();
         renderedToasts.delete(key);
-        removalTimers.delete(key);
       }, EXIT_DURATION),
     );
   };
 
   const render = () => {
-    const currentInput = readInput(root, input);
-    const items = sonnerItems(currentInput);
+    if (runtime.destroyed) return;
+    ensureRootConnected();
+    const items = sonnerItems(activeInput);
     const nextIds = new Set(items.map((item) => String(item.id)));
 
     root.querySelectorAll<HTMLElement>("[data-areia-sonner-toast]").forEach((toast) => {
@@ -303,87 +556,143 @@ function mountToaster(root: HTMLElement, input: ToasterInput = {}) {
     for (const item of items) {
       const key = String(item.id);
       const existing = root.querySelector<HTMLElement>(toastSelector(key));
-      const markup = toMarkup(toastMarkup(item, currentInput));
+      const signature = toMarkup(toastMarkup(item, activeInput));
 
       if (existing) {
-        if (existing.dataset.state === "closed" || renderedToasts.get(key) === markup) continue;
-        existing.outerHTML = markup;
+        if (existing.dataset.state === "closed" || renderedToasts.get(key) === signature) continue;
+        existing.replaceWith(createToastElement(doc, item, activeInput));
       } else {
-        root.insertAdjacentHTML("beforeend", markup);
+        root.appendChild(createToastElement(doc, item, activeInput));
       }
-
-      renderedToasts.set(key, markup);
+      renderedToasts.set(key, signature);
     }
 
     for (const item of items) {
       const key = String(item.id);
       if (item.duration === Infinity || timers.has(key)) continue;
-      const duration = item.duration ?? currentInput.duration ?? TOAST_LIFETIME;
+      const duration = item.duration ?? activeInput.duration ?? TOAST_LIFETIME;
       timers.set(
         key,
         setTimeout(() => {
+          timers.delete(key);
+          if (runtime.destroyed) return;
           item.onAutoClose?.(item);
           remove(item.id);
-          setTimeout(() => sonnerToast.dismiss(item.id), EXIT_DURATION);
+          scheduleDismiss(item.id);
         }, duration),
       );
     }
   };
+  runtime.render = render;
 
   const unsubscribe = subscribeToSonner(render);
   const click = (event: Event) => {
-    const button = (event.target as HTMLElement).closest<HTMLElement>("[data-areia-sonner-close]");
-    if (button?.dataset.areiaSonnerClose) {
-      remove(button.dataset.areiaSonnerClose);
-      setTimeout(() => sonnerToast.dismiss(button.dataset.areiaSonnerClose), EXIT_DURATION);
+    const target = event.target;
+    if (!(target instanceof doc.defaultView!.Element)) return;
+    const button = target.closest<HTMLElement>("[data-areia-sonner-close]");
+    const id = button?.dataset.areiaSonnerClose;
+    if (id == null) return;
+    remove(id);
+    scheduleDismiss(id);
+  };
+  root.addEventListener("click", click);
+
+  const unregister = (owner: HTMLElement, registration: OwnerRegistration) => {
+    if (ownerRecords.get(owner) !== registration) return;
+    ownerRecords.delete(owner);
+    if (owners.get(owner) === registration) owners.delete(owner);
+    if (!runtime.destroyed) {
+      resolveInput();
+      render();
     }
   };
 
-  root.addEventListener("click", click);
-  render();
+  runtime.registerOwner = (owner, input = {}) => {
+    if (runtime.destroyed || owner === root) return () => {};
+    ensureRootConnected();
 
-  const destroy = () => {
+    const registration = { input };
+    registration.input = readInput(owner, input);
+    ownerRecords.set(owner, registration);
+    owners.set(owner, registration);
+
+    owner.removeAttribute("data-areia-sonner-toaster");
+    owner.setAttribute("data-areia-sonner-owner", "");
+    owner.removeAttribute("id");
+    owner.hidden = true;
+
+    resolveInput();
+    render();
+    return () => unregister(owner, registration);
+  };
+
+  const ownersIn = (node: Node, selector: string) => {
+    const matches: HTMLElement[] = [];
+    if (node instanceof doc.defaultView!.HTMLElement && node.matches(selector)) matches.push(node);
+    if (node instanceof doc.defaultView!.Element) {
+      matches.push(...node.querySelectorAll<HTMLElement>(selector));
+    }
+    return matches;
+  };
+
+  observer = new doc.defaultView!.MutationObserver((mutations) => {
+    if (runtime.destroyed) return;
+    for (const mutation of mutations) {
+      for (const node of mutation.removedNodes) {
+        for (const owner of ownersIn(node, "[data-areia-sonner-owner]")) {
+          const registration = ownerRecords.get(owner);
+          if (registration) unregister(owner, registration);
+        }
+      }
+      for (const node of mutation.addedNodes) {
+        for (const owner of ownersIn(
+          node,
+          "[data-areia-sonner-toaster], [data-areia-sonner-owner]",
+        )) {
+          if (owner !== root) runtime.registerOwner(owner, readInput(owner));
+        }
+      }
+    }
+  });
+  observer.observe(doc.documentElement, { childList: true, subtree: true });
+
+  runtime.destroy = () => {
+    if (runtime.destroyed) return;
+    runtime.destroyed = true;
+    observer?.disconnect();
     unsubscribe();
     root.removeEventListener("click", click);
     timers.forEach(clearTimeout);
     removalTimers.forEach(clearTimeout);
-    if (originalParent) originalParent.insertBefore(root, originalNextSibling);
-    mountedRoots.delete(root);
+    dismissTimers.forEach(clearTimeout);
+    owners.clear();
+    root.remove();
+    if (runtimeFor(doc) === runtime) setRuntime(doc, undefined);
   };
-  mountedRoots.set(root, destroy);
-  return destroy;
+
+  setRuntime(doc, runtime);
+  resolveInput();
+  render();
+  return runtime;
 }
 
-/** Mount any toaster roots present in the document that are not yet live. */
+function acquireDocumentRuntime(doc: Document) {
+  return runtimeFor(doc) ?? createDocumentRuntime(doc);
+}
+
+/** Mount toaster owner placeholders into the document-owned singleton runtime. */
 export function ensureToastersMounted(doc: Document | undefined = globalThis.document) {
   if (!doc) return;
-  doc
-    .querySelectorAll<HTMLElement>("[data-areia-sonner-toaster]")
-    .forEach((root) => !mountedRoots.has(root) && mountToaster(root));
+  const runtime = acquireDocumentRuntime(doc);
+  doc.querySelectorAll<HTMLElement>("[data-areia-sonner-toaster]").forEach((owner) => {
+    if (owner !== runtime.root) runtime.registerOwner(owner, readInput(owner));
+  });
 }
 
-function ensureToasterInDocument(doc: Document = document) {
-  ensureToastersMounted(doc);
-  if (doc.querySelector("[data-areia-sonner-toaster]")) return;
-
-  const holder = doc.createElement("div");
-  holder.innerHTML = toMarkup(
-    renderToaster({
-      position: "bottom-right",
-      theme: "system",
-      richColors: true,
-      closeButton: true,
-    }),
-  );
-  const root = holder.firstElementChild as HTMLElement | null;
-  if (!root) return;
-  doc.body.appendChild(root);
-  mountToaster(root, {
-    position: "bottom-right",
-    theme: "system",
-    richColors: true,
-    closeButton: true,
-  });
+/** @internal Explicit document-runtime teardown for tests, HMR, and realm disposal. */
+export function destroyToasterRuntime(doc: Document | undefined = globalThis.document) {
+  if (!doc) return;
+  runtimeFor(doc)?.destroy();
 }
 
 /** Guarantee a live toaster exists, then show a toast (docs / late SPA mounts). */
@@ -392,23 +701,20 @@ export function showToast(
   title: string,
   options?: Parameters<typeof sonnerToast.success>[1],
 ) {
-  if (typeof document !== "undefined") ensureToasterInDocument(document);
-  if (type === "message") return sonnerToast(title, options);
-  return sonnerToast[type](title, options);
+  const runtime = typeof document === "undefined" ? undefined : acquireDocumentRuntime(document);
+  const id = type === "message" ? sonnerToast(title, options) : sonnerToast[type](title, options);
+  // Named methods are patched above; this explicit render also covers callable toast().
+  runtime?.render();
+  return id;
 }
 
 if (typeof document !== "undefined") {
-  const boot = () => ensureToastersMounted();
+  const boot = () => ensureToastersMounted(document);
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
   } else {
     queueMicrotask(boot);
   }
-  // Layout/SPA islands often insert the toaster after the module microtask.
-  queueMicrotask(() => {
-    const observer = new MutationObserver(() => ensureToastersMounted());
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-  });
 }
 
 export const ToasterRoot = ilha
@@ -418,7 +724,7 @@ export const ToasterRoot = ilha
       ? (host as HTMLElement)
       : host.querySelector<HTMLElement>("[data-areia-sonner-toaster]");
     if (!root) return;
-    return mountToaster(root, input);
+    return acquireDocumentRuntime(root.ownerDocument).registerOwner(root, input);
   })
   .render(({ input }) => renderToaster(input));
 

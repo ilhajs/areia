@@ -443,7 +443,7 @@ const setGlobalCursor = (state: CursorState, doc: Document): void => {
     cursorStyleEl = doc.createElement("style");
     doc.head.appendChild(cursorStyleEl);
   }
-  cursorStyleEl.innerHTML = `*{cursor: ${cursorFor(state)}!important;}`;
+  cursorStyleEl.textContent = `*{cursor: ${cursorFor(state)}!important;}`;
 };
 
 const resetGlobalCursor = (): void => {
@@ -892,6 +892,8 @@ export function createResizable(
     }),
   );
 
+  let isDestroyed = false;
+
   const controller: ResizableController = {
     get layout() {
       return [...layout];
@@ -904,6 +906,13 @@ export function createResizable(
     isExpanded: isPaneExpanded,
     getSize: (i) => layout[i],
     destroy: () => {
+      if (isDestroyed) return;
+      isDestroyed = true;
+      if (getBinding(root) !== controller) {
+        cleanups.forEach((fn) => fn());
+        cleanups.length = 0;
+        return;
+      }
       stopDragging();
       cleanups.forEach((fn) => fn());
       cleanups.length = 0;

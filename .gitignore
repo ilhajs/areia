@@ -9,6 +9,9 @@ dist/
 doc_build/
 apps/website/dist/
 apps/website/.ilha/
+browser-tests/.generated/
+playwright-report/
+test-results/
 
 # IDE
 .vscode/*
@@ -19,3 +22,5 @@ repomix-output.xml
 diff.txt
 .claude
 .pi*
+browser-tests
+playwright.config.ts

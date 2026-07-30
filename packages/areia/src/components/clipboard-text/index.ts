@@ -1,6 +1,6 @@
 import ilha, { html, raw } from "ilha";
 import { Check, Copy } from "lucide";
-import { Button, type ButtonInput, type ButtonSize } from "$components/button";
+import { buttonVariants, type ButtonSize } from "$components/button";
 import { Icon } from "$components/icon";
 import { inputVariants } from "$components/input";
 import { Tooltip, type TooltipSide } from "$components/tooltip";
@@ -127,19 +127,24 @@ function copyButton(input: {
 }) {
   const { buttonSize, copiedText, copyAction, textToCopy, inlineCopy } = input;
 
-  return Button({
-    size: buttonSize,
-    variant: "ghost",
-    class: cn(
-      "relative isolate overflow-hidden rounded-l-none rounded-r-[inherit] border-l border-areia-divider px-3 transition-all duration-200",
-      "focus:ring-inset focus:ring-areia-ring/50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-areia-ring",
-    ),
-    "aria-label": copyAction,
-    "data-slot": "clipboard-text-button",
-    "data-copy-text": textToCopy,
-    "data-copied-text": copiedText,
-    onclick: inlineCopy ? CLIPBOARD_TEXT_INLINE_ONCLICK : undefined,
-    children: html`<span
+  const classes = cn(
+    buttonVariants({ variant: "ghost", size: buttonSize, shape: "base" }),
+    "relative isolate overflow-hidden rounded-l-none rounded-r-[inherit] border-l border-areia-divider px-3 transition-all duration-200",
+    "focus:ring-inset focus:ring-areia-ring/50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-areia-ring",
+  );
+
+  return html`<button
+    aria-label="${copyAction}"
+    data-slot="clipboard-text-button"
+    data-copy-text="${textToCopy}"
+    data-copied-text="${copiedText}"
+    type="button"
+    data-variant="ghost"
+    class="${classes}"
+    ${inlineCopy ? raw(`onclick="${CLIPBOARD_TEXT_INLINE_ONCLICK}"`) : ""}
+  >
+    <span class="contents"
+      ><span
         data-slot="clipboard-text-copied-icon"
         class="pointer-events-none absolute inset-0 flex translate-y-full items-center justify-center opacity-0 transition-all duration-200"
         >${copiedIcon}</span
@@ -148,8 +153,9 @@ function copyButton(input: {
         data-slot="clipboard-text-copy-icon"
         class="flex items-center justify-center transition-all duration-200"
         >${copyIcon}</span
-      >`,
-  } as ButtonInput);
+      ></span
+    >
+  </button>`;
 }
 
 function renderClipboardText(input: ClipboardTextInput) {

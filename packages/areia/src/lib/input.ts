@@ -14,6 +14,10 @@ export function toAttrs(input: Record<string, unknown>): string {
   const attrs = Object.entries(input)
     .flatMap(([key, value]) => {
       if (key.startsWith("bind:")) return [];
+      // Native event handlers must go through Ilha's JSX event registry. Raw
+      // string attributes cannot preserve their identity and must never expose
+      // function source in SSR markup.
+      if (key.toLowerCase().startsWith("on") || typeof value === "function") return [];
       if (value === null || value === undefined || value === false) return [];
       const attr = aliases[key] ?? toKebab(key);
       if (value === true) return [attr];

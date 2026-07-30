@@ -358,6 +358,12 @@ export const CheckboxRoot = ilha
     const root = resolveCheckboxRoot(host);
     if (!root) return;
 
+    const previousRuntime = checkboxBindRuntimeByHost.get(host);
+    if (previousRuntime) {
+      checkboxBindRuntimeByHost.delete(host);
+      previousRuntime.controller.destroy();
+    }
+
     const itemValue = typeof input.value === "string" ? input.value : undefined;
     let bindSync: ReturnType<typeof createCheckedBindSync> = null;
 
@@ -376,10 +382,13 @@ export const CheckboxRoot = ilha
 
     bindSync = createCheckedBindSync(input, controller, itemValue);
     bindSync?.applyFromSignal();
-    checkboxBindRuntimeByHost.set(host, { controller, bindSync });
+    const runtime = { controller, bindSync };
+    checkboxBindRuntimeByHost.set(host, runtime);
 
     return () => {
-      checkboxBindRuntimeByHost.delete(host);
+      if (checkboxBindRuntimeByHost.get(host) === runtime) {
+        checkboxBindRuntimeByHost.delete(host);
+      }
       controller.destroy();
     };
   })
