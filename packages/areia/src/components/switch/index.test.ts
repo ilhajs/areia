@@ -1,7 +1,7 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import ilha, { html, mount } from "ilha";
-import { markupValue as markup } from "$lib/test-markup";
+import ilha, { html } from "ilha";
+import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Switch } from "./index";
 
 try {
@@ -78,11 +78,7 @@ describe("Switch in ilha island", () => {
         `,
       );
 
-    document.body.innerHTML = await ProjectCreatorForm.hydratable(
-      {},
-      { name: "ProjectCreatorForm", snapshot: true },
-    );
-    mount({ ProjectCreatorForm }, { root: document.body, lazy: false });
+    await mountSsr({ ProjectCreatorForm }, "ProjectCreatorForm");
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
     await new Promise<void>((r) => queueMicrotask(() => r()));
 
@@ -126,11 +122,7 @@ describe("Switch in ilha island", () => {
         `,
       );
 
-    document.body.innerHTML = await ProjectCreatorForm.hydratable(
-      {},
-      { name: "ProjectCreatorForm", snapshot: true },
-    );
-    mount({ ProjectCreatorForm }, { root: document.body, lazy: false });
+    await mountSsr({ ProjectCreatorForm }, "ProjectCreatorForm");
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
     await Promise.resolve();
@@ -178,8 +170,7 @@ describe("Switch in ilha island", () => {
       () => html`<section data-testid="page">${ProjectCreatorForm()}</section>`,
     );
 
-    document.body.innerHTML = await Page.hydratable({}, { name: "Page", snapshot: true });
-    mount({ Page, ProjectCreatorForm }, { root: document.body, lazy: false });
+    await mountSsr({ Page, ProjectCreatorForm }, "Page");
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
     await Promise.resolve();
@@ -196,5 +187,40 @@ describe("Switch in ilha island", () => {
     expect(warnings).toEqual([]);
 
     console.warn = warn;
+  });
+});
+
+describe("Switch interactions (onCheckedChange + bind)", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+  const tick = () => new Promise<void>((r) => queueMicrotask(() => r()));
+
+  it("emits onCheckedChange once and updates bind:checked once per toggle", async () => {
+    const calls: boolean[] = [];
+    const panel = ilha.state("on", false).render(
+      ({ state }) =>
+        html`${Switch({
+            label: "S",
+            "bind:checked": state.on,
+            onCheckedChange: (c) => calls.push(c),
+          })} <span data-testid="f">${state.on() ? "on" : "off"}</span>`,
+    );
+
+    await mountSsr({ Panel: panel }, "Panel");
+    await frame();
+    await tick();
+    const root = document.querySelector('[data-slot="switch"]') as HTMLElement | null;
+    const flag = () => document.querySelector("[data-testid=f]")?.textContent ?? "";
+
+    expect(flag()).toBe("off");
+    root?.click();
+    await frame();
+    await tick();
+    expect(calls).toEqual([true]);
+    expect(flag()).toBe("on");
+    expect(root?.getAttribute("aria-checked")).toBe("true");
   });
 });

@@ -2,9 +2,11 @@ import ilha, { html, raw } from "ilha";
 import { Checkbox as CheckboxPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
-  createCheckedBindSync,
+  checkedBindSource,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -103,6 +105,8 @@ export type CheckboxInput = InputProps &
     labelTooltip?: string;
     /** When true, checkbox appears before label. When false, label appears before checkbox. */
     controlFirst?: boolean;
+    /** Callback fired by `Checkbox.Root` when the user toggles the checked state. */
+    onCheckedChange?: (checked: boolean) => void;
     /** Whether the checkbox is checked. */
     checked?: boolean;
     /** Whether the checkbox is in an indeterminate visual state. */
@@ -329,43 +333,29 @@ export function CheckboxGroup(
     class="${cn("flex flex-col gap-4", className, aliasedClassName)}"
     ${raw(toAttrs({ ...rest, disabled }))}
   >
-    ${legend != null ? CheckboxLegend({ label: legend }) : ""}
+    ${legend == null ? "" : CheckboxLegend({ label: legend })}
     <div class="flex flex-col gap-2">${content ?? ""}</div>
-    ${error != null
-      ? html`<p class="text-sm text-areia-destructive-soft-foreground">${error}</p>`
-      : ""}
-    ${description != null ? html`<p class="text-sm text-areia-subtle">${description}</p>` : ""}
+    ${error == null
+      ? ""
+      : html`<p class="text-sm text-areia-destructive-soft-foreground">${error}</p>`}
+    ${description == null ? "" : html`<p class="text-sm text-areia-subtle">${description}</p>`}
   </fieldset>`;
-}
-
-type CheckboxBindRuntime = {
-  controller: CheckboxPrimitive.CheckboxController;
-  bindSync: ReturnType<typeof createCheckedBindSync>;
-};
-
-const checkboxBindRuntimeByHost = new WeakMap<Element, CheckboxBindRuntime>();
-
-function resolveCheckboxRoot(host: Element): HTMLElement | null {
-  const root = host.matches('[data-slot="checkbox"]')
-    ? host
-    : host.querySelector('[data-slot="checkbox"]');
-  return root as HTMLElement | null;
 }
 
 export const CheckboxRoot = ilha
   .input<CheckboxInput>()
-  .onMount(({ host, input }) => {
+  .action("checkedChange", (checked: boolean, { host }) => {
+    getBindBridge(host, "checked")?.onUserChange(checked);
+  })
+  .onMount(({ host, input, action }) => {
     const root = resolveCheckboxRoot(host);
     if (!root) return;
 
-    const previousRuntime = checkboxBindRuntimeByHost.get(host);
-    if (previousRuntime) {
-      checkboxBindRuntimeByHost.delete(host);
-      previousRuntime.controller.destroy();
-    }
+    // A re-mount on the same host needs a fresh controller and binding; release
+    // any previous bridge before rebinding.
+    disposeBindBridge(host, "checked");
 
     const itemValue = typeof input.value === "string" ? input.value : undefined;
-    let bindSync: ReturnType<typeof createCheckedBindSync> = null;
 
     stampMorphPreserve(root);
     const controller = CheckboxPrimitive.createCheckbox(root, {
@@ -375,32 +365,32 @@ export const CheckboxRoot = ilha
       required: typeof input.required === "boolean" ? input.required : undefined,
       name: typeof input.name === "string" ? input.name : undefined,
       value: itemValue,
-      onCheckedChange: (checked) => {
-        bindSync?.onUserChange(checked);
-      },
+      onCheckedChange: (checked) => action.checkedChange(checked),
     } satisfies CheckboxPrimitive.CheckboxOptions);
 
-    bindSync = createCheckedBindSync(input, controller, itemValue);
-    bindSync?.applyFromSignal();
-    const runtime = { controller, bindSync };
-    checkboxBindRuntimeByHost.set(host, runtime);
+    createBindBridge(
+      host,
+      "checked",
+      checkedBindSource(input, controller, {
+        itemValue,
+        onUserChange: (checked) => input.onCheckedChange?.(checked),
+        destroy: () => controller.destroy(),
+      }),
+    );
 
-    return () => {
-      if (checkboxBindRuntimeByHost.get(host) === runtime) {
-        checkboxBindRuntimeByHost.delete(host);
-      }
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    // Track bind accessors so this effect re-runs when signals change.
-    subscribeBindProps(input);
-    const runtime = checkboxBindRuntimeByHost.get(host);
-    // onMount may run after the first effect pass — never call createCheckbox here.
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "checked")?.applyFromSignal();
   })
   .render(({ input }) => renderCheckbox(input));
+
+function resolveCheckboxRoot(host: Element): HTMLElement | null {
+  const root = host.matches('[data-slot="checkbox"]')
+    ? host
+    : host.querySelector('[data-slot="checkbox"]');
+  return root as HTMLElement | null;
+}
 
 export const Checkbox = Object.assign(CheckboxRoot, {
   Root: CheckboxRoot,

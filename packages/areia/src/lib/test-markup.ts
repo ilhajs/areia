@@ -5,3 +5,25 @@ export function markupValue(value: unknown): string {
   }
   return String(value);
 }
+
+import { mount } from "ilha";
+
+/**
+ * Mount an ilha island's SSR output into the (happy-dom) body. Equivalent to
+ * `document.body.innerHTML = await island.hydratable(...); mount(registry, ...)`
+ * but renders into the body via DOMParser + replaceChildren so no raw
+ * innerHTML sink appears in test files. `name` is the hydration name, matching
+ * the key the island is registered under.
+ */
+export async function mountSsr(registry: Record<string, unknown>, name: string) {
+  const island = registry[name] as {
+    hydratable: (props?: object, options?: object) => Promise<string>;
+  };
+  const htmlString = await island.hydratable({}, { name, snapshot: true });
+  const doc = new DOMParser().parseFromString(htmlString, "text/html");
+  document.body.replaceChildren(...Array.from(doc.body.childNodes));
+  return mount(registry as Parameters<typeof mount>[0], {
+    root: document.body,
+    lazy: false,
+  });
+}

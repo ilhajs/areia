@@ -391,76 +391,62 @@ function emitPageSizeChange(root: Element, pageSize: number) {
   );
 }
 
+function resolvePaginationRoot(host: Element): HTMLElement | null {
+  return host.matches('[data-slot="pagination"]')
+    ? (host as HTMLElement)
+    : host.querySelector<HTMLElement>('[data-slot="pagination"]');
+}
+
 export const PaginationRoot = ilha
   .input<PaginationInput>()
-  .onMount(({ host, input }) => {
-    const root = host.matches('[data-slot="pagination"]')
-      ? host
-      : host.querySelector('[data-slot="pagination"]');
-    if (!root) return;
-
+  .action("pageChange", (page: number, { input, host }) => {
+    const root = resolvePaginationRoot(host);
     const max = maxPage(input.totalCount, input.perPage);
-    const setPage = (page: number) => {
-      const next = clamp(page, 1, max);
-      input.setPage?.(next);
-      input.onPageChange?.(next);
-      emitPageChange(root, next);
-    };
-
-    const handleClick = (event: Event) => {
-      const target = event.target as HTMLElement | null;
-      const button = target?.closest?.<HTMLElement>("[data-pagination-action]");
-      if (!button || !root.contains(button) || button.hasAttribute("disabled")) return;
-      const page = Number(button.dataset["paginationPage"]);
-      if (Number.isFinite(page)) setPage(page);
-    };
-
-    const commitInput = (element: HTMLInputElement) => setPage(Number(element.value));
-
-    const handleFocusOut = (event: Event) => {
-      const target = event.target;
-      if (target instanceof HTMLInputElement && target.hasAttribute("data-pagination-page-input")) {
-        commitInput(target);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const target = event.target;
-      if (
-        event.key === "Enter" &&
-        target instanceof HTMLInputElement &&
-        target.hasAttribute("data-pagination-page-input")
-      ) {
-        commitInput(target);
-      }
-    };
-
-    const handleChange = (event: Event) => {
-      const target = event.target;
-      if (
-        target instanceof HTMLSelectElement &&
-        target.hasAttribute("data-pagination-page-select")
-      ) {
-        setPage(Number(target.value));
-      }
-      if (target instanceof HTMLSelectElement && target.hasAttribute("data-pagination-page-size")) {
-        const pageSize = Number(target.value);
-        input.onPageSizeChange?.(pageSize);
-        emitPageSizeChange(root, pageSize);
-      }
-    };
-
-    root.addEventListener("click", handleClick);
-    root.addEventListener("focusout", handleFocusOut);
-    root.addEventListener("keydown", handleKeyDown as EventListener);
-    root.addEventListener("change", handleChange);
-
-    return () => {
-      root.removeEventListener("click", handleClick);
-      root.removeEventListener("focusout", handleFocusOut);
-      root.removeEventListener("keydown", handleKeyDown as EventListener);
-      root.removeEventListener("change", handleChange);
-    };
+    const next = clamp(page, 1, max);
+    input.setPage?.(next);
+    input.onPageChange?.(next);
+    if (root) emitPageChange(root, next);
+  })
+  .action("pageSizeChange", (size: number, { input, host }) => {
+    const root = resolvePaginationRoot(host);
+    input.onPageSizeChange?.(size);
+    if (root) emitPageSizeChange(root, size);
+  })
+  .on("[data-pagination-action]@click", ({ host, event, action }) => {
+    const root = resolvePaginationRoot(host);
+    const target = event.target as HTMLElement | null;
+    const button = target?.closest?.<HTMLElement>("[data-pagination-action]");
+    if (!root || !button || !root.contains(button) || button.hasAttribute("disabled")) return;
+    const page = Number(button.dataset["paginationPage"]);
+    if (Number.isFinite(page)) action.pageChange(page);
+  })
+  .on("[data-pagination-page-input]@focusout", ({ event, action }) => {
+    const target = event.target;
+    if (target instanceof HTMLInputElement && target.hasAttribute("data-pagination-page-input")) {
+      action.pageChange(Number(target.value));
+    }
+  })
+  .on("[data-pagination-page-input]@keydown", ({ event, action }) => {
+    const target = event.target;
+    if (
+      event.key === "Enter" &&
+      target instanceof HTMLInputElement &&
+      target.hasAttribute("data-pagination-page-input")
+    ) {
+      action.pageChange(Number(target.value));
+    }
+  })
+  .on("[data-pagination-page-select]@change", ({ event, action }) => {
+    const target = event.target;
+    if (target instanceof HTMLSelectElement && target.hasAttribute("data-pagination-page-select")) {
+      action.pageChange(Number(target.value));
+    }
+  })
+  .on("[data-pagination-page-size]@change", ({ event, action }) => {
+    const target = event.target;
+    if (target instanceof HTMLSelectElement && target.hasAttribute("data-pagination-page-size")) {
+      action.pageSizeChange(Number(target.value));
+    }
   })
   .render(({ input }) => renderPagination(input));
 

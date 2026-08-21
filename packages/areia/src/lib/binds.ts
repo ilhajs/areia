@@ -109,75 +109,7 @@ export function getBindAccessor<T>(
 }
 
 /** Read bind accessors so ilha `.effect()` tracks signal dependencies. */
-export function subscribeBindProps(input: Record<string, unknown>) {
-  for (const key of BIND_PROP_NAMES) {
-    getBindAccessor(input, key)?.();
-  }
-}
 
-export type CheckedBindSync = {
-  applyFromSignal: () => void;
-  onUserChange: (checked: boolean) => void;
-};
-
-/** Bridge ilha checked/group bindings to custom checkbox-like controls. */
-export function createCheckedBindSync(
-  input: Record<string, unknown>,
-  controller: { checked: boolean; setChecked: (checked: boolean, indeterminate?: boolean) => void },
-  itemValue?: string,
-): CheckedBindSync | null {
-  const bindGroup = getBindAccessor<string | string[] | number | boolean | null>(
-    input,
-    "bind:group",
-  );
-  const bindChecked = getBindAccessor<boolean>(input, "bind:checked");
-
-  if (bindGroup && itemValue !== undefined) {
-    return {
-      applyFromSignal: () => {
-        const current = bindGroup();
-        const selected = Array.isArray(current) ? current.map(String) : current;
-        controller.setChecked(
-          Array.isArray(selected) ? selected.includes(itemValue) : String(selected) === itemValue,
-        );
-      },
-      onUserChange: (checked) => {
-        const current = bindGroup();
-        if (Array.isArray(current)) {
-          const arr = current.map(String);
-          const idx = arr.indexOf(itemValue);
-          if (checked && idx === -1) arr.push(itemValue);
-          if (!checked && idx !== -1) arr.splice(idx, 1);
-          bindGroup(arr);
-          return;
-        }
-        if (checked) bindGroup(itemValue);
-      },
-    };
-  }
-
-  if (bindChecked) {
-    return {
-      applyFromSignal: () => controller.setChecked(Boolean(bindChecked())),
-      onUserChange: (checked) => bindChecked(checked),
-    };
-  }
-
-  return null;
-}
-
-export type OpenBindController = {
-  readonly isOpen: boolean;
-  open: () => void;
-  close: () => void;
-};
-
-export type OpenBindSync = {
-  applyFromSignal: () => void;
-  onUserChange: (open: boolean) => void;
-};
-
-/** Resolve initial open state from `bind:open` or a fallback prop. */
 export function openBindDefault(
   input: Record<string, unknown>,
   fallback?: boolean,
@@ -188,36 +120,8 @@ export function openBindDefault(
 }
 
 /** Bridge ilha `bind:open` to overlay-style controllers. */
-export function createOpenBindSync(
-  input: Record<string, unknown>,
-  controller: OpenBindController,
-): OpenBindSync | null {
-  const bindOpen = getBindAccessor<boolean>(input, "bind:open");
-  if (!bindOpen) return null;
-
-  let applying = false;
-
-  return {
-    applyFromSignal: () => {
-      applying = true;
-      const open = Boolean(bindOpen());
-      if (open && !controller.isOpen) controller.open();
-      else if (!open && controller.isOpen) controller.close();
-      applying = false;
-    },
-    onUserChange: (open: boolean) => {
-      if (applying) return;
-      if (Boolean(bindOpen()) !== open) bindOpen(open);
-    },
-  };
-}
 
 export type GroupBindMode = "single" | "multiple";
-
-export type GroupBindSync = {
-  applyFromSignal: () => void;
-  onUserChange: (value: string | string[] | null) => void;
-};
 
 function signalToControllerValue(
   value: string | string[] | number | boolean | null | undefined,
@@ -264,79 +168,6 @@ export function groupBindDefault<T extends string | string[] | undefined>(
 }
 
 /** Bridge ilha `bind:group` to selection controllers (tabs, toggle groups, combobox). */
-export function createGroupBindSync(
-  input: Record<string, unknown>,
-  controller: {
-    getValue: () => string | string[] | null;
-    setValue: (value: string | string[] | null) => void;
-  },
-  mode: GroupBindMode = "single",
-): GroupBindSync | null {
-  const bindGroup = getBindAccessor<string | string[] | number | boolean | null>(
-    input,
-    "bind:group",
-  );
-  if (!bindGroup) return null;
-
-  let applying = false;
-
-  return {
-    applyFromSignal: () => {
-      applying = true;
-      const next = signalToControllerValue(bindGroup(), mode);
-      if (!groupValuesEqual(next, controller.getValue())) controller.setValue(next);
-      applying = false;
-    },
-    onUserChange: (value: string | string[] | null) => {
-      if (applying) return;
-      const current = signalToControllerValue(bindGroup(), mode);
-      if (!groupValuesEqual(current, value)) {
-        bindGroup(
-          controllerToSignalValue(value, mode) as string | string[] | number | boolean | null,
-        );
-      }
-    },
-  };
-}
-
-export type DateBindSync = {
-  applyFromSignal: () => void;
-  onUserChange: (date: Date | null) => void;
-};
-
-/** Bridge ilha `bind:valueAsDate` to date-picker selection (single mode). */
-export function createDateBindSync(
-  input: Record<string, unknown>,
-  controller: {
-    getDate: () => Date | null | undefined;
-    setDate: (date: Date | null) => void;
-  },
-): DateBindSync | null {
-  const bindDate = getBindAccessor<Date | null>(input, "bind:valueAsDate");
-  if (!bindDate) return null;
-
-  let applying = false;
-
-  const sameDay = (a: Date | null | undefined, b: Date | null | undefined) => {
-    if (a == null && b == null) return true;
-    if (a == null || b == null) return false;
-    return a.getTime() === b.getTime();
-  };
-
-  return {
-    applyFromSignal: () => {
-      applying = true;
-      const next = bindDate();
-      if (!sameDay(next, controller.getDate())) controller.setDate(next);
-      applying = false;
-    },
-    onUserChange: (date: Date | null) => {
-      if (applying) return;
-      const current = bindDate();
-      if (!sameDay(current, date)) bindDate(date);
-    },
-  };
-}
 
 /** Write a mounted element into `bind:this` and clear it on cleanup. */
 export function applyThisBind(
@@ -347,4 +178,285 @@ export function applyThisBind(
   if (!bindThis) return undefined;
   if (element) bindThis(element);
   return () => bindThis(null);
+}
+
+// ---------------------------------------------------------------------------
+// Generic two-way bind bridge
+// ---------------------------------------------------------------------------
+// One small, typed internal bridge that owns the per-host storage, the
+// user-versus-programmatic guard, and the applying-flag, so individual
+// components no longer declare a WeakMap, a `subscribeBindProps` effect, or
+// an `applying` guard. A config describes one value shape (checked / open /
+// selection / date); the bridge itself has no component-specific branches.
+
+export interface BindBridgeSource<Value> {
+  /** Whether an external value source (a `bind:*` accessor) is active. */
+  active: boolean;
+  /** Read the authoritative external value (bind read). */
+  readExternal: () => Value;
+  /** Write the external value (bind signal write). No-op when inactive. */
+  writeExternal: (value: Value) => void;
+  /** Read the current controller value. */
+  readController: () => Value;
+  /** Write the controller value silently (wrapped in the applying guard). */
+  writeController: (value: Value) => void;
+  /** Optional custom equality between external and controller values. */
+  equal?: (a: Value, b: Value) => boolean;
+  /** Semantic callback fired exactly once per user interaction. */
+  onUserChange?: (value: Value) => void;
+  /** Optional cleanup (controller destroy, listeners). Runs on re-create + unmount. */
+  dispose?: () => void;
+  /**
+   * Optional hook called after a successful programmatic controller write
+   * (e.g. reposition an indicator). Not called for user-driven writes.
+   */
+  afterControllerWrite?: () => void;
+}
+
+export interface BindBridge<Value = unknown> {
+  /**
+   * Push the external value into the controller silently (programmatic /
+   * controlled sync). Call inside `.effect()` so the read subscribes the
+   * effect to the bind signal.
+   */
+  applyFromSignal(): void;
+  /** User-driven change: write the bind once and fire the semantic callback once. */
+  onUserChange(value: Value): void;
+  /** Release the bridge (idempotent). Runs `source.dispose()`. */
+  dispose(): void;
+}
+
+const bridgesByHost = new WeakMap<Element, Record<string, BindBridge<unknown>>>();
+// ponytail: single module-level WeakMap shared by every component; per-name
+// bridges. If one host ever needs unbounded distinct bridges this could become
+// a per-name Map, but Areia uses at most two per host today.
+
+export function createBindBridge<Value>(
+  host: Element,
+  name: string,
+  source: BindBridgeSource<Value>,
+): BindBridge<Value> {
+  const equal = source.equal ?? ((a: Value, b: Value) => a === b);
+  let applying = false;
+  let disposed = false;
+
+  const bridge: BindBridge<Value> = {
+    applyFromSignal: () => {
+      if (disposed || !source.active) return;
+      const external = source.readExternal();
+      if (equal(external, source.readController())) return;
+      // Defer the programmatic controller write to a microtask: for controls
+      // that also carry a native `bind:*` (e.g. checkbox/switch inputs) the
+      // bind write mirrors a user interaction into the signal synchronously,
+      // which would otherwise re-enter here with `applying` set and swallow
+      // the user's semantic callback. Reading stays synchronous so the calling
+      // `.effect()` still subscribes to the bind signal.
+      queueMicrotask(() => {
+        if (disposed) return;
+        applying = true;
+        try {
+          source.writeController(external);
+          source.afterControllerWrite?.();
+        } finally {
+          applying = false;
+        }
+      });
+    },
+    onUserChange: (value) => {
+      if (disposed || applying) return;
+      if (source.active && !equal(source.readExternal(), value)) {
+        source.writeExternal(value);
+      }
+      source.onUserChange?.(value);
+    },
+    dispose: () => {
+      if (disposed) return;
+      disposed = true;
+      source.dispose?.();
+    },
+  };
+
+  let map = bridgesByHost.get(host);
+  if (!map) {
+    map = {};
+    bridgesByHost.set(host, map);
+  }
+  map[name] = bridge as unknown as BindBridge<unknown>;
+  return bridge;
+}
+
+/** Look up a bridge by name (typed at the boundary). */
+export function getBindBridge<Value = unknown>(
+  host: Element,
+  name: string,
+): BindBridge<Value> | undefined {
+  return bridgesByHost.get(host)?.[name] as BindBridge<Value> | undefined;
+}
+
+/**
+ * Dispose every bridge on a host (or one named bridge). Use the named form
+ * *before* creating a controller on a possibly-rebound host, and the host form
+ * as the island `.onMount` cleanup. Idempotent.
+ */
+export function disposeBindBridge(host: Element, name?: string): void {
+  const map = bridgesByHost.get(host);
+  if (!map) return;
+  if (name != null) {
+    map[name]?.dispose();
+    delete map[name];
+    return;
+  }
+  for (const bridge of Object.values(map)) bridge.dispose();
+  bridgesByHost.delete(host);
+}
+
+// --- shape configs ----------------------------------------------------------
+
+/** Checked / boolean (checkbox, switch). Supports `bind:checked` and `bind:group`+itemValue. */
+export function checkedBindSource<Input extends Record<string, unknown>>(
+  input: Input,
+  controller: {
+    checked: boolean;
+    setChecked: (checked: boolean, indeterminate?: boolean) => void;
+  },
+  opts: {
+    itemValue?: string;
+    onUserChange?: (checked: boolean) => void;
+    destroy?: () => void;
+    afterControllerWrite?: () => void;
+  } = {},
+): BindBridgeSource<boolean> {
+  const bindChecked = getBindAccessor<boolean>(input, "bind:checked");
+  const bindGroup = getBindAccessor<string | string[] | number | boolean | null>(
+    input,
+    "bind:group",
+  );
+  const itemValue = opts.itemValue;
+  const usesGroup = Boolean(bindGroup) && itemValue !== undefined;
+
+  const readSelected = (): boolean => {
+    if (usesGroup) {
+      const current = bindGroup!();
+      if (Array.isArray(current)) return current.map(String).includes(itemValue);
+      return String(current) === itemValue;
+    }
+    return Boolean(bindChecked?.());
+  };
+  const writeSelected = (checked: boolean): void => {
+    if (usesGroup) {
+      const current = bindGroup!();
+      if (Array.isArray(current)) {
+        const arr = current.map(String);
+        const idx = arr.indexOf(itemValue);
+        if (checked && idx === -1) arr.push(itemValue);
+        if (!checked && idx !== -1) arr.splice(idx, 1);
+        bindGroup!(arr);
+      } else if (checked) {
+        bindGroup!(itemValue);
+      }
+      return;
+    }
+    bindChecked?.(checked);
+  };
+
+  return {
+    active: Boolean(bindChecked) || usesGroup,
+    readExternal: readSelected,
+    writeExternal: writeSelected,
+    readController: () => controller.checked,
+    writeController: (checked) => controller.setChecked(checked),
+    onUserChange: opts.onUserChange,
+    dispose: opts.destroy,
+    afterControllerWrite: opts.afterControllerWrite,
+  };
+}
+
+/** Open boolean (popover, dialog, collapsible, dropdown, context-menu, hover-card, …). */
+export function openBindSource<Input extends Record<string, unknown>>(
+  input: Input,
+  controller: { isOpen: boolean; open: () => void; close: () => void },
+  opts: {
+    onUserChange?: (open: boolean) => void;
+    destroy?: () => void;
+    afterControllerWrite?: () => void;
+  } = {},
+): BindBridgeSource<boolean> {
+  const bindOpen = getBindAccessor<boolean>(input, "bind:open");
+  return {
+    active: Boolean(bindOpen),
+    readExternal: () => Boolean(bindOpen?.()),
+    writeExternal: (open) => bindOpen?.(open),
+    readController: () => controller.isOpen,
+    writeController: (open) => (open ? controller.open() : controller.close()),
+    onUserChange: opts.onUserChange,
+    dispose: opts.destroy,
+    afterControllerWrite: opts.afterControllerWrite,
+  };
+}
+
+/** Group selection (tabs, toggle-group, combobox single/multiple). `bind:group`. */
+export function groupBindSource<Input extends Record<string, unknown>>(
+  input: Input,
+  controller: {
+    getValue: () => string | string[] | null;
+    setValue: (value: string | string[] | null) => void;
+  },
+  opts: {
+    mode?: GroupBindMode;
+    onUserChange?: (value: string | string[] | null) => void;
+    destroy?: () => void;
+    afterControllerWrite?: () => void;
+  } = {},
+): BindBridgeSource<string | string[] | null> {
+  const mode = opts.mode ?? "single";
+  const bindGroup = getBindAccessor<string | string[] | number | boolean | null>(
+    input,
+    "bind:group",
+  );
+  return {
+    active: Boolean(bindGroup),
+    readExternal: () => signalToControllerValue(bindGroup?.(), mode),
+    writeExternal: (value) =>
+      bindGroup?.(
+        controllerToSignalValue(value, mode) as string | string[] | number | boolean | null,
+      ),
+    readController: () => controller.getValue(),
+    writeController: (value) => controller.setValue(value),
+    equal: groupValuesEqual,
+    onUserChange: opts.onUserChange,
+    dispose: opts.destroy,
+    afterControllerWrite: opts.afterControllerWrite,
+  };
+}
+
+/** Date (date-picker single). `bind:valueAsDate`. */
+export function dateBindSource<Input extends Record<string, unknown>>(
+  input: Input,
+  controller: {
+    getDate: () => Date | null | undefined;
+    setDate: (date: Date | null) => void;
+  },
+  opts: {
+    onUserChange?: (date: Date | null) => void;
+    destroy?: () => void;
+    afterControllerWrite?: () => void;
+  } = {},
+): BindBridgeSource<Date | null> {
+  const bindDate = getBindAccessor<Date | null>(input, "bind:valueAsDate");
+  const sameDay = (a: Date | null | undefined, b: Date | null | undefined) => {
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
+    return a.getTime() === b.getTime();
+  };
+  return {
+    active: Boolean(bindDate),
+    readExternal: () => bindDate?.() ?? null,
+    writeExternal: (date) => bindDate?.(date),
+    readController: () => controller.getDate() ?? null,
+    writeController: (date) => controller.setDate(date),
+    equal: sameDay,
+    onUserChange: opts.onUserChange,
+    dispose: opts.destroy,
+    afterControllerWrite: opts.afterControllerWrite,
+  };
 }

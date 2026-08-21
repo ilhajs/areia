@@ -11,7 +11,7 @@
         "@types/bun": "^1.3.14",
         "areia": "workspace:*",
         "husky": "^9.1.7",
-        "ilha": "^0.10.0",
+        "ilha": "0.10.3",
         "oxfmt": "^0.57.0",
         "oxlint": "^1.72.0",
         "rimraf": "^6.1.3",
@@ -37,7 +37,7 @@
         "astro-og-canvas": "^0.13.0",
         "canvaskit-wasm": "^0.41.1",
         "clsx": "^2.1.1",
-        "ilha": "^0.10.0",
+        "ilha": "0.10.3",
         "lucide": "^1.28.0",
         "sonner": "^2.0.7",
         "tailwind-merge": "^3.6.0",
@@ -54,7 +54,7 @@
     },
     "packages/areia": {
       "name": "areia",
-      "version": "0.2.3",
+      "version": "0.2.4",
       "dependencies": {
         "@areia/slots": "0.2.0",
         "alien-signals": "3.2.1",
@@ -63,12 +63,12 @@
         "tailwind-merge": "3.6.0",
       },
       "devDependencies": {
-        "ilha": "^0.10.0",
+        "ilha": "0.10.3",
         "lucide": "^1.28.0",
         "tailwindcss": "^4.3.3",
       },
       "peerDependencies": {
-        "ilha": "^0.10.0",
+        "ilha": "0.10.3",
         "sonner": "^2.0.7",
         "tailwindcss": ">=4.0.0",
       },
@@ -78,20 +78,20 @@
     },
     "packages/form": {
       "name": "@areia/form",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "dependencies": {
         "alien-signals": "3.2.1",
       },
       "devDependencies": {
         "@areia/slots": "^0.2.0",
         "@standard-schema/spec": "^1.1.0",
-        "areia": "^0.2.3",
-        "ilha": "^0.10.0",
+        "areia": "^0.2.4",
+        "ilha": "0.10.3",
       },
       "peerDependencies": {
         "@areia/slots": ">=0.2.0",
         "@standard-schema/spec": ">=1.1.0",
-        "areia": ">=0.2.3",
+        "areia": ">=0.2.4",
         "ilha": ">=0.10.0",
       },
       "optionalPeers": [
@@ -922,7 +922,7 @@
 
     "iconv-lite": ["iconv-lite@0.6.3", "", { "dependencies": { "safer-buffer": ">= 2.1.2 < 3.0.0" } }, "sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw=="],
 
-    "ilha": ["ilha@0.10.0", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-X3estJye/A4wv9Df5V/pAp6Fnv+iYNNN7uN0RqFkj+eunLsien+utVwa0eHNy3YGx4/KA3nq0CZ49mvA5PQQJQ=="],
+    "ilha": ["ilha@0.10.3", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-qP8aRnYoy2R1aZ0NhjQcJuo01RicvZgLQo1J3FPVy/RNXm8EdfRo4CjTT4p/VXi8bfZV43dA/ULojFcQ3QIOKQ=="],
 
     "import-without-cache": ["import-without-cache@0.4.0", "", {}, "sha512-NkJQA7oZ4YHQhd2+H3BoRFKF3d/XNsiKpHZCQEMH9pDX27hQQLsTyOocyRgaIVtf8gHX3Nt3LPkR4e5EdtPAGQ=="],
 

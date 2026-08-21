@@ -1,13 +1,13 @@
 import ilha, { html, raw, untrack } from "ilha";
 import { Dialog as DialogPrimitive } from "@areia/slots";
-
-const dialogControllers = new WeakMap<Element, DialogPrimitive.DialogController>();
 import {
   boundElement,
-  createOpenBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   openBindDefault,
+  openBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -388,23 +388,20 @@ function renderDialog(input: DialogInput = {}) {
   return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-type DialogBindRuntime = {
-  controller: DialogPrimitive.DialogController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const dialogBindRuntimeByHost = new WeakMap<Element, DialogBindRuntime>();
-
 export const DialogRoot = ilha
   .input<DialogInput>()
-  .onMount(({ host, input }) => {
+  .action("openChange", (open: boolean, { host }) => {
+    getBindBridge(host, "open")?.onUserChange(open);
+  })
+  .onMount(({ host, input, action }) => {
     const root = host.matches('[data-slot="dialog"]')
       ? host
       : host.querySelector('[data-slot="dialog"]');
     if (!root) return;
 
     const isAlertDialog = input.alertDialog ?? input.role === "alertdialog";
-    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+
+    disposeBindBridge(host, "open");
 
     stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = DialogPrimitive.createDialog(root, {
@@ -413,29 +410,23 @@ export const DialogRoot = ilha
       closeOnEscape: input.closeOnEscape,
       defaultOpen: openBindDefault(input, input.defaultOpen),
       lockScroll: input.lockScroll,
-      onOpenChange: (open) => {
-        bindSync?.onUserChange(open);
-        input.onOpenChange?.(open);
-      },
+      onOpenChange: (open) => action.openChange(open),
       onPortalMounted: input.onPortalMounted,
     });
 
-    bindSync = createOpenBindSync(input, controller);
-    bindSync?.applyFromSignal();
-    dialogControllers.set(root, controller);
-    dialogBindRuntimeByHost.set(host, { controller, bindSync });
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(input, controller, {
+        onUserChange: (open) => input.onOpenChange?.(open),
+        destroy: () => controller.destroy(),
+      }),
+    );
 
-    return () => {
-      dialogBindRuntimeByHost.delete(host);
-      dialogControllers.delete(root);
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = dialogBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "open")?.applyFromSignal();
   })
   .render(({ input }) =>
     renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"])),

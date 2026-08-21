@@ -1,7 +1,7 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import ilha, { html, mount } from "ilha";
-import { markupValue as markup } from "$lib/test-markup";
+import ilha, { html } from "ilha";
+import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Checkbox, checkboxVariants } from "./index";
 
 try {
@@ -116,8 +116,7 @@ describe("Checkbox", () => {
 
       const Page = ilha.render(() => html`<div>${Child()}</div>`);
 
-      document.body.innerHTML = await Page.hydratable({}, { name: "Page", snapshot: true });
-      mount({ Page, Child }, { root: document.body, lazy: false });
+      await mountSsr({ Page, Child }, "Page");
       await new Promise<void>((r) => requestAnimationFrame(() => r()));
       await Promise.resolve();
       await Promise.resolve();
@@ -152,8 +151,7 @@ describe("Checkbox", () => {
         `;
       });
 
-      document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
-      mount({ Panel }, { root: document.body, lazy: false });
+      await mountSsr({ Panel }, "Panel");
       await new Promise<void>((r) => requestAnimationFrame(() => r()));
       await Promise.resolve();
       await Promise.resolve();
@@ -186,5 +184,129 @@ describe("Checkbox.Group", () => {
     const output = markup(Checkbox.Group({ description: "Hint" }, []));
     expect(output).toContain("Hint");
     expect(output).toContain("text-areia-subtle");
+  });
+});
+
+describe("Checkbox interactions (onCheckedChange + bind)", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+  const tick = () => new Promise<void>((r) => queueMicrotask(() => r()));
+
+  async function mountPanel(panel: ReturnType<typeof ilha.render>) {
+    const mountResult = await mountSsr({ Panel: panel }, "Panel");
+    await frame();
+    await tick();
+    await tick();
+    return mountResult;
+  }
+
+  it("emits onCheckedChange exactly once per click", async () => {
+    const calls: boolean[] = [];
+    const panel = ilha.render(
+      () => html`${Checkbox({ label: "Accept", onCheckedChange: (c) => calls.push(c) })}`,
+    );
+    await mountPanel(panel);
+
+    const root = document.querySelector('[data-slot="checkbox"]') as HTMLElement | null;
+    expect(root).not.toBeNull();
+
+    root?.click();
+    await tick();
+    root?.click();
+    await tick();
+
+    expect(calls).toEqual([true, false]);
+  });
+
+  it("never serializes the callback into SSR/HTML output", () => {
+    const output = markup(Checkbox({ label: "Accept", onCheckedChange: () => {} }));
+    expect(output).not.toContain("onCheckedChange");
+    expect(output).not.toMatch(/function\s*\(/);
+    expect(output.match(/onchange/g) ?? []).toEqual([]);
+  });
+
+  it("updates bind:checked once and calls onCheckedChange once per click", async () => {
+    const calls: boolean[] = [];
+    const panel = ilha.state("ok", false).render(
+      ({ state }) =>
+        html`${Checkbox({
+            label: "OK",
+            "bind:checked": state.ok,
+            onCheckedChange: (c) => calls.push(c),
+          })} <span data-testid="flag">${state.ok() ? "on" : "off"}</span>`,
+    );
+
+    await mountPanel(panel as never);
+    const flag = () => document.querySelector("[data-testid=flag]")?.textContent ?? "";
+    const root = document.querySelector('[data-slot="checkbox"]') as HTMLElement | null;
+
+    expect(flag()).toBe("off");
+    root?.click();
+    await tick();
+    await tick();
+    await frame();
+
+    expect(calls).toEqual([true]);
+    expect(flag()).toBe("on");
+    expect(root?.getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("fires onCheckedChange once on keyboard space activation", async () => {
+    const calls: boolean[] = [];
+    const panel = ilha.render(
+      () => html`${Checkbox({ label: "OK", onCheckedChange: (c) => calls.push(c) })}`,
+    );
+    await mountPanel(panel);
+
+    const root = document.querySelector('[data-slot="checkbox"]') as HTMLElement | null;
+    root?.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    await tick();
+
+    expect(calls).toEqual([true]);
+  });
+
+  it("keeps multiple instances' callbacks independent", async () => {
+    const callsA: boolean[] = [];
+    const callsB: boolean[] = [];
+    const panel = ilha.render(
+      () =>
+        html`${Checkbox({ label: "A", onCheckedChange: (c) => callsA.push(c) })}
+        ${Checkbox({ label: "B", onCheckedChange: (c) => callsB.push(c) })}`,
+    );
+    await mountPanel(panel);
+
+    const roots = Array.from(document.querySelectorAll('[data-slot="checkbox"]')) as HTMLElement[];
+    expect(roots.length).toBe(2);
+
+    roots[0].click();
+    await tick();
+    expect(callsA).toEqual([true]);
+    expect(callsB).toEqual([]);
+
+    roots[1].click();
+    await tick();
+    expect(callsB).toEqual([true]);
+  });
+
+  it("stops emitting onCheckedChange after unmount", async () => {
+    const calls: boolean[] = [];
+    const panel = ilha.render(
+      () => html`${Checkbox({ label: "OK", onCheckedChange: (c) => calls.push(c) })}`,
+    );
+    const mountResult = await mountPanel(panel);
+
+    const root = document.querySelector('[data-slot="checkbox"]') as HTMLElement | null;
+    root?.click();
+    await tick();
+    expect(calls).toEqual([true]);
+
+    mountResult.unmount();
+    await tick();
+    root?.click();
+    await tick();
+    expect(calls).toEqual([true]);
   });
 });

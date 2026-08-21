@@ -1,14 +1,14 @@
 import ilha, { html, raw, untrack } from "ilha";
 import { Check } from "lucide";
 import { DropdownMenu as DropdownMenuPrimitive } from "@areia/slots";
-
-const dropdownControllers = new WeakMap<Element, DropdownMenuPrimitive.DropdownMenuController>();
 import {
   boundElement,
-  createOpenBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   openBindDefault,
+  openBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { Icon } from "$components/icon";
@@ -443,32 +443,25 @@ function renderDropdown(input: DropdownInput = {}) {
   return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-type DropdownBindRuntime = {
-  controller: DropdownMenuPrimitive.DropdownMenuController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const dropdownBindRuntimeByHost = new WeakMap<Element, DropdownBindRuntime>();
-
 export const DropdownRoot = ilha
   .input<DropdownInput>()
-  .onMount(({ host, input }) => {
+  .action("openChange", (open: boolean, { host }) => {
+    getBindBridge(host, "open")?.onUserChange(open);
+  })
+  .onMount(({ host, input, action }) => {
     const root = host.matches('[data-slot="dropdown-menu"]')
       ? host
       : host.querySelector('[data-slot="dropdown-menu"]');
     if (!root) return;
 
-    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+    disposeBindBridge(host, "open");
 
     stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = DropdownMenuPrimitive.createDropdownMenu(root, {
       defaultOpen: openBindDefault(input, input.defaultOpen),
       defaultValue: input.defaultValue,
       defaultValues: input.defaultValues,
-      onOpenChange: (open) => {
-        bindSync?.onUserChange(open);
-        input.onOpenChange?.(open);
-      },
+      onOpenChange: (open) => action.openChange(open),
       onSelect: input.onSelect,
       onValueChange: input.onValueChange,
       onValuesChange: input.onValuesChange,
@@ -487,22 +480,19 @@ export const DropdownRoot = ilha
         input.onPortalMounted as DropdownMenuPrimitive.DropdownMenuOptions["onPortalMounted"],
     } satisfies DropdownMenuPrimitive.DropdownMenuOptions);
 
-    bindSync = createOpenBindSync(input, controller);
-    bindSync?.applyFromSignal();
-    dropdownControllers.set(root, controller);
-    dropdownBindRuntimeByHost.set(host, { controller, bindSync });
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(input, controller, {
+        onUserChange: (open) => input.onOpenChange?.(open),
+        destroy: () => controller.destroy(),
+      }),
+    );
 
-    return () => {
-      dropdownBindRuntimeByHost.delete(host);
-      dropdownControllers.delete(root);
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = dropdownBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "open")?.applyFromSignal();
   })
   .render(({ input }) => renderDropdown(input));
 

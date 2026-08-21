@@ -1,12 +1,12 @@
 import ilha, { html, raw } from "ilha";
 import { ContextMenu as ContextMenuPrimitive } from "@areia/slots";
-
-const contextMenuControllers = new WeakMap<Element, ContextMenuPrimitive.ContextMenuController>();
 import {
   boundElement,
-  createOpenBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
+  openBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -168,51 +168,41 @@ function renderContextMenu(input: ContextMenuInput = {}) {
   return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-type ContextMenuBindRuntime = {
-  controller: ContextMenuPrimitive.ContextMenuController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const contextMenuBindRuntimeByHost = new WeakMap<Element, ContextMenuBindRuntime>();
-
 export const ContextMenuRoot = ilha
   .input<ContextMenuInput>()
-  .onMount(({ host, input }) => {
+  .action("openChange", (open: boolean, { host }) => {
+    getBindBridge(host, "open")?.onUserChange(open);
+  })
+  .onMount(({ host, input, action }) => {
     const root = host.matches('[data-slot="context-menu"]')
       ? host
       : host.querySelector('[data-slot="context-menu"]');
     if (!root) return;
 
-    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+    disposeBindBridge(host, "open");
 
     stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = ContextMenuPrimitive.createContextMenu(root, {
       disabled: input.disabled,
       closeOnSelect: input.closeOnSelect,
-      onOpenChange: (open) => {
-        bindSync?.onUserChange(open);
-        input.onOpenChange?.(open);
-      },
+      onOpenChange: (open) => action.openChange(open),
       onSelect: input.onSelect,
       onPortalMounted: input.onPortalMounted,
     } satisfies ContextMenuPrimitive.ContextMenuOptions);
 
-    bindSync = createOpenBindSync(input, controller);
-    bindSync?.applyFromSignal();
-    contextMenuControllers.set(root, controller);
-    contextMenuBindRuntimeByHost.set(host, { controller, bindSync });
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(input, controller, {
+        onUserChange: (open) => input.onOpenChange?.(open),
+        destroy: () => controller.destroy(),
+      }),
+    );
 
-    return () => {
-      contextMenuBindRuntimeByHost.delete(host);
-      contextMenuControllers.delete(root);
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = contextMenuBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "open")?.applyFromSignal();
   })
   .render(({ input }) => renderContextMenu(input));
 

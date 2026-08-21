@@ -1,6 +1,14 @@
-import { describe, expect, it } from "bun:test";
-import { markupValue as markup } from "$lib/test-markup";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, describe, expect, it } from "bun:test";
+import ilha, { html } from "ilha";
+import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Pagination, paginationVariants } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
 
 describe("paginationVariants", () => {
   it("returns default classes", () => {
@@ -80,5 +88,70 @@ describe("Pagination.PageSize", () => {
   it("renders with data-slot", () => {
     const output = markup(Pagination.PageSize({ value: 25 }));
     expect(output).toContain('data-slot="pagination-page-size"');
+  });
+});
+
+describe("Pagination interactions (onPageChange)", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+  const tick = () => new Promise<void>((r) => queueMicrotask(() => r()));
+
+  it("calls onPageChange once when next is clicked", async () => {
+    const calls: number[] = [];
+    const panel = ilha.render(
+      () =>
+        html`${Pagination({
+          page: 1,
+          perPage: 10,
+          totalCount: 100,
+          onPageChange: (p) => calls.push(p),
+        })}`,
+    );
+
+    await mountSsr({ Panel: panel }, "Panel");
+    await frame();
+    await tick();
+
+    const next = document.querySelector('[data-pagination-action="next"]') as HTMLElement | null;
+    expect(next).not.toBeNull();
+    next?.click();
+    await tick();
+
+    expect(calls).toEqual([2]);
+  });
+
+  it("fires onPageSizeChange once when the page-size select changes", async () => {
+    const calls: number[] = [];
+    const panel = ilha.render(
+      () =>
+        html`${Pagination({
+          page: 1,
+          perPage: 10,
+          totalCount: 100,
+          onPageSizeChange: (s) => calls.push(s),
+          children: [
+            Pagination.Controls({ page: 1, perPage: 10, totalCount: 100 }),
+            Pagination.PageSize({ value: 10, options: [10, 25, 50] }),
+          ],
+        })}`,
+    );
+
+    await mountSsr({ Panel: panel }, "Panel");
+    await frame();
+    await tick();
+
+    const select = document.querySelector(
+      "[data-pagination-page-size]",
+    ) as HTMLSelectElement | null;
+    expect(select).not.toBeNull();
+    if (select) {
+      select.value = "25";
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    await tick();
+    expect(calls).toEqual([25]);
   });
 });

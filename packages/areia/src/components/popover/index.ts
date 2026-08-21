@@ -2,10 +2,12 @@ import ilha, { html, raw, untrack } from "ilha";
 import { Popover as PopoverPrimitive } from "@areia/slots";
 import {
   boundElement,
-  createOpenBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   openBindDefault,
+  openBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -414,16 +416,12 @@ export function bindPopoverRoot(root: Element) {
   return controller;
 }
 
-type PopoverBindRuntime = {
-  controller: PopoverPrimitive.PopoverController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const popoverBindRuntimeByHost = new WeakMap<Element, PopoverBindRuntime>();
-
 export const PopoverRoot = ilha
   .input<PopoverInput>()
-  .onMount(({ host, input }) => {
+  .action("openChange", (open: boolean, { host }) => {
+    getBindBridge(host, "open")?.onUserChange(open);
+  })
+  .onMount(({ host, input, action }) => {
     const root = host.matches('[data-slot="popover"]')
       ? host
       : host.querySelector('[data-slot="popover"]');
@@ -436,7 +434,7 @@ export const PopoverRoot = ilha
       if (arrow && side) arrow.setAttribute("data-side", side);
     };
 
-    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+    disposeBindBridge(host, "open");
 
     stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = PopoverPrimitive.createPopover(root, {
@@ -447,36 +445,34 @@ export const PopoverRoot = ilha
       closeOnEscape: input.closeOnEscape,
       collisionPadding: input.collisionPadding,
       defaultOpen: openBindDefault(input, input.defaultOpen),
-      onOpenChange: (open) => {
-        bindSync?.onUserChange(open);
-        input.onOpenChange?.(open);
-      },
+      onOpenChange: (open) => action.openChange(open),
       portal: input.portal,
       side: input.side,
       sideOffset: input.sideOffset,
       onPortalMounted: input.onPortalMounted,
     });
 
-    bindSync = createOpenBindSync(input, controller);
-    bindSync?.applyFromSignal();
-    popoverBindRuntimeByHost.set(host, { controller, bindSync });
-
     syncArrowSide();
     const content = root.querySelector<HTMLElement>('[data-slot="popover-content"]');
     const observer = content ? new MutationObserver(syncArrowSide) : undefined;
     observer?.observe(content!, { attributes: true, attributeFilter: ["data-side"] });
 
-    return () => {
-      popoverBindRuntimeByHost.delete(host);
-      observer?.disconnect();
-      controller.destroy();
-    };
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(input, controller, {
+        onUserChange: (open) => input.onOpenChange?.(open),
+        destroy: () => {
+          observer?.disconnect();
+          controller.destroy();
+        },
+      }),
+    );
+
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = popoverBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "open")?.applyFromSignal();
   })
   .on("[data-slot='popover-content']@animationend", ({ host }) => {
     const root = host.matches('[data-slot="popover"]')

@@ -1,14 +1,14 @@
 import ilha, { html, raw } from "ilha";
 import { ChevronDown } from "lucide";
 import { Accordion as AccordionPrimitive, Collapsible as CollapsiblePrimitive } from "@areia/slots";
-
-const collapsibleControllers = new WeakMap<Element, CollapsiblePrimitive.CollapsibleController>();
 import {
   boundElement,
-  createOpenBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   openBindDefault,
+  openBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -393,15 +393,12 @@ function renderCollapsible(input: CollapsibleInput = {}) {
   });
 }
 
-type CollapsibleBindRuntime = {
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const collapsibleBindRuntimeByHost = new WeakMap<Element, CollapsibleBindRuntime>();
-
 export const CollapsibleRootIsland = ilha
   .input<CollapsibleInput>()
-  .onMount(({ host, input }) => {
+  .action("openChange", (open: boolean, { host }) => {
+    getBindBridge(host, "open")?.onUserChange(open);
+  })
+  .onMount(({ host, input, action }) => {
     const accordionRoot = host.matches('[data-slot="accordion"]')
       ? host
       : host.querySelector('[data-slot="accordion"]');
@@ -426,34 +423,28 @@ export const CollapsibleRootIsland = ilha
       : host.querySelector('[data-slot="collapsible"]');
     if (!root) return;
 
-    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+    disposeBindBridge(host, "open");
 
     stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = CollapsiblePrimitive.createCollapsible(root, {
       defaultOpen: openBindDefault(input, input.defaultOpen ?? input.open),
       hiddenUntilFound: input.hiddenUntilFound,
-      onOpenChange: (open) => {
-        bindSync?.onUserChange(open);
-        input.onOpenChange?.(open);
-      },
+      onOpenChange: (open) => action.openChange(open),
     } satisfies CollapsiblePrimitive.CollapsibleOptions);
 
-    bindSync = createOpenBindSync(input, controller);
-    bindSync?.applyFromSignal();
-    collapsibleControllers.set(root, controller);
-    collapsibleBindRuntimeByHost.set(host, { bindSync });
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(input, controller, {
+        onUserChange: (open) => input.onOpenChange?.(open),
+        destroy: () => controller.destroy(),
+      }),
+    );
 
-    return () => {
-      collapsibleBindRuntimeByHost.delete(host);
-      collapsibleControllers.delete(root);
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = collapsibleBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "open")?.applyFromSignal();
   })
   .render(({ input }) => renderCollapsible(input));
 

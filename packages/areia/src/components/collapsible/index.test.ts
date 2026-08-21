@@ -1,6 +1,14 @@
-import { describe, expect, it } from "bun:test";
-import { markupValue as markup } from "$lib/test-markup";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, describe, expect, it } from "bun:test";
+import ilha, { html } from "ilha";
+import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Collapsible } from "./index";
+
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
 
 describe("Collapsible", () => {
   it("default export is an ilha island", () => {
@@ -69,5 +77,47 @@ describe("Collapsible.Accordion", () => {
   it("renders with data-slot", () => {
     const output = markup(Collapsible.Accordion({}));
     expect(output).toContain('data-slot="accordion"');
+  });
+});
+
+describe("Collapsible interactions (onOpenChange + bind)", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+  const tick = () => new Promise<void>((r) => queueMicrotask(() => r()));
+
+  it("emits onOpenChange once and updates bind:open when toggled", async () => {
+    const calls: boolean[] = [];
+    const panel = ilha.state("open", false).render(
+      ({ state }) =>
+        html`${Collapsible({
+          children: [
+            Collapsible.Trigger({ children: "Toggle" }),
+            Collapsible.Panel({ children: "Body" }),
+          ],
+          "bind:open": state.open,
+          onOpenChange: (o) => calls.push(o),
+        })}`,
+    );
+
+    await mountSsr({ Panel: panel }, "Panel");
+    await frame();
+    await tick();
+
+    const trigger = document.querySelector(
+      '[data-slot="collapsible-trigger"]',
+    ) as HTMLElement | null;
+    expect(trigger).not.toBeNull();
+    trigger?.click();
+    await tick();
+    await tick();
+
+    expect(calls).toEqual([true]);
+    trigger?.click();
+    await tick();
+    await tick();
+    expect(calls).toEqual([true, false]);
   });
 });

@@ -19,9 +19,11 @@ import { Button } from "$components/button";
 import { Icon } from "$components/icon";
 import {
   applyThisBind,
-  createDateBindSync,
+  createBindBridge,
+  dateBindSource,
+  disposeBindBridge,
   getBindAccessor,
-  subscribeBindProps,
+  getBindBridge,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -33,7 +35,7 @@ export type DatePickerMode = "single" | "multiple" | "range";
 export type DateRange = { from?: Date; to?: Date };
 export type DatePickerSelected = Date | Date[] | DateRange | undefined;
 
-export interface DatePickerVariantsProps {}
+export type DatePickerVariantsProps = {};
 
 export const DATE_PICKER_VARIANTS = {} as const;
 export const DATE_PICKER_DEFAULT_VARIANTS = {
@@ -371,12 +373,11 @@ function htmlValue(value: ReturnType<typeof html>) {
 }
 
 function syncRoot(root: HTMLElement, input: DatePickerInput) {
-  const container = document.createElement("div");
-  container.innerHTML = htmlValue(renderDatePicker(input));
-  const next = container.firstElementChild as HTMLElement | null;
+  const doc = new DOMParser().parseFromString(htmlValue(renderDatePicker(input)), "text/html");
+  const next = doc.body.firstElementChild as HTMLElement | null;
   if (!next) return;
 
-  root.innerHTML = next.innerHTML;
+  root.replaceChildren(...Array.from(next.childNodes));
   root.className = next.className;
   for (const { name } of Array.from(root.attributes)) {
     if (name.startsWith("data-") && !next.hasAttribute(name)) root.removeAttribute(name);
@@ -386,21 +387,19 @@ function syncRoot(root: HTMLElement, input: DatePickerInput) {
   }
 }
 
-type DatePickerBindRuntime = {
-  dateSync: ReturnType<typeof createDateBindSync>;
-};
-
-const datePickerBindRuntimeByHost = new WeakMap<Element, DatePickerBindRuntime>();
-
 export const DatePickerRoot = ilha
   .input<DatePickerInput>()
-  .onMount(({ host, input }) => {
+  .action("change", (selected: DatePickerSelected, { host }) => {
+    getBindBridge(host, "date")?.onUserChange(selected as Date | null);
+  })
+  .onMount(({ host, input, action }) => {
     const root = host.matches('[data-slot="date-picker"]')
       ? (host as HTMLElement)
       : host.querySelector<HTMLElement>('[data-slot="date-picker"]');
     if (!root) return;
 
     stampMorphPreserve(root);
+    disposeBindBridge(host, "date");
 
     let currentInput: DatePickerInput = {
       ...input,
@@ -409,7 +408,6 @@ export const DatePickerRoot = ilha
         getBindAccessor<Date | null>(input, "bind:valueAsDate")?.() ??
         selectedFromDataset(root, input.mode ?? DATE_PICKER_DEFAULT_VARIANTS.mode),
     };
-    let dateSync: ReturnType<typeof createDateBindSync> = null;
 
     const getSelectedDate = (): Date | null | undefined => {
       const selected = currentInput.selected;
@@ -421,16 +419,23 @@ export const DatePickerRoot = ilha
     const setSelectedDate = (date: Date | null) => {
       currentInput = { ...currentInput, selected: date ?? undefined };
       syncRoot(root, currentInput);
-      input.onChange?.(currentInput.selected);
       emitChange(root, currentInput.selected);
     };
 
-    dateSync = createDateBindSync(input, {
-      getDate: getSelectedDate,
-      setDate: setSelectedDate,
-    });
-    dateSync?.applyFromSignal();
-    datePickerBindRuntimeByHost.set(host, { dateSync });
+    createBindBridge(
+      host,
+      "date",
+      dateBindSource(
+        input,
+        {
+          getDate: getSelectedDate,
+          setDate: setSelectedDate,
+        },
+        {
+          onUserChange: (date) => input.onChange?.(date ?? undefined),
+        },
+      ),
+    );
 
     const cleanupThis = applyThisBind(root, input);
 
@@ -456,29 +461,26 @@ export const DatePickerRoot = ilha
 
       const mode = currentInput.mode ?? DATE_PICKER_DEFAULT_VARIANTS.mode;
       if (mode === "single" && input["bind:valueAsDate"]) {
-        dateSync?.onUserChange(date);
+        action.change(date);
         return;
       }
 
       const selected = nextSelected(currentInput.selected, date, currentInput);
       currentInput = { ...currentInput, selected };
       syncRoot(root, currentInput);
-      input.onChange?.(selected);
+      action.change(selected);
       emitChange(root, selected);
     };
 
     root.addEventListener("click", handleClick);
     return () => {
-      datePickerBindRuntimeByHost.delete(host);
       cleanupThis?.();
       root.removeEventListener("click", handleClick);
+      disposeBindBridge(host);
     };
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = datePickerBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.dateSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "date")?.applyFromSignal();
   })
   .render(({ input }) => renderDatePicker(input));
 

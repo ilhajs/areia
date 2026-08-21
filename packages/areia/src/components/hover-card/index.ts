@@ -1,13 +1,13 @@
 import ilha, { html, raw, untrack } from "ilha";
 import { HoverCard as HoverCardPrimitive } from "@areia/slots";
-
-const hoverCardControllers = new WeakMap<Element, HoverCardPrimitive.HoverCardController>();
 import {
   boundElement,
-  createOpenBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   openBindDefault,
+  openBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -354,22 +354,18 @@ function renderHoverCard(input: HoverCardInput = {}) {
   return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-type HoverCardBindRuntime = {
-  controller: HoverCardPrimitive.HoverCardController;
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const hoverCardBindRuntimeByHost = new WeakMap<Element, HoverCardBindRuntime>();
-
 export const HoverCardRoot = ilha
   .input<HoverCardInput>()
-  .onMount(({ host, input }) => {
+  .action("openChange", (open: boolean, { host }) => {
+    getBindBridge(host, "open")?.onUserChange(open);
+  })
+  .onMount(({ host, input, action }) => {
     const root = host.matches('[data-slot="hover-card"]')
       ? host
       : host.querySelector('[data-slot="hover-card"]');
     if (!root) return;
 
-    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+    disposeBindBridge(host, "open");
 
     stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = HoverCardPrimitive.createHoverCard(root, {
@@ -382,10 +378,7 @@ export const HoverCardRoot = ilha
       collisionPadding: input.collisionPadding,
       defaultOpen: openBindDefault(input, input.defaultOpen),
       delay: input.delay,
-      onOpenChange: (open) => {
-        bindSync?.onUserChange(open);
-        input.onOpenChange?.(open);
-      },
+      onOpenChange: (open) => action.openChange(open),
       portal: input.portal,
       side: input.side,
       sideOffset: input.sideOffset,
@@ -393,22 +386,19 @@ export const HoverCardRoot = ilha
       onPortalMounted: input.onPortalMounted,
     });
 
-    bindSync = createOpenBindSync(input, controller);
-    bindSync?.applyFromSignal();
-    hoverCardControllers.set(root, controller);
-    hoverCardBindRuntimeByHost.set(host, { controller, bindSync });
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(input, controller, {
+        onUserChange: (open) => input.onOpenChange?.(open),
+        destroy: () => controller.destroy(),
+      }),
+    );
 
-    return () => {
-      hoverCardBindRuntimeByHost.delete(host);
-      hoverCardControllers.delete(root);
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = hoverCardBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "open")?.applyFromSignal();
   })
   .render(({ input }) =>
     renderHoverCard(normalizeStaticChildSlots(input, ["content", "trigger", "children"])),

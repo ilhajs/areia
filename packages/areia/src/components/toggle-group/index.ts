@@ -2,10 +2,12 @@ import ilha, { html, raw } from "ilha";
 import { ToggleGroup as ToggleGroupPrimitive } from "@areia/slots";
 import {
   boundElement,
-  createGroupBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   groupBindDefault,
+  groupBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -133,13 +135,6 @@ function renderToggleGroup(input: ToggleGroupInput = {}) {
   return boundElement("div", binds, openSuffix, render(children));
 }
 
-type ToggleGroupBindRuntime = {
-  controller: ToggleGroupPrimitive.ToggleGroupController;
-  groupSync: ReturnType<typeof createGroupBindSync>;
-};
-
-const toggleGroupBindRuntimeByHost = new WeakMap<Element, ToggleGroupBindRuntime>();
-
 function resolveToggleGroupRoot(host: Element): HTMLElement | null {
   const root = host.matches('[data-slot="toggle-group"]')
     ? host
@@ -149,12 +144,16 @@ function resolveToggleGroupRoot(host: Element): HTMLElement | null {
 
 const ToggleGroupRoot = ilha
   .input<ToggleGroupInput>()
-  .onMount(({ host, input }) => {
+  .action("valueChange", (value: string[], { host }) => {
+    getBindBridge(host, "value")?.onUserChange(value);
+  })
+  .onMount(({ host, input, action }) => {
     const root = resolveToggleGroupRoot(host);
     if (!root) return;
 
     const mode = input.type === "multiple" ? "multiple" : "single";
-    let groupSync: ReturnType<typeof createGroupBindSync> = null;
+
+    disposeBindBridge(host, "value");
 
     stampMorphPreserve(root);
     const controller = ToggleGroupPrimitive.createToggleGroup(root, {
@@ -163,33 +162,32 @@ const ToggleGroupRoot = ilha
       orientation: input.orientation,
       loop: input.loop,
       disabled: input.disabled,
-      onValueChange: (value) => {
-        groupSync?.onUserChange(value);
-        input.onValueChange?.(value);
-      },
+      onValueChange: (value) => action.valueChange(value),
     } satisfies ToggleGroupPrimitive.ToggleGroupOptions);
 
-    groupSync = createGroupBindSync(
-      input,
-      {
-        getValue: () => controller.value,
-        setValue: (value) => controller.setValue(value ?? []),
-      },
-      mode,
+    createBindBridge(
+      host,
+      "value",
+      groupBindSource(
+        input,
+        {
+          getValue: () => controller.value,
+          setValue: (value) => controller.setValue(value ?? []),
+        },
+        {
+          mode,
+          onUserChange: (value) => {
+            if (Array.isArray(value)) input.onValueChange?.(value);
+          },
+          destroy: () => controller.destroy(),
+        },
+      ),
     );
-    groupSync?.applyFromSignal();
-    toggleGroupBindRuntimeByHost.set(host, { controller, groupSync });
 
-    return () => {
-      toggleGroupBindRuntimeByHost.delete(host);
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = toggleGroupBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.groupSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "value")?.applyFromSignal();
   })
   .render(({ input }) => renderToggleGroup(input));
 

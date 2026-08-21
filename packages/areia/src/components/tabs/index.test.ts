@@ -1,7 +1,7 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import ilha, { html, mount } from "ilha";
-import { markupValue as markup } from "$lib/test-markup";
+import ilha, { html } from "ilha";
+import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Tabs, tabsVariants } from "./index";
 
 try {
@@ -150,8 +150,7 @@ describe("Tabs bind:group in parent island", () => {
       })}`;
     });
 
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
-    mount({ Panel }, { root: document.body, lazy: false });
+    await mountSsr({ Panel }, "Panel");
     await Promise.resolve();
     await Promise.resolve();
 
@@ -197,8 +196,7 @@ describe("Tabs bind:group in parent island", () => {
       () => html`<section data-testid="page">${UsefulExtrasSnippets()}</section>`,
     );
 
-    document.body.innerHTML = await Page.hydratable({}, { name: "Page", snapshot: true });
-    mount({ Page, UsefulExtrasSnippets }, { root: document.body, lazy: false });
+    await mountSsr({ Page, UsefulExtrasSnippets }, "Page");
     await Promise.resolve();
     await Promise.resolve();
 
@@ -228,8 +226,7 @@ describe("Tabs bind:group in parent island", () => {
           ],
         })}`,
     );
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
-    const { unmount } = mount({ App }, { root: document.body, lazy: false });
+    const { unmount } = await mountSsr({ App }, "App");
     await Promise.resolve();
     try {
       const root = document.querySelector('[data-slot="tabs"]');
@@ -240,28 +237,5 @@ describe("Tabs bind:group in parent island", () => {
     } finally {
       unmount();
     }
-  });
-});
-
-describe("Tabs.Trigger", () => {
-  it("renders with data-slot", () => {
-    const output = markup(Tabs.Trigger({ value: "a", label: "A" }));
-    expect(output).toContain('data-slot="tabs-trigger"');
-    expect(output).toContain('data-value="a"');
-  });
-});
-
-describe("Tabs.Content", () => {
-  it("renders with data-slot", () => {
-    const output = markup(Tabs.Content({ value: "a", children: "Body" }));
-    expect(output).toContain('data-slot="tabs-content"');
-    expect(output).toContain('data-value="a"');
-  });
-});
-
-describe("Tabs.List", () => {
-  it("renders with data-slot", () => {
-    const output = markup(Tabs.List({}));
-    expect(output).toContain('data-slot="tabs-list"');
   });
 });

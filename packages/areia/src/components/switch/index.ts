@@ -2,9 +2,11 @@ import ilha, { html, raw } from "ilha";
 import { Switch as SwitchPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
-  createCheckedBindSync,
+  checkedBindSource,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -388,13 +390,6 @@ function emitSwitchChange(root: Element, checked: boolean) {
   root.dispatchEvent(new CustomEvent("switch:change", { bubbles: true, detail: { checked } }));
 }
 
-type SwitchBindRuntime = {
-  controller: SwitchPrimitive.SwitchController;
-  bindSync: ReturnType<typeof createCheckedBindSync>;
-};
-
-const switchBindRuntimeByHost = new WeakMap<Element, SwitchBindRuntime>();
-
 function resolveSwitchRoot(host: Element): HTMLElement | null {
   const root = host.matches('[data-slot="switch"]')
     ? host
@@ -404,11 +399,15 @@ function resolveSwitchRoot(host: Element): HTMLElement | null {
 
 export const SwitchRoot = ilha
   .input<SwitchInput>()
-  .onMount(({ host, input }) => {
+  .action("checkedChange", (checked: boolean, { host }) => {
+    getBindBridge(host, "checked")?.onUserChange(checked);
+    emitSwitchChange(resolveSwitchRoot(host) ?? host, checked);
+  })
+  .onMount(({ host, input, action }) => {
     const root = resolveSwitchRoot(host);
     if (!root) return;
 
-    let bindSync: ReturnType<typeof createCheckedBindSync> = null;
+    disposeBindBridge(host, "checked");
 
     stampMorphPreserve(root);
     const controller = SwitchPrimitive.createSwitch(root, {
@@ -424,27 +423,22 @@ export const SwitchRoot = ilha
       name: typeof input.name === "string" ? input.name : undefined,
       value: typeof input.value === "string" ? input.value : undefined,
       uncheckedValue: typeof input.uncheckedValue === "string" ? input.uncheckedValue : undefined,
-      onCheckedChange: (checked: boolean) => {
-        bindSync?.onUserChange(checked);
-        input.onCheckedChange?.(checked);
-        emitSwitchChange(root, checked);
-      },
+      onCheckedChange: (checked: boolean) => action.checkedChange(checked),
     } satisfies SwitchPrimitive.SwitchOptions);
 
-    bindSync = createCheckedBindSync(input, controller);
-    bindSync?.applyFromSignal();
-    switchBindRuntimeByHost.set(host, { controller, bindSync });
+    createBindBridge(
+      host,
+      "checked",
+      checkedBindSource(input, controller, {
+        onUserChange: (checked) => input.onCheckedChange?.(checked),
+        destroy: () => controller.destroy(),
+      }),
+    );
 
-    return () => {
-      switchBindRuntimeByHost.delete(host);
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = switchBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "checked")?.applyFromSignal();
   })
   .render(({ input }) => renderSwitch(input));
 

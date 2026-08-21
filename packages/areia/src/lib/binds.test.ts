@@ -8,9 +8,12 @@ import { Dialog } from "$components/dialog";
 import {
   applyThisBind,
   boundVoidElement,
-  createDateBindSync,
-  createGroupBindSync,
-  createOpenBindSync,
+  createBindBridge,
+  dateBindSource,
+  disposeBindBridge,
+  getBindBridge,
+  groupBindSource,
+  openBindSource,
 } from "./binds";
 import type { SignalAccessor as IlhaSignalAccessor } from "ilha";
 
@@ -119,43 +122,56 @@ describe("Input bind:this", () => {
   });
 });
 
-describe("createOpenBindSync", () => {
-  it("mirrors signal and controller open state", () => {
+describe("openBindBridge", () => {
+  it("mirrors signal/controller; user writes bind + callback once, programmatic is silent", async () => {
     let open = false;
+    let callbacks = 0;
     const bindOpen = ((value?: boolean) => {
       if (value !== undefined) open = value;
       return open;
     }) as IlhaSignalAccessor<boolean>;
 
     let isOpen = false;
-    const controller = {
-      get isOpen() {
-        return isOpen;
-      },
-      open: () => {
-        isOpen = true;
-      },
-      close: () => {
-        isOpen = false;
-      },
-    };
+    const host = document.createElement("div");
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(
+        { "bind:open": bindOpen },
+        {
+          get isOpen() {
+            return isOpen;
+          },
+          open: () => {
+            isOpen = true;
+          },
+          close: () => {
+            isOpen = false;
+          },
+        },
+        { onUserChange: () => callbacks++ },
+      ),
+    );
+    const bridge = getBindBridge(host, "open")!;
 
-    const sync = createOpenBindSync({ "bind:open": bindOpen }, controller)!;
-    sync.applyFromSignal();
-    expect(isOpen).toBe(false);
-
+    // Programmatic: controller sync, no callback, no bind write-back.
     open = true;
-    sync.applyFromSignal();
+    bridge.applyFromSignal();
+    await Promise.resolve();
     expect(isOpen).toBe(true);
+    expect(callbacks).toBe(0);
 
-    sync.onUserChange(false);
+    // User: bind written once + callback once.
+    bridge.onUserChange(false);
     expect(open).toBe(false);
-    expect(isOpen).toBe(true);
+    expect(callbacks).toBe(1);
+
+    disposeBindBridge(host);
   });
 });
 
-describe("createGroupBindSync", () => {
-  it("mirrors single-select values", () => {
+describe("groupBindBridge", () => {
+  it("mirrors single-select values with apply writing the controller once", async () => {
     let value = "free";
     const bindGroup = ((next?: string) => {
       if (next !== undefined) value = next;
@@ -163,28 +179,37 @@ describe("createGroupBindSync", () => {
     }) as IlhaSignalAccessor<string>;
 
     let current: string | null = "free";
-    const sync = createGroupBindSync(
-      { "bind:group": bindGroup },
-      {
-        getValue: () => current,
-        setValue: (next) => {
-          current = typeof next === "string" ? next : (next?.[0] ?? null);
+    const host = document.createElement("div");
+    createBindBridge(
+      host,
+      "value",
+      groupBindSource(
+        { "bind:group": bindGroup },
+        {
+          getValue: () => current,
+          setValue: (next) => {
+            current = typeof next === "string" ? next : (next?.[0] ?? null);
+          },
         },
-      },
-      "single",
-    )!;
+        { mode: "single" },
+      ),
+    );
+    const bridge = getBindBridge(host, "value")!;
 
     value = "pro";
-    sync.applyFromSignal();
+    bridge.applyFromSignal();
+    await Promise.resolve();
     expect(current).toBe("pro");
 
-    sync.onUserChange("free");
+    bridge.onUserChange("free");
     expect(value).toBe("free");
+
+    disposeBindBridge(host);
   });
 });
 
-describe("createDateBindSync", () => {
-  it("mirrors date selection", () => {
+describe("dateBindBridge", () => {
+  it("mirrors date selection; apply is silent, user writes bind once", async () => {
     const day = new Date("2026-05-15T12:00:00.000Z");
     let selected: Date | null = day;
     const bindDate = ((next?: Date | null) => {
@@ -193,23 +218,32 @@ describe("createDateBindSync", () => {
     }) as IlhaSignalAccessor<Date | null>;
 
     let current: Date | null = day;
-    const sync = createDateBindSync(
-      { "bind:valueAsDate": bindDate },
-      {
-        getDate: () => current,
-        setDate: (next) => {
-          current = next;
+    const host = document.createElement("div");
+    createBindBridge(
+      host,
+      "date",
+      dateBindSource(
+        { "bind:valueAsDate": bindDate },
+        {
+          getDate: () => current,
+          setDate: (next) => {
+            current = next;
+          },
         },
-      },
-    )!;
+      ),
+    );
 
+    const bridge = getBindBridge(host, "date")!;
     const next = new Date("2026-05-20T12:00:00.000Z");
     selected = next;
-    sync.applyFromSignal();
+    bridge.applyFromSignal();
+    await Promise.resolve();
     expect(current?.toISOString()).toBe(next.toISOString());
 
-    sync.onUserChange(day);
+    bridge.onUserChange(day);
     expect(selected?.toISOString()).toBe(day.toISOString());
+
+    disposeBindBridge(host);
   });
 });
 

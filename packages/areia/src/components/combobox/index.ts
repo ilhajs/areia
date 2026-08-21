@@ -4,12 +4,14 @@ import {
   applyThisBind,
   boundElement,
   boundVoidElement,
-  createGroupBindSync,
-  createOpenBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   groupBindDefault,
+  groupBindSource,
   openBindDefault,
+  openBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -806,24 +808,23 @@ function renderField(input: ComboboxInput, children?: unknown[]) {
   });
 }
 
-type ComboboxBindRuntime = {
-  controller: ComboboxPrimitive.ComboboxController;
-  openSync: ReturnType<typeof createOpenBindSync>;
-  groupSync: ReturnType<typeof createGroupBindSync>;
-};
-
-const comboboxBindRuntimeByHost = new WeakMap<Element, ComboboxBindRuntime>();
-
 export const ComboboxRoot = ilha
   .input<ComboboxInput>()
-  .onMount(({ host, input }) => {
+  .action("openChange", (open: boolean, { host }) => {
+    getBindBridge(host, "open")?.onUserChange(open);
+  })
+  .action("valueChange", (value: string | string[] | null, { host }) => {
+    getBindBridge(host, "value")?.onUserChange(value);
+  })
+  .onMount(({ host, input, action }) => {
     const root = host.matches('[data-slot="combobox"]')
       ? host
       : host.querySelector('[data-slot="combobox"]');
     if (!root) return;
 
-    let openSync: ReturnType<typeof createOpenBindSync> = null;
-    let groupSync: ReturnType<typeof createGroupBindSync> = null;
+    disposeBindBridge(host);
+
+    const selectionInput = withSelectionBind(input);
 
     stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
     const controller = ComboboxPrimitive.createCombobox(root, {
@@ -834,24 +835,16 @@ export const ComboboxRoot = ilha
       collisionPadding: input.collisionPadding,
       defaultOpen: openBindDefault(input, input.defaultOpen),
       defaultValue:
-        (groupBindDefault(withSelectionBind(input), input.defaultValue) as
-          | string
-          | string[]
-          | undefined) ?? undefined,
+        (groupBindDefault(selectionInput, input.defaultValue) as string | string[] | undefined) ??
+        undefined,
       disabled: input.disabled,
       filter: input.filter,
       itemToStringValue: input.itemToStringValue,
       multiple: input.multiple,
       name: input.name,
       onInputValueChange: input.onInputValueChange,
-      onOpenChange: (open) => {
-        openSync?.onUserChange(open);
-        input.onOpenChange?.(open);
-      },
-      onValueChange: (value) => {
-        groupSync?.onUserChange(value);
-        (input.onValueChange as ComboboxPrimitive.ComboboxOptions["onValueChange"])?.(value);
-      },
+      onOpenChange: (open) => action.openChange(open),
+      onValueChange: (value) => action.valueChange(value),
       openOnFocus: input.openOnFocus,
       placeholder: input.placeholder,
       required: input.required,
@@ -860,21 +853,32 @@ export const ComboboxRoot = ilha
       onPortalMounted: input.onPortalMounted,
     });
 
-    openSync = createOpenBindSync(input, controller);
-    groupSync = createGroupBindSync(
-      withSelectionBind(input),
-      {
-        getValue: () => (input.multiple ? [...controller.values] : controller.value),
-        setValue: (value) => {
-          if (value == null) controller.clear();
-          else controller.setValues(Array.isArray(value) ? value : [value]);
-        },
-      },
-      input.multiple ? "multiple" : "single",
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(input, controller, {
+        onUserChange: (open) => input.onOpenChange?.(open),
+      }),
     );
-    openSync?.applyFromSignal();
-    groupSync?.applyFromSignal();
-    comboboxBindRuntimeByHost.set(host, { controller, openSync, groupSync });
+    createBindBridge(
+      host,
+      "value",
+      groupBindSource(
+        selectionInput,
+        {
+          getValue: () => (input.multiple ? [...controller.values] : controller.value),
+          setValue: (value) => {
+            if (value == null) controller.clear();
+            else controller.setValues(Array.isArray(value) ? value : [value]);
+          },
+        },
+        {
+          mode: input.multiple ? "multiple" : "single",
+          onUserChange: (value) =>
+            (input.onValueChange as ComboboxPrimitive.ComboboxOptions["onValueChange"])?.(value),
+        },
+      ),
+    );
 
     const bindTarget =
       root.querySelector<HTMLElement>('[data-slot="combobox-input"]') ??
@@ -882,17 +886,13 @@ export const ComboboxRoot = ilha
     const cleanupThis = applyThisBind(bindTarget, input);
 
     return () => {
-      comboboxBindRuntimeByHost.delete(host);
       cleanupThis?.();
-      controller.destroy();
+      disposeBindBridge(host);
     };
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = comboboxBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.openSync?.applyFromSignal();
-    runtime.groupSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "open")?.applyFromSignal();
+    getBindBridge(host, "value")?.applyFromSignal();
   })
   .render(({ input }) => renderField(input));
 

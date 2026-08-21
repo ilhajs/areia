@@ -2,10 +2,12 @@ import ilha, { html, raw } from "ilha";
 import { Tabs as TabsPrimitive } from "@areia/slots";
 import {
   boundElement,
-  createGroupBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   groupBindDefault,
+  groupBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -537,13 +539,6 @@ function enhanceOverflow(root: Element) {
   };
 }
 
-type TabsBindRuntime = {
-  controller: TabsPrimitive.TabsController;
-  groupSync: ReturnType<typeof createGroupBindSync>;
-};
-
-const tabsBindRuntimeByHost = new WeakMap<Element, TabsBindRuntime>();
-
 function resolveTabsRoot(host: Element): HTMLElement | null {
   const root = host.matches('[data-slot="tabs"]') ? host : host.querySelector('[data-slot="tabs"]');
   return root as HTMLElement | null;
@@ -551,11 +546,15 @@ function resolveTabsRoot(host: Element): HTMLElement | null {
 
 export const TabsRoot = ilha
   .input<TabsInput>()
-  .onMount(({ host, input }) => {
+  .action("valueChange", (value: string, { host }) => {
+    getBindBridge(host, "value")?.onUserChange(value);
+  })
+  .onMount(({ host, input, action }) => {
     const root = resolveTabsRoot(host);
     if (!root) return;
 
-    let groupSync: ReturnType<typeof createGroupBindSync> = null;
+    disposeBindBridge(host, "value");
+
     const initialValue =
       groupBindDefault(input, input.value ?? input.selectedValue ?? input.defaultValue) ??
       undefined;
@@ -570,41 +569,41 @@ export const TabsRoot = ilha
     const controller = TabsPrimitive.createTabs(root, {
       defaultValue,
       activationMode: input.activationMode ?? (input.activateOnFocus ? "auto" : "manual"),
-      onValueChange: (value) => {
-        groupSync?.onUserChange(value);
-        input.onValueChange?.(value);
-      },
+      onValueChange: (value) => action.valueChange(value),
     });
     const cleanupOverflow = enhanceOverflow(root);
 
-    groupSync = createGroupBindSync(
-      input,
-      {
-        getValue: () => controller.value,
-        setValue: (value) => {
-          if (typeof value === "string") controller.select(value);
-          else if (Array.isArray(value) && value[0]) controller.select(value[0]);
+    createBindBridge(
+      host,
+      "value",
+      groupBindSource(
+        input,
+        {
+          getValue: () => controller.value,
+          setValue: (value) => {
+            if (typeof value === "string") controller.select(value);
+            else if (Array.isArray(value) && value[0]) controller.select(value[0]);
+          },
         },
-      },
-      "single",
+        {
+          onUserChange: (value) => {
+            if (typeof value === "string") input.onValueChange?.(value);
+          },
+          afterControllerWrite: () => controller.updateIndicator(),
+          destroy: () => {
+            cleanupOverflow();
+            controller.destroy();
+          },
+        },
+      ),
     );
-    groupSync?.applyFromSignal();
-    tabsBindRuntimeByHost.set(host, { controller, groupSync });
 
-    return () => {
-      tabsBindRuntimeByHost.delete(host);
-      cleanupOverflow();
-      controller.destroy();
-    };
+    return () => disposeBindBridge(host);
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = tabsBindRuntimeByHost.get(host);
-    if (!runtime) return;
+  .effect(({ host }) => {
     const root = resolveTabsRoot(host);
     if (root) stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-    runtime.controller.updateIndicator();
-    runtime.groupSync?.applyFromSignal();
+    getBindBridge(host, "value")?.applyFromSignal();
   })
   .render(({ input }) => renderTabs(input));
 

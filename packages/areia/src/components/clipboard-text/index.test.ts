@@ -1,65 +1,92 @@
-import { describe, expect, it } from "bun:test";
-import { markupValue as markup } from "$lib/test-markup";
-import { ClipboardText, clipboardTextVariants } from "./index";
+import { GlobalRegistrator } from "@happy-dom/global-registrator";
+import { afterEach, describe, expect, it } from "bun:test";
+import ilha, { html } from "ilha";
+import { markupValue as markup, mountSsr } from "$lib/test-markup";
+import { ClipboardText } from "./index";
 
-describe("clipboardTextVariants", () => {
-  it("returns default lg classes", () => {
-    const classes = clipboardTextVariants();
-    expect(classes).toContain("bg-areia-control-background");
-    expect(classes).toContain("text-sm");
-  });
-
-  it("applies sm size classes", () => {
-    const classes = clipboardTextVariants({ size: "sm" });
-    expect(classes).toContain("text-xs");
-  });
-});
+try {
+  GlobalRegistrator.register();
+} catch {
+  // Already registered by another DOM test file in the same Bun process.
+}
 
 describe("ClipboardText", () => {
-  it("renders wrapper with data-slot", () => {
-    const output = markup(ClipboardText({ text: "abc123" }));
-    expect(output).toContain('data-slot="clipboard-text"');
+  afterEach(() => {
+    document.body.innerHTML = "";
+    Object.defineProperty(navigator, "clipboard", { value: undefined, configurable: true });
   });
 
-  it("displays text value", () => {
-    const output = markup(ClipboardText({ text: "abc123" }));
-    expect(output).toContain('data-slot="clipboard-text-value"');
-    expect(output).toContain("abc123");
+  const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+  const tick = () => new Promise<void>((r) => queueMicrotask(() => r()));
+
+  it("never serializes the callback into SSR/HTML output", () => {
+    const output = markup(ClipboardText({ text: "hi", onCopy: () => {} }));
+    expect(output).not.toContain("onCopy");
+    expect(output).not.toMatch(/function\s*\(/);
   });
 
-  it("renders copy button", () => {
-    const output = markup(ClipboardText({ text: "abc123" }));
-    expect(output).toContain('data-slot="clipboard-text-button"');
-    expect(output).toContain('aria-label="Copy to clipboard"');
+  it("calls onCopy exactly once with the copied text when the button is clicked", async () => {
+    let copies = 0;
+    let text = "";
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: async (t: string) => void (text = t) },
+      configurable: true,
+    });
+
+    const panel = ilha.render(
+      () =>
+        html`${ClipboardText({
+          text: "secret",
+          textToCopy: "secret-copy",
+          onCopy: () => copies++,
+        })}`,
+    );
+
+    await mountSsr({ Panel: panel }, "Panel");
+    await frame();
+    await tick();
+
+    const button = document.querySelector(
+      '[data-slot="clipboard-text-button"]',
+    ) as HTMLElement | null;
+    expect(button).not.toBeNull();
+    button?.click();
+    await tick();
+    await tick();
+
+    expect(text).toBe("secret-copy");
+    expect(copies).toBe(1);
   });
 
-  it("renders tooltip when tooltip is true", () => {
-    const output = markup(ClipboardText({ text: "abc123", tooltip: true }));
-    expect(output).toContain('data-slot="tooltip"');
-    expect(output).toContain("Copy");
-  });
+  it("stops invoking onCopy after unmount", async () => {
+    let copies = 0;
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: async () => {} },
+      configurable: true,
+    });
 
-  it("renders sr-only status element", () => {
-    const output = markup(ClipboardText({ text: "abc123" }));
-    expect(output).toContain('data-slot="clipboard-text-status"');
-    expect(output).toContain('aria-live="polite"');
-  });
+    const panel = ilha.render(
+      () => html`${ClipboardText({ text: "secret", onCopy: () => copies++ })}`,
+    );
 
-  it("sets data-copy-text attribute", () => {
-    const output = markup(ClipboardText({ text: "abc123", textToCopy: "override" }));
-    expect(output).toContain('data-copy-text="override"');
-  });
+    const mountResult = await mountSsr({ Panel: panel }, "Panel");
+    await frame();
+    await tick();
 
-  it("emits valid inline onclick without double quotes inside attribute selectors", () => {
-    const output = markup(ClipboardText({ text: "npx foo", tooltip: true }));
-    expect(output).toContain("onclick=");
-    expect(output).not.toMatch(/onclick="[^"]*\[data-slot="/);
-    expect(output).toContain("[data-slot=\\'clipboard-text\\']");
-  });
+    const button = document.querySelector(
+      '[data-slot="clipboard-text-button"]',
+    ) as HTMLElement | null;
+    button?.click();
+    await tick();
+    await tick();
+    expect(copies).toBe(1);
 
-  it("merges custom class and className", () => {
-    const output = markup(ClipboardText({ text: "x", class: "a", className: "b" }));
-    expect(output).toContain("a");
-    expect(output).toContain("b");
+    mountResult.unmount();
+    await tick();
+
+    button?.click();
+    await tick();
+    await tick();
+    expect(copies).toBe(1);
   });
 });

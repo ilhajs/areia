@@ -1,10 +1,12 @@
 import ilha, { html, raw } from "ilha";
 import {
   boundVoidElement,
-  createOpenBindSync,
+  createBindBridge,
+  disposeBindBridge,
+  getBindBridge,
   openBindDefault,
+  openBindSource,
   splitBindProps,
-  subscribeBindProps,
   type IlhaBindProps,
 } from "$lib/binds";
 import { cn } from "$lib/cn";
@@ -462,22 +464,24 @@ function syncItems(root: Element, input: AutocompleteInput, query: string) {
   const list = root.querySelector<HTMLElement>('[data-slot="autocomplete-list"]');
   if (!list || !input.items) return;
   const nextInput = { ...input, value: query };
-  list.innerHTML = renderString(renderItems(filterItems(normalizeItems(input.items), nextInput)));
+  const markup = renderString(renderItems(filterItems(normalizeItems(input.items), nextInput)));
+  const doc = new DOMParser().parseFromString(markup, "text/html");
+  list.replaceChildren(...Array.from(doc.body.childNodes));
   root.querySelectorAll<HTMLElement>('[data-slot="autocomplete-item"]').forEach((item) => {
     item.removeAttribute("data-highlighted");
     item.removeAttribute("data-selected");
   });
 }
 
-type AutocompleteBindRuntime = {
-  bindSync: ReturnType<typeof createOpenBindSync>;
-};
-
-const autocompleteBindRuntimeByHost = new WeakMap<Element, AutocompleteBindRuntime>();
-
 export const AutocompleteRoot = ilha
   .input<AutocompleteInput>()
-  .onMount(({ host, input }) => {
+  .action("openChange", (open: boolean, { host }) => {
+    getBindBridge(host, "open")?.onUserChange(open);
+  })
+  .action("valueChange", (value: string, { input }) => {
+    input.onValueChange?.(value);
+  })
+  .onMount(({ host, input, action }) => {
     const root = host.matches('[data-slot="autocomplete"]')
       ? host
       : host.querySelector('[data-slot="autocomplete"]');
@@ -488,7 +492,8 @@ export const AutocompleteRoot = ilha
 
     stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
 
-    let bindSync: ReturnType<typeof createOpenBindSync> = null;
+    disposeBindBridge(host, "open");
+
     let notifyOpenChange: (open: boolean) => void = () => {};
     const openController = {
       get isOpen() {
@@ -497,15 +502,17 @@ export const AutocompleteRoot = ilha
       open: () => setOpen(root, true, notifyOpenChange),
       close: () => setOpen(root, false, notifyOpenChange),
     };
-    notifyOpenChange = (open: boolean) => {
-      bindSync?.onUserChange(open);
-      input.onOpenChange?.(open);
-    };
+    notifyOpenChange = action.openChange;
 
-    bindSync = createOpenBindSync(input, openController);
+    createBindBridge(
+      host,
+      "open",
+      openBindSource(input, openController, {
+        onUserChange: (open) => input.onOpenChange?.(open),
+      }),
+    );
+
     if (openBindDefault(input, false)) openController.open();
-    else bindSync?.applyFromSignal();
-    autocompleteBindRuntimeByHost.set(host, { bindSync });
 
     const highlight = (item: HTMLElement | undefined) => {
       root
@@ -517,7 +524,7 @@ export const AutocompleteRoot = ilha
     const handleInput = () => {
       const value = textInput.value;
       syncItems(root, input, value);
-      input.onValueChange?.(value);
+      action.valueChange(value);
       root.dispatchEvent(
         new CustomEvent("autocomplete:value-change", { bubbles: true, detail: { value } }),
       );
@@ -537,7 +544,7 @@ export const AutocompleteRoot = ilha
       root
         .querySelectorAll<HTMLElement>('[data-slot="autocomplete-item"]')
         .forEach((element) => element.toggleAttribute("data-selected", element === item));
-      input.onValueChange?.(value);
+      action.valueChange(value);
       root.dispatchEvent(
         new CustomEvent("autocomplete:value-change", { bubbles: true, detail: { value } }),
       );
@@ -581,19 +588,16 @@ export const AutocompleteRoot = ilha
     document.addEventListener("pointerdown", handleDocumentPointerDown);
 
     return () => {
-      autocompleteBindRuntimeByHost.delete(host);
       textInput.removeEventListener("input", handleInput);
       textInput.removeEventListener("focus", handleFocus);
       textInput.removeEventListener("keydown", handleKeyDown);
       root.removeEventListener("click", handleClick);
       document.removeEventListener("pointerdown", handleDocumentPointerDown);
+      disposeBindBridge(host);
     };
   })
-  .effect(({ host, input }) => {
-    subscribeBindProps(input);
-    const runtime = autocompleteBindRuntimeByHost.get(host);
-    if (!runtime) return;
-    runtime.bindSync?.applyFromSignal();
+  .effect(({ host }) => {
+    getBindBridge(host, "open")?.applyFromSignal();
   })
   .render(({ input }) => renderField(input));
 

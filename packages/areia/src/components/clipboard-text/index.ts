@@ -141,7 +141,7 @@ function copyButton(input: {
     type="button"
     data-variant="ghost"
     class="${classes}"
-    ${inlineCopy ? raw(`onclick="${CLIPBOARD_TEXT_INLINE_ONCLICK}"`) : ""}
+    ${inlineCopy ? raw(` onclick="${CLIPBOARD_TEXT_INLINE_ONCLICK}"`) : ""}
   >
     <span class="contents"
       ><span
@@ -228,39 +228,37 @@ function setCopiedState(root: Element, copied: boolean) {
   }
 }
 
+const clipboardTimers = new WeakMap<Element, ReturnType<typeof setTimeout>>();
+
+function resolveClipboardRoot(host: Element): HTMLElement | null {
+  return host.matches('[data-slot="clipboard-text"]')
+    ? (host as HTMLElement)
+    : host.querySelector<HTMLElement>('[data-slot="clipboard-text"]');
+}
+
 export const ClipboardTextRoot = ilha
   .input<ClipboardTextInput>()
-  .onMount(({ host, input }) => {
-    const root = host.matches('[data-slot="clipboard-text"]')
-      ? host
-      : host.querySelector('[data-slot="clipboard-text"]');
-    const button = root?.querySelector<HTMLButtonElement>('[data-slot="clipboard-text-button"]');
-    if (!root || !button) return;
-    if (input.onCopy == null && button.hasAttribute("onclick")) return;
-
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-
-    const onClick = async () => {
-      const text = button.getAttribute("data-copy-text") ?? input.textToCopy ?? input.text;
-
-      try {
-        await writeClipboard(text);
-        setCopiedState(root, true);
-        input.onCopy?.(text);
-
-        if (timeout) clearTimeout(timeout);
-        timeout = setTimeout(() => setCopiedState(root, false), 1500);
-      } catch (error) {
-        console.warn("Clipboard copy failed", error);
-      }
-    };
-
-    button.addEventListener("click", onClick);
-
-    return () => {
-      button.removeEventListener("click", onClick);
-      if (timeout) clearTimeout(timeout);
-    };
+  .action("copy", async (_props: undefined, { input, host, signal }) => {
+    const root = resolveClipboardRoot(host);
+    if (!root) return;
+    const text = input.textToCopy ?? input.text;
+    try {
+      await writeClipboard(text);
+      if (signal.aborted) return;
+      setCopiedState(root, true);
+      input.onCopy?.(text);
+      clearTimeout(clipboardTimers.get(host));
+      const timer = setTimeout(() => setCopiedState(root, false), 1500);
+      clipboardTimers.set(host, timer);
+      signal.addEventListener("abort", () => clearTimeout(timer), { once: true });
+    } catch (error) {
+      if (signal.aborted) return;
+      console.warn("Clipboard copy failed", error);
+    }
+  })
+  .on("[data-slot='clipboard-text-button']@click", ({ action, input }) => {
+    if (input.onCopy == null) return;
+    action.copy();
   })
   .render(({ input }) => renderClipboardText(input));
 
