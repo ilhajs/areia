@@ -25,7 +25,7 @@ Displays task completion progress with accessible `progressbar` semantics.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Uploading" value={45} />\n));'
+    'import { ilha } from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Uploading" value={45} />\n));'
   }
   lang="tsx"
 >
@@ -42,7 +42,7 @@ import { Progress } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Loading project" value={60} />\n));'
+    'import { ilha } from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Loading project" value={60} />\n));'
   }
   lang="tsx"
 >
@@ -57,7 +57,7 @@ Pass a numeric `value` to render determinate progress. The indicator width is co
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Importing data" value={72} />\n));'
+    'import { ilha } from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Importing data" value={72} />\n));'
   }
   lang="tsx"
 >
@@ -70,7 +70,7 @@ Use `value: null` when the total amount of work is unknown.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Syncing" value={null} />\n));'
+    'import { ilha } from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Syncing" value={null} />\n));'
   }
   lang="tsx"
 >
@@ -81,7 +81,7 @@ Use `value: null` when the total amount of work is unknown.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress\n    label="Storage used"\n    min={0}\n    max={500}\n    value={125}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress\n    label="Storage used"\n    min={0}\n    max={500}\n    value={125}\n  />\n));'
   }
   lang="tsx"
 >
@@ -92,7 +92,7 @@ Use `value: null` when the total amount of work is unknown.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Processing" value={35} showValue={false} />\n));'
+    'import { ilha } from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress label="Processing" value={35} showValue={false} />\n));'
   }
   lang="tsx"
 >
@@ -105,7 +105,7 @@ Use `trackClass`, `indicatorClass`, and `valueClass` to style internal parts.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress\n    label="Deployment"\n    value={80}\n    trackClass="h-3 bg-areia-surface-muted"\n    indicatorClass="bg-emerald-500"\n    valueClass="text-emerald-600"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Progress } from "areia";\n\nexport default ilha.render(() => (\n  <Progress\n    label="Deployment"\n    value={80}\n    trackClass="h-3 bg-areia-surface-muted"\n    indicatorClass="bg-emerald-500"\n    valueClass="text-emerald-600"\n  />\n));'
   }
   lang="tsx"
 >

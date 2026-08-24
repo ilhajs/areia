@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { CircleCheck, CircleX, Info, Plus, TriangleAlert } from "lucide";
 import { Button, Icon } from "areia";
 

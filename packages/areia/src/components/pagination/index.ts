@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Button, buttonVariants, type ButtonSize } from "$components/button";
 import { Select } from "$components/select";
 import { cn } from "$lib/cn";

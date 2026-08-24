@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { ArrowRight, Boxes, Code2 } from "lucide";
 import { Badge, Button, Icon, Input, LayerCard } from "areia";
 

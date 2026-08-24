@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Form, FloatingForm } from "@areia/form";
 import { z } from "zod";
 

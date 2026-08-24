@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Tooltip as TooltipPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";

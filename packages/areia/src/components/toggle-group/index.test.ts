@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import ilha, { html } from "ilha";
+import { ilha, html } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { ToggleGroup } from "./index";
 

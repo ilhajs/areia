@@ -24,7 +24,7 @@ Areia's `Pagination` renders page information, navigation controls, optional pag
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={100} />\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={100} />\n));'
   }
   lang="tsx"
 >
@@ -43,7 +43,7 @@ Call `Pagination(...)` when you want interactive controls. It dispatches `pagina
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={2} perPage={25} totalCount={250} />\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={2} perPage={25} totalCount={250} />\n));'
   }
   lang="tsx"
 >
@@ -60,7 +60,7 @@ The default pagination includes first, previous, page input, next, and last butt
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={100} />\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={100} />\n));'
   }
   lang="tsx"
 >
@@ -73,7 +73,7 @@ Use `controls: "simple"` for previous and next buttons only.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination\n    controls="simple"\n    page={5}\n    perPage={25}\n    totalCount={250}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination\n    controls="simple"\n    page={5}\n    perPage={25}\n    totalCount={250}\n  />\n));'
   }
   lang="tsx"
 >
@@ -86,7 +86,7 @@ Pagination in the middle of a dataset with all navigation buttons enabled.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={5} perPage={25} totalCount={250} />\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={5} perPage={25} totalCount={250} />\n));'
   }
   lang="tsx"
 >
@@ -99,7 +99,7 @@ Pagination handles large datasets. Use the input page selector for large page co
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={10000} />\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nexport default ilha.render(() => (\n  <Pagination page={1} perPage={25} totalCount={10000} />\n));'
   }
   lang="tsx"
 >
@@ -112,7 +112,7 @@ Use `Pagination.Info` with explicit children to customize the visible text.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 3;\nconst perPage = 25;\nconst totalCount = 100;\nconst maxPage = Math.ceil(totalCount / perPage);\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info>\n      Page {page} of {maxPage}\n    </Pagination.Info>\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 3;\nconst perPage = 25;\nconst totalCount = 100;\nconst maxPage = Math.ceil(totalCount / perPage);\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info>\n      Page {page} of {maxPage}\n    </Pagination.Info>\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
   }
   lang="tsx"
   codeOnly
@@ -128,7 +128,7 @@ Use the compound helpers when you need custom layout or page-size controls.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 25;\nconst totalCount = 500;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.Separator />\n    <Pagination.PageSize value={perPage} />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 25;\nconst totalCount = 500;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.Separator />\n    <Pagination.PageSize value={perPage} />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
   }
   lang="tsx"
   codeOnly
@@ -140,7 +140,7 @@ Customize page-size options with the `options` prop. Defaults to `[25, 50, 100, 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 10;\nconst totalCount = 100;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.PageSize\n      value={perPage}\n      options={[10, 20, 50]}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 10;\nconst totalCount = 100;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.PageSize\n      value={perPage}\n      options={[10, 20, 50]}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
   }
   lang="tsx"
   codeOnly
@@ -152,7 +152,7 @@ Arrange the helpers in any order.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 2;\nconst perPage = 50;\nconst totalCount = 400;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <div class="grow"></div>\n    <Pagination.PageSize value={perPage} />\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 2;\nconst perPage = 50;\nconst totalCount = 400;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <div class="grow"></div>\n    <Pagination.PageSize value={perPage} />\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n  </Pagination>\n));'
   }
   lang="tsx"
   codeOnly
@@ -164,7 +164,7 @@ Use `pageSelector: "dropdown"` to render a select with one option per page. This
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 2;\nconst perPage = 25;\nconst totalCount = 100;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n      pageSelector="dropdown"\n    />\n  </Pagination>\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 2;\nconst perPage = 25;\nconst totalCount = 100;\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n  >\n    <Pagination.Info\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n      pageSelector="dropdown"\n    />\n  </Pagination>\n));'
   }
   lang="tsx"
   codeOnly
@@ -176,7 +176,7 @@ Use `labels` to customize ARIA labels. Visible text can be customized with `Pagi
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 25;\nconst totalCount = 100;\nconst labels = {\n  navigation: "Pagination",\n  firstPage: "Première page",\n  previousPage: "Page précédente",\n  nextPage: "Page suivante",\n  lastPage: "Dernière page",\n  pageNumber: "Numéro de page",\n  pageSize: "Taille de page",\n};\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n    labels={labels}\n  >\n    <Pagination.Info>\n      Affichage de <span class="tabular-nums">1-25</span> sur{" "}\n      <span class="tabular-nums">100</span>\n    </Pagination.Info>\n    <Pagination.PageSize\n      value={perPage}\n      label="Par page :"\n      labels={labels}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n      labels={labels}\n    />\n  </Pagination>\n));'
+    'import { ilha } from "ilha";\nimport { Pagination } from "areia";\n\nconst page = 1;\nconst perPage = 25;\nconst totalCount = 100;\nconst labels = {\n  navigation: "Pagination",\n  firstPage: "Première page",\n  previousPage: "Page précédente",\n  nextPage: "Page suivante",\n  lastPage: "Dernière page",\n  pageNumber: "Numéro de page",\n  pageSize: "Taille de page",\n};\n\nexport default ilha.render(() => (\n  <Pagination\n    page={page}\n    perPage={perPage}\n    totalCount={totalCount}\n    labels={labels}\n  >\n    <Pagination.Info>\n      Affichage de <span class="tabular-nums">1-25</span> sur{" "}\n      <span class="tabular-nums">100</span>\n    </Pagination.Info>\n    <Pagination.PageSize\n      value={perPage}\n      label="Par page :"\n      labels={labels}\n    />\n    <Pagination.Controls\n      page={page}\n      perPage={perPage}\n      totalCount={totalCount}\n      labels={labels}\n    />\n  </Pagination>\n));'
   }
   lang="tsx"
   codeOnly

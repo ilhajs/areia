@@ -1,7 +1,7 @@
 /** @jsxImportSource ilha */
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import ilha, { mount, raw } from "ilha";
+import { ilha, mount, raw } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Button } from "$components/button";
 

@@ -1,4 +1,4 @@
-import ilha, { untrack } from "ilha";
+import { ilha, untrack } from "ilha";
 import { resolveFieldType, humanize } from "./infer.ts";
 import { createFormState } from "./state.ts";
 import type { StandardSchemaV1 } from "@standard-schema/spec";

@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Switch } from "areia";
 
 export const Demo1 = ilha.render(() => <Switch label="Enable notifications" />);

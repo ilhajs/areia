@@ -17,8 +17,6 @@
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "^20.10.6",
-    "@ilha/router": "^0.9.0",
-    "@ilha/store": "^0.7.12",
     "@standard-schema/spec": "^1.1.0",
     "@types/bun": "^1.3.14",
     "areia": "workspace:*",

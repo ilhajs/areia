@@ -29,7 +29,7 @@ Areia's `Tooltip` is built on `@data-slot/tooltip` and rendered as an Ilha islan
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip content="Create project">\n    <Button\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Create project"\n    />\n  </Tooltip>\n));'
+    'import { ilha } from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip content="Create project">\n    <Button\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Create project"\n    />\n  </Tooltip>\n));'
   }
   lang="tsx"
 >
@@ -48,7 +48,7 @@ Call `Tooltip(...)` for an interactive island. The root renders the tooltip mark
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip content="Helpful contextual information">\n    <Button>Hover me</Button>\n  </Tooltip>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip content="Helpful contextual information">\n    <Button>Hover me</Button>\n  </Tooltip>\n));'
   }
   lang="tsx"
 >
@@ -65,7 +65,7 @@ Use `content` for the popup and `children` for the trigger content.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Info } from "lucide";\nimport { Button, Icon, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip content="This action cannot be undone.">\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Info} />}\n      aria-label="More information"\n    />\n  </Tooltip>\n));'
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Button, Icon, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip content="This action cannot be undone.">\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Info} />}\n      aria-label="More information"\n    />\n  </Tooltip>\n));'
   }
   lang="tsx"
 >
@@ -78,7 +78,7 @@ When the trigger is not an action, render it as a `span`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip\n    triggerAs="span"\n    triggerClass="underline decoration-dotted underline-offset-4"\n    content="Areia is a vanilla TypeScript component library."\n  >\n    Areia\n  </Tooltip>\n));'
+    'import { ilha } from "ilha";\nimport { Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip\n    triggerAs="span"\n    triggerClass="underline decoration-dotted underline-offset-4"\n    content="Areia is a vanilla TypeScript component library."\n  >\n    Areia\n  </Tooltip>\n));'
   }
   lang="tsx"
 >
@@ -91,7 +91,7 @@ Tooltips share `@data-slot/tooltip` warm-up behavior automatically. After one to
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Languages, Plus, Settings } from "lucide";\nimport { Button, Icon, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Tooltip content="Create project">\n      <Button\n        shape="square"\n        icon={<Icon icon={Plus} />}\n        aria-label="Create project"\n      />\n    </Tooltip>\n    <Tooltip content="Translate">\n      <Button\n        shape="square"\n        icon={<Icon icon={Languages} />}\n        aria-label="Translate"\n      />\n    </Tooltip>\n    <Tooltip content="Settings">\n      <Button\n        shape="square"\n        icon={<Icon icon={Settings} />}\n        aria-label="Settings"\n      />\n    </Tooltip>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Languages, Plus, Settings } from "lucide";\nimport { Button, Icon, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Tooltip content="Create project">\n      <Button\n        shape="square"\n        icon={<Icon icon={Plus} />}\n        aria-label="Create project"\n      />\n    </Tooltip>\n    <Tooltip content="Translate">\n      <Button\n        shape="square"\n        icon={<Icon icon={Languages} />}\n        aria-label="Translate"\n      />\n    </Tooltip>\n    <Tooltip content="Settings">\n      <Button\n        shape="square"\n        icon={<Icon icon={Settings} />}\n        aria-label="Settings"\n      />\n    </Tooltip>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -104,7 +104,7 @@ Use `side` to choose the preferred side of the trigger. Collision handling may f
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid grid-cols-2 gap-3">\n    <Tooltip side="top" content="Top tooltip">\n      <Button>Top</Button>\n    </Tooltip>\n    <Tooltip side="bottom" content="Bottom tooltip">\n      <Button>Bottom</Button>\n    </Tooltip>\n    <Tooltip side="left" content="Left tooltip">\n      <Button>Left</Button>\n    </Tooltip>\n    <Tooltip side="right" content="Right tooltip">\n      <Button>Right</Button>\n    </Tooltip>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid grid-cols-2 gap-3">\n    <Tooltip side="top" content="Top tooltip">\n      <Button>Top</Button>\n    </Tooltip>\n    <Tooltip side="bottom" content="Bottom tooltip">\n      <Button>Bottom</Button>\n    </Tooltip>\n    <Tooltip side="left" content="Left tooltip">\n      <Button>Left</Button>\n    </Tooltip>\n    <Tooltip side="right" content="Right tooltip">\n      <Button>Right</Button>\n    </Tooltip>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -117,7 +117,7 @@ Use `align` to align the tooltip along the selected side.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-3">\n    <Tooltip align="start" content="Start aligned">\n      <Button>Start</Button>\n    </Tooltip>\n    <Tooltip align="center" content="Center aligned">\n      <Button>Center</Button>\n    </Tooltip>\n    <Tooltip align="end" content="End aligned">\n      <Button>End</Button>\n    </Tooltip>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-3">\n    <Tooltip align="start" content="Start aligned">\n      <Button>Start</Button>\n    </Tooltip>\n    <Tooltip align="center" content="Center aligned">\n      <Button>Center</Button>\n    </Tooltip>\n    <Tooltip align="end" content="End aligned">\n      <Button>End</Button>\n    </Tooltip>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -130,7 +130,7 @@ Use `delay` to control how long to wait before opening. Use `skipDelayDuration` 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Tooltip delay={1000} content="Opens after one second">\n      <Button>1s delay</Button>\n    </Tooltip>\n    <Tooltip\n      delay={0}\n      skipDelayDuration={0}\n      content="Opens instantly with no warm-up window"\n    >\n      <Button>Instant</Button>\n    </Tooltip>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Tooltip delay={1000} content="Opens after one second">\n      <Button>1s delay</Button>\n    </Tooltip>\n    <Tooltip\n      delay={0}\n      skipDelayDuration={0}\n      content="Opens instantly with no warm-up window"\n    >\n      <Button>Instant</Button>\n    </Tooltip>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -143,7 +143,7 @@ Set `arrow={false}` to hide the decorative arrow.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip arrow={false} content="No arrow">\n    <Button>Hover me</Button>\n  </Tooltip>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip arrow={false} content="No arrow">\n    <Button>Hover me</Button>\n  </Tooltip>\n));'
   }
   lang="tsx"
 >
@@ -156,7 +156,7 @@ The `content` prop accepts markup.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip\n    content={\n      <div class="flex max-w-48 flex-col gap-1">\n        <span class="font-medium">Deploy preview</span>\n        <span class="text-areia-subtle">\n          Creates a temporary preview environment.\n        </span>\n      </div>\n    }\n  >\n    <Button>Deploy</Button>\n  </Tooltip>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip\n    content={\n      <div class="flex max-w-48 flex-col gap-1">\n        <span class="font-medium">Deploy preview</span>\n        <span class="text-areia-subtle">\n          Creates a temporary preview environment.\n        </span>\n      </div>\n    }\n  >\n    <Button>Deploy</Button>\n  </Tooltip>\n));'
   }
   lang="tsx"
 >
@@ -169,7 +169,7 @@ Use `trigger` when you need complete control over the trigger markup. The custom
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip\n    content="Custom trigger markup"\n    trigger={\n      <span\n        data-slot="tooltip-trigger"\n        tabindex="0"\n        class="inline-flex rounded-full bg-areia-surface-muted px-2 py-1 text-sm text-areia-default"\n      >\n        Beta\n      </span>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip\n    content="Custom trigger markup"\n    trigger={\n      <span\n        data-slot="tooltip-trigger"\n        tabindex="0"\n        class="inline-flex rounded-full bg-areia-surface-muted px-2 py-1 text-sm text-areia-default"\n      >\n        Beta\n      </span>\n    }\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -181,7 +181,7 @@ Use low-level parts for static markup or when you want to call `createTooltip` y
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip.Static\n    content="Static tooltip markup"\n    triggerAs="span"\n  >\n    Hover me\n  </Tooltip.Static>\n));'
+    'import { ilha } from "ilha";\nimport { Tooltip } from "areia";\n\nexport default ilha.render(() => (\n  <Tooltip.Static\n    content="Static tooltip markup"\n    triggerAs="span"\n  >\n    Hover me\n  </Tooltip.Static>\n));'
   }
   lang="tsx"
 >

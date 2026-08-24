@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Breadcrumbs, Icon } from "areia";
 import { Folder, House } from "lucide";
 

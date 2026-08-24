@@ -30,7 +30,7 @@ A styled text input control. When you pass `label`, `description`, or `error`, `
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    label="Email"\n    placeholder="you@example.com"\n    type="email"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    label="Email"\n    placeholder="you@example.com"\n    type="email"\n  />\n));'
   }
   lang="tsx"
 >
@@ -51,7 +51,7 @@ Use the `label` prop to enable the `Field` wrapper with label, description, and 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="email"\n    label="Email"\n    description="We\'ll only use this for account notifications."\n    placeholder="you@example.com"\n    type="email"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="email"\n    label="Email"\n    description="We\'ll only use this for account notifications."\n    placeholder="you@example.com"\n    type="email"\n  />\n));'
   }
   lang="tsx"
 >
@@ -64,7 +64,7 @@ For custom form layouts, use `Input` without `label`. Provide `aria-label` or `a
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    aria-label="Search"\n    placeholder="Search..."\n    type="search"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    aria-label="Search"\n    placeholder="Search..."\n    type="search"\n  />\n));'
   }
   lang="tsx"
 >
@@ -79,7 +79,7 @@ The `label` prop enables the `Field` wrapper with automatic vertical layout.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="project-name"\n    label="Project name"\n    description="Use a short, memorable name."\n    placeholder="My Ilha app"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="project-name"\n    label="Project name"\n    description="Use a short, memorable name."\n    placeholder="My Ilha app"\n  />\n));'
   }
   lang="tsx"
 >
@@ -92,7 +92,7 @@ Pass `error` as a string for simple error messages. Error styling is automatical
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="email-error"\n    label="Email"\n    placeholder="you@example.com"\n    type="email"\n    value="not-an-email"\n    error="Enter a valid email address."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="email-error"\n    label="Email"\n    placeholder="you@example.com"\n    type="email"\n    value="not-an-email"\n    error="Enter a valid email address."\n  />\n));'
   }
   lang="tsx"
 >
@@ -105,7 +105,7 @@ Pass `error` as an object with a `message` property when you want to keep valida
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="username"\n    label="Username"\n    required\n    placeholder="areia-user"\n    error={{\n      message: "Username is required.",\n      match: "valueMissing",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="username"\n    label="Username"\n    required\n    placeholder="areia-user"\n    error={{\n      message: "Username is required.",\n      match: "valueMissing",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -118,7 +118,7 @@ Four sizes are available: `xs`, `sm`, `base`, and `lg`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Input\n      size="xs"\n      aria-label="Extra small input"\n      placeholder="Extra small"\n    />\n    <Input\n      size="sm"\n      aria-label="Small input"\n      placeholder="Small"\n    />\n    <Input\n      size="base"\n      aria-label="Base input"\n      placeholder="Base"\n    />\n    <Input\n      size="lg"\n      aria-label="Large input"\n      placeholder="Large"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Input\n      size="xs"\n      aria-label="Extra small input"\n      placeholder="Extra small"\n    />\n    <Input\n      size="sm"\n      aria-label="Small input"\n      placeholder="Small"\n    />\n    <Input\n      size="base"\n      aria-label="Base input"\n      placeholder="Base"\n    />\n    <Input\n      size="lg"\n      aria-label="Large input"\n      placeholder="Large"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -129,7 +129,7 @@ Four sizes are available: `xs`, `sm`, `base`, and `lg`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input label="Email" placeholder="you@example.com" disabled />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input label="Email" placeholder="you@example.com" disabled />\n));'
   }
   lang="tsx"
 >
@@ -142,7 +142,7 @@ Set `required: false` to show optional text after the label.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="website"\n    label="Website"\n    required={false}\n    placeholder="https://example.com"\n    type="url"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="website"\n    label="Website"\n    required={false}\n    placeholder="https://example.com"\n    type="url"\n  />\n));'
   }
   lang="tsx"
 >
@@ -155,7 +155,7 @@ Use `labelTooltip` to add additional context via a native `title` attribute on t
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="team-name"\n    label="Team name"\n    labelTooltip="This name is visible to everyone in your workspace."\n    placeholder="Design systems"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="team-name"\n    label="Team name"\n    labelTooltip="This name is visible to everyone in your workspace."\n    placeholder="Design systems"\n  />\n));'
   }
   lang="tsx"
 >
@@ -168,7 +168,7 @@ The `label` prop accepts Ilha markup for richer formatting.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="billing-email"\n    label={\n      <>\n        Email for <strong>billing</strong>\n      </>\n    }\n    required\n    placeholder="billing@example.com"\n    type="email"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="billing-email"\n    label={\n      <>\n        Email for <strong>billing</strong>\n      </>\n    }\n    required\n    placeholder="billing@example.com"\n    type="email"\n  />\n));'
   }
   lang="tsx"
 >
@@ -181,7 +181,7 @@ Error messages and descriptions can render without a visible label. Use `aria-la
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="search-error"\n    aria-label="Search"\n    placeholder="Search..."\n    description="Search by name or ID."\n    error="Search is currently unavailable."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    id="search-error"\n    aria-label="Search"\n    placeholder="Search..."\n    description="Search by name or ID."\n    error="Search is currently unavailable."\n  />\n));'
   }
   lang="tsx"
 >
@@ -194,7 +194,7 @@ Supports standard HTML input types such as `text`, `email`, `password`, `number`
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Input\n      label="Email"\n      type="email"\n      placeholder="you@example.com"\n    />\n    <Input\n      label="Password"\n      type="password"\n      placeholder="••••••••"\n    />\n    <Input label="Team size" type="number" placeholder="12" />\n    <Input\n      label="Website"\n      type="url"\n      placeholder="https://example.com"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Input\n      label="Email"\n      type="email"\n      placeholder="you@example.com"\n    />\n    <Input\n      label="Password"\n      type="password"\n      placeholder="••••••••"\n    />\n    <Input label="Team size" type="number" placeholder="12" />\n    <Input\n      label="Website"\n      type="url"\n      placeholder="https://example.com"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -207,7 +207,7 @@ Set `passwordManagerIgnore` on non-credential inputs that password managers migh
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    label="Project slug"\n    placeholder="my-ilha-app"\n    passwordManagerIgnore\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <Input\n    label="Project slug"\n    placeholder="my-ilha-app"\n    passwordManagerIgnore\n  />\n));'
   }
   lang="tsx"
 >

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import ilha, { html } from "ilha";
+import { ilha, html } from "ilha";
 import {
   decodeMarkupEntities,
   hasRenderableContent,

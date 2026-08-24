@@ -35,7 +35,7 @@ npm install sonner
 ## Quick start
 
 ```tsx
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Button } from "areia";
 
 export default ilha(() => <Button variant="primary">Create project</Button>);
@@ -44,7 +44,7 @@ export default ilha(() => <Button variant="primary">Create project</Button>);
 Areia also works with Ilha's html literal style:
 
 ```ts
-import ilha, { html } from "ilha";
+import { ilha, html } from "ilha";
 import { Button } from "areia";
 
 export default ilha(

@@ -24,7 +24,7 @@ Displays a styled anchor for inline text links with multiple variants and an ext
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-4 text-areia-default">\n    <Link href="#">Default inline link</Link>\n    <Link href="#" variant="current">\n      Current color link\n    </Link>\n    <Link href="#" variant="plain">\n      Plain inline link\n    </Link>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-4 text-areia-default">\n    <Link href="#">Default inline link</Link>\n    <Link href="#" variant="current">\n      Current color link\n    </Link>\n    <Link href="#" variant="plain">\n      Plain inline link\n    </Link>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -43,7 +43,7 @@ The default `Link` renders an underlined anchor with primary color styling.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="text-areia-default">\n    Read our <Link href="/docs">documentation</Link> for more\n    details.\n  </p>\n));'
+    'import { ilha } from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="text-areia-default">\n    Read our <Link href="/docs">documentation</Link> for more\n    details.\n  </p>\n));'
   }
   lang="tsx"
 >
@@ -58,7 +58,7 @@ Links flow naturally within paragraph text with proper underline offset.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="max-w-prose text-areia-default">\n    This is a paragraph with an\n    <Link href="#">inline link</Link> that flows naturally with\n    the surrounding text. Links maintain proper underline offset\n    for readability.\n  </p>\n));'
+    'import { ilha } from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="max-w-prose text-areia-default">\n    This is a paragraph with an\n    <Link href="#">inline link</Link> that flows naturally with\n    the surrounding text. Links maintain proper underline offset\n    for readability.\n  </p>\n));'
   }
   lang="tsx"
 >
@@ -71,7 +71,7 @@ Use `Link.ExternalIcon` to visually indicate links that navigate away from your 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="https://kumo-ui.com" external>\n    Visit Kumo UI\n    <Link.ExternalIcon />\n  </Link>\n));'
+    'import { ilha } from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="https://kumo-ui.com" external>\n    Visit Kumo UI\n    <Link.ExternalIcon />\n  </Link>\n));'
   }
   lang="tsx"
 >
@@ -84,7 +84,7 @@ The `current` variant inherits color from its parent. Use it for links inside co
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="text-areia-destructive-soft-foreground">\n    This error message contains a\n    <Link href="#" variant="current">\n      link\n    </Link>\n    that inherits the red color from its parent.\n  </p>\n));'
+    'import { ilha } from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <p class="text-areia-destructive-soft-foreground">\n    This error message contains a\n    <Link href="#" variant="current">\n      link\n    </Link>\n    that inherits the red color from its parent.\n  </p>\n));'
   }
   lang="tsx"
 >
@@ -97,7 +97,7 @@ Use `plain` when an underline would be distracting, such as navigation, menus, a
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <nav class="flex flex-wrap gap-4">\n    <Link href="#" variant="plain">\n      Overview\n    </Link>\n    <Link href="#" variant="plain">\n      Components\n    </Link>\n    <Link href="#" variant="plain">\n      Guides\n    </Link>\n  </nav>\n));'
+    'import { ilha } from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <nav class="flex flex-wrap gap-4">\n    <Link href="#" variant="plain">\n      Overview\n    </Link>\n    <Link href="#" variant="plain">\n      Components\n    </Link>\n    <Link href="#" variant="plain">\n      Guides\n    </Link>\n  </nav>\n));'
   }
   lang="tsx"
 >
@@ -110,7 +110,7 @@ Pass `class` or `className` to merge additional classes with the generated varia
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="#" class="font-medium decoration-dashed">\n    Custom styled link\n  </Link>\n));'
+    'import { ilha } from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="#" class="font-medium decoration-dashed">\n    Custom styled link\n  </Link>\n));'
   }
   lang="tsx"
 >
@@ -147,7 +147,7 @@ SVG icon component to indicate external links. It accepts arbitrary SVG attribut
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="https://example.com" external>\n    External Site\n    <Link.ExternalIcon class="size-4" />\n  </Link>\n));'
+    'import { ilha } from "ilha";\nimport { Link } from "areia";\n\nexport default ilha.render(() => (\n  <Link href="https://example.com" external>\n    External Site\n    <Link.ExternalIcon class="size-4" />\n  </Link>\n));'
   }
   lang="tsx"
 >

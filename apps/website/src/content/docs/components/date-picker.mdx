@@ -17,7 +17,7 @@ Areia's `DatePicker` uses `date-fns` for month generation and renders a vanilla 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="single"\n    selected={new Date(2026, 4, 21)}\n    defaultMonth={new Date(2026, 4, 1)}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="single"\n    selected={new Date(2026, 4, 21)}\n    defaultMonth={new Date(2026, 4, 1)}\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -35,7 +35,7 @@ DatePicker supports three selection modes: `single`, `multiple`, and `range`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => <DatePicker mode="single" />);'
+    'import { ilha } from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => <DatePicker mode="single" />);'
   }
   lang="tsx"
 >
@@ -54,7 +54,7 @@ Select a single date. This is the most common use case for date pickers.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <DatePicker\n      mode="single"\n      selected={new Date(2026, 4, 21)}\n      defaultMonth={new Date(2026, 4, 1)}\n    />\n    <p class="text-sm text-areia-subtle">\n      Selected: May 21, 2026\n    </p>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <DatePicker\n      mode="single"\n      selected={new Date(2026, 4, 21)}\n      defaultMonth={new Date(2026, 4, 1)}\n    />\n    <p class="text-sm text-areia-subtle">\n      Selected: May 21, 2026\n    </p>\n  </div>\n));'
   }
   lang="tsx"
   codeOnly
@@ -66,7 +66,7 @@ Select multiple individual dates. Use `maxSelected` to limit the number of selec
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <DatePicker\n      mode="multiple"\n      selected={[\n        new Date(2026, 4, 7),\n        new Date(2026, 4, 14),\n        new Date(2026, 4, 21),\n      ]}\n      defaultMonth={new Date(2026, 4, 1)}\n      maxSelected={5}\n    />\n    <p class="text-sm text-areia-subtle">\n      Select up to 5 dates.\n    </p>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <DatePicker\n      mode="multiple"\n      selected={[\n        new Date(2026, 4, 7),\n        new Date(2026, 4, 14),\n        new Date(2026, 4, 21),\n      ]}\n      defaultMonth={new Date(2026, 4, 1)}\n      maxSelected={5}\n    />\n    <p class="text-sm text-areia-subtle">\n      Select up to 5 dates.\n    </p>\n  </div>\n));'
   }
   lang="tsx"
   codeOnly
@@ -78,7 +78,7 @@ Select a continuous date range. Range selection works well with `numberOfMonths:
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker, type DateRange } from "areia";\n\nconst range: DateRange = {\n  from: new Date(2026, 4, 12),\n  to: new Date(2026, 4, 18),\n};\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="range"\n    selected={range}\n    defaultMonth={new Date(2026, 4, 1)}\n    numberOfMonths={2}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { DatePicker, type DateRange } from "areia";\n\nconst range: DateRange = {\n  from: new Date(2026, 4, 12),\n  to: new Date(2026, 4, 18),\n};\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="range"\n    selected={range}\n    defaultMonth={new Date(2026, 4, 1)}\n    numberOfMonths={2}\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -90,7 +90,7 @@ Use `min` and `max` to disable dates before or after an allowed range.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <DatePicker\n      mode="single"\n      defaultMonth={new Date(2026, 4, 1)}\n      min={new Date(2026, 4, 5)}\n      max={new Date(2026, 4, 25)}\n    />\n    <p class="text-sm text-areia-subtle">\n      Only dates from May 5–25 are selectable.\n    </p>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <DatePicker\n      mode="single"\n      defaultMonth={new Date(2026, 4, 1)}\n      min={new Date(2026, 4, 5)}\n      max={new Date(2026, 4, 25)}\n    />\n    <p class="text-sm text-areia-subtle">\n      Only dates from May 5–25 are selectable.\n    </p>\n  </div>\n));'
   }
   lang="tsx"
   codeOnly
@@ -102,7 +102,7 @@ Use `disabled` to make specific dates unavailable.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="multiple"\n    defaultMonth={new Date(2026, 4, 1)}\n    disabled={[\n      new Date(2026, 4, 5),\n      new Date(2026, 4, 12),\n      new Date(2026, 4, 18),\n      new Date(2026, 4, 25),\n    ]}\n    maxSelected={5}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="multiple"\n    defaultMonth={new Date(2026, 4, 1)}\n    disabled={[\n      new Date(2026, 4, 5),\n      new Date(2026, 4, 12),\n      new Date(2026, 4, 18),\n      new Date(2026, 4, 25),\n    ]}\n    maxSelected={5}\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -114,7 +114,7 @@ Use `weekStartsOn` to choose the first day of the week. `0` is Sunday and `1` is
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="single"\n    defaultMonth={new Date(2026, 4, 1)}\n    weekStartsOn={1}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="single"\n    defaultMonth={new Date(2026, 4, 1)}\n    weekStartsOn={1}\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -126,7 +126,7 @@ Set `showOutsideDays: false` to hide adjacent-month dates in the calendar grid.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="single"\n    defaultMonth={new Date(2026, 4, 1)}\n    showOutsideDays={false}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { DatePicker } from "areia";\n\nexport default ilha.render(() => (\n  <DatePicker\n    mode="single"\n    defaultMonth={new Date(2026, 4, 1)}\n    showOutsideDays={false}\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -138,7 +138,7 @@ Compose with [Popover](/components/popover) to create a dropdown date picker.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Calendar } from "lucide";\nimport { Button, DatePicker, Icon, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={\n      <Button icon={<Icon icon={Calendar} />}>\n        Pick a date\n      </Button>\n    }\n    content={\n      <DatePicker\n        mode="single"\n        defaultMonth={new Date(2026, 4, 1)}\n      />\n    }\n    contentClass="p-0"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Calendar } from "lucide";\nimport { Button, DatePicker, Icon, Popover } from "areia";\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={\n      <Button icon={<Icon icon={Calendar} />}>\n        Pick a date\n      </Button>\n    }\n    content={\n      <DatePicker\n        mode="single"\n        defaultMonth={new Date(2026, 4, 1)}\n      />\n    }\n    contentClass="p-0"\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -150,7 +150,7 @@ Render two months inside a popover for a compact date-range picker.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Calendar } from "lucide";\nimport {\n  Button,\n  DatePicker,\n  Icon,\n  Popover,\n  type DateRange,\n} from "areia";\n\nconst range: DateRange = {\n  from: new Date(2026, 4, 12),\n  to: new Date(2026, 4, 18),\n};\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={\n      <Button icon={<Icon icon={Calendar} />}>\n        May 12 – May 18\n      </Button>\n    }\n    content={\n      <DatePicker\n        mode="range"\n        selected={range}\n        defaultMonth={new Date(2026, 4, 1)}\n        numberOfMonths={2}\n      />\n    }\n    contentClass="p-0"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Calendar } from "lucide";\nimport {\n  Button,\n  DatePicker,\n  Icon,\n  Popover,\n  type DateRange,\n} from "areia";\n\nconst range: DateRange = {\n  from: new Date(2026, 4, 12),\n  to: new Date(2026, 4, 18),\n};\n\nexport default ilha.render(() => (\n  <Popover\n    trigger={\n      <Button icon={<Icon icon={Calendar} />}>\n        May 12 – May 18\n      </Button>\n    }\n    content={\n      <DatePicker\n        mode="range"\n        selected={range}\n        defaultMonth={new Date(2026, 4, 1)}\n        numberOfMonths={2}\n      />\n    }\n    contentClass="p-0"\n  />\n));'
   }
   lang="tsx"
   codeOnly

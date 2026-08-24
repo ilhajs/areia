@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Switch as SwitchPrimitive } from "@areia/slots";
 import {
   boundVoidElement,

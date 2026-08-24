@@ -32,7 +32,7 @@ Nested groups (shell sidebar + detail split) work the same way. Persist layout a
 <Preview
   size="lg"
   code={
-    'import ilha from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="horizontal"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={50} minSize={10} collapsible>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Left</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle withHandle />\n    <Resizable.Panel defaultSize={50} minSize={10}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Right</span>\n      </div>\n    </Resizable.Panel>\n  </Resizable>\n));'
+    'import { ilha } from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="horizontal"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={50} minSize={10} collapsible>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Left</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle withHandle />\n    <Resizable.Panel defaultSize={50} minSize={10}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Right</span>\n      </div>\n    </Resizable.Panel>\n  </Resizable>\n));'
   }
   lang="tsx"
 >
@@ -52,7 +52,7 @@ Compose panels and handles within a root group. The root must be a direct parent
 <Preview
   size="lg"
   code={
-    'import ilha from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="horizontal"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={50}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Left</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle />\n    <Resizable.Panel defaultSize={50}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Right</span>\n      </div>\n    </Resizable.Panel>\n  </Resizable>\n));'
+    'import { ilha } from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="horizontal"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={50}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Left</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle />\n    <Resizable.Panel defaultSize={50}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Right</span>\n      </div>\n    </Resizable.Panel>\n  </Resizable>\n));'
   }
   lang="tsx"
 >
@@ -79,7 +79,7 @@ Use `direction="vertical"` for vertical resizing.
 <Preview
   size="lg"
   code={
-    'import ilha from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="vertical"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={25}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Header</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle />\n    <Resizable.Panel defaultSize={75}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Content</span>\n      </div>\n    </Resizable.Panel>\n  </Resizable>\n));'
+    'import { ilha } from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="vertical"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={25}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Header</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle />\n    <Resizable.Panel defaultSize={75}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Content</span>\n      </div>\n    </Resizable.Panel>\n  </Resizable>\n));'
   }
   lang="tsx"
 >
@@ -93,7 +93,7 @@ Use `withHandle` on `Resizable.Handle` to show a visible grip indicator.
 <Preview
   size="lg"
   code={
-    'import ilha from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="horizontal"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={25}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Sidebar</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle withHandle />\n    <Resizable.Panel defaultSize={75}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Content</span>\n      </div>\n    </Resizable.Panel>\n  </Resizable>\n));'
+    'import { ilha } from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="horizontal"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={25}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Sidebar</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle withHandle />\n    <Resizable.Panel defaultSize={75}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">Content</span>\n      </div>\n    </Resizable.Panel>\n  </Resizable>\n));'
   }
   lang="tsx"
 >
@@ -107,7 +107,7 @@ Resizable panels can be nested for complex layouts.
 <Preview
   size="lg"
   code={
-    'import ilha from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="horizontal"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={50}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">One</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle withHandle />\n    <Resizable.Panel defaultSize={50}>\n      <Resizable direction="vertical">\n        <Resizable.Panel defaultSize={25}>\n          <div class="flex items-center justify-center p-4">\n            <span class="font-semibold">Two</span>\n          </div>\n        </Resizable.Panel>\n        <Resizable.Handle withHandle />\n        <Resizable.Panel defaultSize={75}>\n          <div class="flex items-center justify-center p-4">\n            <span class="font-semibold">Three</span>\n          </div>\n        </Resizable.Panel>\n      </Resizable>\n    </Resizable.Panel>\n  </Resizable>\n));'
+    'import { ilha } from "ilha";\nimport { Resizable } from "areia";\n\nexport default ilha.render(() => (\n  <Resizable\n    direction="horizontal"\n    class="h-64 max-w-md rounded-lg border border-areia-border"\n  >\n    <Resizable.Panel defaultSize={50}>\n      <div class="flex items-center justify-center p-4">\n        <span class="font-semibold">One</span>\n      </div>\n    </Resizable.Panel>\n    <Resizable.Handle withHandle />\n    <Resizable.Panel defaultSize={50}>\n      <Resizable direction="vertical">\n        <Resizable.Panel defaultSize={25}>\n          <div class="flex items-center justify-center p-4">\n            <span class="font-semibold">Two</span>\n          </div>\n        </Resizable.Panel>\n        <Resizable.Handle withHandle />\n        <Resizable.Panel defaultSize={75}>\n          <div class="flex items-center justify-center p-4">\n            <span class="font-semibold">Three</span>\n          </div>\n        </Resizable.Panel>\n      </Resizable>\n    </Resizable.Panel>\n  </Resizable>\n));'
   }
   lang="tsx"
 >

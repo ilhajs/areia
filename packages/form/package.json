@@ -1,6 +1,6 @@
 {
   "name": "@areia/form",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Schema-driven, auto-generating form components for Areia",
   "license": "MIT",
   "author": "Ryuz <ryuzer@proton.me>",
@@ -31,14 +31,14 @@
   "devDependencies": {
     "@areia/slots": "^0.2.0",
     "@standard-schema/spec": "^1.1.0",
-    "areia": "^0.2.4",
-    "ilha": "0.11.0"
+    "areia": "^0.2.6",
+    "ilha": "0.11.1"
   },
   "peerDependencies": {
     "@areia/slots": ">=0.2.0",
     "@standard-schema/spec": ">=1.1.0",
-    "areia": ">=0.2.4",
-    "ilha": ">=0.11.0"
+    "areia": ">=0.2.6",
+    "ilha": ">=0.11.1"
   },
   "peerDependenciesMeta": {
     "@standard-schema/spec": {

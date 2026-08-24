@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Progress } from "areia";
 
 export const Demo1 = ilha.render(() => <Progress label="Uploading" value={45} />);

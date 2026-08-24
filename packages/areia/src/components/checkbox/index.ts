@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Checkbox as CheckboxPrimitive } from "@areia/slots";
 import {
   boundVoidElement,

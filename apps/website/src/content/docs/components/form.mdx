@@ -38,7 +38,7 @@ import {
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { z } from "zod";\nimport { Form } from "@areia/form";\n\nconst schema = z.object({\n  name: z.string(),\n  age: z.number().min(0).max(120),\n  theme: z.enum(["light", "dark", "system"]),\n  active: z.boolean()\n});\n\nconst MyForm = Form(\n  schema,\n  { name: "John", age: 30, theme: "system", active: true },\n  { onSubmit: (values) => console.log(values) }\n);\n\nexport default ilha.render(() => <MyForm />);'
+    'import { ilha } from "ilha";\nimport { z } from "zod";\nimport { Form } from "@areia/form";\n\nconst schema = z.object({\n  name: z.string(),\n  age: z.number().min(0).max(120),\n  theme: z.enum(["light", "dark", "system"]),\n  active: z.boolean()\n});\n\nconst MyForm = Form(\n  schema,\n  { name: "John", age: 30, theme: "system", active: true },\n  { onSubmit: (values) => console.log(values) }\n);\n\nexport default ilha.render(() => <MyForm />);'
   }
   lang="tsx"
 >
@@ -115,7 +115,7 @@ Manually override field types, labels, or extra props with `uiOverrides`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { z } from "zod";\nimport { Form } from "@areia/form";\n\nconst ColorForm = Form(\n  z.object({ brandColor: z.string() }),\n  { brandColor: "#ff0000" },\n  {\n    uiOverrides: { brandColor: { type: "color", label: "Brand Color" } },\n    onSubmit: (values) => console.log(values),\n  }\n);\n\nexport default ilha.render(() => <ColorForm />);'
+    'import { ilha } from "ilha";\nimport { z } from "zod";\nimport { Form } from "@areia/form";\n\nconst ColorForm = Form(\n  z.object({ brandColor: z.string() }),\n  { brandColor: "#ff0000" },\n  {\n    uiOverrides: { brandColor: { type: "color", label: "Brand Color" } },\n    onSubmit: (values) => console.log(values),\n  }\n);\n\nexport default ilha.render(() => <ColorForm />);'
   }
   lang="tsx"
 >
@@ -128,7 +128,7 @@ Manually override field types, labels, or extra props with `uiOverrides`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { z } from "zod";\nimport { FloatingForm } from "@areia/form";\n\nconst SceneControls = FloatingForm(\n  z.object({\n    speed: z.number().min(0.1).max(10),\n    wireframe: z.boolean(),\n    color: z.string(),\n  }),\n  { speed: 1.0, wireframe: false, color: "#ff00ff" },\n  {\n    title: "Scene Controls",\n    uiOverrides: { color: { type: "color" } },\n    onChange: (values) => console.log("changed:", values),\n  }\n);\n\nexport default ilha.render(() => (\n  <div class="relative w-full h-[400px]">\n    <SceneControls />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { z } from "zod";\nimport { FloatingForm } from "@areia/form";\n\nconst SceneControls = FloatingForm(\n  z.object({\n    speed: z.number().min(0.1).max(10),\n    wireframe: z.boolean(),\n    color: z.string(),\n  }),\n  { speed: 1.0, wireframe: false, color: "#ff00ff" },\n  {\n    title: "Scene Controls",\n    uiOverrides: { color: { type: "color" } },\n    onChange: (values) => console.log("changed:", values),\n  }\n);\n\nexport default ilha.render(() => (\n  <div class="relative w-full h-[400px]">\n    <SceneControls />\n  </div>\n));'
   }
   lang="tsx"
 >

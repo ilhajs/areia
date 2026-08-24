@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import ilha, { html, mount } from "ilha";
+import { ilha, html, mount } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Dialog, dialogVariants } from "./index";
 

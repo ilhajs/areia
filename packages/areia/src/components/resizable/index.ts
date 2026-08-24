@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Resizable as ResizablePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { decodeMarkupEntities, render } from "$lib/markup";

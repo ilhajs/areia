@@ -21,7 +21,7 @@ Displays modal content over the page.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    trigger={<Button>Open dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <div class="grid gap-2">\n          <Dialog.Title>Edit profile</Dialog.Title>\n          <Dialog.Description>\n            Make changes to your profile. Close the dialog when\n            you are done.\n          </Dialog.Description>\n        </div>\n        <div class="flex justify-end gap-2">\n          <Dialog.Close>\n            <Button variant="secondary">Cancel</Button>\n          </Dialog.Close>\n          <Dialog.Close>\n            <Button variant="primary">Save</Button>\n          </Dialog.Close>\n        </div>\n      </>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    trigger={<Button>Open dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <div class="grid gap-2">\n          <Dialog.Title>Edit profile</Dialog.Title>\n          <Dialog.Description>\n            Make changes to your profile. Close the dialog when\n            you are done.\n          </Dialog.Description>\n        </div>\n        <div class="flex justify-end gap-2">\n          <Dialog.Close>\n            <Button variant="secondary">Cancel</Button>\n          </Dialog.Close>\n          <Dialog.Close>\n            <Button variant="primary">Save</Button>\n          </Dialog.Close>\n        </div>\n      </>\n    }\n  />\n));'
   }
   lang="tsx"
 >
@@ -40,7 +40,7 @@ Use `Dialog` for an interactive dialog. The composition-first API accepts `Dialo
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog>\n    <Dialog.Trigger>\n      <Button>Open</Button>\n    </Dialog.Trigger>\n    <Dialog.Portal>\n      <Dialog.Overlay />\n      <Dialog.Content class="grid gap-4 p-6">\n        <Dialog.Title>Dialog title</Dialog.Title>\n        <Dialog.Description>\n          Helpful supporting text for the dialog.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Close</Button>\n        </Dialog.Close>\n      </Dialog.Content>\n    </Dialog.Portal>\n  </Dialog>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog>\n    <Dialog.Trigger>\n      <Button>Open</Button>\n    </Dialog.Trigger>\n    <Dialog.Portal>\n      <Dialog.Overlay />\n      <Dialog.Content class="grid gap-4 p-6">\n        <Dialog.Title>Dialog title</Dialog.Title>\n        <Dialog.Description>\n          Helpful supporting text for the dialog.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Close</Button>\n        </Dialog.Close>\n      </Dialog.Content>\n    </Dialog.Portal>\n  </Dialog>\n));'
   }
   lang="tsx"
 >
@@ -71,7 +71,7 @@ Use `role: "alertdialog"` for confirmation flows that require explicit acknowled
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    role="alertdialog"\n    trigger={\n      <Button variant="destructive">Delete project</Button>\n    }\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <div class="grid gap-2">\n          <Dialog.Title>Delete project?</Dialog.Title>\n          <Dialog.Description>\n            This action cannot be undone. The project and all\n            related data will be permanently deleted.\n          </Dialog.Description>\n        </div>\n        <div class="flex justify-end gap-2">\n          <Dialog.Close>\n            <Button variant="secondary">Cancel</Button>\n          </Dialog.Close>\n          <Dialog.Close>\n            <Button variant="destructive">Delete</Button>\n          </Dialog.Close>\n        </div>\n      </>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    role="alertdialog"\n    trigger={\n      <Button variant="destructive">Delete project</Button>\n    }\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <div class="grid gap-2">\n          <Dialog.Title>Delete project?</Dialog.Title>\n          <Dialog.Description>\n            This action cannot be undone. The project and all\n            related data will be permanently deleted.\n          </Dialog.Description>\n        </div>\n        <div class="flex justify-end gap-2">\n          <Dialog.Close>\n            <Button variant="secondary">Cancel</Button>\n          </Dialog.Close>\n          <Dialog.Close>\n            <Button variant="destructive">Delete</Button>\n          </Dialog.Close>\n        </div>\n      </>\n    }\n  />\n));'
   }
   lang="tsx"
 >
@@ -82,7 +82,7 @@ Use `role: "alertdialog"` for confirmation flows that require explicit acknowled
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nconst sizes = ["sm", "base", "lg", "xl"] as const;\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap gap-2">\n    {sizes.map((size) => (\n      <Dialog\n        size={size}\n        trigger={<Button variant="secondary">{size}</Button>}\n        contentClass="grid gap-4 p-6"\n        content={\n          <>\n            <Dialog.Title>{size} dialog</Dialog.Title>\n            <Dialog.Description>\n              Dialogs constrain their minimum width by size.\n            </Dialog.Description>\n            <Dialog.Close>\n              <Button>Close</Button>\n            </Dialog.Close>\n          </>\n        }\n      />\n    ))}\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Dialog } from "areia";\n\nconst sizes = ["sm", "base", "lg", "xl"] as const;\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap gap-2">\n    {sizes.map((size) => (\n      <Dialog\n        size={size}\n        trigger={<Button variant="secondary">{size}</Button>}\n        contentClass="grid gap-4 p-6"\n        content={\n          <>\n            <Dialog.Title>{size} dialog</Dialog.Title>\n            <Dialog.Description>\n              Dialogs constrain their minimum width by size.\n            </Dialog.Description>\n            <Dialog.Close>\n              <Button>Close</Button>\n            </Dialog.Close>\n          </>\n        }\n      />\n    ))}\n  </div>\n));'
   }
   lang="tsx"
   codeOnly
@@ -94,7 +94,7 @@ Configure outside-click, Escape, initial open state, and scroll locking through 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    closeOnClickOutside={false}\n    closeOnEscape\n    lockScroll\n    trigger={<Button>Open locked dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <Dialog.Title>Explicit close</Dialog.Title>\n        <Dialog.Description>\n          Clicking outside this dialog will not close it.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Close</Button>\n        </Dialog.Close>\n      </>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    closeOnClickOutside={false}\n    closeOnEscape\n    lockScroll\n    trigger={<Button>Open locked dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <Dialog.Title>Explicit close</Dialog.Title>\n        <Dialog.Description>\n          Clicking outside this dialog will not close it.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Close</Button>\n        </Dialog.Close>\n      </>\n    }\n  />\n));'
   }
   lang="tsx"
 >
@@ -107,7 +107,7 @@ For simple dialogs, pass `trigger` and `content`. Areia generates the trigger, p
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    trigger={<Button>Open shortcut dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <Dialog.Title>Shortcut API</Dialog.Title>\n        <Dialog.Description>\n          Use props when you do not need to customize the slot\n          structure.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Done</Button>\n        </Dialog.Close>\n      </>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Button, Dialog } from "areia";\n\nexport default ilha.render(() => (\n  <Dialog\n    trigger={<Button>Open shortcut dialog</Button>}\n    contentClass="grid gap-4 p-6"\n    content={\n      <>\n        <Dialog.Title>Shortcut API</Dialog.Title>\n        <Dialog.Description>\n          Use props when you do not need to customize the slot\n          structure.\n        </Dialog.Description>\n        <Dialog.Close>\n          <Button>Done</Button>\n        </Dialog.Close>\n      </>\n    }\n  />\n));'
   }
   lang="tsx"
 >

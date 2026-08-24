@@ -32,7 +32,7 @@ Areia's `Combobox` is built on `@data-slot/combobox` and rendered as an Ilha isl
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="fruit"\n    label="Fruit"\n    placeholder="Search fruit..."\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n      date: "Date",\n      elderberry: "Elderberry",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="fruit"\n    label="Fruit"\n    placeholder="Search fruit..."\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n      date: "Date",\n      elderberry: "Elderberry",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -51,7 +51,7 @@ Call `Combobox(...)` for an interactive island. The root renders the combobox ma
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="ilha-topic"\n    label="Ilha topic"\n    placeholder="Search Ilha topics..."\n    items={{\n      islands: "Islands",\n      signals: "Signals",\n      jsx: "JSX rendering",\n      html: "html literals",\n      hydration: "Hydration",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="ilha-topic"\n    label="Ilha topic"\n    placeholder="Search Ilha topics..."\n    items={{\n      islands: "Islands",\n      signals: "Signals",\n      jsx: "JSX rendering",\n      html: "html literals",\n      hydration: "Hydration",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -68,7 +68,7 @@ A combobox with a visible label and searchable options.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="basic-fruit"\n    label="Fruit"\n    placeholder="Choose a fruit"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n      date: "Date",\n      elderberry: "Elderberry",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="basic-fruit"\n    label="Fruit"\n    placeholder="Choose a fruit"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n      date: "Date",\n      elderberry: "Elderberry",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -81,7 +81,7 @@ Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nconst items = {\n  apple: "Apple",\n  banana: "Banana",\n  cherry: "Cherry",\n};\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Combobox\n      size="xs"\n      placeholder="Extra small"\n      items={items}\n    />\n    <Combobox size="sm" placeholder="Small" items={items} />\n    <Combobox size="base" placeholder="Base" items={items} />\n    <Combobox size="lg" placeholder="Large" items={items} />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nconst items = {\n  apple: "Apple",\n  banana: "Banana",\n  cherry: "Cherry",\n};\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Combobox\n      size="xs"\n      placeholder="Extra small"\n      items={items}\n    />\n    <Combobox size="sm" placeholder="Small" items={items} />\n    <Combobox size="base" placeholder="Base" items={items} />\n    <Combobox size="lg" placeholder="Large" items={items} />\n  </div>\n));'
   }
   lang="tsx"
   codeOnly
@@ -93,7 +93,7 @@ The `label`, `description`, and `error` props enable the built-in field wrapper.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="region"\n    label="Region"\n    description="Choose the region closest to your users."\n    placeholder="Search regions..."\n    items={{\n      iad: "Washington, D.C.",\n      sfo: "San Francisco",\n      lhr: "London",\n      fra: "Frankfurt",\n      nrt: "Tokyo",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="region"\n    label="Region"\n    description="Choose the region closest to your users."\n    placeholder="Search regions..."\n    items={{\n      iad: "Washington, D.C.",\n      sfo: "San Francisco",\n      lhr: "London",\n      fra: "Frankfurt",\n      nrt: "Tokyo",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -106,7 +106,7 @@ Pass `error` as a string for simple validation messages. Error styling is automa
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="database-error"\n    label="Database"\n    required\n    error="Select a database before continuing."\n    placeholder="Search databases..."\n    items={{\n      postgres: "PostgreSQL",\n      mysql: "MySQL",\n      mongodb: "MongoDB",\n      redis: "Redis",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="database-error"\n    label="Database"\n    required\n    error="Select a database before continuing."\n    placeholder="Search databases..."\n    items={{\n      postgres: "PostgreSQL",\n      mysql: "MySQL",\n      mongodb: "MongoDB",\n      redis: "Redis",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -119,7 +119,7 @@ Set `disabled` to prevent interaction.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    label="Fruit"\n    placeholder="Search fruit..."\n    disabled\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    label="Fruit"\n    placeholder="Search fruit..."\n    disabled\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -132,7 +132,7 @@ Use item descriptor objects to disable individual options. Disabled rows are ski
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="plans"\n    label="Plan"\n    placeholder="Search plans..."\n    items={{\n      free: "Free",\n      pro: "Pro",\n      business: { label: "Business", disabled: true },\n      enterprise: { label: "Enterprise", disabled: true },\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="plans"\n    label="Plan"\n    placeholder="Search plans..."\n    items={{\n      free: "Free",\n      pro: "Pro",\n      business: { label: "Business", disabled: true },\n      enterprise: { label: "Enterprise", disabled: true },\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -145,7 +145,7 @@ Use `defaultValue` with the option value string to preselect an item.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="default-database"\n    label="Database"\n    defaultValue="postgres"\n    items={{\n      postgres: "PostgreSQL",\n      mysql: "MySQL",\n      mongodb: "MongoDB",\n      redis: "Redis",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="default-database"\n    label="Database"\n    defaultValue="postgres"\n    items={{\n      postgres: "PostgreSQL",\n      mysql: "MySQL",\n      mongodb: "MongoDB",\n      redis: "Redis",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -158,7 +158,7 @@ Set `multiple` to allow selecting several values. Selected options render as rem
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="multi-frameworks"\n    label="Frameworks"\n    multiple\n    placeholder="Search frameworks..."\n    defaultValue={["astro", "svelte"]}\n    items={{\n      astro: "Astro",\n      next: "Next.js",\n      nuxt: "Nuxt",\n      remix: "Remix",\n      svelte: "SvelteKit",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="multi-frameworks"\n    label="Frameworks"\n    multiple\n    placeholder="Search frameworks..."\n    defaultValue={["astro", "svelte"]}\n    items={{\n      astro: "Astro",\n      next: "Next.js",\n      nuxt: "Nuxt",\n      remix: "Remix",\n      svelte: "SvelteKit",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -175,7 +175,7 @@ Set `name` to create a hidden input that submits the selected value with a nativ
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <form class="flex w-full max-w-sm flex-col gap-3">\n    <Combobox\n      id="form-fruit"\n      name="fruit"\n      label="Fruit"\n      required\n      placeholder="Search fruit..."\n      items={{\n        apple: "Apple",\n        banana: "Banana",\n        cherry: "Cherry",\n      }}\n    />\n    <Button type="submit">Submit</Button>\n  </form>\n));'
+    'import { ilha } from "ilha";\nimport { Button, Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <form class="flex w-full max-w-sm flex-col gap-3">\n    <Combobox\n      id="form-fruit"\n      name="fruit"\n      label="Fruit"\n      required\n      placeholder="Search fruit..."\n      items={{\n        apple: "Apple",\n        banana: "Banana",\n        cherry: "Cherry",\n      }}\n    />\n    <Button type="submit">Submit</Button>\n  </form>\n));'
   }
   lang="tsx"
 >
@@ -188,7 +188,7 @@ Use explicit child markup when you need custom labels, grouping, separators, or 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="custom-items"\n    label="Runtime"\n    placeholder="Search runtimes..."\n  >\n    <Combobox.Item value="bun" label="Bun">\n      <span class="font-medium">Bun</span>\n      <span class="text-areia-subtle"> JavaScript runtime</span>\n    </Combobox.Item>\n    <Combobox.Item value="node" label="Node.js">\n      <span class="font-medium">Node.js</span>\n      <span class="text-areia-subtle"> JavaScript runtime</span>\n    </Combobox.Item>\n    <Combobox.Item value="deno" label="Deno">\n      <span class="font-medium">Deno</span>\n      <span class="text-areia-subtle"> TypeScript runtime</span>\n    </Combobox.Item>\n  </Combobox>\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="custom-items"\n    label="Runtime"\n    placeholder="Search runtimes..."\n  >\n    <Combobox.Item value="bun" label="Bun">\n      <span class="font-medium">Bun</span>\n      <span class="text-areia-subtle"> JavaScript runtime</span>\n    </Combobox.Item>\n    <Combobox.Item value="node" label="Node.js">\n      <span class="font-medium">Node.js</span>\n      <span class="text-areia-subtle"> JavaScript runtime</span>\n    </Combobox.Item>\n    <Combobox.Item value="deno" label="Deno">\n      <span class="font-medium">Deno</span>\n      <span class="text-areia-subtle"> TypeScript runtime</span>\n    </Combobox.Item>\n  </Combobox>\n));'
   }
   lang="tsx"
 >
@@ -201,7 +201,7 @@ Use `Combobox.Group` and `Combobox.GroupLabel` to organize related options.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="grouped-location"\n    label="Location"\n    placeholder="Search locations..."\n  >\n    <Combobox.Group>\n      <Combobox.GroupLabel>North America</Combobox.GroupLabel>\n      <Combobox.Item value="iad">\n        Washington, D.C.\n      </Combobox.Item>\n      <Combobox.Item value="sfo">San Francisco</Combobox.Item>\n    </Combobox.Group>\n    <Combobox.Group>\n      <Combobox.GroupLabel>Europe</Combobox.GroupLabel>\n      <Combobox.Item value="lhr">London</Combobox.Item>\n      <Combobox.Item value="fra">Frankfurt</Combobox.Item>\n    </Combobox.Group>\n  </Combobox>\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="grouped-location"\n    label="Location"\n    placeholder="Search locations..."\n  >\n    <Combobox.Group>\n      <Combobox.GroupLabel>North America</Combobox.GroupLabel>\n      <Combobox.Item value="iad">\n        Washington, D.C.\n      </Combobox.Item>\n      <Combobox.Item value="sfo">San Francisco</Combobox.Item>\n    </Combobox.Group>\n    <Combobox.Group>\n      <Combobox.GroupLabel>Europe</Combobox.GroupLabel>\n      <Combobox.Item value="lhr">London</Combobox.Item>\n      <Combobox.Item value="fra">Frankfurt</Combobox.Item>\n    </Combobox.Group>\n  </Combobox>\n));'
   }
   lang="tsx"
 >
@@ -214,7 +214,7 @@ Use the low-level parts to render a select-like trigger with a separate search i
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nconst items = [\n  <Combobox.Item value="go" label="Go" children="🐹 Go" />,\n  <Combobox.Item\n    value="rust"\n    label="Rust"\n    children="🦀 Rust"\n  />,\n  <Combobox.Item\n    value="ts"\n    label="TypeScript"\n    children="🔷 TypeScript"\n  />,\n];\n\nexport default ilha.render(() => (\n  <Combobox\n    id="language-inside"\n    label="Language"\n    placeholder="Select language"\n  >\n    <Combobox.TriggerValue placeholder="Select language" />\n    <Combobox.Content>\n      <Combobox.Input placeholder="Search languages..." />\n      <Combobox.List>\n        <Combobox.Empty />\n        {items}\n      </Combobox.List>\n    </Combobox.Content>\n  </Combobox>\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nconst items = [\n  <Combobox.Item value="go" label="Go" children="🐹 Go" />,\n  <Combobox.Item\n    value="rust"\n    label="Rust"\n    children="🦀 Rust"\n  />,\n  <Combobox.Item\n    value="ts"\n    label="TypeScript"\n    children="🔷 TypeScript"\n  />,\n];\n\nexport default ilha.render(() => (\n  <Combobox\n    id="language-inside"\n    label="Language"\n    placeholder="Select language"\n  >\n    <Combobox.TriggerValue placeholder="Select language" />\n    <Combobox.Content>\n      <Combobox.Input placeholder="Search languages..." />\n      <Combobox.List>\n        <Combobox.Empty />\n        {items}\n      </Combobox.List>\n    </Combobox.Content>\n  </Combobox>\n));'
   }
   lang="tsx"
   codeOnly
@@ -226,7 +226,7 @@ Use the low-level parts to render a select-like trigger with a separate search i
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="quick-search"\n    label="Quick search"\n    placeholder="Start typing..."\n    openOnFocus\n    autoHighlight\n    items={{\n      dashboard: "Dashboard",\n      settings: "Settings",\n      billing: "Billing",\n      support: "Support",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="quick-search"\n    label="Quick search"\n    placeholder="Start typing..."\n    openOnFocus\n    autoHighlight\n    items={{\n      dashboard: "Dashboard",\n      settings: "Settings",\n      billing: "Billing",\n      support: "Support",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -239,7 +239,7 @@ Combobox supports autocomplete-style filtering natively. As the user types, the 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="autocomplete"\n    label="Language"\n    placeholder="Start typing..."\n    openOnFocus\n    items={{\n      rust: "Rust",\n      ruby: "Ruby",\n      react: "React",\n      python: "Python",\n      php: "PHP",\n      perl: "Perl",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nexport default ilha.render(() => (\n  <Combobox\n    id="autocomplete"\n    label="Language"\n    placeholder="Start typing..."\n    openOnFocus\n    items={{\n      rust: "Rust",\n      ruby: "Ruby",\n      react: "React",\n      python: "Python",\n      php: "PHP",\n      perl: "Perl",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -264,7 +264,7 @@ For free-form values that do not need to match the list, use `itemToStringValue`
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Combobox } from "areia";\n\nconst items = {\n  one: "One",\n  two: "Two",\n  three: "Three",\n  four: "Four",\n  five: "Five",\n};\n\nexport default ilha.render(() => (\n  <Combobox\n    id="short-dropdown"\n    label="Short dropdown"\n    placeholder="Search..."\n  >\n    <Combobox.TriggerInput placeholder="Search..." />\n    <Combobox.Content class="max-h-40">\n      <Combobox.List>\n        <Combobox.Empty />\n        {Object.entries(items).map(([value, label]) => (\n          <Combobox.Item value={value}>{label}</Combobox.Item>\n        ))}\n      </Combobox.List>\n    </Combobox.Content>\n  </Combobox>\n));'
+    'import { ilha } from "ilha";\nimport { Combobox } from "areia";\n\nconst items = {\n  one: "One",\n  two: "Two",\n  three: "Three",\n  four: "Four",\n  five: "Five",\n};\n\nexport default ilha.render(() => (\n  <Combobox\n    id="short-dropdown"\n    label="Short dropdown"\n    placeholder="Search..."\n  >\n    <Combobox.TriggerInput placeholder="Search..." />\n    <Combobox.Content class="max-h-40">\n      <Combobox.List>\n        <Combobox.Empty />\n        {Object.entries(items).map(([value, label]) => (\n          <Combobox.Item value={value}>{label}</Combobox.Item>\n        ))}\n      </Combobox.List>\n    </Combobox.Content>\n  </Combobox>\n));'
   }
   lang="tsx"
   codeOnly

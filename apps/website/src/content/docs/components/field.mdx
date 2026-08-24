@@ -21,7 +21,7 @@ Groups a label, form control, description, and validation message. `Field` wires
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field label="Email" description="Use your work email.">\n    <Input\n      data-slot="field-control"\n      type="email"\n      name="email"\n      placeholder="you@example.com"\n    />\n  </Field>\n));'
+    'import { ilha } from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field label="Email" description="Use your work email.">\n    <Input\n      data-slot="field-control"\n      type="email"\n      name="email"\n      placeholder="you@example.com"\n    />\n  </Field>\n));'
   }
   lang="tsx"
 >
@@ -40,7 +40,7 @@ Render a control with `data-slot="field-control"` inside `Field`. The controller
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field\n    label="Username"\n    description="This will be visible on your profile."\n  >\n    <Input\n      data-slot="field-control"\n      name="username"\n      placeholder="ryuz"\n    />\n  </Field>\n));'
+    'import { ilha } from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field\n    label="Username"\n    description="This will be visible on your profile."\n  >\n    <Input\n      data-slot="field-control"\n      name="username"\n      placeholder="ryuz"\n    />\n  </Field>\n));'
   }
   lang="tsx"
 >
@@ -55,7 +55,7 @@ Native constraint validation is read from the field control.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field label="Project name" error="Project name is required.">\n    <Input\n      data-slot="field-control"\n      name="project"\n      required\n      placeholder="My app"\n    />\n  </Field>\n));'
+    'import { ilha } from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field label="Project name" error="Project name is required.">\n    <Input\n      data-slot="field-control"\n      name="project"\n      required\n      placeholder="My app"\n    />\n  </Field>\n));'
   }
   lang="tsx"
 >
@@ -68,7 +68,7 @@ Return a string from `validate` to mark the field invalid. `Field` is an Ilha is
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field\n    label="Email"\n    error="Enter a valid email address."\n    validationMode="onBlur"\n    validate={(value) =>\n      value.includes("@")\n        ? null\n        : "Enter a valid email address."\n    }\n  >\n    <Input\n      data-slot="field-control"\n      type="email"\n      name="email"\n      placeholder="you@example.com"\n    />\n  </Field>\n));'
+    'import { ilha } from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field\n    label="Email"\n    error="Enter a valid email address."\n    validationMode="onBlur"\n    validate={(value) =>\n      value.includes("@")\n        ? null\n        : "Enter a valid email address."\n    }\n  >\n    <Input\n      data-slot="field-control"\n      type="email"\n      name="email"\n      placeholder="you@example.com"\n    />\n  </Field>\n));'
   }
   lang="tsx"
   codeOnly
@@ -80,7 +80,7 @@ Use `invalid` when validity is controlled by server state or another external so
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field\n    label="Workspace slug"\n    invalid\n    error="This slug is already taken."\n  >\n    <Input\n      data-slot="field-control"\n      name="slug"\n      value="areia"\n    />\n  </Field>\n));'
+    'import { ilha } from "ilha";\nimport { Field, Input } from "areia";\n\nexport default ilha.render(() => (\n  <Field\n    label="Workspace slug"\n    invalid\n    error="This slug is already taken."\n  >\n    <Input\n      data-slot="field-control"\n      name="slug"\n      value="areia"\n    />\n  </Field>\n));'
   }
   lang="tsx"
 >
@@ -93,7 +93,7 @@ Use the part helpers when you need a custom layout.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Field, Textarea } from "areia";\n\nexport default ilha.render(() => (\n  <Field>\n    <Field.Label label="Description" />\n    <Textarea\n      data-slot="field-control"\n      name="description"\n      placeholder="Describe your project..."\n    />\n    <div class="flex items-center justify-between gap-3">\n      <Field.Description description="Keep it concise." />\n      <Field.Error error="Description is required." />\n    </div>\n  </Field>\n));'
+    'import { ilha } from "ilha";\nimport { Field, Textarea } from "areia";\n\nexport default ilha.render(() => (\n  <Field>\n    <Field.Label label="Description" />\n    <Textarea\n      data-slot="field-control"\n      name="description"\n      placeholder="Describe your project..."\n    />\n    <div class="flex items-center justify-between gap-3">\n      <Field.Description description="Keep it concise." />\n      <Field.Error error="Description is required." />\n    </div>\n  </Field>\n));'
   }
   lang="tsx"
 >

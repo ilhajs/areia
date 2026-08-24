@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Toggle, ToggleGroup } from "areia";
 
 export const Demo1 = ilha.render(() => <Toggle variant="outline">Bold</Toggle>);

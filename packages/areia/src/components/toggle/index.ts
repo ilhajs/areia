@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Toggle as TogglePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { render } from "$lib/markup";

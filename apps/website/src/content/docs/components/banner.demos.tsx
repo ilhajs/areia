@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Banner, Button, Icon } from "areia";
 import { Info, TriangleAlert } from "lucide";
 

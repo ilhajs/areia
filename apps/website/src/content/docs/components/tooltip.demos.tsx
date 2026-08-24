@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Button, Icon, Tooltip } from "areia";
 import { Info, Languages, Plus, Settings } from "lucide";
 

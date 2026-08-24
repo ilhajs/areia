@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Tabs as TabsPrimitive } from "@areia/slots";
 import {
   boundElement,

@@ -1,5 +1,5 @@
 import { Badge, ClipboardText, Icon, LinkButton } from "areia";
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Book, Boxes, Code2, Sparkles, Type } from "lucide";
 
 const features = [

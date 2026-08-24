@@ -33,7 +33,7 @@ A two-state control that can be either on or off. Areia's `Switch` uses `@data-s
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Enable notifications" />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Enable notifications" />\n));'
   }
   lang="tsx"
 >
@@ -52,7 +52,7 @@ Call `Switch(...)` for interactive behavior. It initializes `@data-slot/switch`,
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch\n    id="marketing-emails"\n    label="Marketing emails"\n    name="marketing-emails"\n    value="enabled"\n    uncheckedValue="disabled"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch\n    id="marketing-emails"\n    label="Marketing emails"\n    name="marketing-emails"\n    value="enabled"\n    uncheckedValue="disabled"\n  />\n));'
   }
   lang="tsx"
 >
@@ -85,7 +85,7 @@ Requires **ilha** `^0.8.0` and a recent **areia** release. Controlled `checked` 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => <Switch label="Dark mode" />);'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => <Switch label="Dark mode" />);'
   }
   lang="tsx"
 >
@@ -96,7 +96,7 @@ Requires **ilha** `^0.8.0` and a recent **areia** release. Controlled `checked` 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Dark mode" checked />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Dark mode" checked />\n));'
   }
   lang="tsx"
 >
@@ -107,7 +107,7 @@ Requires **ilha** `^0.8.0` and a recent **areia** release. Controlled `checked` 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <Switch label="Disabled off" disabled />\n    <Switch label="Disabled on" checked disabled />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <Switch label="Disabled off" disabled />\n    <Switch label="Disabled on" checked disabled />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -120,7 +120,7 @@ Use `readOnly` to prevent user changes while keeping the field enabled for form 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Managed by policy" checked readOnly />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Managed by policy" checked readOnly />\n));'
   }
   lang="tsx"
 >
@@ -133,7 +133,7 @@ The Switch supports two variants: `default` for brand-colored toggles and `neutr
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid gap-3 sm:grid-cols-2">\n    <Switch label="Default off" variant="default" />\n    <Switch label="Default on" variant="default" checked />\n    <Switch label="Neutral off" variant="neutral" />\n    <Switch label="Neutral on" variant="neutral" checked />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid gap-3 sm:grid-cols-2">\n    <Switch label="Default off" variant="default" />\n    <Switch label="Default on" variant="default" checked />\n    <Switch label="Neutral off" variant="neutral" />\n    <Switch label="Neutral on" variant="neutral" checked />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -146,7 +146,7 @@ The neutral variant is useful for subtle, lower-emphasis settings.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Compact setting" variant="neutral" />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Compact setting" variant="neutral" />\n));'
   }
   lang="tsx"
 >
@@ -159,7 +159,7 @@ Three sizes are available: `sm`, `base`, and `lg`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <Switch label="Small" size="sm" />\n    <Switch label="Base" size="base" />\n    <Switch label="Large" size="lg" />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <Switch label="Small" size="sm" />\n    <Switch label="Base" size="base" />\n    <Switch label="Large" size="lg" />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -172,7 +172,7 @@ Use `controlFirst: false` to place the label before the switch.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Enable beta features" controlFirst={false} />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch label="Enable beta features" controlFirst={false} />\n));'
   }
   lang="tsx"
 >
@@ -185,7 +185,7 @@ Use `labelTooltip` for contextual help. Set `required: false` to show the option
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch\n    label="Usage analytics"\n    labelTooltip="Helps improve the product by sending anonymous usage data."\n    required={false}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch\n    label="Usage analytics"\n    labelTooltip="Helps improve the product by sending anonymous usage data."\n    required={false}\n  />\n));'
   }
   lang="tsx"
 >
@@ -198,7 +198,7 @@ When a custom `id` is provided, clicking the label toggles the switch.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch id="custom-switch-id" label="Custom id switch" />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch id="custom-switch-id" label="Custom id switch" />\n));'
   }
   lang="tsx"
 >
@@ -211,7 +211,7 @@ When a switch does not have visible label text, provide an accessible name with 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch aria-label="Enable setting" />\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch aria-label="Enable setting" />\n));'
   }
   lang="tsx"
 >
@@ -224,7 +224,7 @@ Group related switches with `Switch.Group`. It provides a shared legend, descrip
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch.Group\n    legend="Notification settings"\n    description="Choose how you want to receive account updates."\n  >\n    <Switch.Item\n      label="Email notifications"\n      name="email"\n      value="enabled"\n    />\n    <Switch.Item\n      label="SMS notifications"\n      name="sms"\n      value="enabled"\n    />\n    <Switch.Item\n      label="Push notifications"\n      name="push"\n      value="enabled"\n    />\n  </Switch.Group>\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch.Group\n    legend="Notification settings"\n    description="Choose how you want to receive account updates."\n  >\n    <Switch.Item\n      label="Email notifications"\n      name="email"\n      value="enabled"\n    />\n    <Switch.Item\n      label="SMS notifications"\n      name="sms"\n      value="enabled"\n    />\n    <Switch.Item\n      label="Push notifications"\n      name="push"\n      value="enabled"\n    />\n  </Switch.Group>\n));'
   }
   lang="tsx"
 >
@@ -237,7 +237,7 @@ Set `controlFirst: false` on the group to place labels before all switches in th
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch.Group legend="Privacy settings" controlFirst={false}>\n    <Switch.Item\n      label="Show profile publicly"\n      name="public-profile"\n    />\n    <Switch.Item\n      label="Allow search indexing"\n      name="search-indexing"\n    />\n  </Switch.Group>\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch.Group legend="Privacy settings" controlFirst={false}>\n    <Switch.Item\n      label="Show profile publicly"\n      name="public-profile"\n    />\n    <Switch.Item\n      label="Allow search indexing"\n      name="search-indexing"\n    />\n  </Switch.Group>\n));'
   }
   lang="tsx"
 >
@@ -250,7 +250,7 @@ Use `Switch.Legend` with `class: "sr-only"` to keep the legend accessible to scr
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch.Group>\n    <Switch.Legend class="sr-only">\n      Notification settings\n    </Switch.Legend>\n    <Switch.Item label="Email" name="email" />\n    <Switch.Item label="SMS" name="sms" />\n  </Switch.Group>\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch.Group>\n    <Switch.Legend class="sr-only">\n      Notification settings\n    </Switch.Legend>\n    <Switch.Item label="Email" name="email" />\n    <Switch.Item label="SMS" name="sms" />\n  </Switch.Group>\n));'
   }
   lang="tsx"
 >
@@ -263,7 +263,7 @@ Use `Switch.Legend` directly when you need custom legend styling.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch.Group>\n    <Switch.Legend class="text-sm font-semibold uppercase tracking-wide text-areia-subtle">\n      Notification settings\n    </Switch.Legend>\n    <Switch.Item\n      label="Product updates"\n      name="product-updates"\n    />\n    <Switch.Item\n      label="Security alerts"\n      name="security-alerts"\n      checked\n    />\n  </Switch.Group>\n));'
+    'import { ilha } from "ilha";\nimport { Switch } from "areia";\n\nexport default ilha.render(() => (\n  <Switch.Group>\n    <Switch.Legend class="text-sm font-semibold uppercase tracking-wide text-areia-subtle">\n      Notification settings\n    </Switch.Legend>\n    <Switch.Item\n      label="Product updates"\n      name="product-updates"\n    />\n    <Switch.Item\n      label="Security alerts"\n      name="security-alerts"\n      checked\n    />\n  </Switch.Group>\n));'
   }
   lang="tsx"
 >

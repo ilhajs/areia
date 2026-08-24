@@ -25,7 +25,7 @@ A pressable button that toggles between pressed and unpressed states.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <Toggle variant="outline">Bold</Toggle>\n));'
+    'import { ilha } from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <Toggle variant="outline">Bold</Toggle>\n));'
   }
   lang="tsx"
 >
@@ -44,7 +44,7 @@ Use `Toggle` with optional `variant`, `size`, and `defaultPressed`. It is a sing
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <Toggle variant="outline">Italic</Toggle>\n));'
+    'import { ilha } from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <Toggle variant="outline">Italic</Toggle>\n));'
   }
   lang="tsx"
 >
@@ -57,7 +57,7 @@ Use `Toggle` with optional `variant`, `size`, and `defaultPressed`. It is a sing
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle>Default</Toggle>\n    <Toggle variant="outline">Outline</Toggle>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle>Default</Toggle>\n    <Toggle variant="outline">Outline</Toggle>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -68,7 +68,7 @@ Use `Toggle` with optional `variant`, `size`, and `defaultPressed`. It is a sing
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle size="sm" variant="outline">\n      Small\n    </Toggle>\n    <Toggle size="default" variant="outline">\n      Default\n    </Toggle>\n    <Toggle size="lg" variant="outline">\n      Large\n    </Toggle>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle size="sm" variant="outline">\n      Small\n    </Toggle>\n    <Toggle size="default" variant="outline">\n      Default\n    </Toggle>\n    <Toggle size="lg" variant="outline">\n      Large\n    </Toggle>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -79,7 +79,7 @@ Use `Toggle` with optional `variant`, `size`, and `defaultPressed`. It is a sing
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle disabled>Disabled</Toggle>\n    <Toggle variant="outline" disabled>\n      Disabled\n    </Toggle>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle disabled>Disabled</Toggle>\n    <Toggle variant="outline" disabled>\n      Disabled\n    </Toggle>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -92,7 +92,7 @@ Use `defaultPressed` to set the initial pressed state.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle defaultPressed>Pressed</Toggle>\n    <Toggle variant="outline" defaultPressed>\n      Pressed\n    </Toggle>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <Toggle defaultPressed>Pressed</Toggle>\n    <Toggle variant="outline" defaultPressed>\n      Pressed\n    </Toggle>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -105,7 +105,7 @@ Use `ToggleGroup` when multiple toggles belong together as a single control.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ToggleGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ToggleGroup type="single" defaultValue="center">\n    <ToggleGroup.Item value="left" variant="outline">\n      Left\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="center" variant="outline">\n      Center\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="right" variant="outline">\n      Right\n    </ToggleGroup.Item>\n  </ToggleGroup>\n));'
+    'import { ilha } from "ilha";\nimport { ToggleGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ToggleGroup type="single" defaultValue="center">\n    <ToggleGroup.Item value="left" variant="outline">\n      Left\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="center" variant="outline">\n      Center\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="right" variant="outline">\n      Right\n    </ToggleGroup.Item>\n  </ToggleGroup>\n));'
   }
   lang="tsx"
 >
@@ -116,7 +116,7 @@ Use `type="multiple"` to allow more than one item to be pressed at a time.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ToggleGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ToggleGroup type="multiple" defaultValue={["bold"]}>\n    <ToggleGroup.Item value="bold" variant="outline">\n      Bold\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="italic" variant="outline">\n      Italic\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="underline" variant="outline">\n      Underline\n    </ToggleGroup.Item>\n  </ToggleGroup>\n));'
+    'import { ilha } from "ilha";\nimport { ToggleGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ToggleGroup type="multiple" defaultValue={["bold"]}>\n    <ToggleGroup.Item value="bold" variant="outline">\n      Bold\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="italic" variant="outline">\n      Italic\n    </ToggleGroup.Item>\n    <ToggleGroup.Item value="underline" variant="outline">\n      Underline\n    </ToggleGroup.Item>\n  </ToggleGroup>\n));'
   }
   lang="tsx"
   codeOnly
@@ -128,7 +128,7 @@ Use `onPressedChange` to respond to state changes.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.state("bold", false).render(({ state }) => (\n  <div class="flex flex-col items-start gap-3">\n    <Toggle\n      variant="outline"\n      onPressedChange={(pressed) => {\n        state.bold(pressed);\n      }}\n    >\n      Bold\n    </Toggle>\n    <p class="text-sm text-areia-subtle">\n      Bold is:{" "}\n      <span class="font-medium text-areia-default">\n        {state.bold() ? "On" : "Off"}\n      </span>\n    </p>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Toggle } from "areia";\n\nexport default ilha.state("bold", false).render(({ state }) => (\n  <div class="flex flex-col items-start gap-3">\n    <Toggle\n      variant="outline"\n      onPressedChange={(pressed) => {\n        state.bold(pressed);\n      }}\n    >\n      Bold\n    </Toggle>\n    <p class="text-sm text-areia-subtle">\n      Bold is:{" "}\n      <span class="font-medium text-areia-default">\n        {state.bold() ? "On" : "Off"}\n      </span>\n    </p>\n  </div>\n));'
   }
   lang="tsx"
   codeOnly

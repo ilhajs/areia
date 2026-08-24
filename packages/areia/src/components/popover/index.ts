@@ -1,4 +1,4 @@
-import ilha, { html, raw, untrack } from "ilha";
+import { ilha, html, raw, untrack } from "ilha";
 import { Popover as PopoverPrimitive } from "@areia/slots";
 import {
   boundElement,

@@ -1,4 +1,4 @@
-import ilha, { html, raw, untrack, type SignalAccessor } from "ilha";
+import { ilha, html, raw, untrack, type SignalAccessor } from "ilha";
 import { Combobox as ComboboxPrimitive } from "@areia/slots";
 import {
   applyThisBind,

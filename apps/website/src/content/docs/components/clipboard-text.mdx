@@ -22,7 +22,7 @@ Displays read-only text with a one-click copy action.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="npm install areia"\n    tooltip\n    class="w-80"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="npm install areia"\n    tooltip\n    class="w-80"\n  />\n));'
   }
   lang="tsx"
 >
@@ -41,7 +41,7 @@ Use `ClipboardText` when the copy button should be interactive.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="0c239dd2-92b4-4b68-bf35-8d6e1c5c12fd"\n    class="w-96"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="0c239dd2-92b4-4b68-bf35-8d6e1c5c12fd"\n    class="w-96"\n  />\n));'
   }
   lang="tsx"
 >
@@ -56,7 +56,7 @@ Display a shortened value while copying the full value with `textToCopy`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="sk_live_••••••••••••abc123"\n    textToCopy="sk_live_abc123-full-secret-value"\n    class="w-80"\n    tooltip={{\n      text: "Copy secret",\n      copiedText: "Copied secret",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="sk_live_••••••••••••abc123"\n    textToCopy="sk_live_abc123-full-secret-value"\n    class="w-80"\n    tooltip={{\n      text: "Copy secret",\n      copiedText: "Copied secret",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -67,7 +67,7 @@ Display a shortened value while copying the full value with `textToCopy`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid w-96 gap-3">\n    <ClipboardText text="Small clipboard text" size="sm" />\n    <ClipboardText text="Default clipboard text" size="base" />\n    <ClipboardText text="Large clipboard text" size="lg" />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid w-96 gap-3">\n    <ClipboardText text="Small clipboard text" size="sm" />\n    <ClipboardText text="Default clipboard text" size="base" />\n    <ClipboardText text="Large clipboard text" size="lg" />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -80,7 +80,7 @@ Pass `tooltip: true` for the default tooltip, or configure the tooltip text, cop
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="https://example.com/invite/areia"\n    class="w-96"\n    tooltip={{\n      text: "Copy invite link",\n      copiedText: "Invite link copied",\n      side: "bottom",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="https://example.com/invite/areia"\n    class="w-96"\n    tooltip={{\n      text: "Copy invite link",\n      copiedText: "Invite link copied",\n      side: "bottom",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -93,7 +93,7 @@ Customize the copy button label for localization.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="areia-token-123"\n    labels={{\n      copyAction: "Copiar para a área de transferência",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { ClipboardText } from "areia";\n\nexport default ilha.render(() => (\n  <ClipboardText\n    text="areia-token-123"\n    labels={{\n      copyAction: "Copiar para a área de transferência",\n    }}\n  />\n));'
   }
   lang="tsx"
 >

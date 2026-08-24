@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Field, Input, Textarea } from "areia";
 
 export const Demo1 = ilha.render(() => (

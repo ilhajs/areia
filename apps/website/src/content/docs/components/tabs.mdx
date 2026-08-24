@@ -46,7 +46,7 @@ const Panel = ilha
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-6">\n    <div>\n      <p class="mb-2 text-sm text-areia-subtle">Segmented</p>\n      <Tabs\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "analytics", label: "Analytics" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue="overview"\n      />\n    </div>\n    <div>\n      <p class="mb-2 text-sm text-areia-subtle">Underline</p>\n      <Tabs\n        variant="underline"\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "analytics", label: "Analytics" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue="overview"\n      />\n    </div>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-6">\n    <div>\n      <p class="mb-2 text-sm text-areia-subtle">Segmented</p>\n      <Tabs\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "analytics", label: "Analytics" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue="overview"\n      />\n    </div>\n    <div>\n      <p class="mb-2 text-sm text-areia-subtle">Underline</p>\n      <Tabs\n        variant="underline"\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "analytics", label: "Analytics" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue="overview"\n      />\n    </div>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -65,7 +65,7 @@ Call `Tabs(...)` for interactive behavior. Prefer composing `Tabs.List`, `Tabs.T
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs selectedValue="overview">\n    <Tabs.List>\n      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>\n      <Tabs.Trigger value="settings">Settings</Tabs.Trigger>\n    </Tabs.List>\n  </Tabs>\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs selectedValue="overview">\n    <Tabs.List>\n      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>\n      <Tabs.Trigger value="settings">Settings</Tabs.Trigger>\n    </Tabs.List>\n  </Tabs>\n));'
   }
   lang="tsx"
 >
@@ -82,7 +82,7 @@ A pill-shaped indicator slides between tabs on a subtle background.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    variant="segmented"\n    tabs={[\n      { value: "tab-1", label: "Tab 1" },\n      { value: "tab-2", label: "Tab 2" },\n      { value: "tab-3", label: "Tab 3" },\n    ]}\n    selectedValue="tab-1"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    variant="segmented"\n    tabs={[\n      { value: "tab-1", label: "Tab 1" },\n      { value: "tab-2", label: "Tab 2" },\n      { value: "tab-3", label: "Tab 3" },\n    ]}\n    selectedValue="tab-1"\n  />\n));'
   }
   lang="tsx"
 >
@@ -95,7 +95,7 @@ The underline variant uses a bottom border and primary-colored indicator.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    variant="underline"\n    tabs={[\n      { value: "tab-1", label: "Tab 1" },\n      { value: "tab-2", label: "Tab 2" },\n      { value: "tab-3", label: "Tab 3" },\n    ]}\n    selectedValue="tab-1"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    variant="underline"\n    tabs={[\n      { value: "tab-1", label: "Tab 1" },\n      { value: "tab-2", label: "Tab 2" },\n      { value: "tab-3", label: "Tab 3" },\n    ]}\n    selectedValue="tab-1"\n  />\n));'
   }
   lang="tsx"
 >
@@ -108,7 +108,7 @@ Use `size="sm"` for compact tabs inside toolbars and filter rows.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-6">\n    <Tabs\n      size="sm"\n      tabs={[\n        { value: "open", label: "Open" },\n        { value: "closed", label: "Closed" },\n        { value: "all", label: "All" },\n      ]}\n      selectedValue="open"\n    />\n    <Tabs\n      variant="underline"\n      size="sm"\n      tabs={[\n        { value: "daily", label: "Daily" },\n        { value: "weekly", label: "Weekly" },\n        { value: "monthly", label: "Monthly" },\n      ]}\n      selectedValue="daily"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-6">\n    <Tabs\n      size="sm"\n      tabs={[\n        { value: "open", label: "Open" },\n        { value: "closed", label: "Closed" },\n        { value: "all", label: "All" },\n      ]}\n      selectedValue="open"\n    />\n    <Tabs\n      variant="underline"\n      size="sm"\n      tabs={[\n        { value: "daily", label: "Daily" },\n        { value: "weekly", label: "Weekly" },\n        { value: "monthly", label: "Monthly" },\n      ]}\n      selectedValue="daily"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -121,7 +121,7 @@ Segmented tabs scroll horizontally when there are more items than available spac
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <Tabs\n      tabs={[\n        { value: "overview", label: "Overview" },\n        { value: "analytics", label: "Analytics" },\n        { value: "reports", label: "Reports" },\n        { value: "notifications", label: "Notifications" },\n        { value: "settings", label: "Settings" },\n        { value: "billing", label: "Billing" },\n        { value: "security", label: "Security" },\n        { value: "integrations", label: "Integrations" },\n      ]}\n      selectedValue="overview"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <Tabs\n      tabs={[\n        { value: "overview", label: "Overview" },\n        { value: "analytics", label: "Analytics" },\n        { value: "reports", label: "Reports" },\n        { value: "notifications", label: "Notifications" },\n        { value: "settings", label: "Settings" },\n        { value: "billing", label: "Billing" },\n        { value: "security", label: "Security" },\n        { value: "integrations", label: "Integrations" },\n      ]}\n      selectedValue="overview"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -134,7 +134,7 @@ Use `onValueChange` to respond when the active tab changes.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha\n  .state("activeTab", "overview")\n  .render(({ state }) => (\n    <div class="space-y-4">\n      <Tabs\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "usage", label: "Usage" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue={state.activeTab()}\n        onValueChange={(value) => {\n          state.activeTab(value);\n        }}\n      />\n      <p class="text-sm text-areia-subtle">\n        Active tab: <code>{state.activeTab}</code>\n      </p>\n    </div>\n  ));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha\n  .state("activeTab", "overview")\n  .render(({ state }) => (\n    <div class="space-y-4">\n      <Tabs\n        tabs={[\n          { value: "overview", label: "Overview" },\n          { value: "usage", label: "Usage" },\n          { value: "settings", label: "Settings" },\n        ]}\n        selectedValue={state.activeTab()}\n        onValueChange={(value) => {\n          state.activeTab(value);\n        }}\n      />\n      <p class="text-sm text-areia-subtle">\n        Active tab: <code>{state.activeTab}</code>\n      </p>\n    </div>\n  ));'
   }
   lang="tsx"
   codeOnly
@@ -146,7 +146,7 @@ Compose `Tabs.Content` children for panel content. This keeps panel JSX colocate
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs selectedValue="overview">\n    <Tabs.List>\n      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>\n      <Tabs.Trigger value="activity">Activity</Tabs.Trigger>\n      <Tabs.Trigger value="settings">Settings</Tabs.Trigger>\n    </Tabs.List>\n    <Tabs.Content value="overview">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Project health and key metrics.\n      </div>\n    </Tabs.Content>\n    <Tabs.Content value="activity">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Recent project activity appears here.\n      </div>\n    </Tabs.Content>\n    <Tabs.Content value="settings">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Workspace preferences and access controls.\n      </div>\n    </Tabs.Content>\n  </Tabs>\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs selectedValue="overview">\n    <Tabs.List>\n      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>\n      <Tabs.Trigger value="activity">Activity</Tabs.Trigger>\n      <Tabs.Trigger value="settings">Settings</Tabs.Trigger>\n    </Tabs.List>\n    <Tabs.Content value="overview">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Project health and key metrics.\n      </div>\n    </Tabs.Content>\n    <Tabs.Content value="activity">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Recent project activity appears here.\n      </div>\n    </Tabs.Content>\n    <Tabs.Content value="settings">\n      <div class="rounded-lg bg-areia-surface-muted p-4 text-sm">\n        Workspace preferences and access controls.\n      </div>\n    </Tabs.Content>\n  </Tabs>\n));'
   }
   lang="tsx"
 >
@@ -159,7 +159,7 @@ Use the `tabs` array for concise data-driven tabs. Pass `content` on each item t
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    selectedValue="overview"\n    tabs={[\n      {\n        value: "overview",\n        label: "Overview",\n        content: "Overview panel",\n      },\n      {\n        value: "settings",\n        label: "Settings",\n        content: "Settings panel",\n      },\n    ]}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    selectedValue="overview"\n    tabs={[\n      {\n        value: "overview",\n        label: "Overview",\n        content: "Overview panel",\n      },\n      {\n        value: "settings",\n        label: "Settings",\n        content: "Settings panel",\n      },\n    ]}\n  />\n));'
   }
   lang="tsx"
 >
@@ -172,7 +172,7 @@ Disable individual tabs with `disabled: true`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    tabs={[\n      { value: "profile", label: "Profile" },\n      { value: "team", label: "Team" },\n      { value: "billing", label: "Billing", disabled: true },\n    ]}\n    selectedValue="profile"\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Tabs } from "areia";\n\nexport default ilha.render(() => (\n  <Tabs\n    tabs={[\n      { value: "profile", label: "Profile" },\n      { value: "team", label: "Team" },\n      { value: "billing", label: "Billing", disabled: true },\n    ]}\n    selectedValue="profile"\n  />\n));'
   }
   lang="tsx"
 >

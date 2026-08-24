@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Link } from "areia";
 
 export const Demo1 = ilha.render(() => (

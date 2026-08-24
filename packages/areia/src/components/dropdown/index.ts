@@ -1,4 +1,4 @@
-import ilha, { html, raw, untrack } from "ilha";
+import { ilha, html, raw, untrack } from "ilha";
 import { Check } from "lucide";
 import { DropdownMenu as DropdownMenuPrimitive } from "@areia/slots";
 import {

@@ -1,4 +1,4 @@
-import ilha, { untrack } from "ilha";
+import { ilha, untrack } from "ilha";
 import { setupDrag } from "./drag.ts";
 import { renderForm } from "./Form.tsx";
 import { createFormState } from "./state.ts";

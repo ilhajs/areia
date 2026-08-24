@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import ilha, { html, mount, signal, type SignalAccessor } from "ilha";
+import { ilha, html, mount, signal, type SignalAccessor } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Combobox, comboboxVariants, type ComboboxInput } from "./index";
 

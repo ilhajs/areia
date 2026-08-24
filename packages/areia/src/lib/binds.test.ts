@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import ilha, { html, mount } from "ilha";
+import { ilha, html, mount } from "ilha";
 import { Input } from "$components/input";
 import { Radio } from "$components/radio";
 import { Textarea } from "$components/textarea";

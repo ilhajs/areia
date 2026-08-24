@@ -33,7 +33,7 @@ Displays a button or a component that looks like a button.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-2">\n    <Button variant="secondary">Button</Button>\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-2">\n    <Button variant="secondary">Button</Button>\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -50,7 +50,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary">Click me</Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary">Click me</Button>\n));'
   }
   lang="tsx"
 >
@@ -65,7 +65,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="primary">Primary</Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="primary">Primary</Button>\n));'
   }
   lang="tsx"
 >
@@ -76,7 +76,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary">Secondary</Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary">Secondary</Button>\n));'
   }
   lang="tsx"
 >
@@ -87,7 +87,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="ghost">Ghost</Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="ghost">Ghost</Button>\n));'
   }
   lang="tsx"
 >
@@ -98,7 +98,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="destructive">Destructive</Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="destructive">Destructive</Button>\n));'
   }
   lang="tsx"
 >
@@ -109,7 +109,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="outline">Outline</Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="outline">Outline</Button>\n));'
   }
   lang="tsx"
 >
@@ -120,7 +120,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary-destructive">\n    Secondary Destructive\n  </Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary-destructive">\n    Secondary Destructive\n  </Button>\n));'
   }
   lang="tsx"
 >
@@ -131,7 +131,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button size="xs" variant="secondary">\n      Extra Small\n    </Button>\n    <Button size="sm" variant="secondary">\n      Small\n    </Button>\n    <Button size="base" variant="secondary">\n      Base\n    </Button>\n    <Button size="lg" variant="secondary">\n      Large\n    </Button>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button size="xs" variant="secondary">\n      Extra Small\n    </Button>\n    <Button size="sm" variant="secondary">\n      Small\n    </Button>\n    <Button size="base" variant="secondary">\n      Base\n    </Button>\n    <Button size="lg" variant="secondary">\n      Large\n    </Button>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -142,7 +142,7 @@ import { Button, ButtonGroup } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary" icon={<Icon icon={Plus} />}>\n    Create Ilha app\n  </Button>\n));'
+    'import { ilha } from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary" icon={<Icon icon={Plus} />}>\n    Create Ilha app\n  </Button>\n));'
   }
   lang="tsx"
 >
@@ -155,7 +155,7 @@ For icon-only buttons, use `shape="square"` or `shape="circle"` with the `icon` 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n    />\n    <Button\n      variant="secondary"\n      shape="circle"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n    />\n    <Button\n      variant="secondary"\n      shape="circle"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -166,7 +166,7 @@ For icon-only buttons, use `shape="square"` or `shape="circle"` with the `icon` 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="primary" loading>\n    Loading...\n  </Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="primary" loading>\n    Loading...\n  </Button>\n));'
   }
   lang="tsx"
 >
@@ -177,7 +177,7 @@ For icon-only buttons, use `shape="square"` or `shape="circle"` with the `icon` 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary" disabled>\n    Disabled\n  </Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="secondary" disabled>\n    Disabled\n  </Button>\n));'
   }
   lang="tsx"
 >
@@ -190,7 +190,7 @@ Use the native `title` attribute when additional context helps the user understa
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button variant="secondary" title="Create a new Ilha app">\n      Create Ilha app\n    </Button>\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n      title="Add item"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Plus } from "lucide";\nimport { Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <Button variant="secondary" title="Create a new Ilha app">\n      Create Ilha app\n    </Button>\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Plus} />}\n      aria-label="Add item"\n      title="Add item"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -203,7 +203,7 @@ Use `ButtonGroup` to visually join related buttons or controls.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Bold, Italic, Underline } from "lucide";\nimport { Button, ButtonGroup, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <ButtonGroup aria-label="Text formatting">\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Bold} />}\n      aria-label="Bold"\n    />\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Italic} />}\n      aria-label="Italic"\n    />\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Underline} />}\n      aria-label="Underline"\n    />\n  </ButtonGroup>\n));'
+    'import { ilha } from "ilha";\nimport { Bold, Italic, Underline } from "lucide";\nimport { Button, ButtonGroup, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <ButtonGroup aria-label="Text formatting">\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Bold} />}\n      aria-label="Bold"\n    />\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Italic} />}\n      aria-label="Italic"\n    />\n    <Button\n      variant="outline"\n      shape="square"\n      icon={<Icon icon={Underline} />}\n      aria-label="Underline"\n    />\n  </ButtonGroup>\n));'
   }
   lang="tsx"
 >
@@ -214,7 +214,7 @@ Use `orientation="vertical"` for stacked groups, `ButtonGroup.Text` for text seg
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button, ButtonGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ButtonGroup>\n    <Button variant="outline">Back</Button>\n    <ButtonGroup.Separator />\n    <ButtonGroup.Text>Page 1</ButtonGroup.Text>\n    <ButtonGroup.Separator />\n    <Button variant="outline">Next</Button>\n  </ButtonGroup>\n));'
+    'import { ilha } from "ilha";\nimport { Button, ButtonGroup } from "areia";\n\nexport default ilha.render(() => (\n  <ButtonGroup>\n    <Button variant="outline">Back</Button>\n    <ButtonGroup.Separator />\n    <ButtonGroup.Text>Page 1</ButtonGroup.Text>\n    <ButtonGroup.Separator />\n    <Button variant="outline">Next</Button>\n  </ButtonGroup>\n));'
   }
   lang="tsx"
 >
@@ -227,7 +227,7 @@ Use `LinkButton` when the interaction should navigate somewhere but still look l
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ExternalLink } from "lucide";\nimport { LinkButton, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <LinkButton href="/components/link" variant="secondary">\n      Read Link docs\n    </LinkButton>\n    <LinkButton\n      href="https://ilha.build/"\n      variant="ghost"\n      icon={<Icon icon={ExternalLink} />}\n      external\n    >\n      Ilha Docs\n    </LinkButton>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { ExternalLink } from "lucide";\nimport { LinkButton, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <LinkButton href="/components/link" variant="secondary">\n      Read Link docs\n    </LinkButton>\n    <LinkButton\n      href="https://ilha.build/"\n      variant="ghost"\n      icon={<Icon icon={ExternalLink} />}\n      external\n    >\n      Ilha Docs\n    </LinkButton>\n  </div>\n));'
   }
   lang="tsx"
 >

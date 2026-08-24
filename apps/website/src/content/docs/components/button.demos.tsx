@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Bold, ExternalLink, Italic, Plus, Underline } from "lucide";
 import { Button, ButtonGroup, Icon, LinkButton } from "areia";
 

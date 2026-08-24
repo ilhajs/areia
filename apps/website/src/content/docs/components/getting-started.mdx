@@ -35,7 +35,7 @@ Use components directly from `areia`:
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="primary">Create project</Button>\n));'
+    'import { ilha } from "ilha";\nimport { Button } from "areia";\n\nexport default ilha.render(() => (\n  <Button variant="primary">Create project</Button>\n));'
   }
   lang="tsx"
 >
@@ -48,7 +48,7 @@ Areia components are designed for Ilha and can be used with JSX or Ilha's html l
 
 <Preview
   code={
-    'import ilha, { html } from "ilha";\nimport { Button } from "areia";\n\n// Default JSX syntax\nexport default ilha.render(() => (\n  <div class="flex gap-2">\n    <Button variant="primary">Save</Button>\n    <Button variant="secondary">Cancel</Button>\n  </div>\n));\n\n// No-build html template literal\nexport default ilha.render(\n  () => html`\n    <div class="flex gap-2">\n      ${Button({ variant: "primary", children: "Save" })}\n      ${Button({ variant: "secondary", children: "Cancel" })}\n    </div>\n  `,\n);'
+    'import { ilha, html } from "ilha";\nimport { Button } from "areia";\n\n// Default JSX syntax\nexport default ilha.render(() => (\n  <div class="flex gap-2">\n    <Button variant="primary">Save</Button>\n    <Button variant="secondary">Cancel</Button>\n  </div>\n));\n\n// No-build html template literal\nexport default ilha.render(\n  () => html`\n    <div class="flex gap-2">\n      ${Button({ variant: "primary", children: "Save" })}\n      ${Button({ variant: "secondary", children: "Cancel" })}\n    </div>\n  `,\n);'
   }
   lang="tsx"
 >

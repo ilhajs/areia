@@ -24,7 +24,7 @@ Displays a form label with support for optional indicators and contextual toolti
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Label } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <Label for="default-label-demo" label="Default Label" />\n    <Label\n      for="optional-label-demo"\n      label="Optional Label"\n      showOptional\n    />\n    <Label\n      for="tooltip-label-demo"\n      label="Label with Tooltip"\n      tooltip="Helpful context about this field."\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Label } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <Label for="default-label-demo" label="Default Label" />\n    <Label\n      for="optional-label-demo"\n      label="Optional Label"\n      showOptional\n    />\n    <Label\n      for="tooltip-label-demo"\n      label="Label with Tooltip"\n      tooltip="Helpful context about this field."\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -45,7 +45,7 @@ Some form components include built-in label support. Use their `label`, `require
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-4">\n    <Input\n      id="middle-name"\n      label="Middle name"\n      required={false}\n      placeholder="Ada"\n    />\n    <Input\n      id="email-updates"\n      label="Email"\n      labelTooltip="We\'ll only use this for account notifications."\n      placeholder="you@example.com"\n      type="email"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Input } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-4">\n    <Input\n      id="middle-name"\n      label="Middle name"\n      required={false}\n      placeholder="Ada"\n    />\n    <Input\n      id="email-updates"\n      label="Email"\n      labelTooltip="We\'ll only use this for account notifications."\n      placeholder="you@example.com"\n      type="email"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -58,7 +58,7 @@ For custom form layouts, use `Label` directly and associate it with a control us
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input, Label } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-1.5">\n    <Label for="username" label="Username" />\n    <Input id="username" placeholder="areia-user" />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Input, Label } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-1.5">\n    <Label for="username" label="Username" />\n    <Input id="username" placeholder="areia-user" />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -73,7 +73,7 @@ Use `showOptional` to display subtle “(optional)” text after the label.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input, Label } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-1.5">\n    <Label for="nickname" label="Nickname" showOptional />\n    <Input id="nickname" placeholder="Ryuz" />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Input, Label } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-1.5">\n    <Label for="nickname" label="Nickname" showOptional />\n    <Input id="nickname" placeholder="Ryuz" />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -86,7 +86,7 @@ Use `tooltip` to show an info icon with additional context.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input, Label } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-1.5">\n    <Label\n      for="email"\n      label="Email"\n      tooltip="We\'ll use this to send you product and account updates."\n    />\n    <Input\n      id="email"\n      type="email"\n      placeholder="you@example.com"\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Input, Label } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-1.5">\n    <Label\n      for="email"\n      label="Email"\n      tooltip="We\'ll use this to send you product and account updates."\n    />\n    <Input\n      id="email"\n      type="email"\n      placeholder="you@example.com"\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -99,7 +99,7 @@ Use `tooltip` to show an info icon with additional context.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Label, Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox.Item\n    value="terms"\n    label={\n      <Label asContent>\n        I agree to the <strong>Terms of Service</strong>\n      </Label>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Label, Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox.Item\n    value="terms"\n    label={\n      <Label asContent>\n        I agree to the <strong>Terms of Service</strong>\n      </Label>\n    }\n  />\n));'
   }
   lang="tsx"
 >
@@ -112,7 +112,7 @@ Use optional indicators only where they help users understand which fields are r
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Input, Label, Select } from "areia";\n\nexport default ilha.render(() => (\n  <form class="flex w-full max-w-sm flex-col gap-4">\n    <Input\n      id="full-name"\n      label="Full name"\n      required\n      placeholder="Ada Lovelace"\n    />\n\n    <div class="flex flex-col gap-1.5">\n      <Label for="company" label="Company" showOptional />\n      <Input id="company" placeholder="Areia Labs" />\n    </div>\n\n    <Select\n      id="country"\n      label="Country"\n      placeholder="Select a country"\n      items={{\n        us: "United States",\n        uk: "United Kingdom",\n        ca: "Canada",\n      }}\n    />\n  </form>\n));'
+    'import { ilha } from "ilha";\nimport { Input, Label, Select } from "areia";\n\nexport default ilha.render(() => (\n  <form class="flex w-full max-w-sm flex-col gap-4">\n    <Input\n      id="full-name"\n      label="Full name"\n      required\n      placeholder="Ada Lovelace"\n    />\n\n    <div class="flex flex-col gap-1.5">\n      <Label for="company" label="Company" showOptional />\n      <Input id="company" placeholder="Areia Labs" />\n    </div>\n\n    <Select\n      id="country"\n      label="Country"\n      placeholder="Select a country"\n      items={{\n        us: "United States",\n        uk: "United Kingdom",\n        ca: "Canada",\n      }}\n    />\n  </form>\n));'
   }
   lang="tsx"
 >
@@ -125,7 +125,7 @@ Use `asContent` when another component already renders the outer label element a
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Label } from "areia";\n\nexport default ilha.render(() => (\n  <label class="text-base font-medium text-areia-default">\n    <Label\n      asContent\n      label="Project slug"\n      showOptional\n      tooltip="Used in generated URLs. You can change it later."\n    />\n  </label>\n));'
+    'import { ilha } from "ilha";\nimport { Label } from "areia";\n\nexport default ilha.render(() => (\n  <label class="text-base font-medium text-areia-default">\n    <Label\n      asContent\n      label="Project slug"\n      showOptional\n      tooltip="Used in generated URLs. You can change it later."\n    />\n  </label>\n));'
   }
   lang="tsx"
 >

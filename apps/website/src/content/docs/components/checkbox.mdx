@@ -29,7 +29,7 @@ A control that allows the user to toggle between checked and not checked. It use
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Accept terms and conditions" />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Accept terms and conditions" />\n));'
   }
   lang="tsx"
 >
@@ -46,7 +46,7 @@ import { Checkbox } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Remember me" />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Remember me" />\n));'
   }
   lang="tsx"
 >
@@ -61,7 +61,7 @@ Checkbox with a built-in label. The label automatically displays in a horizontal
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Accept terms and conditions" />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Accept terms and conditions" />\n));'
   }
   lang="tsx"
 >
@@ -72,7 +72,7 @@ Checkbox with a built-in label. The label automatically displays in a horizontal
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Enable notifications" checked />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Enable notifications" checked />\n));'
   }
   lang="tsx"
 >
@@ -85,7 +85,7 @@ Used for “select all” patterns when some but not all items are selected.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Select all" indeterminate />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Select all" indeterminate />\n));'
   }
   lang="tsx"
 >
@@ -98,7 +98,7 @@ Use `controlFirst: false` to place the label before the checkbox.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Enable notifications" controlFirst={false} />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Enable notifications" controlFirst={false} />\n));'
   }
   lang="tsx"
 >
@@ -109,7 +109,7 @@ Use `controlFirst: false` to place the label before the checkbox.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Disabled" disabled />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Disabled" disabled />\n));'
   }
   lang="tsx"
 >
@@ -122,7 +122,7 @@ The error variant provides visual styling. For error messages, use `Checkbox.Gro
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Required field" variant="error" required />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox label="Required field" variant="error" required />\n));'
   }
   lang="tsx"
 >
@@ -135,7 +135,7 @@ When a checkbox does not have visible label text, provide an accessible name wit
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox aria-label="Select row" />\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox aria-label="Select row" />\n));'
   }
   lang="tsx"
 >
@@ -148,7 +148,7 @@ Group multiple checkboxes with a legend and description. Use `Checkbox.Group` an
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox.Group\n    legend="Notification preferences"\n    description="Choose how you want to receive updates."\n  >\n    <Checkbox.Item\n      label="Email notifications"\n      value="email"\n      checked\n    />\n    <Checkbox.Item label="SMS notifications" value="sms" />\n    <Checkbox.Item label="Product updates" value="updates" />\n  </Checkbox.Group>\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox.Group\n    legend="Notification preferences"\n    description="Choose how you want to receive updates."\n  >\n    <Checkbox.Item\n      label="Email notifications"\n      value="email"\n      checked\n    />\n    <Checkbox.Item label="SMS notifications" value="sms" />\n    <Checkbox.Item label="Product updates" value="updates" />\n  </Checkbox.Group>\n));'
   }
   lang="tsx"
 >
@@ -161,7 +161,7 @@ Show validation errors at the group level.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox.Group\n    legend="Notification preferences"\n    error="Select at least one notification method."\n  >\n    <Checkbox.Item\n      label="Email notifications"\n      value="email"\n      variant="error"\n    />\n    <Checkbox.Item\n      label="SMS notifications"\n      value="sms"\n      variant="error"\n    />\n  </Checkbox.Group>\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox.Group\n    legend="Notification preferences"\n    error="Select at least one notification method."\n  >\n    <Checkbox.Item\n      label="Email notifications"\n      value="email"\n      variant="error"\n    />\n    <Checkbox.Item\n      label="SMS notifications"\n      value="sms"\n      variant="error"\n    />\n  </Checkbox.Group>\n));'
   }
   lang="tsx"
 >
@@ -174,7 +174,7 @@ Use `Checkbox.Legend` with `class: "sr-only"` to keep the legend accessible to s
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <p class="text-base font-medium text-areia-default">\n      Notification preferences\n    </p>\n    <Checkbox.Group>\n      <Checkbox.Legend\n        label="Notification preferences"\n        class="sr-only"\n      />\n      <Checkbox.Item\n        label="Email notifications"\n        value="email"\n        checked\n      />\n      <Checkbox.Item label="SMS notifications" value="sms" />\n    </Checkbox.Group>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-col gap-3">\n    <p class="text-base font-medium text-areia-default">\n      Notification preferences\n    </p>\n    <Checkbox.Group>\n      <Checkbox.Legend\n        label="Notification preferences"\n        class="sr-only"\n      />\n      <Checkbox.Item\n        label="Email notifications"\n        value="email"\n        checked\n      />\n      <Checkbox.Item label="SMS notifications" value="sms" />\n    </Checkbox.Group>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -187,7 +187,7 @@ Use `Checkbox.Legend` when you need custom typography, colors, or layout instead
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox.Group>\n    <Checkbox.Legend\n      label="Notification preferences"\n      class="text-sm uppercase tracking-wide text-areia-subtle"\n    />\n    <Checkbox.Item\n      label="Email notifications"\n      value="email"\n      checked\n    />\n    <Checkbox.Item label="SMS notifications" value="sms" />\n  </Checkbox.Group>\n));'
+    'import { ilha } from "ilha";\nimport { Checkbox } from "areia";\n\nexport default ilha.render(() => (\n  <Checkbox.Group>\n    <Checkbox.Legend\n      label="Notification preferences"\n      class="text-sm uppercase tracking-wide text-areia-subtle"\n    />\n    <Checkbox.Item\n      label="Email notifications"\n      value="email"\n      checked\n    />\n    <Checkbox.Item label="SMS notifications" value="sms" />\n  </Checkbox.Group>\n));'
   }
   lang="tsx"
 >

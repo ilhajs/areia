@@ -25,7 +25,7 @@ Displays contextual inline messages for informational, alert, or error states.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Info, TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-2xl flex-col gap-3">\n    <Banner\n      icon={<Icon icon={Info} class="size-5" />}\n      title="Update available"\n      description="A new version is ready to install."\n    />\n    <Banner\n      icon={<Icon icon={TriangleAlert} class="size-5" />}\n      variant="alert"\n      title="Session expiring"\n      description="Your session will expire in 5 minutes."\n    />\n    <Banner\n      icon={<Icon icon={TriangleAlert} class="size-5" />}\n      variant="error"\n      title="Save failed"\n      description="We couldn\'t save your changes. Please try again."\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Info, TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-2xl flex-col gap-3">\n    <Banner\n      icon={<Icon icon={Info} class="size-5" />}\n      title="Update available"\n      description="A new version is ready to install."\n    />\n    <Banner\n      icon={<Icon icon={TriangleAlert} class="size-5" />}\n      variant="alert"\n      title="Session expiring"\n      description="Your session will expire in 5 minutes."\n    />\n    <Banner\n      icon={<Icon icon={TriangleAlert} class="size-5" />}\n      variant="error"\n      title="Save failed"\n      description="We couldn\'t save your changes. Please try again."\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -42,7 +42,7 @@ import { Banner } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n  />\n));'
   }
   lang="tsx"
 >
@@ -57,7 +57,7 @@ import { Banner } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n  />\n));'
   }
   lang="tsx"
 >
@@ -68,7 +68,7 @@ import { Banner } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Session expiring"\n    description="Your session will expire in 5 minutes."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Session expiring"\n    description="Your session will expire in 5 minutes."\n  />\n));'
   }
   lang="tsx"
 >
@@ -79,7 +79,7 @@ import { Banner } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="error"\n    title="Save failed"\n    description="We couldn\'t save your changes. Please try again."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="error"\n    title="Save failed"\n    description="We couldn\'t save your changes. Please try again."\n  />\n));'
   }
   lang="tsx"
 >
@@ -90,7 +90,7 @@ import { Banner } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Review required"\n    description="Please review your project settings before proceeding."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Review required"\n    description="Please review your project settings before proceeding."\n  />\n));'
   }
   lang="tsx"
 >
@@ -101,7 +101,7 @@ import { Banner } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n    action={\n      <Button size="sm" variant="primary">\n        Update now\n      </Button>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n    action={\n      <Button size="sm" variant="primary">\n        Update now\n      </Button>\n    }\n  />\n));'
   }
   lang="tsx"
 >
@@ -112,7 +112,7 @@ import { Banner } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Session expiring"\n    description="Your session will expire in 5 minutes."\n    action={\n      <>\n        <Button size="sm" variant="ghost">\n          Dismiss\n        </Button>\n        <Button size="sm" variant="secondary">\n          Extend session\n        </Button>\n      </>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Session expiring"\n    description="Your session will expire in 5 minutes."\n    action={\n      <>\n        <Button size="sm" variant="ghost">\n          Dismiss\n        </Button>\n        <Button size="sm" variant="secondary">\n          Extend session\n        </Button>\n      </>\n    }\n  />\n));'
   }
   lang="tsx"
 >
@@ -125,7 +125,7 @@ Use markup in `description` when the message needs links, emphasis, or other inl
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Custom content supported"\n    description={\n      <>\n        This banner supports <strong>custom content</strong>{" "}\n        with Ilha markup.\n      </>\n    }\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Custom content supported"\n    description={\n      <>\n        This banner supports <strong>custom content</strong>{" "}\n        with Ilha markup.\n      </>\n    }\n  />\n));'
   }
   lang="tsx"
 >

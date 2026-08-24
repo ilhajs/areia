@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Button, HoverCard, Icon } from "areia";
 import { CalendarDays, Info, Mail, User } from "lucide";
 

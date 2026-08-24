@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import ilha, { html } from "ilha";
+import { ilha, html } from "ilha";
 import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Pagination, paginationVariants } from "./index";
 

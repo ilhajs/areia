@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { toast as sonnerToast } from "sonner";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";

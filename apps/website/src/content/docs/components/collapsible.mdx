@@ -23,7 +23,7 @@ A composable disclosure component for showing and hiding content.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <Collapsible\n      defaultOpen\n      trigger="What is Areia?"\n      panel="Areia is a vanilla TypeScript component library for building application interfaces."\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <Collapsible\n      defaultOpen\n      trigger="What is Areia?"\n      panel="Areia is a vanilla TypeScript component library for building application interfaces."\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -42,7 +42,7 @@ Use the high-level `trigger` and `panel` props for a single disclosure.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    trigger="Show details"\n    panel="Content revealed when the trigger is activated."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    trigger="Show details"\n    panel="Content revealed when the trigger is activated."\n  />\n));'
   }
   lang="tsx"
 >
@@ -53,7 +53,7 @@ Use `items` for accordion behavior.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    defaultValue="overview"\n    items={[\n      {\n        value: "overview",\n        label: "Overview",\n        content: "A quick summary of the project.",\n      },\n      {\n        value: "settings",\n        label: "Settings",\n        content: "Controls and preferences for this workspace.",\n      },\n    ]}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    defaultValue="overview"\n    items={[\n      {\n        value: "overview",\n        label: "Overview",\n        content: "A quick summary of the project.",\n      },\n      {\n        value: "settings",\n        label: "Settings",\n        content: "Controls and preferences for this workspace.",\n      },\n    ]}\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -67,7 +67,7 @@ Use `Collapsible.Static(...)` for static markup or when you want to initialize b
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    trigger="What is Areia?"\n    panel="Areia provides accessible primitives and styled components for application UIs."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    trigger="What is Areia?"\n    panel="Areia provides accessible primitives and styled components for application UIs."\n  />\n));'
   }
   lang="tsx"
 >
@@ -78,7 +78,7 @@ Use `Collapsible.Static(...)` for static markup or when you want to initialize b
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    defaultOpen\n    trigger="Deployment details"\n    panel="The latest deployment completed successfully."\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    defaultOpen\n    trigger="Deployment details"\n    panel="The latest deployment completed successfully."\n  />\n));'
   }
   lang="tsx"
 >
@@ -91,7 +91,7 @@ Render multiple single disclosures when each item should manage its own open sta
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md space-y-3">\n    <Collapsible\n      trigger="What is Areia?"\n      panel="A component library for application interfaces."\n    />\n    <Collapsible\n      trigger="How do I use it?"\n      panel="Install the package and import the components you need."\n    />\n    <Collapsible\n      trigger="Does it include primitives?"\n      panel="Yes. Interactive components are backed by @areia/slots."\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md space-y-3">\n    <Collapsible\n      trigger="What is Areia?"\n      panel="A component library for application interfaces."\n    />\n    <Collapsible\n      trigger="How do I use it?"\n      panel="Install the package and import the components you need."\n    />\n    <Collapsible\n      trigger="Does it include primitives?"\n      panel="Yes. Interactive components are backed by @areia/slots."\n    />\n  </div>\n));'
   }
   lang="tsx"
   codeOnly
@@ -103,7 +103,7 @@ Use the compound helpers when you need custom layout.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible>\n    <Collapsible.Trigger class="rounded-md bg-areia-control-background px-3 py-2 text-sm font-medium ring ring-areia-control-border">\n      Show release notes\n    </Collapsible.Trigger>\n    <Collapsible.Panel class="mt-3 rounded-lg bg-areia-surface-muted p-4 text-sm text-areia-default">\n      This panel uses custom styling instead of the default\n      border-left accent.\n    </Collapsible.Panel>\n  </Collapsible>\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible>\n    <Collapsible.Trigger class="rounded-md bg-areia-control-background px-3 py-2 text-sm font-medium ring ring-areia-control-border">\n      Show release notes\n    </Collapsible.Trigger>\n    <Collapsible.Panel class="mt-3 rounded-lg bg-areia-surface-muted p-4 text-sm text-areia-default">\n      This panel uses custom styling instead of the default\n      border-left accent.\n    </Collapsible.Panel>\n  </Collapsible>\n));'
   }
   lang="tsx"
 >
@@ -116,7 +116,7 @@ Pass `items` to render an accordion where one item is open at a time by default.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nconst items = [\n  {\n    value: "project",\n    label: "Project",\n    content: "Configure project metadata and visibility.",\n  },\n  {\n    value: "team",\n    label: "Team",\n    content: "Invite teammates and manage roles.",\n  },\n  {\n    value: "billing",\n    label: "Billing",\n    content: "Update payment method and invoices.",\n  },\n];\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <Collapsible defaultValue="project" items={items} />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nconst items = [\n  {\n    value: "project",\n    label: "Project",\n    content: "Configure project metadata and visibility.",\n  },\n  {\n    value: "team",\n    label: "Team",\n    content: "Invite teammates and manage roles.",\n  },\n  {\n    value: "billing",\n    label: "Billing",\n    content: "Update payment method and invoices.",\n  },\n];\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <Collapsible defaultValue="project" items={items} />\n  </div>\n));'
   }
   lang="tsx"
   codeOnly
@@ -128,7 +128,7 @@ Use `multiple: true` when more than one item can be open.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    multiple\n    defaultValue={["filters", "columns"]}\n    items={[\n      {\n        value: "filters",\n        label: "Filters",\n        content:\n          "Status, owner, and date range filters are active.",\n      },\n      {\n        value: "columns",\n        label: "Columns",\n        content: "Choose which table columns are visible.",\n      },\n      {\n        value: "exports",\n        label: "Exports",\n        content: "Download visible rows as CSV.",\n      },\n    ]}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha.render(() => (\n  <Collapsible\n    multiple\n    defaultValue={["filters", "columns"]}\n    items={[\n      {\n        value: "filters",\n        label: "Filters",\n        content:\n          "Status, owner, and date range filters are active.",\n      },\n      {\n        value: "columns",\n        label: "Columns",\n        content: "Choose which table columns are visible.",\n      },\n      {\n        value: "exports",\n        label: "Exports",\n        content: "Download visible rows as CSV.",\n      },\n    ]}\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -140,7 +140,7 @@ Use Ilha state to respond to accordion value changes.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha\n  .state("openItem", "account")\n  .render(({ state }) => (\n    <div class="space-y-4">\n      <Collapsible\n        defaultValue={state.openItem()}\n        items={[\n          {\n            value: "account",\n            label: "Account",\n            content: "Account settings are expanded.",\n          },\n          {\n            value: "security",\n            label: "Security",\n            content: "Security settings are expanded.",\n          },\n        ]}\n        onValueChange={(value) => {\n          state.openItem(value[0] ?? "");\n        }}\n      />\n      <p class="text-sm text-areia-subtle">\n        Open item: <code>{state.openItem}</code>\n      </p>\n    </div>\n  ));'
+    'import { ilha } from "ilha";\nimport { Collapsible } from "areia";\n\nexport default ilha\n  .state("openItem", "account")\n  .render(({ state }) => (\n    <div class="space-y-4">\n      <Collapsible\n        defaultValue={state.openItem()}\n        items={[\n          {\n            value: "account",\n            label: "Account",\n            content: "Account settings are expanded.",\n          },\n          {\n            value: "security",\n            label: "Security",\n            content: "Security settings are expanded.",\n          },\n        ]}\n        onValueChange={(value) => {\n          state.openItem(value[0] ?? "");\n        }}\n      />\n      <p class="text-sm text-areia-subtle">\n        Open item: <code>{state.openItem}</code>\n      </p>\n    </div>\n  ));'
   }
   lang="tsx"
   codeOnly

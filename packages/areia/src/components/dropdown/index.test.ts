@@ -1,7 +1,7 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
 import { markupValue as markup } from "$lib/test-markup";
-import ilha, { html, mount } from "ilha";
+import { ilha, html, mount } from "ilha";
 import { Dropdown, dropdownVariants } from "./index";
 
 try {

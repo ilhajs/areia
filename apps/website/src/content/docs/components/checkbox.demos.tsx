@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Checkbox } from "areia";
 
 export const Demo1 = ilha.render(() => <Checkbox label="Accept terms and conditions" />);

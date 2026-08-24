@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Progress as ProgressPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";

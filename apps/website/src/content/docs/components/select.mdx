@@ -31,7 +31,7 @@ Areia's `Select` uses the platform `<select>` primitive, so it keeps native keyb
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="fruit"\n    label="Fruit"\n    value="apple"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="fruit"\n    label="Fruit"\n    value="apple"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -48,7 +48,7 @@ import { Select } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="plan"\n    label="Plan"\n    placeholder="Choose a plan"\n    items={{\n      free: "Free",\n      pro: "Pro",\n      team: "Team",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="plan"\n    label="Plan"\n    placeholder="Choose a plan"\n    items={{\n      free: "Free",\n      pro: "Pro",\n      team: "Team",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -63,7 +63,7 @@ A select with a visible label. When you provide the `label` prop, the select ren
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="basic-fruit"\n    label="Fruit"\n    value="apple"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="basic-fruit"\n    label="Fruit"\n    value="apple"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -76,7 +76,7 @@ Use the `size` prop to match Input sizing: `xs`, `sm`, `base`, and `lg`.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nconst items = {\n  apple: "Apple",\n  banana: "Banana",\n  cherry: "Cherry",\n};\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Select\n      size="xs"\n      aria-label="Extra small select"\n      value="apple"\n      items={items}\n    />\n    <Select\n      size="sm"\n      aria-label="Small select"\n      value="apple"\n      items={items}\n    />\n    <Select\n      size="base"\n      aria-label="Base select"\n      value="apple"\n      items={items}\n    />\n    <Select\n      size="lg"\n      aria-label="Large select"\n      value="apple"\n      items={items}\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nconst items = {\n  apple: "Apple",\n  banana: "Banana",\n  cherry: "Cherry",\n};\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-sm flex-col gap-3">\n    <Select\n      size="xs"\n      aria-label="Extra small select"\n      value="apple"\n      items={items}\n    />\n    <Select\n      size="sm"\n      aria-label="Small select"\n      value="apple"\n      items={items}\n    />\n    <Select\n      size="base"\n      aria-label="Base select"\n      value="apple"\n      items={items}\n    />\n    <Select\n      size="lg"\n      aria-label="Large select"\n      value="apple"\n      items={items}\n    />\n  </div>\n));'
   }
   lang="tsx"
   codeOnly
@@ -88,7 +88,7 @@ When a visible label is not needed, use `aria-label` for accessibility.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    aria-label="Select fruit"\n    value="banana"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    aria-label="Select fruit"\n    value="banana"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -101,7 +101,7 @@ When a visible label is not needed, use `aria-label` for accessibility.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="issue-type"\n    label="Issue type"\n    description="Choose the category that best matches your report."\n    error="Select an issue type before continuing."\n    placeholder="Choose an issue type"\n    items={{\n      bug: "Bug",\n      documentation: "Documentation",\n      feature: "Feature",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="issue-type"\n    label="Issue type"\n    description="Choose the category that best matches your report."\n    error="Select an issue type before continuing."\n    placeholder="Choose an issue type"\n    items={{\n      bug: "Bug",\n      documentation: "Documentation",\n      feature: "Feature",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -114,7 +114,7 @@ Use the `placeholder` prop to render a placeholder option before the selectable 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="priority"\n    label="Priority"\n    placeholder="Choose priority"\n    items={{\n      low: "Low",\n      medium: "Medium",\n      high: "High",\n      critical: "Critical",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="priority"\n    label="Priority"\n    placeholder="Choose priority"\n    items={{\n      low: "Low",\n      medium: "Medium",\n      high: "High",\n      critical: "Critical",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -127,7 +127,7 @@ Use `labelTooltip` to add additional context via a native `title` attribute on t
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="severity"\n    label="Severity"\n    labelTooltip="Choose the highest impact level that applies."\n    placeholder="Choose severity"\n    items={{\n      low: "Low",\n      medium: "Medium",\n      high: "High",\n      critical: "Critical",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="severity"\n    label="Severity"\n    labelTooltip="Choose the highest impact level that applies."\n    placeholder="Choose severity"\n    items={{\n      low: "Low",\n      medium: "Medium",\n      high: "High",\n      critical: "Critical",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -138,7 +138,7 @@ Use `labelTooltip` to add additional context via a native `title` attribute on t
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    label="Fruit"\n    disabled\n    value="apple"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    label="Fruit"\n    disabled\n    value="apple"\n    items={{\n      apple: "Apple",\n      banana: "Banana",\n      cherry: "Cherry",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -151,7 +151,7 @@ Enable native multiple selection with the `multiple` prop. The select becomes a 
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="columns"\n    label="Columns"\n    multiple\n    description="Hold Command or Control to select multiple options."\n    items={{\n      name: "Name",\n      location: "Location",\n      size: "Size",\n      read: "Read",\n      write: "Write",\n      createdAt: "Created At",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="columns"\n    label="Columns"\n    multiple\n    description="Hold Command or Control to select multiple options."\n    items={{\n      name: "Name",\n      location: "Location",\n      size: "Size",\n      read: "Read",\n      write: "Write",\n      createdAt: "Created At",\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -164,7 +164,7 @@ Options can be disabled with descriptor objects in the `items` prop.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="plan-disabled"\n    label="Plan"\n    value="free"\n    items={{\n      free: "Free",\n      pro: "Pro",\n      business: { label: "Business", disabled: true },\n      enterprise: { label: "Enterprise", disabled: true },\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="plan-disabled"\n    label="Plan"\n    value="free"\n    items={{\n      free: "Free",\n      pro: "Pro",\n      business: { label: "Business", disabled: true },\n      enterprise: { label: "Enterprise", disabled: true },\n    }}\n  />\n));'
   }
   lang="tsx"
 >
@@ -177,7 +177,7 @@ Use `Select.Option` when you want explicit control over individual option markup
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="explicit-options"\n    label="Fruit"\n    placeholder="Choose fruit"\n  >\n    <Select.Option value="apple" label="Apple" />\n    <Select.Option value="banana" label="Banana" />\n    <Select.Option value="cherry" label="Cherry" />\n  </Select>\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="explicit-options"\n    label="Fruit"\n    placeholder="Choose fruit"\n  >\n    <Select.Option value="apple" label="Apple" />\n    <Select.Option value="banana" label="Banana" />\n    <Select.Option value="cherry" label="Cherry" />\n  </Select>\n));'
   }
   lang="tsx"
 >
@@ -190,7 +190,7 @@ Use `Select.Group` to organize related options under native `optgroup` labels.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="grouped-food"\n    label="Food"\n    placeholder="Choose food"\n  >\n    <Select.Group label="Fruits">\n      <Select.Option value="apple" label="Apple" />\n      <Select.Option value="banana" label="Banana" />\n    </Select.Group>\n    <Select.Group label="Vegetables">\n      <Select.Option value="carrot" label="Carrot" />\n      <Select.Option value="lettuce" label="Lettuce" />\n    </Select.Group>\n  </Select>\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    id="grouped-food"\n    label="Food"\n    placeholder="Choose food"\n  >\n    <Select.Group label="Fruits">\n      <Select.Option value="apple" label="Apple" />\n      <Select.Option value="banana" label="Banana" />\n    </Select.Group>\n    <Select.Group label="Vegetables">\n      <Select.Option value="carrot" label="Carrot" />\n      <Select.Option value="lettuce" label="Lettuce" />\n    </Select.Group>\n  </Select>\n));'
   }
   lang="tsx"
 >
@@ -203,7 +203,7 @@ Use `variant: "ghost"` for compact UIs where the select should blend into the su
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    variant="ghost"\n    aria-label="Sort by"\n    value="updated"\n    items={{\n      updated: "Recently updated",\n      created: "Recently created",\n      name: "Name",\n    }}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Select } from "areia";\n\nexport default ilha.render(() => (\n  <Select\n    variant="ghost"\n    aria-label="Sort by"\n    value="updated"\n    items={{\n      updated: "Recently updated",\n      created: "Recently created",\n      name: "Name",\n    }}\n  />\n));'
   }
   lang="tsx"
 >

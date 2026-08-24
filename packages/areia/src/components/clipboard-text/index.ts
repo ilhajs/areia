@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { Check, Copy } from "lucide";
 import { buttonVariants, type ButtonSize } from "$components/button";
 import { Icon } from "$components/icon";

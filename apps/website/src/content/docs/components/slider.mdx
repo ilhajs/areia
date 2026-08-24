@@ -23,7 +23,7 @@ An input for selecting a numeric value or range by dragging a thumb along a trac
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider class="w-full max-w-sm" defaultValue={50} max={100} />\n));'
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider class="w-full max-w-sm" defaultValue={50} max={100} />\n));'
   }
   lang="tsx"
 >
@@ -40,7 +40,7 @@ import { Slider } from "areia";
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider class="w-full max-w-sm" defaultValue={50} max={100} />\n));'
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider class="w-full max-w-sm" defaultValue={50} max={100} />\n));'
   }
   lang="tsx"
 >
@@ -55,7 +55,7 @@ Pass a tuple for `defaultValue` to create a range slider with two thumbs.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={[25, 75]}\n    max={100}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={[25, 75]}\n    max={100}\n  />\n));'
   }
   lang="tsx"
   codeOnly
@@ -67,7 +67,7 @@ Set `orientation` to `"vertical"` for a vertical slider. Use a fixed height wrap
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <div class="h-48">\n    <Slider\n      class="h-full"\n      orientation="vertical"\n      defaultValue={50}\n      max={100}\n    />\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <div class="h-48">\n    <Slider\n      class="h-full"\n      orientation="vertical"\n      defaultValue={50}\n      max={100}\n    />\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -80,7 +80,7 @@ Set `disabled` to prevent interaction.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={50}\n    max={100}\n    disabled\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={50}\n    max={100}\n    disabled\n  />\n));'
   }
   lang="tsx"
 >
@@ -93,7 +93,7 @@ Set a custom `step` increment.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={50}\n    max={100}\n    step={10}\n  />\n));'
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={50}\n    max={100}\n    step={10}\n  />\n));'
   }
   lang="tsx"
 >
@@ -106,7 +106,7 @@ Use `onValueChange` and `onValueCommit` to respond to value changes.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.state("value", 50).render(({ state }) => (\n  <div class="flex flex-col items-start gap-3">\n    <Slider\n      class="w-full max-w-sm"\n      defaultValue={state.value()}\n      max={100}\n      onValueChange={(value) => {\n        state.value(\n          typeof value === "number" ? value : value[1],\n        );\n      }}\n    />\n    <p class="text-sm text-areia-subtle">\n      Value:{" "}\n      <span class="font-medium text-areia-default">\n        {state.value()}\n      </span>\n    </p>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.state("value", 50).render(({ state }) => (\n  <div class="flex flex-col items-start gap-3">\n    <Slider\n      class="w-full max-w-sm"\n      defaultValue={state.value()}\n      max={100}\n      onValueChange={(value) => {\n        state.value(\n          typeof value === "number" ? value : value[1],\n        );\n      }}\n    />\n    <p class="text-sm text-areia-subtle">\n      Value:{" "}\n      <span class="font-medium text-areia-default">\n        {state.value()}\n      </span>\n    </p>\n  </div>\n));'
   }
   lang="tsx"
   codeOnly

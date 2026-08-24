@@ -24,7 +24,7 @@ Displays a card with a layered visual treatment for navigation, summaries, or fe
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { ArrowRight } from "lucide";\nimport { Button, Icon, LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard>\n      <LayerCard.Title>Next Steps</LayerCard.Title>\n      <LayerCard.Content>\n        <div class="flex items-center justify-between gap-4">\n          <div class="flex flex-col gap-1">\n            <h3 class="font-medium">Get started with Areia</h3>\n            <p class="text-sm text-areia-subtle">\n              Learn how to install and use the component\n              library.\n            </p>\n          </div>\n          <Button\n            variant="ghost"\n            shape="square"\n            icon={<Icon icon={ArrowRight} />}\n            aria-label="Open guide"\n          />\n        </div>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { ArrowRight } from "lucide";\nimport { Button, Icon, LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard>\n      <LayerCard.Title>Next Steps</LayerCard.Title>\n      <LayerCard.Content>\n        <div class="flex items-center justify-between gap-4">\n          <div class="flex flex-col gap-1">\n            <h3 class="font-medium">Get started with Areia</h3>\n            <p class="text-sm text-areia-subtle">\n              Learn how to install and use the component\n              library.\n            </p>\n          </div>\n          <Button\n            variant="ghost"\n            shape="square"\n            icon={<Icon icon={ArrowRight} />}\n            aria-label="Open guide"\n          />\n        </div>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -43,7 +43,7 @@ Use `LayerCard.Title` for the elevated title row and `LayerCard.Content` for the
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard>\n      <LayerCard.Title>Documentation</LayerCard.Title>\n      <LayerCard.Content>\n        <h3 class="font-medium">Component guide</h3>\n        <p class="text-sm text-areia-subtle">\n          Learn how to use Areia components.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard>\n      <LayerCard.Title>Documentation</LayerCard.Title>\n      <LayerCard.Content>\n        <h3 class="font-medium">Component guide</h3>\n        <p class="text-sm text-areia-subtle">\n          Learn how to use Areia components.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -54,7 +54,7 @@ Use `LayerCard.Title` for the elevated title row and `LayerCard.Content` for the
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard class="p-4">\n      <h3 class="font-medium">Quick start guide</h3>\n      <p class="text-sm text-areia-subtle">\n        Learn how to install and configure Areia.\n      </p>\n    </LayerCard>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard class="p-4">\n      <h3 class="font-medium">Quick start guide</h3>\n      <p class="text-sm text-areia-subtle">\n        Learn how to install and configure Areia.\n      </p>\n    </LayerCard>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -67,7 +67,7 @@ Use `LayerCard.Title` for the elevated title row and `LayerCard.Content` for the
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard>\n      <LayerCard.Title>Getting Started</LayerCard.Title>\n      <LayerCard.Content>\n        <h3 class="font-medium">Quick start guide</h3>\n        <p class="text-sm text-areia-subtle">\n          A short walkthrough for new users.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard>\n      <LayerCard.Title>Getting Started</LayerCard.Title>\n      <LayerCard.Content>\n        <h3 class="font-medium">Quick start guide</h3>\n        <p class="text-sm text-areia-subtle">\n          A short walkthrough for new users.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -80,7 +80,7 @@ For simple card containers, render content directly inside `LayerCard` without `
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard class="p-4">\n      <h3 class="font-medium">Quick start guide</h3>\n      <p class="text-sm text-areia-subtle">\n        Build consistent interfaces with reusable primitives.\n      </p>\n    </LayerCard>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard class="p-4">\n      <h3 class="font-medium">Quick start guide</h3>\n      <p class="text-sm text-areia-subtle">\n        Build consistent interfaces with reusable primitives.\n      </p>\n    </LayerCard>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -91,7 +91,7 @@ For simple card containers, render content directly inside `LayerCard` without `
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Boxes, Code2 } from "lucide";\nimport { Icon, LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid w-full max-w-2xl gap-3 sm:grid-cols-2">\n    <LayerCard>\n      <LayerCard.Title>\n        <Icon icon={Boxes} class="size-4" />\n        <span>Components</span>\n      </LayerCard.Title>\n      <LayerCard.Content>\n        <h3 class="font-medium">Browse components</h3>\n        <p class="text-sm text-areia-subtle">\n          Explore every available UI primitive.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n    <LayerCard>\n      <LayerCard.Title>\n        <Icon icon={Code2} class="size-4" />\n        <span>Examples</span>\n      </LayerCard.Title>\n      <LayerCard.Content>\n        <h3 class="font-medium">View examples</h3>\n        <p class="text-sm text-areia-subtle">\n          Copy patterns for common product screens.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Boxes, Code2 } from "lucide";\nimport { Icon, LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid w-full max-w-2xl gap-3 sm:grid-cols-2">\n    <LayerCard>\n      <LayerCard.Title>\n        <Icon icon={Boxes} class="size-4" />\n        <span>Components</span>\n      </LayerCard.Title>\n      <LayerCard.Content>\n        <h3 class="font-medium">Browse components</h3>\n        <p class="text-sm text-areia-subtle">\n          Explore every available UI primitive.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n    <LayerCard>\n      <LayerCard.Title>\n        <Icon icon={Code2} class="size-4" />\n        <span>Examples</span>\n      </LayerCard.Title>\n      <LayerCard.Content>\n        <h3 class="font-medium">View examples</h3>\n        <p class="text-sm text-areia-subtle">\n          Copy patterns for common product screens.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -104,7 +104,7 @@ Layer cards work well for compact toolbars and summaries.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { Badge, Input, LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-2xl">\n    <LayerCard>\n      <LayerCard.Title>\n        <span>Subrequests</span>\n        <Badge variant="neutral">128</Badge>\n      </LayerCard.Title>\n      <LayerCard.Content>\n        <div class="flex flex-col gap-3">\n          <div class="flex items-center gap-2">\n            <Input\n              size="sm"\n              placeholder="Search origins..."\n              aria-label="Search origins"\n              class="min-w-0 flex-1"\n            />\n            <Badge variant="success">2xx</Badge>\n            <Badge variant="warning">4xx</Badge>\n          </div>\n          <div class="grid grid-cols-3 gap-2 text-sm">\n            <span class="font-medium">Origin</span>\n            <span class="font-medium">Requests</span>\n            <span class="font-medium">Duration</span>\n            <span class="text-areia-subtle">\n              api.example.com\n            </span>\n            <span>82</span>\n            <span>120ms</span>\n            <span class="text-areia-subtle">\n              cdn.example.com\n            </span>\n            <span>46</span>\n            <span>48ms</span>\n          </div>\n        </div>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { Badge, Input, LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-2xl">\n    <LayerCard>\n      <LayerCard.Title>\n        <span>Subrequests</span>\n        <Badge variant="neutral">128</Badge>\n      </LayerCard.Title>\n      <LayerCard.Content>\n        <div class="flex flex-col gap-3">\n          <div class="flex items-center gap-2">\n            <Input\n              size="sm"\n              placeholder="Search origins..."\n              aria-label="Search origins"\n              class="min-w-0 flex-1"\n            />\n            <Badge variant="success">2xx</Badge>\n            <Badge variant="warning">4xx</Badge>\n          </div>\n          <div class="grid grid-cols-3 gap-2 text-sm">\n            <span class="font-medium">Origin</span>\n            <span class="font-medium">Requests</span>\n            <span class="font-medium">Duration</span>\n            <span class="text-areia-subtle">\n              api.example.com\n            </span>\n            <span>82</span>\n            <span>120ms</span>\n            <span class="text-areia-subtle">\n              cdn.example.com\n            </span>\n            <span>46</span>\n            <span>48ms</span>\n          </div>\n        </div>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
   }
   lang="tsx"
 >
@@ -117,7 +117,7 @@ Layer cards work well for compact toolbars and summaries.
 
 <Preview
   code={
-    'import ilha from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard>\n      <LayerCard.Title data-testid="layer-card-title">\n        Getting Started\n      </LayerCard.Title>\n      <LayerCard.Content data-testid="layer-card-content">\n        <h3 class="font-medium">Quick start guide</h3>\n        <p class="text-sm text-areia-subtle">\n          A short walkthrough for new users.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
+    'import { ilha } from "ilha";\nimport { LayerCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="w-full max-w-md">\n    <LayerCard>\n      <LayerCard.Title data-testid="layer-card-title">\n        Getting Started\n      </LayerCard.Title>\n      <LayerCard.Content data-testid="layer-card-content">\n        <h3 class="font-medium">Quick start guide</h3>\n        <p class="text-sm text-areia-subtle">\n          A short walkthrough for new users.\n        </p>\n      </LayerCard.Content>\n    </LayerCard>\n  </div>\n));'
   }
   lang="tsx"
 >

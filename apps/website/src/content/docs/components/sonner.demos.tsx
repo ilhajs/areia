@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Button } from "areia";
 import { Toaster } from "areia/sonner";
 

@@ -1,4 +1,4 @@
-import ilha, { html, raw, untrack } from "ilha";
+import { ilha, html, raw, untrack } from "ilha";
 import { HoverCard as HoverCardPrimitive } from "@areia/slots";
 import {
   boundElement,

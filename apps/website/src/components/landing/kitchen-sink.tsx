@@ -33,7 +33,7 @@ import {
   Toggle,
   Tooltip,
 } from "areia";
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { ArrowUpRight, Bold, CircleCheck, Info, Italic, Plus, Settings, Underline } from "lucide";
 import type { JSX } from "ilha/jsx-runtime";
 

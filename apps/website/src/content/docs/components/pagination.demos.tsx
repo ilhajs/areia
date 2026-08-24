@@ -1,4 +1,4 @@
-import ilha from "ilha";
+import { ilha } from "ilha";
 import { Pagination } from "areia";
 
 export const Demo1 = ilha.render(() => <Pagination page={1} perPage={25} totalCount={100} />);

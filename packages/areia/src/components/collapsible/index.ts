@@ -1,4 +1,4 @@
-import ilha, { html, raw } from "ilha";
+import { ilha, html, raw } from "ilha";
 import { ChevronDown } from "lucide";
 import { Accordion as AccordionPrimitive, Collapsible as CollapsiblePrimitive } from "@areia/slots";
 import {
