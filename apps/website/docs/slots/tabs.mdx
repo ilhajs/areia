@@ -1,0 +1,234 @@
+---
+title: Tabs
+description: A set of layered sections of content that display one panel at a time.
+sidebar:
+  order: 20
+---
+
+A set of tabbed panels where exactly one panel is visible at a time. Supports keyboard navigation with roving tabindex, horizontal and vertical orientations, and an optional animated indicator that tracks the active tab.
+
+```ts
+import { Tabs } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <div data-slot="tabs" class="w-80">
+    <div data-slot="tabs-list" class="flex gap-1">
+      <button data-slot="tabs-trigger" data-value="tab-1" class="win95-button border-b-0 data-[state=active]:bg-white">
+        Tab One
+      </button>
+      <button data-slot="tabs-trigger" data-value="tab-2" class="win95-button border-b-0 data-[state=active]:bg-white">
+        Tab Two
+      </button>
+      <button data-slot="tabs-trigger" data-value="tab-3" class="win95-button border-b-0 data-[state=active]:bg-white">
+        Tab Three
+      </button>
+    </div>
+    <div data-slot="tabs-content" data-value="tab-1" class="win95-inset -mt-0.5 min-h-20 p-3">
+      Content for tab one.
+    </div>
+    <div data-slot="tabs-content" data-value="tab-2" class="win95-inset -mt-0.5 min-h-20 p-3">
+      Content for tab two.
+    </div>
+    <div data-slot="tabs-content" data-value="tab-3" class="win95-inset -mt-0.5 min-h-20 p-3">
+      Content for tab three.
+    </div>
+  </div>
+`;
+
+const root = document.querySelector('[data-slot="tabs"]')!;
+const controller = Tabs.createTabs(root, {
+  defaultValue: "tab-1",
+  orientation: "horizontal",
+});
+```
+
+## Import
+
+```ts
+import { Tabs } from "@areia/slots";
+```
+
+## Usage
+
+```ts
+import { Tabs } from "@areia/slots";
+
+// Auto-bind a single root
+const root = document.querySelector('[data-slot="tabs"]');
+const controller = Tabs.createTabs(root, {
+  defaultValue: "tab-1",
+  activationMode: "auto",
+});
+
+// Listen for tab changes
+root.addEventListener("tabs:change", (e) => {
+  console.log(e.detail.value);
+});
+
+// Auto-bind all unbound roots in scope
+const controllers = Tabs.create();
+```
+
+## Expected Markup
+
+The tabs component expects a `tabs-list` containing `tabs-trigger` elements, and a set of `tabs-content` panels. Each trigger and content panel must have a matching `data-value` attribute. An optional `tabs-indicator` slot provides an animated highlight that follows the active tab.
+
+```html
+<div data-slot="tabs">
+  <div data-slot="tabs-list">
+    <button data-slot="tabs-trigger" data-value="tab-1">
+      Tab One
+    </button>
+    <button data-slot="tabs-trigger" data-value="tab-2">
+      Tab Two
+    </button>
+    <button data-slot="tabs-trigger" data-value="tab-3">
+      Tab Three
+    </button>
+    <div data-slot="tabs-indicator"></div>
+  </div>
+  <div data-slot="tabs-content" data-value="tab-1">
+    Content for tab one.
+  </div>
+  <div data-slot="tabs-content" data-value="tab-2">
+    Content for tab two.
+  </div>
+  <div data-slot="tabs-content" data-value="tab-3">
+    Content for tab three.
+  </div>
+</div>
+```
+
+### Data Slots
+
+| Slot             | Required | Description                                                                 |
+| ---------------- | -------- | --------------------------------------------------------------------------- |
+| `tabs`           | Yes      | Root container.                                                             |
+| `tabs-list`      | Yes      | Wrapper for triggers. Receives `role="tablist"`.                            |
+| `tabs-trigger`   | Yes      | Button that activates its associated panel. Requires `data-value`.          |
+| `tabs-content`   | Yes      | Panel whose visibility is controlled by its trigger. Requires `data-value`. |
+| `tabs-indicator` | No       | Animated highlight that tracks the active trigger.                          |
+
+### CSS Custom Properties (Indicator)
+
+When the `tabs-indicator` element is present, the controller sets the following CSS custom properties so you can animate its position and size:
+
+| Property              | Description                             |
+| --------------------- | --------------------------------------- |
+| `--active-tab-left`   | Left offset (px) of the active trigger. |
+| `--active-tab-width`  | Width (px) of the active trigger.       |
+| `--active-tab-top`    | Top offset (px) of the active trigger.  |
+| `--active-tab-height` | Height (px) of the active trigger.      |
+
+Use these variables with CSS transitions for smooth indicator movement:
+
+```css
+[data-slot="tabs-indicator"] {
+  position: absolute;
+  left: var(--active-tab-left);
+  width: var(--active-tab-width);
+  top: var(--active-tab-top);
+  height: var(--active-tab-height);
+  transition:
+    left 200ms ease,
+    width 200ms ease;
+}
+```
+
+The indicator automatically updates on window resize, list scroll, and layout changes (via `ResizeObserver`).
+
+### Generated Attributes
+
+| Attribute                   | Element(s)                 | Description                                                                                              |
+| --------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `data-state`                | Triggers, content panels   | `"active"` or `"inactive"`.                                                                              |
+| `data-value`                | Root                       | Currently selected tab value.                                                                            |
+| `data-activation-direction` | Content panels (transient) | `"left"`, `"right"`, `"up"`, or `"down"` showing the direction the user navigated. Removed when settled. |
+| `role`                      | List, triggers, panels     | `"tablist"`, `"tab"`, and `"tabpanel"` respectively.                                                     |
+| `aria-selected`             | Triggers                   | `"true"` or `"false"`.                                                                                   |
+| `aria-disabled`             | Triggers                   | `"true"` when the trigger is disabled.                                                                   |
+| `aria-controls`             | Triggers                   | Points to the associated content panel `id`.                                                             |
+| `aria-labelledby`           | Content panels             | Points to the associated trigger `id`.                                                                   |
+| `aria-orientation`          | List                       | `"vertical"` when `orientation` is vertical.                                                             |
+| `tabindex`                  | Triggers                   | `0` on the active trigger, `-1` on others (roving tabindex).                                             |
+| `hidden`                    | Content panels             | Set to `true` on inactive panels.                                                                        |
+| `disabled`                  | Triggers (native button)   | Native `disabled` on disabled triggers.                                                                  |
+
+## Events
+
+### Outbound
+
+| Event         | Detail              | Description                                      |
+| ------------- | ------------------- | ------------------------------------------------ |
+| `tabs:change` | `{ value: string }` | Fired on the root when the selected tab changes. |
+
+### Inbound
+
+| Event         | Detail                          | Description                           |
+| ------------- | ------------------------------- | ------------------------------------- |
+| `tabs:set`    | `{ value: string }` or `string` | Dispatch on the root to select a tab. |
+| `tabs:select` | `{ value: string }` or `string` | **Deprecated.** Alias for `tabs:set`. |
+
+## API Reference
+
+### Options
+
+| Option           | Type                         | Default        | Description                                                                                                                                        |
+| ---------------- | ---------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaultValue`   | `string`                     | —              | Value of the initially selected tab. Falls back to the first enabled trigger.                                                                      |
+| `onValueChange`  | `(value: string) => void`    | —              | Called when the selected tab changes.                                                                                                              |
+| `orientation`    | `"horizontal" \| "vertical"` | `"horizontal"` | Layout direction. Controls arrow key axis and ARIA orientation.                                                                                    |
+| `activationMode` | `"auto" \| "manual"`         | `"auto"`       | How tabs are activated during keyboard navigation. `"auto"` selects on arrow keys; `"manual"` moves focus only and requires Enter/Space to select. |
+
+### Controller
+
+| Member              | Type                      | Description                                                     |
+| ------------------- | ------------------------- | --------------------------------------------------------------- |
+| `select(value)`     | `(value: string) => void` | Select the tab identified by `value`.                           |
+| `value`             | `string` (getter)         | Currently selected tab value.                                   |
+| `updateIndicator()` | `() => void`              | Force-update the indicator position. Call after layout changes. |
+| `destroy()`         | `() => void`              | Remove all listeners, observers, and clean up.                  |
+
+## Controller
+
+The controller is returned by `Tabs.createTabs()` and provides imperative control over the selection state.
+
+```ts
+const controller = Tabs.createTabs(root, {
+  defaultValue: "tab-1",
+});
+
+// Select a tab programmatically
+controller.select("tab-2");
+
+// Read current state
+console.log(controller.value); // "tab-2"
+
+// Force-update indicator after external layout changes
+controller.updateIndicator();
+
+// Clean up
+controller.destroy();
+```
+
+### Keyboard Interaction
+
+The tab list supports full keyboard navigation with roving tabindex:
+
+| Key                           | Behavior                                                                         |
+| ----------------------------- | -------------------------------------------------------------------------------- |
+| **ArrowLeft** (horizontal)    | Move focus to the previous enabled trigger. Auto mode: also selects it.          |
+| **ArrowRight** (horizontal)   | Move focus to the next enabled trigger. Auto mode: also selects it.              |
+| **ArrowUp** (vertical)        | Move focus to the previous enabled trigger. Auto mode: also selects it.          |
+| **ArrowDown** (vertical)      | Move focus to the next enabled trigger. Auto mode: also selects it.              |
+| **Home**                      | Move focus to the first enabled trigger. Auto mode: also selects it.             |
+| **End**                       | Move focus to the last enabled trigger. Auto mode: also selects it.              |
+| **Enter** / **Space**         | Activate the currently focused trigger (primary activation in manual mode).      |
+| **ArrowDown** from active tab | In horizontal mode, moves focus into the active panel's first focusable element. |
+
+Navigation wraps from the last trigger to the first and vice versa. Disabled triggers are skipped entirely.
+
+### Activation Modes
+
+- **`"auto"`** (default): Arrow keys immediately select the tab as focus moves. This is the typical behavior users expect from tabs.
+- **`"manual"`**: Arrow keys move focus only. The user must press Enter or Space to activate the focused tab. Use this when tab changes have significant side effects (e.g., loading data).

@@ -1,0 +1,225 @@
+---
+title: Accordion
+description: Vertically (or horizontally) stacked panels that expand and collapse one at a time.
+sidebar:
+  order: 1
+---
+
+A set of interactive headings that each reveal a section of content. The accordion keeps at most one panel open by default, supports keyboard navigation, and animates open/close transitions via CSS.
+
+```ts
+import { Accordion } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <div
+    data-slot="accordion"
+    class="w-72 border-2 border-t-black border-l-black border-r-white border-b-white bg-white"
+  >
+    <div
+      data-slot="accordion-item"
+      data-value="item-1"
+      class="border-b border-neutral-500 last:border-b-0"
+    >
+      <button
+        data-slot="accordion-trigger"
+        class="win95-button flex w-full justify-between"
+      >
+        Item One
+        <span data-slot="accordion-trigger-icon" aria-hidden="true"></span>
+      </button>
+      <div data-slot="accordion-content" class="bg-white px-3 py-2 text-sm">
+        <div
+          data-slot="accordion-content-inner"
+          class="border-l-2 border-neutral-400 pl-2"
+        >
+          Content for item one.
+        </div>
+      </div>
+    </div>
+    <div
+      data-slot="accordion-item"
+      data-value="item-2"
+      class="border-b border-neutral-500 last:border-b-0"
+    >
+      <button
+        data-slot="accordion-trigger"
+        class="win95-button flex w-full justify-between"
+      >
+        Item Two
+        <span data-slot="accordion-trigger-icon" aria-hidden="true"></span>
+      </button>
+      <div data-slot="accordion-content" class="bg-white px-3 py-2 text-sm">
+        <div
+          data-slot="accordion-content-inner"
+          class="border-l-2 border-neutral-400 pl-2"
+        >
+          Content for item two.
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+const accordion = document.querySelector(
+  '[data-slot="accordion"]',
+)!;
+
+const controller = Accordion.createAccordion(accordion, {
+  multiple: false,
+  orientation: "vertical",
+});
+```
+
+## Import
+
+```ts
+import { Accordion } from "@areia/slots";
+```
+
+## Usage
+
+```ts
+import { Accordion } from "@areia/slots";
+
+// Auto-bind a single root
+const root = document.querySelector('[data-slot="accordion"]');
+const controller = Accordion.createAccordion(root, {
+  defaultValue: "item-1",
+});
+
+// Auto-bind all unbound roots in scope
+const controllers = Accordion.create();
+```
+
+## Expected Markup
+
+The accordion expects the following `data-slot` structure. Each item requires a `data-value` attribute used to identify it during expand, collapse, and toggle operations.
+
+```html
+<div data-slot="accordion">
+  <div data-slot="accordion-item" data-value="item-1">
+    <button data-slot="accordion-trigger">
+      Item One
+      <span
+        data-slot="accordion-trigger-icon"
+        aria-hidden="true"
+      ></span>
+    </button>
+    <div data-slot="accordion-content">
+      <div data-slot="accordion-content-inner">
+        Content for item one.
+      </div>
+    </div>
+  </div>
+  <div data-slot="accordion-item" data-value="item-2">
+    <button data-slot="accordion-trigger">
+      Item Two
+      <span
+        data-slot="accordion-trigger-icon"
+        aria-hidden="true"
+      ></span>
+    </button>
+    <div data-slot="accordion-content">
+      <div data-slot="accordion-content-inner">
+        Content for item two.
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### Data Slots
+
+| Slot                      | Required | Description                                       |
+| ------------------------- | -------- | ------------------------------------------------- |
+| `accordion`               | Yes      | Root container.                                   |
+| `accordion-item`          | Yes      | Wraps a trigger and its associated content panel. |
+| `accordion-trigger`       | Yes      | Button that expands or collapses the item.        |
+| `accordion-content`       | Yes      | Collapsible panel controlled by the trigger.      |
+| `accordion-content-inner` | No       | Inner wrapper for padding or animation isolation. |
+| `accordion-trigger-icon`  | No       | Decorative icon on the trigger (e.g. chevron).    |
+
+### CSS Custom Properties
+
+- `--accordion-panel-height` — Set to the panel’s `scrollHeight` (in px) during open/close transitions, then reset to `auto` when settled.
+- `--accordion-panel-width` — Set to the panel’s `scrollWidth` (in px) during open/close transitions, then reset to `auto` when settled.
+- `--radix-accordion-content-height` / `--radix-accordion-content-width` — Radix-compatible aliases of the above.
+
+### Generated Attributes
+
+The controller writes the following attributes on initialization and updates them as state changes:
+
+| Attribute             | Element(s)                            | Description                                        |
+| --------------------- | ------------------------------------- | -------------------------------------------------- |
+| `data-state`          | `accordion-item`                      | `"open"` or `"closed"`.                            |
+| `data-open`           | `accordion-item`                      | Present when the item is expanded.                 |
+| `data-closed`         | `accordion-item`                      | Present when the item is collapsed.                |
+| `data-disabled`       | `accordion-item`, `accordion-trigger` | Present when the item is disabled.                 |
+| `data-orientation`    | Root, items, triggers, contents       | `"vertical"` or `"horizontal"`.                    |
+| `data-index`          | `accordion-item`                      | Zero-based index of the item.                      |
+| `data-starting-style` | `accordion-content`                   | Set during open transition, removed when settled.  |
+| `data-ending-style`   | `accordion-content`                   | Set during close transition, removed when settled. |
+
+## Events
+
+### Outbound
+
+| Event              | Detail                | Description                                               |
+| ------------------ | --------------------- | --------------------------------------------------------- |
+| `accordion:change` | `{ value: string[] }` | Fired on the root when the set of expanded items changes. |
+
+### Inbound
+
+| Event           | Detail                          | Description                                                                            |
+| --------------- | ------------------------------- | -------------------------------------------------------------------------------------- |
+| `accordion:set` | `{ value: string \| string[] }` | Dispatch on the root to expand the given item(s). Invalid values are silently ignored. |
+
+## API Reference
+
+### Options
+
+| Option             | Type                         | Default      | Description                                                                                  |
+| ------------------ | ---------------------------- | ------------ | -------------------------------------------------------------------------------------------- |
+| `defaultValue`     | `string \| string[]`         | —            | Item value(s) to expand on initialization.                                                   |
+| `multiple`         | `boolean`                    | `false`      | Allow more than one item to be expanded at the same time.                                    |
+| `disabled`         | `boolean`                    | `false`      | Disable the entire accordion.                                                                |
+| `orientation`      | `"horizontal" \| "vertical"` | `"vertical"` | Layout direction. Controls roving-focus axis and ARIA attributes.                            |
+| `loopFocus`        | `boolean`                    | `false`      | When `true`, arrow-key navigation wraps from the last trigger to the first (and vice versa). |
+| `hiddenUntilFound` | `boolean`                    | `false`      | Use `hidden="until-found"` on closed panels instead of `hidden`.                             |
+| `collapsible`      | `boolean`                    | —            | **Deprecated.** The accordion is collapsible by default. Kept for backward compatibility.    |
+| `onValueChange`    | `(value: string[]) => void`  | —            | Called when the set of expanded items changes.                                               |
+
+### Controller
+
+| Member        | Type                      | Description                              |
+| ------------- | ------------------------- | ---------------------------------------- |
+| `expand(v)`   | `(value: string) => void` | Expand the item identified by `value`.   |
+| `collapse(v)` | `(value: string) => void` | Collapse the item identified by `value`. |
+| `toggle(v)`   | `(value: string) => void` | Toggle the item identified by `value`.   |
+| `value`       | `string[]` (getter)       | Currently expanded values.               |
+| `destroy()`   | `() => void`              | Remove all listeners and clean up.       |
+
+## Controller
+
+The controller is returned by `Accordion.createAccordion()` and provides imperative control over the accordion’s state.
+
+```ts
+const controller = Accordion.createAccordion(root, {
+  defaultValue: "item-1",
+});
+
+// Expand programmatically
+controller.expand("item-2");
+
+// Collapse programmatically
+controller.collapse("item-1");
+
+// Toggle an item
+controller.toggle("item-3");
+
+// Read current state
+console.log(controller.value); // ["item-2"]
+
+// Clean up
+controller.destroy();
+```

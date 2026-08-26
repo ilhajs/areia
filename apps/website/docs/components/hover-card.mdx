@@ -1,0 +1,284 @@
+---
+title: Hover Card
+description: A popup that appears when a user hovers or focuses on an element, supporting interactive content.
+sidebar:
+  order: 16
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+  Demo6,
+  Demo7,
+  Demo8,
+  Demo9,
+  Demo10,
+} from "./hover-card.demos";
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/hover-card/index.ts)
+
+Areia's `HoverCard` is built on `@areia/slots/hover-card` and rendered as an Ilha island when you use `HoverCard`. It handles hover/focus interactions, warm-up behavior between nearby hover-cards, collision-aware positioning, Escape dismissal, and accessible hover-card attributes.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { CalendarDays } from "lucide";\nimport { Button, Icon, HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <HoverCard\n    content={\n      <div class="flex w-64 flex-col gap-2">\n        <HoverCard.Title>Upcoming release</HoverCard.Title>\n        <HoverCard.Description>\n          The next major version ships with improved performance\n          and new primitives.\n        </HoverCard.Description>\n      </div>\n    }\n  >\n    <Button\n      shape="square"\n      icon={<Icon icon={CalendarDays} />}\n      aria-label="Release notes"\n    />\n  </HoverCard>\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { HoverCard } from "areia";
+```
+
+## Usage
+
+Call `HoverCard(...)` for an interactive island. The root renders the hover-card markup and initializes the `@areia/slots/hover-card` controller after mount.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Button, HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <HoverCard\n    content={\n      <div class="flex flex-col gap-1">\n        <HoverCard.Title>Pro tip</HoverCard.Title>\n        <HoverCard.Description>\n          Hover cards are great for previewing content without a\n          click.\n        </HoverCard.Description>\n      </div>\n    }\n  >\n    <Button>Hover me</Button>\n  </HoverCard>\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+For static server-rendered markup or custom initialization, use `HoverCard.Static(...)`. For most application usage, call `HoverCard(...)`.
+
+## Examples
+
+### Basic HoverCard
+
+Use `content` for the popup and `children` for the trigger content.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Button, Icon, HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <HoverCard\n    content={\n      <div class="flex flex-col gap-1">\n        <HoverCard.Title>Did you know?</HoverCard.Title>\n        <HoverCard.Description>\n          Hover cards support interactive content inside the\n          popup.\n        </HoverCard.Description>\n      </div>\n    }\n  >\n    <Button\n      variant="secondary"\n      shape="square"\n      icon={<Icon icon={Info} />}\n      aria-label="More information"\n    />\n  </HoverCard>\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+### Text Trigger
+
+When the trigger is not an action, render it as a `span`.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <HoverCard\n    triggerAs="span"\n    triggerClass="underline decoration-dotted underline-offset-4"\n    content={\n      <div class="flex flex-col gap-1">\n        <HoverCard.Title>Areia</HoverCard.Title>\n        <HoverCard.Description>\n          A vanilla TypeScript component library built for Astro\n          and Ilha.\n        </HoverCard.Description>\n      </div>\n    }\n  >\n    Areia\n  </HoverCard>\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### Multiple HoverCards
+
+HoverCards share warm-up behavior automatically. After one hover-card closes, hovering another within `skipDelayDuration` opens it without the normal delay.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { CalendarDays, Mail, User } from "lucide";\nimport { Button, Icon, HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-2">\n    <HoverCard\n      content={\n        <div class="flex flex-col gap-1">\n          <HoverCard.Title>Calendar</HoverCard.Title>\n          <HoverCard.Description>\n            View upcoming events.\n          </HoverCard.Description>\n        </div>\n      }\n    >\n      <Button\n        shape="square"\n        icon={<Icon icon={CalendarDays} />}\n        aria-label="Calendar"\n      />\n    </HoverCard>\n    <HoverCard\n      content={\n        <div class="flex flex-col gap-1">\n          <HoverCard.Title>Messages</HoverCard.Title>\n          <HoverCard.Description>\n            Check your inbox.\n          </HoverCard.Description>\n        </div>\n      }\n    >\n      <Button\n        shape="square"\n        icon={<Icon icon={Mail} />}\n        aria-label="Messages"\n      />\n    </HoverCard>\n    <HoverCard\n      content={\n        <div class="flex flex-col gap-1">\n          <HoverCard.Title>Profile</HoverCard.Title>\n          <HoverCard.Description>\n            Manage your account.\n          </HoverCard.Description>\n        </div>\n      }\n    >\n      <Button\n        shape="square"\n        icon={<Icon icon={User} />}\n        aria-label="Profile"\n      />\n    </HoverCard>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### Side
+
+Use `side` to choose the preferred side of the trigger. Collision handling may flip the hover-card at runtime when there is not enough space.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Button, HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="grid grid-cols-2 gap-3">\n    <HoverCard\n      side="top"\n      content={\n        <HoverCard.Description>\n          Top hover-card\n        </HoverCard.Description>\n      }\n    >\n      <Button>Top</Button>\n    </HoverCard>\n    <HoverCard\n      side="bottom"\n      content={\n        <HoverCard.Description>\n          Bottom hover-card\n        </HoverCard.Description>\n      }\n    >\n      <Button>Bottom</Button>\n    </HoverCard>\n    <HoverCard\n      side="left"\n      content={\n        <HoverCard.Description>\n          Left hover-card\n        </HoverCard.Description>\n      }\n    >\n      <Button>Left</Button>\n    </HoverCard>\n    <HoverCard\n      side="right"\n      content={\n        <HoverCard.Description>\n          Right hover-card\n        </HoverCard.Description>\n      }\n    >\n      <Button>Right</Button>\n    </HoverCard>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo6 client:load />
+</Preview>
+
+### Alignment
+
+Use `align` to align the hover-card along the selected side.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Button, HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex items-center gap-3">\n    <HoverCard\n      align="start"\n      content={\n        <HoverCard.Description>\n          Start aligned\n        </HoverCard.Description>\n      }\n    >\n      <Button>Start</Button>\n    </HoverCard>\n    <HoverCard\n      align="center"\n      content={\n        <HoverCard.Description>\n          Center aligned\n        </HoverCard.Description>\n      }\n    >\n      <Button>Center</Button>\n    </HoverCard>\n    <HoverCard\n      align="end"\n      content={\n        <HoverCard.Description>\n          End aligned\n        </HoverCard.Description>\n      }\n    >\n      <Button>End</Button>\n    </HoverCard>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo7 client:load />
+</Preview>
+
+### Delay Control
+
+Use `delay` to control how long to wait before opening. Use `closeDelay` to control how long to wait before closing after leaving. Use `skipDelayDuration` to control the warm-up window after a hover-card closes.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Button, HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-3">\n    <HoverCard\n      delay={1000}\n      content={\n        <HoverCard.Description>\n          Opens after one second\n        </HoverCard.Description>\n      }\n    >\n      <Button>1s delay</Button>\n    </HoverCard>\n    <HoverCard\n      delay={0}\n      closeDelay={0}\n      skipDelayDuration={0}\n      content={\n        <HoverCard.Description>\n          Opens and closes instantly with no warm-up window\n        </HoverCard.Description>\n      }\n    >\n      <Button>Instant</Button>\n    </HoverCard>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo8 client:load />
+</Preview>
+
+### Custom Content
+
+The `content` prop accepts markup. HoverCards are designed for richer content than tooltips.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Button, HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <HoverCard\n    content={\n      <div class="flex flex-col gap-3">\n        <div class="flex items-center gap-3">\n          <div class="flex size-9 items-center justify-center rounded-full bg-areia-surface-muted text-sm font-medium">\n            JD\n          </div>\n          <div>\n            <HoverCard.Title>Jane Doe</HoverCard.Title>\n            <HoverCard.Description>\n              Product Designer\n            </HoverCard.Description>\n          </div>\n        </div>\n        <div class="flex gap-2">\n          <Button size="sm">Follow</Button>\n        </div>\n      </div>\n    }\n  >\n    <Button>User preview</Button>\n  </HoverCard>\n));'
+  }
+  lang="tsx"
+>
+  <Demo9 client:load />
+</Preview>
+
+### Custom Trigger
+
+Use `trigger` when you need complete control over the trigger markup. The custom trigger must include `data-slot="hover-card-trigger"`.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <HoverCard\n    content="Custom trigger markup"\n    trigger={\n      <span\n        data-slot="hover-card-trigger"\n        tabindex="0"\n        class="inline-flex rounded-full bg-areia-surface-muted px-2 py-1 text-sm text-areia-default"\n      >\n        Beta\n      </span>\n    }\n  />\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Static Composition
+
+Use low-level parts for static markup or when you want to call `createHoverCard` yourself.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { HoverCard } from "areia";\n\nexport default ilha.render(() => (\n  <HoverCard.Static\n    content="Static hover-card markup"\n    triggerAs="span"\n  >\n    Hover me\n  </HoverCard.Static>\n));'
+  }
+  lang="tsx"
+>
+  <Demo10 client:load />
+</Preview>
+
+## HoverCard vs Tooltip
+
+|         | Tooltip                        | HoverCard                               |
+| ------- | ------------------------------ | --------------------------------------- |
+| Purpose | Short, non-interactive labels  | Rich preview content with interaction   |
+| Content | Brief text                     | Links, buttons, avatars, custom layouts |
+| Trigger | Hover or focus                 | Hover or focus                          |
+| ARIA    | `role="tooltip"`               | `aria-haspopup="dialog"`                |
+| Focus   | Does not move focus into popup | Does not move focus into popup          |
+| Delay   | 300ms default                  | 700ms default                           |
+
+Use `Tooltip` to label an icon button or add a short explanation. Use `HoverCard` when you want to show richer preview content on hover.
+
+## API Reference
+
+### HoverCard
+
+`HoverCard` is an Ilha island. It accepts standard HTML `div` attributes plus `@areia/slots/hover-card` options.
+
+| Prop                  | Type                                     | Default    | Description                                                                           |
+| --------------------- | ---------------------------------------- | ---------- | ------------------------------------------------------------------------------------- |
+| `content`             | `unknown`                                | -          | Content to display inside the hover-card popup.                                       |
+| `children`            | `unknown`                                | -          | Trigger content when `trigger` is not provided.                                       |
+| `trigger`             | `unknown`                                | -          | Custom trigger markup. Must include `data-slot="hover-card-trigger"`.                 |
+| `triggerAs`           | `"button" \| "span" \| "div" \| "a"`     | `"span"`   | Tag used for the generated trigger.                                                   |
+| `class`               | `string`                                 | -          | Additional CSS classes applied to the hover-card root.                                |
+| `className`           | `string`                                 | -          | Alias for `class`.                                                                    |
+| `triggerClass`        | `string`                                 | -          | Additional CSS classes applied to the generated trigger.                              |
+| `triggerClassName`    | `string`                                 | -          | Alias for `triggerClass`.                                                             |
+| `contentClass`        | `string`                                 | -          | Additional CSS classes applied to the hover-card popup.                               |
+| `contentClassName`    | `string`                                 | -          | Alias for `contentClass`.                                                             |
+| `side`                | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side relative to the trigger.                                               |
+| `align`               | `"start" \| "center" \| "end"`           | `"center"` | Preferred alignment along the selected side.                                          |
+| `sideOffset`          | `number`                                 | `4`        | Distance from the trigger in pixels.                                                  |
+| `alignOffset`         | `number`                                 | `0`        | Offset from the aligned edge in pixels.                                               |
+| `avoidCollisions`     | `boolean`                                | `true`     | Flip or shift to stay inside the viewport.                                            |
+| `collisionPadding`    | `number`                                 | `8`        | Viewport edge padding used for collision handling.                                    |
+| `delay`               | `number`                                 | `700`      | Delay before showing the hover-card in milliseconds.                                  |
+| `closeDelay`          | `number`                                 | `300`      | Delay before closing after mouse leave in milliseconds.                               |
+| `skipDelayDuration`   | `number`                                 | `300`      | Warm-up window where another hover-card opens without delay. Set `0` to disable.      |
+| `portal`              | `boolean`                                | `true`     | Portal content to `document.body` while open.                                         |
+| `closeOnClickOutside` | `boolean`                                | `true`     | Close when clicking outside the hover-card.                                           |
+| `closeOnEscape`       | `boolean`                                | `true`     | Close when pressing Escape.                                                           |
+| `onOpenChange`        | `(open: boolean) => void`                | -          | Called when visibility changes.                                                       |
+| `onPortalMounted`     | `(container: HTMLElement) => void`       | -          | After portaled content mounts on open. See Dialog docs, **Ilha + portaled overlays**. |
+
+### HoverCard.Trigger
+
+Generated trigger element.
+
+| Prop        | Type                                 | Default  | Description             |
+| ----------- | ------------------------------------ | -------- | ----------------------- |
+| `as`        | `"button" \| "span" \| "div" \| "a"` | `"span"` | Trigger tag name.       |
+| `children`  | `unknown`                            | -        | Trigger content.        |
+| `class`     | `string`                             | -        | Additional CSS classes. |
+| `className` | `string`                             | -        | Alias for `class`.      |
+
+### HoverCard.Content
+
+Popup container.
+
+| Prop        | Type                                     | Default    | Description             |
+| ----------- | ---------------------------------------- | ---------- | ----------------------- |
+| `children`  | `unknown`                                | -          | HoverCard content.      |
+| `side`      | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side styling. |
+| `class`     | `string`                                 | -          | Additional CSS classes. |
+| `className` | `string`                                 | -          | Alias for `class`.      |
+
+### HoverCard.Title
+
+Renders an `h3` styled for hover-card headings.
+
+| Prop        | Type      | Default | Description             |
+| ----------- | --------- | ------- | ----------------------- |
+| `children`  | `unknown` | -       | Title content.          |
+| `class`     | `string`  | -       | Additional CSS classes. |
+| `className` | `string`  | -       | Alias for `class`.      |
+
+### HoverCard.Description
+
+Renders a subdued paragraph.
+
+| Prop        | Type      | Default | Description             |
+| ----------- | --------- | ------- | ----------------------- |
+| `children`  | `unknown` | -       | Description content.    |
+| `class`     | `string`  | -       | Additional CSS classes. |
+| `className` | `string`  | -       | Alias for `class`.      |
+
+## Accessibility
+
+### Behavior
+
+- Opens on pointer hover for mouse/pen input after a delay.
+- Opens on keyboard focus after a delay.
+- Touch hover is ignored; touch devices use focus behavior.
+- Pressing `Escape` hides the hover-card.
+- Moving from the trigger to the hover-card content keeps it open.
+- Disabled triggers do not open hover-cards.
+- The popup can contain interactive content and remains open while the user interacts with it.
+
+### ARIA
+
+The controller automatically handles:
+
+- `aria-haspopup="dialog"` on the trigger.
+- `aria-controls` linking the trigger to the content.
+- `aria-expanded` on the trigger.
+- Stable generated IDs for content when needed.
+
+### Trigger Labels
+
+HoverCards are supplemental. Icon-only triggers still need an accessible name, usually with `aria-label` on the trigger button.

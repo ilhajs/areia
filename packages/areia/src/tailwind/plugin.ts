@@ -12,7 +12,7 @@ const areiaPlugin: ReturnType<typeof createPlugin.withOptions<AreiaPluginOptions
   createPlugin.withOptions<AreiaPluginOptions>(
     (options = {}) => {
       return ({ addBase, addVariant }) => {
-        const darkSelector = options.darkModeSelector || ".dark";
+        const darkSelector = options.darkModeSelector || '.dark, [data-theme="dark"]';
 
         addBase({
           ":root": lightVariables,
@@ -23,6 +23,8 @@ const areiaPlugin: ReturnType<typeof createPlugin.withOptions<AreiaPluginOptions
     },
     (_options = {}) => {
       return {
+        // SAFETY: areiaThemeConfig is a full Tailwind theme partial; the Config
+        // generic is stricter than what withOptions plugins may return.
         theme: areiaThemeConfig as unknown as NonNullable<Config["theme"]>,
         content: [`${import.meta.dirname}/**/*.js`, "./node_modules/areia/dist/**/*.js"],
       };

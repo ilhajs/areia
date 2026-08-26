@@ -1,0 +1,142 @@
+---
+title: Banner
+description: Displays contextual inline messages for informational, alert, or error states.
+sidebar:
+  order: 3
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+  Demo6,
+  Demo7,
+  Demo8,
+  Demo9,
+} from "./banner.demos";
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/banner/index.ts)
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Info, TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex w-full max-w-2xl flex-col gap-3">\n    <Banner\n      icon={<Icon icon={Info} class="size-5" />}\n      title="Update available"\n      description="A new version is ready to install."\n    />\n    <Banner\n      icon={<Icon icon={TriangleAlert} class="size-5" />}\n      variant="alert"\n      title="Session expiring"\n      description="Your session will expire in 5 minutes."\n    />\n    <Banner\n      icon={<Icon icon={TriangleAlert} class="size-5" />}\n      variant="error"\n      title="Save failed"\n      description="We couldn\'t save your changes. Please try again."\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Banner } from "areia";
+```
+
+## Usage
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+## Examples
+
+### Variants
+
+#### Default
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+#### Alert
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Session expiring"\n    description="Your session will expire in 5 minutes."\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+#### Error
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="error"\n    title="Save failed"\n    description="We couldn\'t save your changes. Please try again."\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### With Icon
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Review required"\n    description="Please review your project settings before proceeding."\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo6 client:load />
+</Preview>
+
+### With Action
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Update available"\n    description="A new version is ready to install."\n    action={\n      <Button size="sm" variant="primary">\n        Update now\n      </Button>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo7 client:load />
+</Preview>
+
+### With Multiple Actions
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { TriangleAlert } from "lucide";\nimport { Banner, Button, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={TriangleAlert} class="size-5" />}\n    variant="alert"\n    title="Session expiring"\n    description="Your session will expire in 5 minutes."\n    action={\n      <>\n        <Button size="sm" variant="ghost">\n          Dismiss\n        </Button>\n        <Button size="sm" variant="secondary">\n          Extend session\n        </Button>\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo8 client:load />
+</Preview>
+
+### Custom Content
+
+Use markup in `description` when the message needs links, emphasis, or other inline content.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Info } from "lucide";\nimport { Banner, Icon } from "areia";\n\nexport default ilha.render(() => (\n  <Banner\n    icon={<Icon icon={Info} class="size-5" />}\n    title="Custom content supported"\n    description={\n      <>\n        This banner supports <strong>custom content</strong>{" "}\n        with Ilha markup.\n      </>\n    }\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo9 client:load />
+</Preview>
+
+## API Reference
+
+| Prop          | Type                              | Default     | Description                                                                 |
+| ------------- | --------------------------------- | ----------- | --------------------------------------------------------------------------- |
+| `icon`        | `unknown`                         | -           | Icon markup rendered before the banner content.                             |
+| `title`       | `unknown`                         | -           | Primary heading text for the banner.                                        |
+| `description` | `unknown`                         | -           | Secondary description displayed below the title.                            |
+| `action`      | `unknown`                         | -           | Action slot rendered at the trailing end of structured banners.             |
+| `text`        | `unknown`                         | -           | Simple banner content used when `title` and `description` are not provided. |
+| `variant`     | `"default" \| "alert" \| "error"` | `"default"` | Visual style of the banner.                                                 |
+| `class`       | `string`                          | -           | Additional CSS classes merged with the generated classes.                   |
+| `className`   | `string`                          | -           | Alias for `class`.                                                          |

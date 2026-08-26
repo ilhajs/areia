@@ -1,0 +1,224 @@
+---
+title: Field
+description: Low-level form field primitive that wires accessible relationships and tracks validity, dirty, touched, filled, and focused states.
+sidebar:
+  order: 10
+---
+
+Groups a label, form control, description, and validation message. `Field` wires accessible relationships between labels and controls, tracks focused, filled, dirty, touched, valid, and invalid states, and supports native and custom validation.
+
+```ts
+import { Field } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <div data-slot="field" class="grid w-72 gap-1">
+    <label data-slot="field-label" class="font-bold">Email</label>
+    <input
+      data-slot="field-control"
+      type="email"
+      name="email"
+      required
+      class="win95-input"
+    />
+    <p data-slot="field-description" class="text-xs text-neutral-700">Use a work email address.</p>
+    <div data-slot="field-error" class="text-xs text-red-800"></div>
+  </div>
+`;
+
+const root = document.querySelector('[data-slot="field"]')!;
+const controller = Field.createField(root, {
+  name: "email",
+  validationMode: "onBlur",
+});
+```
+
+## Import
+
+```ts
+import { Field } from "@areia/slots";
+```
+
+## Usage
+
+Add `data-slot="field"` to a container element and place the sub-slot elements inside. Call `Field.createField(root)` to initialize the controller.
+
+```ts
+import { Field } from "@areia/slots";
+
+// Auto-bind a single root
+const root = document.querySelector('[data-slot="field"]');
+const controller = Field.createField(root, {
+  name: "username",
+  validationMode: "onBlur",
+});
+
+// Auto-bind all unbound roots in scope
+const controllers = Field.create();
+```
+
+## Expected Markup
+
+The controller expects a root element with `data-slot="field"` and the following sub-slots.
+
+```html
+<div data-slot="field">
+  <label data-slot="field-label">Email</label>
+  <input
+    data-slot="field-control"
+    type="email"
+    name="email"
+    required
+  />
+  <p data-slot="field-description">Use a work email address.</p>
+  <div data-slot="field-error"></div>
+  <output data-slot="field-validity"></output>
+</div>
+```
+
+### Data Slots
+
+| Slot                | Required | Description                                                                                                                |
+| ------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `field`             | Yes      | Root container.                                                                                                            |
+| `field-label`       | No       | Label element(s). Auto-wired to the control via `for` / `id`.                                                              |
+| `field-control`     | No       | The form control. Auto-detected if omitted: `input`, `textarea`, `select`, `button`, `[contenteditable]`, or `[tabindex]`. |
+| `field-description` | No       | Help text associated with the control via `aria-describedby`.                                                              |
+| `field-error`       | No       | Error message shown when the field is invalid.                                                                             |
+| `field-validity`    | No       | Output element that receives `dataset.valid`, `dataset.error`, and `dataset.errors`.                                       |
+| `field-item`        | No       | Additional elements that receive state attribute updates.                                                                  |
+
+### Generated Attributes
+
+The controller writes the following attributes on initialization and updates them as state changes on the root and all sub-slot elements:
+
+| Attribute       | Description                                           |
+| --------------- | ----------------------------------------------------- |
+| `data-valid`    | Present when the field is valid.                      |
+| `data-invalid`  | Present when the field is invalid.                    |
+| `data-dirty`    | Present when the user has modified the control value. |
+| `data-touched`  | Present when the user has blurred the control.        |
+| `data-filled`   | Present when the control has a non-empty value.       |
+| `data-focused`  | Present when the control currently has focus.         |
+| `data-disabled` | Present when the field is disabled.                   |
+
+ARIA wiring applied by the controller:
+
+- `for` / `id` association between labels and the control.
+- `aria-labelledby` on the control referencing labels.
+- `aria-describedby` on the control referencing descriptions and errors.
+- `aria-invalid` on the control.
+
+## Events
+
+### Outbound
+
+| Event                   | Detail                                               | Description                                        |
+| ----------------------- | ---------------------------------------------------- | -------------------------------------------------- |
+| `field:validity-change` | `{ valid: boolean, validity: FieldValidityData }`    | Fired on the root after validation state changes.  |
+| `field:change`          | `{ value: string, dirty: boolean, filled: boolean }` | Fired on the root on control `input` and `change`. |
+| `field:dirty-change`    | `{ dirty: boolean }`                                 | Fired when the dirty state changes.                |
+| `field:touched-change`  | `{ touched: boolean }`                               | Fired when the touched state changes.              |
+| `field:filled-change`   | `{ filled: boolean }`                                | Fired when the filled state changes.               |
+| `field:focus-change`    | `{ focused: boolean }`                               | Fired when focus enters or leaves the control.     |
+
+### Inbound
+
+| Event                 | Detail                           | Description                                                                   |
+| --------------------- | -------------------------------- | ----------------------------------------------------------------------------- |
+| `field:validate`      | —                                | Dispatch on the root to trigger a validation run.                             |
+| `field:set-invalid`   | `{ error?: string \| string[] }` | Dispatch on the root to force an invalid state with an optional custom error. |
+| `field:clear-invalid` | —                                | Dispatch on the root to clear forced invalid state and re-run validation.     |
+
+## API Reference
+
+### Options
+
+| Option                   | Type                                                                                        | Default        | Description                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------- |
+| `name`                   | `string`                                                                                    | control `name` | Field name. Used to name the control element.                                         |
+| `disabled`               | `boolean`                                                                                   | `false`        | Disables the field and control.                                                       |
+| `invalid`                | `boolean`                                                                                   | `false`        | Forces the field into an invalid state.                                               |
+| `dirty`                  | `boolean`                                                                                   | `false`        | Initial dirty state.                                                                  |
+| `touched`                | `boolean`                                                                                   | `false`        | Initial touched state.                                                                |
+| `validationMode`         | `"onBlur" \| "onChange" \| "onSubmit"`                                                      | `"onBlur"`     | When native and custom validation is committed.                                       |
+| `validate`               | `(value: string, control: HTMLElement) => string \| string[] \| null \| undefined \| false` | —              | Custom validation function. Return a non-empty value to mark invalid. Supports async. |
+| `validationDebounceTime` | `number`                                                                                    | `0`            | Debounce custom validation on change events, in milliseconds.                         |
+| `onValidityChange`       | `(valid: boolean) => void`                                                                  | —              | Called after validation state changes.                                                |
+
+### Controller
+
+| Member                        | Type                                                     | Description                                                           |
+| ----------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
+| `name`                        | `string \| undefined` (getter)                           | The field name.                                                       |
+| `valid`                       | `boolean` (getter)                                       | Whether the field is valid (no native or custom errors).              |
+| `invalid`                     | `boolean` (getter)                                       | Whether the field is invalid (forced or validation errors).           |
+| `dirty`                       | `boolean` (getter)                                       | Whether the user has modified the control value.                      |
+| `touched`                     | `boolean` (getter)                                       | Whether the user has blurred the control.                             |
+| `filled`                      | `boolean` (getter)                                       | Whether the control has a non-empty value.                            |
+| `focused`                     | `boolean` (getter)                                       | Whether the control currently has focus.                              |
+| `validity`                    | `FieldValidityData` (getter)                             | The current validity state snapshot.                                  |
+| `validate()`                  | `() => Promise<FieldValidityData>`                       | Runs native and custom validation, returning the result.              |
+| `setInvalid(invalid, error?)` | `(invalid: boolean, error?: string \| string[]) => void` | Sets or clears a forced invalid state with an optional error message. |
+| `clearInvalid()`              | `() => void`                                             | Clears forced invalid state and re-runs validation.                   |
+| `destroy()`                   | `() => void`                                             | Removes all event listeners and cleans up the controller.             |
+
+### FieldValidityData
+
+Snapshot returned by `controller.validity` and `controller.validate()`.
+
+| Property          | Type       | Description                                            |
+| ----------------- | ---------- | ------------------------------------------------------ |
+| `valid`           | `boolean`  | Aggregate validity — `true` when all constraints pass. |
+| `valueMissing`    | `boolean`  | Required constraint failed.                            |
+| `typeMismatch`    | `boolean`  | Value does not match the input type.                   |
+| `patternMismatch` | `boolean`  | Value does not match the `pattern` attribute.          |
+| `tooLong`         | `boolean`  | Value exceeds `maxlength`.                             |
+| `tooShort`        | `boolean`  | Value is shorter than `minlength`.                     |
+| `rangeUnderflow`  | `boolean`  | Value is below `min`.                                  |
+| `rangeOverflow`   | `boolean`  | Value is above `max`.                                  |
+| `stepMismatch`    | `boolean`  | Value does not match the step constraint.              |
+| `badInput`        | `boolean`  | Input could not be parsed.                             |
+| `customError`     | `boolean`  | Custom validation failed.                              |
+| `error`           | `string`   | The first error message.                               |
+| `errors`          | `string[]` | All collected error messages.                          |
+
+## Controller
+
+The controller is returned by `Field.createField()` and provides imperative control over the field's state.
+
+```ts
+import { Field } from "@areia/slots";
+
+const root = document.querySelector('[data-slot="field"]');
+const controller = Field.createField(root, {
+  name: "email",
+  validate: (value) =>
+    value.includes("@") ? null : "Enter a valid email address.",
+});
+
+// Read state
+console.log(
+  controller.valid,
+  controller.dirty,
+  controller.filled,
+);
+
+// Validate on demand
+const result = await controller.validate();
+if (!result.valid) {
+  console.error(result.errors);
+}
+
+// Force an error from server state
+controller.setInvalid(true, "Email already taken.");
+
+// Clear forced errors
+controller.clearInvalid();
+
+// Tear down
+controller.destroy();
+```
+
+### Form Reset
+
+When the control is inside a `<form>`, the controller listens for `reset` events and resets dirty, touched, and validity state automatically.

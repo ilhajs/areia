@@ -222,7 +222,7 @@ function checkboxControl(input: CheckboxInput) {
     )}
     <span
       data-slot="checkbox-indicator"
-      class="pointer-events-none absolute inset-0 flex items-center justify-center text-areia-inverse"
+      class="pointer-events-none absolute inset-0 flex items-center justify-center text-areia-background"
     >
       ${indeterminate ? minusIcon() : checkIcon()}
     </span>

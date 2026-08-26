@@ -7,7 +7,7 @@
 - `@areia/slots` is the headless layer: vanilla TypeScript controllers and slot markup with no styles. Package `exports` point at `dist/` — it must be built before dependents can resolve types or runtime entrypoints.
 - `areia` is the styled component library: Ilha islands + Tailwind tokens (`--areia-*`) on top of `@areia/slots`.
 - `@areia/form` is schema-driven forms (Standard Schema) on top of `areia`. Its `tsc` step needs `areia`'s `dist/` present.
-- The docs site (`apps/website`, `@areia/website`) uses Nimbus (Astro) + Ilha + Areia. Content lives under `apps/website/src/content/docs/` (`components/` and `slots/`). Build packages before running or building the site.
+- The docs site (`apps/website`, `@areia/website`) uses Blume (Astro) + Ilha + Areia. Content lives under `apps/website/docs/` (`components/` and `slots/`). Build packages before running or building the site.
 
 ## Build and run
 
@@ -30,7 +30,7 @@
 - `packages/slots/src/` — one folder per primitive (`combobox/`, `dialog/`, …) plus `core/` shared helpers. Entry is `src/index.ts`; build with `tsc && tsdown`.
 - `packages/areia/src/components/<name>/` — one folder per styled component (`index.ts` + tests). Shared helpers live in `packages/areia/src/lib/` (`binds.ts`, `morph-preserve.ts`, `markup.ts`, `cn.ts`, …).
 - `packages/form/src/` — `Form.tsx`, `FloatingForm.tsx`, `state.ts`, `infer.ts`, and `fields/*`. Factories return Ilha islands with the schema held in closure (never serialize schemas through `data-ilha-props`).
-- `apps/website/src/content/docs/` — MDX guides (`components/`, `slots/`). Sibling `*.demos.tsx` / `*.examples.ts` files hold Preview demos.
+- `apps/website/docs/` — MDX guides (Blume) (`components/`, `slots/`). Sibling `*.demos.tsx` files hold Preview demos; each folder's `meta.ts` sets sidebar order.
 - Package `exports` always target `dist/`. After `bun install` or a clean checkout, run `bun run build` before typecheck, tests that import built packages, or the docs site.
 
 ## Component and island conventions
@@ -58,7 +58,7 @@
 
 ## Writing docs
 
-Docs live in `apps/website/src/content/docs/**/*.mdx` (`components/` for Areia, `slots/` for primitives). Sidebar order comes from each file's frontmatter `sidebar.order`. Style guidelines:
+Docs live in `apps/website/docs/**/*.mdx` (`components/` for Areia, `slots/` for primitives). Sidebar order comes from each folder's `meta.ts` `pages` list. Style guidelines:
 
 - **Address the reader as "you."** Describe what they do: "You bind the selection with `bind:value`," not "Areia provides a value bind."
 - **Prefer active voice.** "`Combobox` opens on focus when `openOnFocus` is true," not "the popup is opened on focus."
@@ -72,7 +72,7 @@ Docs live in `apps/website/src/content/docs/**/*.mdx` (`components/` for Areia, 
 ## Agent behavior
 
 - Prefer small, focused changes. Fix the root cause (island nesting, tracked bind reads, build order) instead of morph workarounds that fight Ilha.
-- When adding a component: headless primitive in `@areia/slots` when behavior is reusable; styled island in `packages/areia/src/components/`; docs + demo under `apps/website/src/content/docs/`.
+- When adding a component: headless primitive in `@areia/slots` when behavior is reusable; styled island in `packages/areia/src/components/`; docs + demo under `apps/website/docs/`.
 - When touching binds or portals, keep open/selection sync imperative and verify clear → select → clear (and open/close with `bind:open`) still works.
 - If you are unsure how a change affects SSR serialization, hydration, portal restore, or Ilha morph, ask rather than guessing.
 - If you change documented behavior or public APIs, update the MDX guide and keep `bun run build` green (ordered package builds) before finishing.

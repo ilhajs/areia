@@ -1,0 +1,200 @@
+---
+title: Slider
+description: An input where the user selects a value from a range by dragging a thumb along a track.
+sidebar:
+  order: 28
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+} from "./slider.demos";
+
+An input for selecting a numeric value or range by dragging a thumb along a track.
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/slider/index.ts)
+
+`Slider` is backed by `@areia/slots` and wires the track, range, and thumb parts after mount.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider class="w-full max-w-sm" defaultValue={50} max={100} />\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Slider } from "areia";
+```
+
+## Usage
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider class="w-full max-w-sm" defaultValue={50} max={100} />\n));'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+## Examples
+
+### Range
+
+Pass a tuple for `defaultValue` to create a range slider with two thumbs.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={[25, 75]}\n    max={100}\n  />\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+### Vertical
+
+Set `orientation` to `"vertical"` for a vertical slider. Use a fixed height wrapper.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <div class="h-48">\n    <Slider\n      class="h-full"\n      orientation="vertical"\n      defaultValue={50}\n      max={100}\n    />\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+### Disabled
+
+Set `disabled` to prevent interaction.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={50}\n    max={100}\n    disabled\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### Step
+
+Set a custom `step` increment.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.render(() => (\n  <Slider\n    class="w-full max-w-sm"\n    defaultValue={50}\n    max={100}\n    step={10}\n  />\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+### Change Events
+
+Use `onValueChange` and `onValueCommit` to respond to value changes.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Slider } from "areia";\n\nexport default ilha.state("value", 50).render(({ state }) => (\n  <div class="flex flex-col items-start gap-3">\n    <Slider\n      class="w-full max-w-sm"\n      defaultValue={state.value()}\n      max={100}\n      onValueChange={(value) => {\n        state.value(\n          typeof value === "number" ? value : value[1],\n        );\n      }}\n    />\n    <p class="text-sm text-areia-subtle">\n      Value:{" "}\n      <span class="font-medium text-areia-default">\n        {state.value()}\n      </span>\n    </p>\n  </div>\n));'
+  }
+  lang="tsx"
+  codeOnly
+/>
+
+## API Reference
+
+### Slider
+
+Root component that manages the slider state.
+
+| Prop             | Type                                          | Default        | Description                                                            |
+| ---------------- | --------------------------------------------- | -------------- | ---------------------------------------------------------------------- |
+| `value`          | `number \| [number, number]`                  | —              | Controlled value.                                                      |
+| `defaultValue`   | `number \| [number, number]`                  | `0`            | Initial value. Use a tuple for range sliders.                          |
+| `min`            | `number`                                      | `0`            | Minimum allowed value.                                                 |
+| `max`            | `number`                                      | `100`          | Maximum allowed value.                                                 |
+| `step`           | `number`                                      | `1`            | Increment between selectable values.                                   |
+| `orientation`    | `"horizontal" \| "vertical"`                  | `"horizontal"` | Layout direction of the slider.                                        |
+| `disabled`       | `boolean`                                     | `false`        | Disables interaction and applies muted styling.                        |
+| `thumbAlignment` | `"center" \| "edge" \| "edge-client-only"`    | `"center"`     | How the thumb is aligned relative to the track edges.                  |
+| `onValueChange`  | `(value: number \| [number, number]) => void` | —              | Called on every value change during drag.                              |
+| `onValueCommit`  | `(value: number \| [number, number]) => void` | —              | Called when the value is committed (pointer release or keyboard blur). |
+
+### Slider.Track
+
+Container for the range bar.
+
+Accepts standard div attributes plus `class` and `className`.
+
+### Slider.Range
+
+The filled segment between the track start and the thumb.
+
+Accepts standard div attributes plus `class` and `className`.
+
+### Slider.Thumb
+
+Draggable thumb element. Two thumbs are rendered when `defaultValue` is a tuple.
+
+Accepts standard div attributes plus `class` and `className`.
+
+## Slots
+
+`Slider` renders these data slots:
+
+- `slider`
+- `slider-track`
+- `slider-range`
+- `slider-thumb`
+
+The root and parts receive state attributes from the slot controller:
+
+| Attribute          | Element       | Description                                              |
+| ------------------ | ------------- | -------------------------------------------------------- |
+| `data-orientation` | all parts     | Current orientation (`"horizontal"` or `"vertical"`).    |
+| `data-disabled`    | all parts     | Present when slider is disabled.                         |
+| `data-dragging`    | slider, thumb | Present during drag interaction.                         |
+| `data-value`       | slider        | Current value(s) as a string (e.g. `"50"` or `"25,75"`). |
+
+## Events
+
+The slider emits custom DOM events from the root element.
+
+### Outbound
+
+| Event           | Detail                                  | Description                                                     |
+| --------------- | --------------------------------------- | --------------------------------------------------------------- |
+| `slider:change` | `{ value: number \| [number, number] }` | Fired on every value change during drag.                        |
+| `slider:commit` | `{ value: number \| [number, number] }` | Fired when interaction ends (pointer release or keyboard blur). |
+
+### Inbound
+
+| Event        | Detail                                  | Description                            |
+| ------------ | --------------------------------------- | -------------------------------------- |
+| `slider:set` | `{ value: number \| [number, number] }` | Set the slider value programmatically. |
+
+```ts
+const slider = document.querySelector('[data-slot="slider"]')!;
+
+slider.addEventListener("slider:change", (e) => {
+  console.log("Value changing:", e.detail.value);
+});
+
+slider.addEventListener("slider:commit", (e) => {
+  console.log("Value committed:", e.detail.value);
+});
+
+// Set value programmatically
+slider.dispatchEvent(
+  new CustomEvent("slider:set", { detail: { value: 75 } }),
+);
+```

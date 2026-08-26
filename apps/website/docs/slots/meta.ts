@@ -1,0 +1,29 @@
+import { defineMeta } from "blume";
+
+export default defineMeta({
+  pages: [
+    "accordion",
+    "alert-dialog",
+    "checkbox",
+    "collapsible",
+    "combobox",
+    "command",
+    "context-menu",
+    "dialog",
+    "dropdown-menu",
+    "field",
+    "hover-card",
+    "navigation-menu",
+    "popover",
+    "progress",
+    "radio-group",
+    "resizable",
+    "select",
+    "slider",
+    "switch",
+    "tabs",
+    "toggle",
+    "toggle-group",
+    "tooltip",
+  ],
+});

@@ -1,0 +1,348 @@
+---
+title: Navigation Menu
+description: Low-level navigation menu primitive with directional animations, viewport positioning, item indicators, and mega-menu support.
+sidebar:
+  order: 12
+---
+
+A navigation menu with hover and focus interactions, directional content transitions, and a shared viewport for displaying sub-menus. `NavigationMenu` supports sticky headers, item indicators, hover-safe triangles, and mega-menu layouts.
+
+```ts
+import { NavigationMenu } from "@areia/slots";
+
+document.querySelector("#root")!.innerHTML = `
+  <nav data-slot="navigation-menu" class="w-96">
+    <ul data-slot="navigation-menu-list" class="flex gap-1">
+      <li data-slot="navigation-menu-item" data-value="products">
+        <button data-slot="navigation-menu-trigger" class="win95-button">
+          Products
+        </button>
+        <div data-slot="navigation-menu-content" class="win95-menu mt-1">
+          Product content goes here.
+        </div>
+      </li>
+      <li data-slot="navigation-menu-item" data-value="resources">
+        <button data-slot="navigation-menu-trigger" class="win95-button">
+          Resources
+        </button>
+        <div data-slot="navigation-menu-content" class="win95-menu mt-1">
+          Resource content goes here.
+        </div>
+      </li>
+    </ul>
+    <div data-slot="navigation-menu-viewport" class="win95-inset mt-2 min-h-16 p-3"></div>
+  </nav>
+`;
+
+const root = document.querySelector(
+  '[data-slot="navigation-menu"]',
+)!;
+const controller = NavigationMenu.createNavigationMenu(root, {
+  delayOpen: 200,
+  align: "start",
+});
+```
+
+## Import
+
+```ts
+import { NavigationMenu } from "@areia/slots";
+```
+
+## Usage
+
+Add `data-slot="navigation-menu"` to a `<nav>` element. Place items with triggers and content inside a list, and a viewport for rendering active content. Call `NavigationMenu.createNavigationMenu(root)` to initialize.
+
+```ts
+import { NavigationMenu } from "@areia/slots";
+
+// Auto-bind a single root
+const root = document.querySelector(
+  '[data-slot="navigation-menu"]',
+)!;
+const controller = NavigationMenu.createNavigationMenu(root, {
+  delayOpen: 200,
+  delayClose: 150,
+  align: "start",
+  sideOffset: 4,
+});
+
+// Auto-bind all unbound roots in scope
+const controllers = NavigationMenu.create();
+```
+
+## Directional Animations
+
+When the user moves between items, the controller computes the direction of travel and applies `data-motion-from-start`, `data-motion-from-end`, `data-motion-to-start`, or `data-motion-to-end` on the entering and exiting content. Use these attributes in CSS to drive directional transitions.
+
+```css
+[data-slot="navigation-menu-content"][data-motion-from-end] {
+  animation: slideFromRight 150ms ease;
+}
+
+[data-slot="navigation-menu-content"][data-motion-from-start] {
+  animation: slideFromLeft 150ms ease;
+}
+```
+
+## Expected Markup
+
+The controller expects a root element with `data-slot="navigation-menu"` and the following sub-slots.
+
+### Canonical Markup
+
+```html
+<nav data-slot="navigation-menu">
+  <ul data-slot="navigation-menu-list">
+    <li data-slot="navigation-menu-item" data-value="products">
+      <button data-slot="navigation-menu-trigger">
+        Products
+      </button>
+      <div data-slot="navigation-menu-content">
+        Mega-menu content for Products
+      </div>
+    </li>
+    <li data-slot="navigation-menu-item" data-value="solutions">
+      <button data-slot="navigation-menu-trigger">
+        Solutions
+      </button>
+      <div data-slot="navigation-menu-content">
+        Mega-menu content for Solutions
+      </div>
+    </li>
+    <li data-slot="navigation-menu-item">
+      <a href="/pricing">Pricing</a>
+    </li>
+    <div data-slot="navigation-menu-indicator"></div>
+  </ul>
+  <div data-slot="navigation-menu-viewport"></div>
+</nav>
+```
+
+### Minimal Markup
+
+The popup stack (portal, positioner, popup) is synthesized automatically while open if not authored. Only `navigation-menu-viewport` is strictly required for shared viewport mode.
+
+```html
+<nav data-slot="navigation-menu">
+  <ul data-slot="navigation-menu-list">
+    <li data-slot="navigation-menu-item" data-value="products">
+      <button data-slot="navigation-menu-trigger">
+        Products
+      </button>
+      <div data-slot="navigation-menu-content">...</div>
+    </li>
+  </ul>
+  <div data-slot="navigation-menu-viewport"></div>
+</nav>
+```
+
+### Generated Popup Structure
+
+While open, the viewport is wrapped in auto-generated elements:
+
+```html
+<div data-slot="navigation-menu-portal">
+  <div
+    data-slot="navigation-menu-positioner"
+    style="position: absolute; ..."
+  >
+    <div data-slot="navigation-menu-popup">
+      <div data-slot="navigation-menu-viewport">
+        <!-- Active content is moved here -->
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### Data Slots
+
+| Slot                         | Required | Description                                                                      |
+| ---------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `navigation-menu`            | Yes      | Root `<nav>` element.                                                            |
+| `navigation-menu-list`       | Yes      | Container for items and the optional indicator.                                  |
+| `navigation-menu-item`       | Yes      | Each top-level item. Set `data-value` for submenu items or omit for plain links. |
+| `navigation-menu-trigger`    | No       | Button that opens a submenu on hover/focus.                                      |
+| `navigation-menu-content`    | No       | Submenu content within an item.                                                  |
+| `navigation-menu-viewport`   | Yes      | Shared container where active submenu content is rendered.                       |
+| `navigation-menu-indicator`  | No       | Optional animated indicator that tracks the active trigger.                      |
+| `navigation-menu-portal`     | No       | Explicit portal wrapper around the viewport. Generated if omitted.               |
+| `navigation-menu-positioner` | No       | Explicit positioner for the viewport. Generated if omitted.                      |
+| `navigation-menu-popup`      | No       | Explicit popup container around the viewport. Generated if omitted.              |
+
+### Generated Attributes
+
+The controller writes the following attributes on initialization and updates them as state changes:
+
+| Attribute                | Element(s)       | Description                                             |
+| ------------------------ | ---------------- | ------------------------------------------------------- |
+| `data-active`            | Item, Trigger    | Present on the currently active item and trigger.       |
+| `data-state`             | Trigger, Content | `"open"` or `"closed"`.                                 |
+| `data-motion-from-start` | Content          | Present on entering content when the user moves right.  |
+| `data-motion-from-end`   | Content          | Present on entering content when the user moves left.   |
+| `data-motion-to-start`   | Content          | Present on exiting content when the user moves right.   |
+| `data-motion-to-end`     | Content          | Present on exiting content when the user moves left.    |
+| `data-instant`           | Indicator        | Present on first open to disable transition animations. |
+
+### Sticky Header Support
+
+When the navigation menu is inside a sticky or fixed header, set `data-position-method="fixed"` on the root to anchor the viewport positioner using `position: fixed` instead of `position: absolute`.
+
+## CSS Variables
+
+### On the positioner / popup
+
+| Variable              | Description                                        |
+| --------------------- | -------------------------------------------------- |
+| `--popup-width`       | Current width of the popup (px).                   |
+| `--popup-height`      | Current height of the popup (px).                  |
+| `--positioner-width`  | Current width of the positioner (px).              |
+| `--positioner-height` | Current height of the positioner (px).             |
+| `--available-width`   | Available viewport width for the positioner (px).  |
+| `--available-height`  | Available viewport height for the positioner (px). |
+| `--transform-origin`  | CSS transform origin for scale animations.         |
+
+### On the indicator
+
+| Variable             | Description                                             |
+| -------------------- | ------------------------------------------------------- |
+| `--indicator-left`   | Left offset of the indicator relative to the list (px). |
+| `--indicator-top`    | Top offset of the indicator relative to the list (px).  |
+| `--indicator-width`  | Width of the active trigger (px).                       |
+| `--indicator-height` | Height of the active trigger (px).                      |
+
+## Events
+
+### Outbound
+
+| Event                    | Detail                      | Description                                     |
+| ------------------------ | --------------------------- | ----------------------------------------------- |
+| `navigation-menu:change` | `{ value: string \| null }` | Fired on the root when the active item changes. |
+
+### Inbound
+
+| Event                    | Detail              | Description                                                 |
+| ------------------------ | ------------------- | ----------------------------------------------------------- |
+| `navigation-menu:select` | `{ value: string }` | Dispatch on the root to open the item with the given value. |
+
+## API Reference
+
+### Options
+
+| Option              | Type                                     | Default      | Description                                                                                |
+| ------------------- | ---------------------------------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| `delayOpen`         | `number`                                 | `0`          | Delay before opening on hover, in milliseconds.                                            |
+| `delayClose`        | `number`                                 | `0`          | Delay before closing on mouse leave, in milliseconds.                                      |
+| `openOnFocus`       | `boolean`                                | `false`      | Whether focusing a trigger opens its content.                                              |
+| `side`              | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"`   | Preferred side of the viewport relative to the trigger.                                    |
+| `align`             | `"start" \| "center" \| "end"`           | `"start"`    | Alignment of the viewport relative to the trigger.                                         |
+| `sideOffset`        | `number`                                 | `0`          | Distance from the trigger to the viewport in pixels.                                       |
+| `alignOffset`       | `number`                                 | `0`          | Offset along the alignment axis in pixels.                                                 |
+| `positionMethod`    | `"absolute" \| "fixed"`                  | `"absolute"` | Positioning strategy for the shared viewport positioner. Use `"fixed"` for sticky headers. |
+| `safeTriangle`      | `boolean`                                | `false`      | Enables hover safe-triangle behavior for diagonal pointer movement.                        |
+| `debugSafeTriangle` | `boolean`                                | `false`      | Renders the safe-triangle polygon for debugging.                                           |
+| `onValueChange`     | `(value: string \| null) => void`        | —            | Called when the active item value changes.                                                 |
+
+### Placement Attributes
+
+Values resolve with precedence: **JS options > data-\* attributes on the root > defaults**.
+
+| Data Attribute         | Type                                     | Description                      |
+| ---------------------- | ---------------------------------------- | -------------------------------- |
+| `data-side`            | `"top" \| "right" \| "bottom" \| "left"` | Preferred placement side.        |
+| `data-align`           | `"start" \| "center" \| "end"`           | Preferred alignment.             |
+| `data-side-offset`     | `number`                                 | Distance from the trigger.       |
+| `data-align-offset`    | `number`                                 | Offset along the alignment axis. |
+| `data-position-method` | `"absolute" \| "fixed"`                  | Positioning strategy.            |
+| `data-delay-open`      | `number`                                 | Open delay (ms).                 |
+| `data-delay-close`     | `number`                                 | Close delay (ms).                |
+| `data-open-on-focus`   | `boolean`                                | Open on focus.                   |
+| `data-safe-triangle`   | `boolean`                                | Enable safe-triangle.            |
+
+### Controller
+
+| Member        | Type                      | Description                                               |
+| ------------- | ------------------------- | --------------------------------------------------------- |
+| `value`       | `string \| null` (getter) | Currently active item value.                              |
+| `open(value)` | `(value: string) => void` | Opens the submenu for the given item value.               |
+| `close()`     | `() => void`              | Closes the current submenu.                               |
+| `destroy()`   | `() => void`              | Removes all event listeners and cleans up the controller. |
+
+## Controller
+
+The controller is returned by `NavigationMenu.createNavigationMenu()` and provides imperative control over the navigation menu's state.
+
+```ts
+import { NavigationMenu } from "@areia/slots";
+
+const root = document.querySelector(
+  '[data-slot="navigation-menu"]',
+)!;
+const controller = NavigationMenu.createNavigationMenu(root, {
+  delayOpen: 200,
+  align: "start",
+  onValueChange: (value) => {
+    console.log("Active item:", value);
+  },
+});
+
+// Open a specific submenu
+controller.open("products");
+
+// Read the active value
+console.log(controller.value); // "products"
+
+// Close the submenu
+controller.close();
+
+// Tear down
+controller.destroy();
+```
+
+### Listening to Events
+
+```ts
+const root = document.querySelector(
+  '[data-slot="navigation-menu"]',
+)!;
+
+root.addEventListener("navigation-menu:change", (event) => {
+  const { value } = event.detail;
+  console.log("Active item changed:", value);
+});
+```
+
+### Item Indicator
+
+Place a `data-slot="navigation-menu-indicator"` inside the list to get an animated indicator that tracks the active trigger. The controller sets CSS variables on it:
+
+```css
+[data-slot="navigation-menu-indicator"] {
+  position: absolute;
+  left: var(--indicator-left);
+  top: var(--indicator-top);
+  width: var(--indicator-width);
+  height: var(--indicator-height);
+  transition:
+    left 200ms ease,
+    width 200ms ease;
+  border-radius: 6px;
+  background: var(--color-areia-surface-muted);
+}
+
+/* Disable transition on first render */
+[data-slot="navigation-menu-indicator"][data-instant] {
+  transition: none;
+}
+```
+
+The controller sets `data-instant` on the indicator during initial open to prevent the transition from animating on page load.
+
+### Hover Safe Triangle
+
+When `safeTriangle: true`, the controller renders a triangular safe zone between the trigger and the viewport. Moving the pointer through this zone keeps the submenu open, preventing accidental closes when moving diagonally. This is useful for mega-menus with large content areas.
+
+### Plain Links
+
+Items without `data-value` or `data-slot="navigation-menu-trigger"` are treated as plain links. They receive hover styling and keyboard navigation support but do not open submenus. Focus movement on tab respects these items within the menu structure.

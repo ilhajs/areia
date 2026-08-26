@@ -1,0 +1,92 @@
+---
+title: Badge
+description: Displays a small label for status, categorization, or metadata.
+sidebar:
+  order: 2
+---
+
+import {
+  Demo1,
+  Demo2,
+  Demo3,
+  Demo4,
+  Demo5,
+} from "./badge.demos";
+
+[Source Code](https://github.com/ilhajs/areia/blob/main/packages/areia/src/components/badge/index.ts)
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Badge } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-2">\n    <Badge variant="primary">Primary</Badge>\n    <Badge variant="secondary">Secondary</Badge>\n    <Badge variant="error">Error</Badge>\n    <Badge variant="success">Success</Badge>\n    <Badge variant="warning">Warning</Badge>\n    <Badge variant="info">Info</Badge>\n    <Badge variant="outline">Outline</Badge>\n    <Badge variant="beta">Beta</Badge>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo1 client:load />
+</Preview>
+
+## Import
+
+```ts
+import { Badge } from "areia";
+```
+
+## Usage
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Badge } from "areia";\n\nexport default ilha.render(() => <Badge>New</Badge>);'
+  }
+  lang="tsx"
+>
+  <Demo2 client:load />
+</Preview>
+
+## Examples
+
+### Semantic Variants
+
+Use semantic variants for common status and categorization states.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Badge } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-2">\n    <Badge variant="primary">Primary</Badge>\n    <Badge variant="secondary">Secondary</Badge>\n    <Badge variant="error">Error</Badge>\n    <Badge variant="success">Success</Badge>\n    <Badge variant="warning">Warning</Badge>\n    <Badge variant="info">Info</Badge>\n    <Badge variant="outline">Outline</Badge>\n    <Badge variant="beta">Beta</Badge>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo3 client:load />
+</Preview>
+
+### Other Variants
+
+Use color variants for product-specific labels where semantic badges are not enough to convey the intended meaning or status.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Badge } from "areia";\n\nexport default ilha.render(() => (\n  <div class="flex flex-wrap items-center gap-2">\n    <Badge variant="neutral">Neutral</Badge>\n    <Badge variant="red">Red</Badge>\n    <Badge variant="orange">Orange</Badge>\n    <Badge variant="green">Green</Badge>\n    <Badge variant="teal">Teal</Badge>\n    <Badge variant="teal-subtle">Teal Subtle</Badge>\n    <Badge variant="blue">Blue</Badge>\n    <Badge variant="purple">Purple</Badge>\n  </div>\n));'
+  }
+  lang="tsx"
+>
+  <Demo4 client:load />
+</Preview>
+
+### In a Sentence
+
+Badges can be used inline with nearby text to call attention to lightweight metadata.
+
+<Preview
+  code={
+    'import { ilha } from "ilha";\nimport { Badge } from "areia";\n\nexport default ilha.render(() => (\n  <p class="flex items-center gap-2 text-areia-default">\n    Ilha Islands\n    <Badge variant="success">Stable</Badge>\n  </p>\n));'
+  }
+  lang="tsx"
+>
+  <Demo5 client:load />
+</Preview>
+
+## API Reference
+
+| Prop        | Type                                                                                                                                                                                                            | Default     | Description                                               |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | --------------------------------------------------------- |
+| `variant`   | `"primary" \| "secondary" \| "error" \| "warning" \| "success" \| "destructive" \| "info" \| "beta" \| "outline" \| "red" \| "green" \| "neutral" \| "orange" \| "purple" \| "teal" \| "teal-subtle" \| "blue"` | `"primary"` | Color variant of the badge.                               |
+| `children`  | `unknown`                                                                                                                                                                                                       | -           | Content rendered inside the badge.                        |
+| `class`     | `string`                                                                                                                                                                                                        | -           | Additional CSS classes merged with the generated classes. |
+| `className` | `string`                                                                                                                                                                                                        | -           | Alias for `class`.                                        |

@@ -1,4 +1,4 @@
-import { Badge, ClipboardText, Icon, LinkButton } from "areia";
+import { Badge, ClipboardText, Icon, Link, LinkButton } from "areia";
 import { ilha } from "ilha";
 import { Book, Boxes, Code2, Sparkles, Type } from "lucide";
 
@@ -70,6 +70,9 @@ export const LandingHero = ilha(() => (
           >
             View on GitHub
           </LinkButton>
+          <Link href="https://areia.ilha.build/llms.txt" external>
+            llms.txt
+          </Link>
         </div>
 
         <ClipboardText text="npm install areia" tooltip class="w-full max-w-md" />
