@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import { ilha, html, mount } from "ilha";
+import { ilha, html, mount, state } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Autocomplete, autocompleteVariants } from "./index";
 
@@ -93,16 +93,21 @@ describe("Autocomplete", () => {
     let readOpen!: () => boolean;
     let setOpen!: (v: boolean) => void;
 
-    const Panel = ilha.state("open", false).render(({ state }) => {
-      readOpen = state.open as () => boolean;
-      setOpen = (v: boolean) => state.open(v);
+    const Panel = ilha(() => {
+      const open = state(false);
+
+      readOpen = open as () => boolean;
+      setOpen = (v: boolean) => open(v);
       return html`${Autocomplete({
         items: [{ value: "a", label: "Alpha" }],
-        "bind:open": state.open,
+        "bind:open": open,
       })}`;
     });
 
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    document.body.innerHTML = await Panel.hydratable(
+      {},
+      { name: "Panel", snapshot: true, skipOnMount: false },
+    );
     mount({ Panel }, { root: document.body, lazy: false });
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
     await Promise.resolve();
@@ -127,7 +132,7 @@ describe("Autocomplete", () => {
 
 describe("Autocomplete behavior", () => {
   async function mountAutocomplete() {
-    const Panel = ilha.render(
+    const Panel = ilha(
       () =>
         html`${Autocomplete({
           items: [
@@ -137,7 +142,10 @@ describe("Autocomplete behavior", () => {
         })}`,
     );
 
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    document.body.innerHTML = await Panel.hydratable(
+      {},
+      { name: "Panel", snapshot: true, skipOnMount: false },
+    );
     mount({ Panel }, { root: document.body, lazy: false });
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
     await Promise.resolve();

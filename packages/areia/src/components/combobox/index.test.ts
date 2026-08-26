@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import { ilha, html, mount, signal, type SignalAccessor } from "ilha";
+import { ilha, html, ilhaSignal, mount, state, type SignalAccessor } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Combobox, comboboxVariants, type ComboboxInput } from "./index";
 
@@ -17,7 +17,7 @@ async function settle() {
 }
 
 async function mountCombobox(input: ComboboxInput = {}) {
-  const Panel = ilha.render(
+  const Panel = ilha(
     () =>
       html`${Combobox({
         items: [
@@ -28,7 +28,10 @@ async function mountCombobox(input: ComboboxInput = {}) {
       })}`,
   );
 
-  document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+  document.body.innerHTML = await Panel.hydratable(
+    {},
+    { name: "Panel", snapshot: true, skipOnMount: false },
+  );
   mount({ Panel }, { root: document.body, lazy: false });
   await settle();
 
@@ -230,8 +233,8 @@ describe("Combobox behavior", () => {
   });
 
   it("filters after clear → pick → clear with bind:value (no remorph duplicates)", async () => {
-    const selected = signal<string | null>("apple");
-    const Panel = ilha.render(
+    const selected = ilhaSignal<string | null>("apple");
+    const Panel = ilha(
       () =>
         html`${Combobox({
           label: "Fruit",
@@ -245,7 +248,10 @@ describe("Combobox behavior", () => {
         })}`,
     );
 
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    document.body.innerHTML = await Panel.hydratable(
+      {},
+      { name: "Panel", snapshot: true, skipOnMount: false },
+    );
     mount({ Panel }, { root: document.body, lazy: false });
     await settle();
 
@@ -314,21 +320,24 @@ describe("Combobox multiple-mode types", () => {
   it("syncs bind:value with the committed selection in multiple mode", async () => {
     let readSelected!: () => string[];
 
-    const Panel = ilha
-      .state("selected", () => [] as string[])
-      .render(({ state }) => {
-        readSelected = state.selected as () => string[];
-        return html`${Combobox({
-          multiple: true,
-          "bind:value": state.selected as SignalAccessor<string[]>,
-          items: [
-            { value: "apple", label: "Apple" },
-            { value: "banana", label: "Banana" },
-          ],
-        })}`;
-      });
+    const Panel = ilha(() => {
+      const selected = state(() => [] as string[]);
 
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+      readSelected = selected as () => string[];
+      return html`${Combobox({
+        multiple: true,
+        "bind:value": selected as SignalAccessor<string[]>,
+        items: [
+          { value: "apple", label: "Apple" },
+          { value: "banana", label: "Banana" },
+        ],
+      })}`;
+    });
+
+    document.body.innerHTML = await Panel.hydratable(
+      {},
+      { name: "Panel", snapshot: true, skipOnMount: false },
+    );
     mount({ Panel }, { root: document.body, lazy: false });
     await settle();
 

@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Spinner } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="flex items-center gap-3">
     <Spinner size="sm" />
     <Spinner />
@@ -9,4 +9,4 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => <Spinner aria-label="Loading" />);
+export const Demo2 = ilha(() => <Spinner aria-label="Loading" />);

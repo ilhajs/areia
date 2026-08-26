@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Button, Dropdown } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Dropdown trigger={<Button>Add</Button>}>
     <Dropdown.Item value="component">Component</Dropdown.Item>
     <Dropdown.Item value="primitive">Primitive</Dropdown.Item>
@@ -9,7 +9,7 @@ export const Demo1 = ilha.render(() => (
   </Dropdown>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Dropdown>
     <Dropdown.Trigger>
       <Button>Menu</Button>
@@ -25,7 +25,7 @@ export const Demo2 = ilha.render(() => (
   </Dropdown>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Dropdown trigger={<Button>Actions</Button>}>
     <Dropdown.Group>
       <Dropdown.Label>Project</Dropdown.Label>
@@ -39,7 +39,7 @@ export const Demo3 = ilha.render(() => (
   </Dropdown>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Dropdown trigger={<Button>Add</Button>}>
     <Dropdown.Item value="component">Component</Dropdown.Item>
     <Dropdown.Item value="primitive">Primitive</Dropdown.Item>
@@ -47,7 +47,7 @@ export const Demo4 = ilha.render(() => (
   </Dropdown>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Dropdown trigger={<Button>Edit</Button>}>
     <Dropdown.Item value="rename">Rename</Dropdown.Item>
     <Dropdown.Item value="duplicate">Duplicate</Dropdown.Item>
@@ -65,7 +65,7 @@ export const Demo5 = ilha.render(() => (
   </Dropdown>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Dropdown
     trigger={
       <span class="flex size-8 items-center justify-center rounded-full bg-areia-accent text-sm font-medium text-white">
@@ -83,7 +83,7 @@ export const Demo6 = ilha.render(() => (
   </Dropdown>
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Dropdown trigger={<Button>Resources</Button>}>
     <Dropdown.LinkItem href="/settings" value="settings">
       Settings

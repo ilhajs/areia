@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { ilha, html, raw, action, state, effect } from "ilha";
 import { ContextMenu as ContextMenuPrimitive } from "@areia/slots";
 import {
   boundElement,
@@ -168,12 +168,18 @@ function renderContextMenu(input: ContextMenuInput = {}) {
   return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-export const ContextMenuRoot = ilha
-  .input<ContextMenuInput>()
-  .action("openChange", (open: boolean, { host }) => {
+export const ContextMenuRoot = ilha((input: ContextMenuInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const openChange = action((open: boolean) => {
     getBindBridge(host, "open")?.onUserChange(open);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = host.matches('[data-slot="context-menu"]')
       ? host
       : host.querySelector('[data-slot="context-menu"]');
@@ -185,7 +191,7 @@ export const ContextMenuRoot = ilha
     const controller = ContextMenuPrimitive.createContextMenu(root, {
       disabled: input.disabled,
       closeOnSelect: input.closeOnSelect,
-      onOpenChange: (open) => action.openChange(open),
+      onOpenChange: (open) => openChange(open),
       onSelect: input.onSelect,
       onPortalMounted: input.onPortalMounted,
     } satisfies ContextMenuPrimitive.ContextMenuOptions);
@@ -200,11 +206,14 @@ export const ContextMenuRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "open")?.applyFromSignal();
-  })
-  .render(({ input }) => renderContextMenu(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "open")?.applyFromSignal();
+  });
+
+  return renderContextMenu(input);
+});
 
 export const ContextMenu = Object.assign(ContextMenuRoot, {
   Root: ContextMenuRoot,

@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Select } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Select
     id="fruit"
     label="Fruit"
@@ -14,7 +14,7 @@ export const Demo1 = ilha.render(() => (
   />
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Select
     id="plan"
     label="Plan"
@@ -27,7 +27,7 @@ export const Demo2 = ilha.render(() => (
   />
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Select
     id="basic-fruit"
     label="Fruit"
@@ -40,7 +40,7 @@ export const Demo3 = ilha.render(() => (
   />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Select
     aria-label="Select fruit"
     value="banana"
@@ -52,7 +52,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Select
     id="issue-type"
     label="Issue type"
@@ -67,7 +67,7 @@ export const Demo5 = ilha.render(() => (
   />
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Select
     id="priority"
     label="Priority"
@@ -81,7 +81,7 @@ export const Demo6 = ilha.render(() => (
   />
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Select
     id="severity"
     label="Severity"
@@ -96,7 +96,7 @@ export const Demo7 = ilha.render(() => (
   />
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <Select
     label="Fruit"
     disabled
@@ -109,7 +109,7 @@ export const Demo8 = ilha.render(() => (
   />
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Select
     id="columns"
     label="Columns"
@@ -126,7 +126,7 @@ export const Demo9 = ilha.render(() => (
   />
 ));
 
-export const Demo10 = ilha.render(() => (
+export const Demo10 = ilha(() => (
   <Select
     id="plan-disabled"
     label="Plan"
@@ -140,7 +140,7 @@ export const Demo10 = ilha.render(() => (
   />
 ));
 
-export const Demo11 = ilha.render(() => (
+export const Demo11 = ilha(() => (
   <Select id="explicit-options" label="Fruit" placeholder="Choose fruit">
     <Select.Option value="apple" label="Apple" />
     <Select.Option value="banana" label="Banana" />
@@ -148,7 +148,7 @@ export const Demo11 = ilha.render(() => (
   </Select>
 ));
 
-export const Demo12 = ilha.render(() => (
+export const Demo12 = ilha(() => (
   <Select id="grouped-food" label="Food" placeholder="Choose food">
     <Select.Group label="Fruits">
       <Select.Option value="apple" label="Apple" />
@@ -161,7 +161,7 @@ export const Demo12 = ilha.render(() => (
   </Select>
 ));
 
-export const Demo13 = ilha.render(() => (
+export const Demo13 = ilha(() => (
   <Select
     variant="ghost"
     aria-label="Sort by"

@@ -1,18 +1,18 @@
 import { ilha } from "ilha";
 import { Toggle, ToggleGroup } from "areia";
 
-export const Demo1 = ilha.render(() => <Toggle variant="outline">Bold</Toggle>);
+export const Demo1 = ilha(() => <Toggle variant="outline">Bold</Toggle>);
 
-export const Demo2 = ilha.render(() => <Toggle variant="outline">Italic</Toggle>);
+export const Demo2 = ilha(() => <Toggle variant="outline">Italic</Toggle>);
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <div class="flex items-center gap-2">
     <Toggle>Default</Toggle>
     <Toggle variant="outline">Outline</Toggle>
   </div>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <div class="flex items-center gap-2">
     <Toggle size="sm" variant="outline">
       Small
@@ -26,7 +26,7 @@ export const Demo4 = ilha.render(() => (
   </div>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="flex items-center gap-2">
     <Toggle disabled>Disabled</Toggle>
     <Toggle variant="outline" disabled>
@@ -35,7 +35,7 @@ export const Demo5 = ilha.render(() => (
   </div>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <div class="flex items-center gap-2">
     <Toggle defaultPressed>Pressed</Toggle>
     <Toggle variant="outline" defaultPressed>
@@ -44,7 +44,7 @@ export const Demo6 = ilha.render(() => (
   </div>
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <ToggleGroup type="single" defaultValue="center">
     <ToggleGroup.Item value="left" variant="outline">
       Left

@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Button, Dialog } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Dialog
     trigger={<Button>Open dialog</Button>}
     contentClass="grid gap-4 p-6"
@@ -26,7 +26,7 @@ export const Demo1 = ilha.render(() => (
   />
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Dialog>
     <Dialog.Trigger>
       <Button>Open</Button>
@@ -44,7 +44,7 @@ export const Demo2 = ilha.render(() => (
   </Dialog>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Dialog
     role="alertdialog"
     trigger={<Button variant="destructive">Delete project</Button>}
@@ -71,7 +71,7 @@ export const Demo3 = ilha.render(() => (
   />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Dialog
     closeOnClickOutside={false}
     closeOnEscape
@@ -90,7 +90,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Dialog
     trigger={<Button>Open shortcut dialog</Button>}
     contentClass="grid gap-4 p-6"

@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { ContextMenu } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <ContextMenu
     trigger={
       <div class="rounded-lg border border-dashed border-areia-border p-8 text-center text-areia-subtle">
@@ -14,7 +14,7 @@ export const Demo1 = ilha.render(() => (
   </ContextMenu>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <ContextMenu>
     <ContextMenu.Trigger>
       <button class="rounded-lg bg-areia-control-background px-3 py-2 ring ring-areia-control-border">
@@ -29,7 +29,7 @@ export const Demo2 = ilha.render(() => (
   </ContextMenu>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <ContextMenu
     trigger={
       <div class="rounded-lg bg-areia-surface-muted p-6 text-areia-default">
@@ -43,7 +43,7 @@ export const Demo3 = ilha.render(() => (
   </ContextMenu>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <ContextMenu
     closeOnSelect={false}
     trigger={
@@ -55,7 +55,7 @@ export const Demo4 = ilha.render(() => (
   </ContextMenu>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <ContextMenu trigger={<div class="rounded-lg bg-areia-surface-muted p-6">Right click</div>}>
     <ContextMenu.Item value="cut" label="Cut" />
     <ContextMenu.Item value="paste" label="Paste" disabled />

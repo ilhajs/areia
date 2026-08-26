@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { action, effect, ilha, html, raw } from "ilha";
 import { Check, Copy } from "lucide";
 import { buttonVariants, type ButtonSize } from "$components/button";
 import { Icon } from "$components/icon";
@@ -236,9 +236,10 @@ function resolveClipboardRoot(host: Element): HTMLElement | null {
     : host.querySelector<HTMLElement>('[data-slot="clipboard-text"]');
 }
 
-export const ClipboardTextRoot = ilha
-  .input<ClipboardTextInput>()
-  .action("copy", async (_props: undefined, { input, host, signal }) => {
+export const ClipboardTextRoot = ilha((input: ClipboardTextInput) => {
+  let host: Element;
+
+  const copy = action(async (_props: undefined, { signal }: { signal: AbortSignal }) => {
     const root = resolveClipboardRoot(host);
     if (!root) return;
     const text = input.textToCopy ?? input.text;
@@ -255,19 +256,37 @@ export const ClipboardTextRoot = ilha
       if (signal.aborted) return;
       console.warn("Clipboard copy failed", error);
     }
-  })
-  .on("[data-slot='clipboard-text-button']@click", ({ action, input }) => {
-    if (input.onCopy == null) return;
-    action.copy();
-  })
-  .render(({ input }) => renderClipboardText(input));
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+  });
+
+  effect.once(({ signal }) => {
+    host.addEventListener(
+      "click",
+      (event) => {
+        const target = event.target as Element | null;
+        if (!target?.closest("[data-slot='clipboard-text-button']")) return;
+        if (input.onCopy == null) return;
+        copy();
+      },
+      { signal },
+    );
+  });
+
+  return renderClipboardText(input);
+});
 
 function ClipboardTextBase(input: ClipboardTextInput) {
   return renderClipboardText(input);
 }
 
-function ClipboardTextComponent(input: ClipboardTextInput) {
-  return input.onCopy ? ClipboardTextRoot(input) : renderClipboardText(input);
+function ClipboardTextComponent(input: ClipboardTextInput): ReturnType<typeof html> {
+  // SAFETY: both branches are accepted inside `html` templates; the island-call
+  // wrapper is only rejected nominally because ilha does not export IslandCall.
+  const call = input.onCopy ? ClipboardTextRoot(input) : renderClipboardText(input);
+  return call as unknown as ReturnType<typeof html>;
 }
 
 export const ClipboardText = Object.assign(ClipboardTextComponent, {

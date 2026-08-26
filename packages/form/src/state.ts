@@ -1,4 +1,4 @@
-import { computed, signal, untrack, type SignalAccessor } from "ilha";
+import { ilhaSignal, untrack, type SignalAccessor } from "ilha";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import type { FormStateResult } from "./types.ts";
 
@@ -26,27 +26,51 @@ function shallowEqual(a: Record<string, unknown>, b: Record<string, unknown>): b
   return true;
 }
 
+/**
+ * Derive default values by validating `{}` against the schema — fields with
+ * schema-level defaults (e.g. zod `.default()`) resolve here. Requires a
+ * synchronous schema; async validation cannot seed initial values.
+ */
+function deriveDefaults<T extends Record<string, unknown>>(
+  schema: StandardSchemaV1<unknown, T>,
+): T {
+  const result = schema["~standard"].validate({} as never);
+  if (result instanceof Promise) {
+    throw new Error(
+      "[@areia/form] Schema validation is async, so default values cannot be derived. " +
+        "Pass `defaultValues` explicitly or use a synchronous schema (e.g. zod with `.default()`).",
+    );
+  }
+  if (result.issues) {
+    throw new Error(
+      "[@areia/form] Could not derive default values from the schema — fields without " +
+        "schema defaults failed validation. Add `.default()` to each field or pass " +
+        "`defaultValues` explicitly. Issues: " +
+        result.issues.map((i) => i.message).join("; "),
+    );
+  }
+  return result.value as T;
+}
+
 export function createFormState<T extends Record<string, unknown>>(
   schema: StandardSchemaV1<unknown, T>,
-  defaultValues: T,
+  defaultValues?: T,
 ): FormStateResult<T> {
   // Deep-clone defaults so nested objects are never shared by reference.
-  const frozen = deepClone(defaultValues);
+  const frozen = deepClone(defaultValues ?? deriveDefaults(schema));
 
   // Built on ilha's own `signal`/`computed` (not raw alien-signals) so `values`
   // and every `field(path)` slice are real ilha signal accessors — usable
   // directly as `bind:value` / `bind:checked` targets in JSX.
-  const values = signal<T>(deepClone(frozen));
-  const errorsSignal = signal<Record<string, string>>({});
+  const values = ilhaSignal<T>(deepClone(frozen));
+  const errorsSignal = ilhaSignal<Record<string, string>>({});
 
-  // Dirty is computed by comparing current values to the frozen defaults.
-  // This works regardless of whether the write comes from `setValue()` or a
-  // direct `bind:value` write through a `field()` select accessor.
-  const isDirty = computed(
-    () => !shallowEqual(values() as Record<string, unknown>, frozen as Record<string, unknown>),
-  );
-
-  const isValid = computed(() => Object.keys(errorsSignal()).length === 0);
+  // Dirty/validity are derived on read from the signal accessors above — the
+  // effects that consult them already subscribe through their `values()` /
+  // `errors()` reads.
+  const isDirty = () =>
+    !shallowEqual(values() as Record<string, unknown>, frozen as Record<string, unknown>);
+  const isValid = () => Object.keys(errorsSignal()).length === 0;
 
   // Cache + untrack: `values.select()` reads `values()` while building the
   // accessor. Doing that inside Form render would remorph the whole form on
@@ -89,6 +113,7 @@ export function createFormState<T extends Record<string, unknown>>(
 
   return {
     values,
+    defaults: frozen,
     isDirty,
     isValid,
     errors: errorsSignal,

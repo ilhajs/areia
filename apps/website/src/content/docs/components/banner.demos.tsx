@@ -2,7 +2,7 @@ import { ilha } from "ilha";
 import { Banner, Button, Icon } from "areia";
 import { Info, TriangleAlert } from "lucide";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="flex w-full max-w-2xl flex-col gap-3">
     <Banner
       icon={<Icon icon={Info} class="size-5" />}
@@ -24,7 +24,7 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Banner
     icon={<Icon icon={Info} class="size-5" />}
     title="Update available"
@@ -32,7 +32,7 @@ export const Demo2 = ilha.render(() => (
   />
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Banner
     icon={<Icon icon={Info} class="size-5" />}
     title="Update available"
@@ -40,7 +40,7 @@ export const Demo3 = ilha.render(() => (
   />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Banner
     icon={<Icon icon={TriangleAlert} class="size-5" />}
     variant="alert"
@@ -49,7 +49,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Banner
     icon={<Icon icon={TriangleAlert} class="size-5" />}
     variant="error"
@@ -58,7 +58,7 @@ export const Demo5 = ilha.render(() => (
   />
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Banner
     icon={<Icon icon={TriangleAlert} class="size-5" />}
     variant="alert"
@@ -67,7 +67,7 @@ export const Demo6 = ilha.render(() => (
   />
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Banner
     icon={<Icon icon={Info} class="size-5" />}
     title="Update available"
@@ -80,7 +80,7 @@ export const Demo7 = ilha.render(() => (
   />
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <Banner
     icon={<Icon icon={TriangleAlert} class="size-5" />}
     variant="alert"
@@ -99,7 +99,7 @@ export const Demo8 = ilha.render(() => (
   />
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Banner
     icon={<Icon icon={Info} class="size-5" />}
     title="Custom content supported"

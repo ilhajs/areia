@@ -19,6 +19,8 @@ export interface UIOverride {
 export type UIOverrides = Record<string, UIOverride>;
 
 export interface FormStateResult<T extends Record<string, unknown>> {
+  /** Frozen initial values — passed explicitly or derived from schema defaults. */
+  defaults: T;
   values: () => T;
   /** Computed: `true` when any top-level key differs from the initial defaults. */
   isDirty: () => boolean;

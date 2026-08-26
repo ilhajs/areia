@@ -2,7 +2,7 @@ import { ilha } from "ilha";
 import { Bell } from "lucide";
 import { Button, Icon, Popover } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Popover
     trigger={<Button shape="square" icon={<Icon icon={Bell} />} aria-label="Notifications" />}
     content={
@@ -14,7 +14,7 @@ export const Demo1 = ilha.render(() => (
   />
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Popover>
     <Popover.Trigger>
       <Button>Open</Button>
@@ -26,7 +26,7 @@ export const Demo2 = ilha.render(() => (
   </Popover>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Popover
     trigger={<Button>Open Popover</Button>}
     content={
@@ -40,7 +40,7 @@ export const Demo3 = ilha.render(() => (
   />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Popover
     trigger={<Button>Open Settings</Button>}
     content={
@@ -57,7 +57,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="grid grid-cols-2 gap-3">
     <Popover
       side="bottom"
@@ -102,7 +102,7 @@ export const Demo5 = ilha.render(() => (
   </div>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <div class="flex items-center gap-3">
     <Popover align="start" trigger={<Button>Start</Button>} content="Start aligned" />
     <Popover align="center" trigger={<Button>Center</Button>} content="Center aligned" />
@@ -110,7 +110,7 @@ export const Demo6 = ilha.render(() => (
   </div>
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Popover
     trigger={<Button>User Profile</Button>}
     content={
@@ -135,11 +135,11 @@ export const Demo7 = ilha.render(() => (
   />
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <Popover arrow={false} trigger={<Button>Open</Button>} content="This popover has no arrow." />
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Popover
     closeOnClickOutside={false}
     trigger={<Button>Persistent</Button>}
@@ -155,7 +155,7 @@ export const Demo9 = ilha.render(() => (
   />
 ));
 
-export const Demo10 = ilha.render(() => (
+export const Demo10 = ilha(() => (
   <Popover
     trigger={<button>Open</button>}
     triggerAs="button"

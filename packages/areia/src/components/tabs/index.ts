@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { ilha, html, raw, action, state, effect } from "ilha";
 import { Tabs as TabsPrimitive } from "@areia/slots";
 import {
   boundElement,
@@ -544,12 +544,18 @@ function resolveTabsRoot(host: Element): HTMLElement | null {
   return root as HTMLElement | null;
 }
 
-export const TabsRoot = ilha
-  .input<TabsInput>()
-  .action("valueChange", (value: string, { host }) => {
+export const TabsRoot = ilha((input: TabsInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const valueChange = action((value: string) => {
     getBindBridge(host, "value")?.onUserChange(value);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = resolveTabsRoot(host);
     if (!root) return;
 
@@ -569,7 +575,7 @@ export const TabsRoot = ilha
     const controller = TabsPrimitive.createTabs(root, {
       defaultValue,
       activationMode: input.activationMode ?? (input.activateOnFocus ? "auto" : "manual"),
-      onValueChange: (value) => action.valueChange(value),
+      onValueChange: (value) => valueChange(value),
     });
     const cleanupOverflow = enhanceOverflow(root);
 
@@ -599,13 +605,18 @@ export const TabsRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    const root = resolveTabsRoot(host);
+  });
+
+  effect(() => {
+    const h = hostRef() ?? host;
+    if (!h) return;
+    const root = resolveTabsRoot(h);
     if (root) stampMorphPreserve(root, MORPH_CONTROLLER_STYLE);
-    getBindBridge(host, "value")?.applyFromSignal();
-  })
-  .render(({ input }) => renderTabs(input));
+    getBindBridge(h, "value")?.applyFromSignal();
+  });
+
+  return renderTabs(input);
+});
 
 export const Tabs = Object.assign(TabsRoot, {
   Root: TabsRoot,

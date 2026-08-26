@@ -50,8 +50,11 @@ describe("Progress", () => {
 
   it("stamps data-morph-preserve including style after mount", async () => {
     document.body.innerHTML = "";
-    const App = ilha.render(() => html`${Progress({ value: 42, min: 0, max: 100 })}`);
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    const App = ilha(() => html`${Progress({ value: 42, min: 0, max: 100 })}`);
+    document.body.innerHTML = await App.hydratable(
+      {},
+      { name: "App", snapshot: true, skipOnMount: false },
+    );
     const { unmount } = mount({ App }, { root: document.body, lazy: false });
     await Promise.resolve();
     try {

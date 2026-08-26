@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Badge, Table } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Table>
     <Table.Header>
       <Table.Row>
@@ -30,7 +30,7 @@ export const Demo1 = ilha.render(() => (
   </Table>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Table>
     <Table.Header>
       <Table.Row>
@@ -49,7 +49,7 @@ export const Demo2 = ilha.render(() => (
   </Table>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Table>
     <Table.Header variant="compact">
       <Table.Row>
@@ -78,7 +78,7 @@ export const Demo3 = ilha.render(() => (
   </Table>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Table layout="fixed">
     <colgroup>
       <col class="w-1/2" />
@@ -112,7 +112,7 @@ export const Demo4 = ilha.render(() => (
   </Table>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Table>
     <Table.Header>
       <Table.Row>

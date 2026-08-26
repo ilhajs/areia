@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { ilha, html, raw, action, state, effect } from "ilha";
 import { Switch as SwitchPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
@@ -323,7 +323,7 @@ export type SwitchItemInput = SwitchInput & {
   value?: string;
 };
 
-export function SwitchItem(input: SwitchItemInput = {}) {
+export function SwitchItem(input: SwitchItemInput = {}): ReturnType<typeof Switch> {
   return Switch(input);
 }
 
@@ -397,13 +397,19 @@ function resolveSwitchRoot(host: Element): HTMLElement | null {
   return root as HTMLElement | null;
 }
 
-export const SwitchRoot = ilha
-  .input<SwitchInput>()
-  .action("checkedChange", (checked: boolean, { host }) => {
+export const SwitchRoot = ilha((input: SwitchInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const checkedChange = action((checked: boolean) => {
     getBindBridge(host, "checked")?.onUserChange(checked);
     emitSwitchChange(resolveSwitchRoot(host) ?? host, checked);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = resolveSwitchRoot(host);
     if (!root) return;
 
@@ -423,7 +429,7 @@ export const SwitchRoot = ilha
       name: typeof input.name === "string" ? input.name : undefined,
       value: typeof input.value === "string" ? input.value : undefined,
       uncheckedValue: typeof input.uncheckedValue === "string" ? input.uncheckedValue : undefined,
-      onCheckedChange: (checked: boolean) => action.checkedChange(checked),
+      onCheckedChange: (checked: boolean) => checkedChange(checked),
     } satisfies SwitchPrimitive.SwitchOptions);
 
     createBindBridge(
@@ -436,11 +442,14 @@ export const SwitchRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "checked")?.applyFromSignal();
-  })
-  .render(({ input }) => renderSwitch(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "checked")?.applyFromSignal();
+  });
+
+  return renderSwitch(input);
+});
 
 export const Switch = Object.assign(SwitchRoot, {
   Root: SwitchRoot,

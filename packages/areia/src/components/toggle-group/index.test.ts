@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { ilha, html } from "ilha";
+import { ilha, html, state } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { ToggleGroup } from "./index";
 
@@ -27,16 +27,16 @@ describe("ToggleGroup", () => {
   });
 
   it("uses bind:group on the island", () => {
-    const Panel = ilha.state("v", "a").render(
-      ({ state }) =>
-        html`${ToggleGroup({
-          "bind:group": state.v,
-          children: [
-            ToggleGroup.Item({ value: "a", children: "A" }),
-            ToggleGroup.Item({ value: "b", children: "B" }),
-          ],
-        })}`,
-    );
+    const Panel = ilha(() => {
+      const v = state("a");
+      return html`${ToggleGroup({
+        "bind:group": v,
+        children: [
+          ToggleGroup.Item({ value: "a", children: "A" }),
+          ToggleGroup.Item({ value: "b", children: "B" }),
+        ],
+      })}`;
+    });
     const output = markup(Panel());
     expect(output).toContain("data-ilha-bind");
     expect(output).toContain("data-ilha-slot");

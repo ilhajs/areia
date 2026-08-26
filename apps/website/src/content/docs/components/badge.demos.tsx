@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Badge } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="flex flex-wrap items-center gap-2">
     <Badge variant="primary">Primary</Badge>
     <Badge variant="secondary">Secondary</Badge>
@@ -14,9 +14,9 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => <Badge>New</Badge>);
+export const Demo2 = ilha(() => <Badge>New</Badge>);
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <div class="flex flex-wrap items-center gap-2">
     <Badge variant="primary">Primary</Badge>
     <Badge variant="secondary">Secondary</Badge>
@@ -29,7 +29,7 @@ export const Demo3 = ilha.render(() => (
   </div>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <div class="flex flex-wrap items-center gap-2">
     <Badge variant="neutral">Neutral</Badge>
     <Badge variant="red">Red</Badge>
@@ -42,7 +42,7 @@ export const Demo4 = ilha.render(() => (
   </div>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <p class="flex items-center gap-2 text-areia-default">
     Ilha Islands
     <Badge variant="success">Stable</Badge>

@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Resizable } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Resizable direction="horizontal" class="h-64 max-w-md rounded-lg border border-areia-border">
     <Resizable.Panel defaultSize={50} minSize={10} collapsible>
       <div class="flex items-center justify-center p-4">
@@ -17,7 +17,7 @@ export const Demo1 = ilha.render(() => (
   </Resizable>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Resizable direction="horizontal" class="h-64 max-w-md rounded-lg border border-areia-border">
     <Resizable.Panel defaultSize={50}>
       <div class="flex items-center justify-center p-4">
@@ -33,7 +33,7 @@ export const Demo2 = ilha.render(() => (
   </Resizable>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Resizable direction="vertical" class="h-64 max-w-md rounded-lg border border-areia-border">
     <Resizable.Panel defaultSize={25}>
       <div class="flex items-center justify-center p-4">
@@ -49,7 +49,7 @@ export const Demo3 = ilha.render(() => (
   </Resizable>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Resizable direction="horizontal" class="h-64 max-w-md rounded-lg border border-areia-border">
     <Resizable.Panel defaultSize={25}>
       <div class="flex items-center justify-center p-4">
@@ -65,7 +65,7 @@ export const Demo4 = ilha.render(() => (
   </Resizable>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Resizable direction="horizontal" class="h-64 max-w-md rounded-lg border border-areia-border">
     <Resizable.Panel defaultSize={50}>
       <div class="flex items-center justify-center p-4">

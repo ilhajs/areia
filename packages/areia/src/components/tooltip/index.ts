@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { effect, ilha, html, raw } from "ilha";
 import { Tooltip as TooltipPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { hasSlot, normalizeStaticChildSlots, render, withSlot } from "$lib/markup";
@@ -338,9 +338,12 @@ function bindTooltipRoot(root: Element, options: TooltipPrimitive.TooltipOptions
   };
 }
 
-export const TooltipRoot = ilha
-  .input<TooltipInput>()
-  .onMount(({ host, input }) => {
+export const TooltipRoot = ilha((input: TooltipInput) => {
+  let host: Element;
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+
     const root = host.matches('[data-slot="tooltip"]')
       ? host
       : host.querySelector('[data-slot="tooltip"]');
@@ -359,10 +362,10 @@ export const TooltipRoot = ilha
       skipDelayDuration: input.skipDelayDuration,
       onPortalMounted: input.onPortalMounted,
     });
-  })
-  .render(({ input }) =>
-    renderTooltip(normalizeStaticChildSlots(input, ["content", "trigger", "children"])),
-  );
+  });
+
+  return renderTooltip(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
+});
 
 function TooltipBase(input: TooltipInput) {
   return renderTooltip(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));

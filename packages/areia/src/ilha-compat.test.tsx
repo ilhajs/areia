@@ -49,7 +49,7 @@ describe("Ilha 0.10 compatibility", () => {
       </Button>
     ));
 
-    const output = await App.hydratable({}, { name: "App", snapshot: true });
+    const output = await App.hydratable({}, { name: "App", snapshot: true, skipOnMount: false });
     expect(output).not.toContain("onclick=");
     expect(output).not.toContain("wasAborted");
 
@@ -67,7 +67,7 @@ describe("Ilha 0.10 compatibility", () => {
   });
 
   it("creates independent islands with callable shorthand", async () => {
-    const Badge = ilha<{ label: string }>(({ input }) => <span>{input.label}</span>);
+    const Badge = ilha<{ label: string }>(({ label }) => <span>{label}</span>);
     const App = ilha(() => (
       <div>
         <Badge key="first" label="First" />
@@ -75,7 +75,7 @@ describe("Ilha 0.10 compatibility", () => {
       </div>
     ));
 
-    const output = await App.hydratable({}, { name: "App", snapshot: true });
+    const output = await App.hydratable({}, { name: "App", snapshot: true, skipOnMount: false });
     expect(output).toContain('data-ilha-slot="k:first"');
     expect(output).toContain('data-ilha-slot="k:second"');
     expect(output).toContain("First");

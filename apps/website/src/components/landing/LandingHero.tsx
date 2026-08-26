@@ -37,7 +37,7 @@ const GitHubIcon = () => (
   </svg>
 );
 
-export const LandingHero = ilha.render(() => (
+export const LandingHero = ilha(() => (
   <section class="border-border border-b">
     <div class="mx-auto grid max-w-6xl items-start gap-10 px-5 py-16 sm:gap-14 sm:px-6 sm:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14 lg:px-8 lg:py-28">
       <div class="flex flex-col gap-6 sm:gap-7">

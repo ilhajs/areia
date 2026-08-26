@@ -1,4 +1,4 @@
-import { ilha, html, raw, untrack } from "ilha";
+import { ilha, html, untrack, raw, action, state, effect } from "ilha";
 import { Check } from "lucide";
 import { DropdownMenu as DropdownMenuPrimitive } from "@areia/slots";
 import {
@@ -443,12 +443,18 @@ function renderDropdown(input: DropdownInput = {}) {
   return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-export const DropdownRoot = ilha
-  .input<DropdownInput>()
-  .action("openChange", (open: boolean, { host }) => {
+export const DropdownRoot = ilha((input: DropdownInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const openChange = action((open: boolean) => {
     getBindBridge(host, "open")?.onUserChange(open);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = host.matches('[data-slot="dropdown-menu"]')
       ? host
       : host.querySelector('[data-slot="dropdown-menu"]');
@@ -461,7 +467,7 @@ export const DropdownRoot = ilha
       defaultOpen: openBindDefault(input, input.defaultOpen),
       defaultValue: input.defaultValue,
       defaultValues: input.defaultValues,
-      onOpenChange: (open) => action.openChange(open),
+      onOpenChange: (open) => openChange(open),
       onSelect: input.onSelect,
       onValueChange: input.onValueChange,
       onValuesChange: input.onValuesChange,
@@ -490,11 +496,14 @@ export const DropdownRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "open")?.applyFromSignal();
-  })
-  .render(({ input }) => renderDropdown(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "open")?.applyFromSignal();
+  });
+
+  return renderDropdown(input);
+});
 
 export const Dropdown = Object.assign(DropdownRoot, {
   Root: DropdownRoot,

@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { effect, ilha, html, raw } from "ilha";
 import { Slider as SliderPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
@@ -189,9 +189,12 @@ function renderSlider(input: SliderInput = {}) {
   </div>`;
 }
 
-export const SliderRoot = ilha
-  .input<SliderInput>()
-  .onMount(({ host, input }) => {
+export const SliderRoot = ilha((input: SliderInput) => {
+  let host: Element;
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+
     const root = host.matches('[data-slot="slider"]')
       ? host
       : host.querySelector('[data-slot="slider"]');
@@ -211,8 +214,10 @@ export const SliderRoot = ilha
     } satisfies SliderPrimitive.SliderOptions);
 
     return () => controller.destroy();
-  })
-  .render(({ input }) => renderSlider(input));
+  });
+
+  return renderSlider(input);
+});
 
 export const Slider = Object.assign(SliderRoot, {
   Root: SliderRoot,

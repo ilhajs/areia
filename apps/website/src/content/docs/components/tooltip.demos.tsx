@@ -2,19 +2,19 @@ import { ilha } from "ilha";
 import { Button, Icon, Tooltip } from "areia";
 import { Info, Languages, Plus, Settings } from "lucide";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Tooltip content="Create project">
     <Button shape="square" icon={<Icon icon={Plus} />} aria-label="Create project" />
   </Tooltip>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Tooltip content="Helpful contextual information">
     <Button>Hover me</Button>
   </Tooltip>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Tooltip content="This action cannot be undone.">
     <Button
       variant="secondary"
@@ -25,7 +25,7 @@ export const Demo3 = ilha.render(() => (
   </Tooltip>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Tooltip
     triggerAs="span"
     triggerClass="underline decoration-dotted underline-offset-4"
@@ -35,7 +35,7 @@ export const Demo4 = ilha.render(() => (
   </Tooltip>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="flex items-center gap-2">
     <Tooltip content="Create project">
       <Button shape="square" icon={<Icon icon={Plus} />} aria-label="Create project" />
@@ -49,7 +49,7 @@ export const Demo5 = ilha.render(() => (
   </div>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <div class="grid grid-cols-2 gap-3">
     <Tooltip side="top" content="Top tooltip">
       <Button>Top</Button>
@@ -66,7 +66,7 @@ export const Demo6 = ilha.render(() => (
   </div>
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <div class="flex items-center gap-3">
     <Tooltip align="start" content="Start aligned">
       <Button>Start</Button>
@@ -80,7 +80,7 @@ export const Demo7 = ilha.render(() => (
   </div>
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <div class="flex flex-wrap items-center gap-3">
     <Tooltip delay={1000} content="Opens after one second">
       <Button>1s delay</Button>
@@ -91,13 +91,13 @@ export const Demo8 = ilha.render(() => (
   </div>
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Tooltip arrow={false} content="No arrow">
     <Button>Hover me</Button>
   </Tooltip>
 ));
 
-export const Demo10 = ilha.render(() => (
+export const Demo10 = ilha(() => (
   <Tooltip
     content={
       <div class="flex max-w-48 flex-col gap-1">
@@ -110,7 +110,7 @@ export const Demo10 = ilha.render(() => (
   </Tooltip>
 ));
 
-export const Demo11 = ilha.render(() => (
+export const Demo11 = ilha(() => (
   <Tooltip.Static content="Static tooltip markup" triggerAs="span">
     Hover me
   </Tooltip.Static>

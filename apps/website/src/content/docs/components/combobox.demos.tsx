@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Button, Combobox } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Combobox
     id="fruit"
     label="Fruit"
@@ -16,7 +16,7 @@ export const Demo1 = ilha.render(() => (
   />
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Combobox
     id="ilha-topic"
     label="Ilha topic"
@@ -31,7 +31,7 @@ export const Demo2 = ilha.render(() => (
   />
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Combobox
     id="basic-fruit"
     label="Fruit"
@@ -46,7 +46,7 @@ export const Demo3 = ilha.render(() => (
   />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Combobox
     id="region"
     label="Region"
@@ -62,7 +62,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Combobox
     id="database-error"
     label="Database"
@@ -78,7 +78,7 @@ export const Demo5 = ilha.render(() => (
   />
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Combobox
     label="Fruit"
     placeholder="Search fruit..."
@@ -91,7 +91,7 @@ export const Demo6 = ilha.render(() => (
   />
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Combobox
     id="plans"
     label="Plan"
@@ -105,7 +105,7 @@ export const Demo7 = ilha.render(() => (
   />
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <Combobox
     id="default-database"
     label="Database"
@@ -119,7 +119,7 @@ export const Demo8 = ilha.render(() => (
   />
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Combobox
     id="multi-frameworks"
     label="Frameworks"
@@ -136,7 +136,7 @@ export const Demo9 = ilha.render(() => (
   />
 ));
 
-export const Demo10 = ilha.render(() => (
+export const Demo10 = ilha(() => (
   <form class="flex w-full max-w-sm flex-col gap-3">
     <Combobox
       id="form-fruit"
@@ -154,7 +154,7 @@ export const Demo10 = ilha.render(() => (
   </form>
 ));
 
-export const Demo11 = ilha.render(() => (
+export const Demo11 = ilha(() => (
   <Combobox id="custom-items" label="Runtime" placeholder="Search runtimes...">
     <Combobox.Item value="bun" label="Bun">
       <span class="font-medium">Bun</span>
@@ -171,7 +171,7 @@ export const Demo11 = ilha.render(() => (
   </Combobox>
 ));
 
-export const Demo12 = ilha.render(() => (
+export const Demo12 = ilha(() => (
   <Combobox id="grouped-location" label="Location" placeholder="Search locations...">
     <Combobox.Group>
       <Combobox.GroupLabel>North America</Combobox.GroupLabel>
@@ -186,7 +186,7 @@ export const Demo12 = ilha.render(() => (
   </Combobox>
 ));
 
-export const Demo13 = ilha.render(() => (
+export const Demo13 = ilha(() => (
   <Combobox
     id="quick-search"
     label="Quick search"
@@ -202,7 +202,7 @@ export const Demo13 = ilha.render(() => (
   />
 ));
 
-export const Demo14 = ilha.render(() => (
+export const Demo14 = ilha(() => (
   <Combobox
     id="autocomplete"
     label="Language"

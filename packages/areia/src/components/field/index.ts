@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { effect, ilha, html, raw } from "ilha";
 import { Field as FieldPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { render } from "$lib/markup";
@@ -181,9 +181,12 @@ function FieldBase(input: FieldInput = {}) {
   return renderField(input);
 }
 
-export const FieldRoot = ilha
-  .input<FieldInput>()
-  .onMount(({ host, input }) => {
+export const FieldRoot = ilha((input: FieldInput) => {
+  let host: Element;
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+
     const root = host.matches('[data-slot="field"]')
       ? host
       : host.querySelector('[data-slot="field"]');
@@ -196,8 +199,10 @@ export const FieldRoot = ilha
       validate: input.validate,
       validationMode: input.validationMode,
     });
-  })
-  .render(({ input }) => renderField(input));
+  });
+
+  return renderField(input);
+});
 
 export const Field = Object.assign(FieldRoot, {
   Root: FieldRoot,

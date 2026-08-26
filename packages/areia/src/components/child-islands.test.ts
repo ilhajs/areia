@@ -1,7 +1,7 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
 import { markupValue as markup } from "$lib/test-markup";
-import { ilha, html, mount } from "ilha";
+import { ilha, html, mount, state } from "ilha";
 import {
   Badge,
   Button,
@@ -45,10 +45,11 @@ function serializedTriggerMarkup() {
 }
 
 function counterIsland() {
-  return ilha
-    .state("count", 0)
-    .on("button@click", ({ state }) => state.count(state.count() + 1))
-    .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+  return ilha(() => {
+    const count = state(0);
+    const bump = () => count(count() + 1);
+    return html`<button type="button" onclick=${bump}>Count: ${count()}</button>`;
+  });
 }
 
 async function expectInteractiveChild(
@@ -58,9 +59,12 @@ async function expectInteractiveChild(
   document.body.innerHTML = "";
 
   const Counter = counterIsland();
-  const App = ilha.render(() => html`${make(Counter)}`);
+  const App = ilha(() => html`${make(Counter)}`);
 
-  document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+  document.body.innerHTML = await App.hydratable(
+    {},
+    { name: "App", snapshot: true, skipOnMount: false },
+  );
   const { unmount } = mount({ App, Counter }, { root: document.body, lazy: false });
 
   try {
@@ -277,7 +281,7 @@ describe("child Ilha islands", () => {
     it("opens Popover nested inside a parent Ilha island with a Button trigger", async () => {
       document.body.innerHTML = "";
 
-      const App = ilha.render(
+      const App = ilha(
         () =>
           html`${Popover({
             side: "bottom",
@@ -287,7 +291,7 @@ describe("child Ilha islands", () => {
           })}`,
       );
 
-      const ssr = await App.hydratable({}, { name: "App", snapshot: true });
+      const ssr = await App.hydratable({}, { name: "App", snapshot: true, skipOnMount: false });
       expect(ssr).toContain('data-slot="popover-trigger"');
       expect(ssr).toContain('data-slot="popover-content"');
 
@@ -319,7 +323,7 @@ describe("child Ilha islands", () => {
     it("opens Popover nested inside a child Ilha island within a parent layout island", async () => {
       document.body.innerHTML = "";
 
-      const MobileNav = ilha.render(
+      const MobileNav = ilha(
         () =>
           html`${Popover({
             side: "bottom",
@@ -337,14 +341,17 @@ describe("child Ilha islands", () => {
             </nav>`,
           })}`,
       );
-      const Layout = ilha.render(
+      const Layout = ilha(
         () => html`<div>
           <div data-ilha-slot="k:page">page content</div>
           <div class="fixed top-4 right-4 z-50 md:hidden">${MobileNav}</div>
         </div>`,
       );
 
-      document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
+      document.body.innerHTML = await Layout.hydratable(
+        {},
+        { name: "Layout", snapshot: true, skipOnMount: false },
+      );
       const { unmount } = mount({ Layout }, { root: document.body, lazy: false });
 
       try {

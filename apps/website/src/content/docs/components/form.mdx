@@ -34,11 +34,11 @@ import {
 
 ## Usage
 
-`Form` is a factory: call it with your schema, default values, and options. It returns an ilha island with the schema captured in its closure — so the schema is never serialized through `data-ilha-props`.
+Give every field a schema default (zod `.default()`) and call `Form` with just the schema — initial values come straight from the schema. Pass `{ defaultValues }` in options when you need explicit ones. The factory returns an ilha island with the schema captured in its closure, so the schema is never serialized through `data-ilha-props`.
 
 <Preview
   code={
-    'import { ilha } from "ilha";\nimport { z } from "zod";\nimport { Form } from "@areia/form";\n\nconst schema = z.object({\n  name: z.string(),\n  age: z.number().min(0).max(120),\n  theme: z.enum(["light", "dark", "system"]),\n  active: z.boolean()\n});\n\nconst MyForm = Form(\n  schema,\n  { name: "John", age: 30, theme: "system", active: true },\n  { onSubmit: (values) => console.log(values) }\n);\n\nexport default ilha.render(() => <MyForm />);'
+    'import { ilha } from "ilha";\nimport { z } from "zod";\nimport { Form } from "@areia/form";\n\nconst schema = z.object({\n  name: z.string().default("John"),\n  age: z.number().min(0).max(120).default(30),\n  theme: z.enum(["light", "dark", "system"]).default("system"),\n  active: z.boolean().default(true),\n});\n\nconst MyForm = Form(schema, {\n  onSubmit: (values) => console.log(values),\n});\n\nexport default ilha(() => <MyForm />);'
   }
   lang="tsx"
 >
@@ -57,18 +57,14 @@ import { Form } from "@areia/form";
 import { z } from "zod";
 
 const schema = z.object({
-  name: z.string(),
-  active: z.boolean(),
+  name: z.string().default(""),
+  active: z.boolean().default(true),
 });
 
-export const SettingsForm = Form(
-  schema,
-  { name: "", active: true },
-  {
-    onSubmit: (values) => console.log(values),
-    onChange: (values) => console.log("changed:", values),
-  },
-);
+export const SettingsForm = Form(schema, {
+  onSubmit: (values) => console.log(values),
+  onChange: (values) => console.log("changed:", values),
+});
 
 // Safe during SSR — no-ops where customElements is unavailable.
 SettingsForm.define("areia-settings-form");
@@ -184,50 +180,50 @@ renderForm({
 
 ## API Reference
 
-### Form(schema, defaultValues, options?)
+### Form(schema, options?)
 
-| Parameter       | Type                      | Description                                          |
-| --------------- | ------------------------- | ---------------------------------------------------- |
-| `schema`        | `StandardSchemaV1`        | The validation schema (Zod, Valibot, ArkType, etc.). |
-| `defaultValues` | `Record<string, unknown>` | Initial field values.                                |
-| `options`       | `FormOptions`             | Optional configuration.                              |
+| Parameter | Type               | Description                                          |
+| --------- | ------------------ | ---------------------------------------------------- |
+| `schema`  | `StandardSchemaV1` | The validation schema (Zod, Valibot, ArkType, etc.). |
+| `options` | `FormOptions`      | Optional configuration.                              |
 
 Returns an ilha island. Call [`.define(tagName)`](https://ilha.build/guide/island/define/) to expose it as a custom element.
 
 **FormOptions**
 
-| Option        | Type                                | Default    | Description                                         |
-| ------------- | ----------------------------------- | ---------- | --------------------------------------------------- |
-| `uiOverrides` | `UIOverrides`                       | -          | Manual overrides for field type, labels, options.   |
-| `onSubmit`    | `(values: T, event: Event) => void` | -          | Called when the form passes validation and submits. |
-| `onChange`    | `(values: T) => void`               | -          | Fired when values diverge from the defaults.        |
-| `submitLabel` | `string`                            | `"Submit"` | Text rendered on the submit button.                 |
-| `validateOn`  | `"change" \| "blur" \| "submit"`    | -          | When validation rules are checked.                  |
+| Option          | Type                                | Default     | Description                                              |
+| --------------- | ----------------------------------- | ----------- | -------------------------------------------------------- |
+| `defaultValues` | `Record<string, unknown>`           | from schema | Initial values. Omit to derive from schema `.default()`. |
+| `uiOverrides`   | `UIOverrides`                       | -           | Manual overrides for field type, labels, options.        |
+| `onSubmit`      | `(values: T, event: Event) => void` | -           | Called when the form passes validation and submits.      |
+| `onChange`      | `(values: T) => void`               | -           | Fired when values diverge from the defaults.             |
+| `submitLabel`   | `string`                            | `"Submit"`  | Text rendered on the submit button.                      |
+| `validateOn`    | `"change" \| "blur" \| "submit"`    | -           | When validation rules are checked.                       |
 
-### FloatingForm(schema, defaultValues, options?)
+### FloatingForm(schema, options?)
 
-| Parameter       | Type                      | Description             |
-| --------------- | ------------------------- | ----------------------- |
-| `schema`        | `StandardSchemaV1`        | The validation schema.  |
-| `defaultValues` | `Record<string, unknown>` | Initial values.         |
-| `options`       | `FloatingFormOptions`     | Optional configuration. |
+| Parameter | Type                  | Description             |
+| --------- | --------------------- | ----------------------- |
+| `schema`  | `StandardSchemaV1`    | The validation schema.  |
+| `options` | `FloatingFormOptions` | Optional configuration. |
 
 Also returns an ilha island — use `.define()` the same way as `Form`.
 
 **FloatingFormOptions**
 
-| Option        | Type                       | Default            | Description                         |
-| ------------- | -------------------------- | ------------------ | ----------------------------------- |
-| `uiOverrides` | `UIOverrides`              | -                  | Overrides.                          |
-| `title`       | `string`                   | `"Controls"`       | Title rendered in the drag handle.  |
-| `collapsed`   | `boolean`                  | `false`            | Whether the panel starts collapsed. |
-| `position`    | `{ x: number; y: number }` | `{ x: 20, y: 20 }` | Initial position.                   |
-| `width`       | `string \| number`         | `"320px"`          | Fixed width of the floating panel.  |
-| `onClose`     | `() => void`               | -                  | Shows a close button when set.      |
-| `onChange`    | `(values: T) => void`      | -                  | Called when values become dirty.    |
-| `onSubmit`    | `(values: T) => void`      | -                  | Called on form submit.              |
+| Option          | Type                       | Default            | Description                                              |
+| --------------- | -------------------------- | ------------------ | -------------------------------------------------------- |
+| `defaultValues` | `Record<string, unknown>`  | from schema        | Initial values. Omit to derive from schema `.default()`. |
+| `uiOverrides`   | `UIOverrides`              | -                  | Overrides.                                               |
+| `title`         | `string`                   | `"Controls"`       | Title rendered in the drag handle.                       |
+| `collapsed`     | `boolean`                  | `false`            | Whether the panel starts collapsed.                      |
+| `position`      | `{ x: number; y: number }` | `{ x: 20, y: 20 }` | Initial position.                                        |
+| `width`         | `string \| number`         | `"320px"`          | Fixed width of the floating panel.                       |
+| `onClose`       | `() => void`               | -                  | Shows a close button when set.                           |
+| `onChange`      | `(values: T) => void`      | -                  | Called when values become dirty.                         |
+| `onSubmit`      | `(values: T) => void`      | -                  | Called on form submit.                                   |
 
-### createFormState(schema, defaultValues)
+### createFormState(schema, defaultValues?)
 
 | Return     | Type                                     | Description                                              |
 | ---------- | ---------------------------------------- | -------------------------------------------------------- |

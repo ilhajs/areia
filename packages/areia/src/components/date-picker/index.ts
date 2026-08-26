@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { ilha, html, raw, action, state, effect } from "ilha";
 import {
   addMonths,
   eachDayOfInterval,
@@ -387,12 +387,18 @@ function syncRoot(root: HTMLElement, input: DatePickerInput) {
   }
 }
 
-export const DatePickerRoot = ilha
-  .input<DatePickerInput>()
-  .action("change", (selected: DatePickerSelected, { host }) => {
+export const DatePickerRoot = ilha((input: DatePickerInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const change = action((selected: DatePickerSelected) => {
     getBindBridge(host, "date")?.onUserChange(selected as Date | null);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = host.matches('[data-slot="date-picker"]')
       ? (host as HTMLElement)
       : host.querySelector<HTMLElement>('[data-slot="date-picker"]');
@@ -461,14 +467,14 @@ export const DatePickerRoot = ilha
 
       const mode = currentInput.mode ?? DATE_PICKER_DEFAULT_VARIANTS.mode;
       if (mode === "single" && input["bind:valueAsDate"]) {
-        action.change(date);
+        change(date);
         return;
       }
 
       const selected = nextSelected(currentInput.selected, date, currentInput);
       currentInput = { ...currentInput, selected };
       syncRoot(root, currentInput);
-      action.change(selected);
+      change(selected);
       emitChange(root, selected);
     };
 
@@ -478,11 +484,14 @@ export const DatePickerRoot = ilha
       root.removeEventListener("click", handleClick);
       disposeBindBridge(host);
     };
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "date")?.applyFromSignal();
-  })
-  .render(({ input }) => renderDatePicker(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "date")?.applyFromSignal();
+  });
+
+  return renderDatePicker(input);
+});
 
 function DatePickerBase(input: DatePickerInput = {}) {
   return renderDatePicker(input);

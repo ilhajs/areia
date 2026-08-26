@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { effect, ilha, html, raw } from "ilha";
 import { Resizable as ResizablePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { decodeMarkupEntities, render } from "$lib/markup";
@@ -359,11 +359,19 @@ function renderResizable(input: ResizableInput = {}) {
   </div>`;
 }
 
-export const ResizablePanelGroupRoot = ilha
-  .input<ResizableInput>()
-  .onMount(({ host, input }) => scheduleConnectResizableTree(host, input))
-  .effect(({ host, input }) => scheduleConnectResizableTree(host, input))
-  .render(({ input }) => renderResizable(input));
+export const ResizablePanelGroupRoot = ilha((input: ResizableInput) => {
+  let host: Element;
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    scheduleConnectResizableTree(host, input);
+  });
+  effect(() => {
+    scheduleConnectResizableTree(host, input);
+  });
+
+  return renderResizable(input);
+});
 
 function autoMountResizable(scope: ParentNode = document) {
   scheduleConnectResizableTree(scope);

@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { effect, ilha, html, raw } from "ilha";
 import { Progress as ProgressPrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
@@ -105,9 +105,12 @@ function renderProgress(input: ProgressInput = {}) {
   </div>`;
 }
 
-export const ProgressRoot = ilha
-  .input<ProgressInput>()
-  .onMount(({ host, input }) => {
+export const ProgressRoot = ilha((input: ProgressInput) => {
+  let host: Element;
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+
     const root = host.matches('[data-slot="progress"]')
       ? host
       : host.querySelector('[data-slot="progress"]');
@@ -122,8 +125,10 @@ export const ProgressRoot = ilha
     } satisfies ProgressPrimitive.ProgressOptions);
 
     return () => controller.destroy();
-  })
-  .render(({ input }) => renderProgress(input));
+  });
+
+  return renderProgress(input);
+});
 
 export const Progress = Object.assign(ProgressRoot, {
   Root: ProgressRoot,

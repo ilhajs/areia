@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Collapsible } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="w-full max-w-md">
     <Collapsible
       defaultOpen
@@ -11,18 +11,18 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Collapsible trigger="Show details" panel="Content revealed when the trigger is activated." />
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Collapsible
     trigger="What is Areia?"
     panel="Areia provides accessible primitives and styled components for application UIs."
   />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Collapsible
     defaultOpen
     trigger="Deployment details"
@@ -30,7 +30,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Collapsible>
     <Collapsible.Trigger class="rounded-md bg-areia-control-background px-3 py-2 text-sm font-medium ring ring-areia-control-border">
       Show release notes

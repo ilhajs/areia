@@ -2,7 +2,7 @@ import { ilha } from "ilha";
 import { CircleCheck, CircleX, Info, Plus, TriangleAlert } from "lucide";
 import { Button, Icon } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="flex flex-wrap items-center gap-3 text-areia-default">
     <Icon icon={Info} />
     <Icon icon={CircleCheck} class="text-areia-success" />
@@ -10,9 +10,9 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => <Icon icon={Info} />);
+export const Demo2 = ilha(() => <Icon icon={Info} />);
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <div class="flex items-center gap-3 text-areia-default">
     <Icon icon={Info} class="size-3" />
     <Icon icon={Info} />
@@ -21,7 +21,7 @@ export const Demo3 = ilha.render(() => (
   </div>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <div class="flex items-center gap-3">
     <Icon icon={Info} class="text-areia-info-soft-foreground" />
     <Icon icon={CircleCheck} class="text-areia-success-soft-foreground" />
@@ -30,7 +30,7 @@ export const Demo4 = ilha.render(() => (
   </div>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="flex items-center gap-3 text-areia-default">
     <Icon icon={Info} strokeWidth={1} />
     <Icon icon={Info} strokeWidth={1.75} />
@@ -38,14 +38,14 @@ export const Demo5 = ilha.render(() => (
   </div>
 ));
 
-export const Demo6 = ilha.render(() => <Icon icon={CircleCheck} label="Success" />);
+export const Demo6 = ilha(() => <Icon icon={CircleCheck} label="Success" />);
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Button variant="secondary" icon={<Icon icon={Plus} />}>
     Create item
   </Button>
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <Button variant="secondary" shape="square" icon={<Icon icon={Plus} />} aria-label="Create item" />
 ));

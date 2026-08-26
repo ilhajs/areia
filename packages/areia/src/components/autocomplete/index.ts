@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { ilha, html, raw, action, state, effect } from "ilha";
 import {
   boundVoidElement,
   createBindBridge,
@@ -65,7 +65,7 @@ export type AutocompleteItems =
   | AutocompleteItemDescriptor[]
   | Record<string, unknown | { label: unknown; disabled?: boolean }>;
 
-export type AutocompleteError = unknown | { message: unknown; match?: unknown };
+export type AutocompleteError = string | number | { message: unknown; match?: unknown };
 
 export type AutocompleteInput = Omit<HTMLElementProps<HTMLDivElement>, "className" | "children"> &
   AutocompleteVariantsProps &
@@ -111,9 +111,17 @@ export type AutocompleteInput = Omit<HTMLElementProps<HTMLDivElement>, "classNam
     inputClassName?: string;
   };
 
-function normalizeError(error: AutocompleteError): unknown {
-  if (error && typeof error === "object" && "message" in error) return error.message;
-  return error;
+/** Normalized error payload: a message string or an object carrying one. */
+type NormalizedAutocompleteError = string | { message: unknown; match?: unknown };
+
+function normalizeError(
+  error: AutocompleteError | undefined,
+): NormalizedAutocompleteError | undefined {
+  if (error == null) return undefined;
+  if (error && typeof error === "object" && "message" in error) {
+    return error as { message: unknown; match?: unknown };
+  }
+  return String(error);
 }
 
 function normalizeItems(items: AutocompleteItems | undefined): AutocompleteItemDescriptor[] {
@@ -473,15 +481,21 @@ function syncItems(root: Element, input: AutocompleteInput, query: string) {
   });
 }
 
-export const AutocompleteRoot = ilha
-  .input<AutocompleteInput>()
-  .action("openChange", (open: boolean, { host }) => {
+export const AutocompleteRoot = ilha((input: AutocompleteInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const openChange = action((open: boolean) => {
     getBindBridge(host, "open")?.onUserChange(open);
-  })
-  .action("valueChange", (value: string, { input }) => {
+  });
+  const valueChange = action((value: string) => {
     input.onValueChange?.(value);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = host.matches('[data-slot="autocomplete"]')
       ? host
       : host.querySelector('[data-slot="autocomplete"]');
@@ -494,6 +508,8 @@ export const AutocompleteRoot = ilha
 
     disposeBindBridge(host, "open");
 
+    host = __host;
+
     let notifyOpenChange: (open: boolean) => void = () => {};
     const openController = {
       get isOpen() {
@@ -502,7 +518,7 @@ export const AutocompleteRoot = ilha
       open: () => setOpen(root, true, notifyOpenChange),
       close: () => setOpen(root, false, notifyOpenChange),
     };
-    notifyOpenChange = action.openChange;
+    notifyOpenChange = openChange;
 
     createBindBridge(
       host,
@@ -524,7 +540,7 @@ export const AutocompleteRoot = ilha
     const handleInput = () => {
       const value = textInput.value;
       syncItems(root, input, value);
-      action.valueChange(value);
+      valueChange(value);
       root.dispatchEvent(
         new CustomEvent("autocomplete:value-change", { bubbles: true, detail: { value } }),
       );
@@ -544,7 +560,7 @@ export const AutocompleteRoot = ilha
       root
         .querySelectorAll<HTMLElement>('[data-slot="autocomplete-item"]')
         .forEach((element) => element.toggleAttribute("data-selected", element === item));
-      action.valueChange(value);
+      valueChange(value);
       root.dispatchEvent(
         new CustomEvent("autocomplete:value-change", { bubbles: true, detail: { value } }),
       );
@@ -595,11 +611,14 @@ export const AutocompleteRoot = ilha
       document.removeEventListener("pointerdown", handleDocumentPointerDown);
       disposeBindBridge(host);
     };
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "open")?.applyFromSignal();
-  })
-  .render(({ input }) => renderField(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "open")?.applyFromSignal();
+  });
+
+  return renderField(input);
+});
 
 function AutocompleteBase(children: unknown[]): ReturnType<typeof html>;
 function AutocompleteBase(input?: AutocompleteInput, children?: unknown[]): ReturnType<typeof html>;

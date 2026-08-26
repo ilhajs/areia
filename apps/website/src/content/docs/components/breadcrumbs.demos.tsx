@@ -2,7 +2,7 @@ import { ilha } from "ilha";
 import { Breadcrumbs, Icon } from "areia";
 import { Folder, House } from "lucide";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Breadcrumbs
     items={[
       {
@@ -20,7 +20,7 @@ export const Demo1 = ilha.render(() => (
   />
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Breadcrumbs
     items={[
       { href: "/", children: "Home" },
@@ -30,7 +30,7 @@ export const Demo2 = ilha.render(() => (
   />
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Breadcrumbs
     items={[
       { href: "/", children: "Home" },
@@ -40,7 +40,7 @@ export const Demo3 = ilha.render(() => (
   />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <div class="flex flex-col gap-8">
     <Breadcrumbs
       size="sm"
@@ -61,7 +61,7 @@ export const Demo4 = ilha.render(() => (
   </div>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Breadcrumbs
     items={[
       {
@@ -79,7 +79,7 @@ export const Demo5 = ilha.render(() => (
   />
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Breadcrumbs
     loading
     items={[
@@ -94,7 +94,7 @@ export const Demo6 = ilha.render(() => (
   />
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Breadcrumbs
     items={[
       { href: "/", children: "Home" },
@@ -105,7 +105,7 @@ export const Demo7 = ilha.render(() => (
   />
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <Breadcrumbs copyUrl="https://example.com/docs/current-page">
     <Breadcrumbs.Link href="/">Home</Breadcrumbs.Link>
     <Breadcrumbs.Separator />

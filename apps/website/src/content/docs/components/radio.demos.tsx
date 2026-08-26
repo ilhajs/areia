@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Badge, Radio } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Radio.Group legend="Notification preference" name="notification-basic" value="email">
     <Radio.Item label="Email" value="email" name="notification-basic" checked />
     <Radio.Item label="SMS" value="sms" name="notification-basic" />
@@ -9,14 +9,14 @@ export const Demo1 = ilha.render(() => (
   </Radio.Group>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Radio.Group legend="Contact method" name="contact" value="email">
     <Radio.Item label="Email" value="email" name="contact" checked />
     <Radio.Item label="Phone" value="phone" name="contact" />
   </Radio.Group>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Radio.Group legend="Account type" name="account-type" value="personal">
     <Radio.Item label="Personal" value="personal" name="account-type" checked />
     <Radio.Item label="Team" value="team" name="account-type" />
@@ -24,7 +24,7 @@ export const Demo3 = ilha.render(() => (
   </Radio.Group>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Radio.Group legend="Size" name="size" orientation="horizontal" value="md">
     <Radio.Item label="Small" value="sm" name="size" />
     <Radio.Item label="Medium" value="md" name="size" checked />
@@ -32,7 +32,7 @@ export const Demo4 = ilha.render(() => (
   </Radio.Group>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Radio.Group
     legend="Build mode"
     name="build-mode"
@@ -44,14 +44,14 @@ export const Demo5 = ilha.render(() => (
   </Radio.Group>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Radio.Group legend="Options" name="control-position" controlPosition="end" value="a">
     <Radio.Item label="Option A" value="a" name="control-position" checked controlPosition="end" />
     <Radio.Item label="Option B" value="b" name="control-position" controlPosition="end" />
   </Radio.Group>
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Radio.Group legend="Plan" name="plan-card" appearance="card" value="free">
     <Radio.Item
       label="Free"
@@ -78,7 +78,7 @@ export const Demo7 = ilha.render(() => (
   </Radio.Group>
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <Radio.Group
     legend="Plan"
     name="plan-card-start"
@@ -106,7 +106,7 @@ export const Demo8 = ilha.render(() => (
   </Radio.Group>
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Radio.Group legend="Plan" name="rich-plan" appearance="card" value="pro">
     <Radio.Item
       label={
@@ -136,7 +136,7 @@ export const Demo9 = ilha.render(() => (
   </Radio.Group>
 ));
 
-export const Demo10 = ilha.render(() => (
+export const Demo10 = ilha(() => (
   <Radio.Group
     legend="Plan"
     name="plan-horizontal"
@@ -150,14 +150,14 @@ export const Demo10 = ilha.render(() => (
   </Radio.Group>
 ));
 
-export const Demo11 = ilha.render(() => (
+export const Demo11 = ilha(() => (
   <Radio.Group legend="Payment method" name="payment" error="Please select a payment method.">
     <Radio.Item label="Card" value="card" name="payment" variant="error" />
     <Radio.Item label="Bank transfer" value="bank" name="payment" variant="error" />
   </Radio.Group>
 ));
 
-export const Demo12 = ilha.render(() => (
+export const Demo12 = ilha(() => (
   <div class="flex flex-col gap-6">
     <Radio.Group legend="Disabled group" name="disabled-group" disabled value="email">
       <Radio.Item label="Email" value="email" name="disabled-group" checked disabled />
@@ -170,7 +170,7 @@ export const Demo12 = ilha.render(() => (
   </div>
 ));
 
-export const Demo13 = ilha.render(() => (
+export const Demo13 = ilha(() => (
   <div class="flex flex-col gap-3">
     <p class="text-base font-medium text-areia-default">Paths</p>
     <Radio.Group>
@@ -181,7 +181,7 @@ export const Demo13 = ilha.render(() => (
   </div>
 ));
 
-export const Demo14 = ilha.render(() => (
+export const Demo14 = ilha(() => (
   <Radio.Group>
     <Radio.Legend
       label="Notification preference"

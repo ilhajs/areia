@@ -191,8 +191,11 @@ describe("Dropdown.Shortcut", () => {
 
 describe("Dropdown behavior (island mount)", () => {
   async function mountDropdown(input: Parameters<typeof Dropdown>[0]) {
-    const Panel = ilha.render(() => html`${Dropdown(input)}`);
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    const Panel = ilha(() => html`${Dropdown(input)}`);
+    document.body.innerHTML = await Panel.hydratable(
+      {},
+      { name: "Panel", snapshot: true, skipOnMount: false },
+    );
     mount({ Panel }, { root: document.body, lazy: false });
     await settle();
   }

@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { ilha, html, raw, action, state, effect } from "ilha";
 import { ChevronDown } from "lucide";
 import { Accordion as AccordionPrimitive, Collapsible as CollapsiblePrimitive } from "@areia/slots";
 import {
@@ -393,12 +393,18 @@ function renderCollapsible(input: CollapsibleInput = {}) {
   });
 }
 
-export const CollapsibleRootIsland = ilha
-  .input<CollapsibleInput>()
-  .action("openChange", (open: boolean, { host }) => {
+export const CollapsibleRootIsland = ilha((input: CollapsibleInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const openChange = action((open: boolean) => {
     getBindBridge(host, "open")?.onUserChange(open);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const accordionRoot = host.matches('[data-slot="accordion"]')
       ? host
       : host.querySelector('[data-slot="accordion"]');
@@ -429,7 +435,7 @@ export const CollapsibleRootIsland = ilha
     const controller = CollapsiblePrimitive.createCollapsible(root, {
       defaultOpen: openBindDefault(input, input.defaultOpen ?? input.open),
       hiddenUntilFound: input.hiddenUntilFound,
-      onOpenChange: (open) => action.openChange(open),
+      onOpenChange: (open) => openChange(open),
     } satisfies CollapsiblePrimitive.CollapsibleOptions);
 
     createBindBridge(
@@ -442,11 +448,14 @@ export const CollapsibleRootIsland = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "open")?.applyFromSignal();
-  })
-  .render(({ input }) => renderCollapsible(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "open")?.applyFromSignal();
+  });
+
+  return renderCollapsible(input);
+});
 
 export const Collapsible = Object.assign(CollapsibleRootIsland, {
   Root: CollapsibleRootIsland,

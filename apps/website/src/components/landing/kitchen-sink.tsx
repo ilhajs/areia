@@ -33,7 +33,7 @@ import {
   Toggle,
   Tooltip,
 } from "areia";
-import { ilha } from "ilha";
+import { action, ilha } from "ilha";
 import { ArrowUpRight, Bold, CircleCheck, Info, Italic, Plus, Settings, Underline } from "lucide";
 import type { JSX } from "ilha/jsx-runtime";
 
@@ -87,16 +87,17 @@ export function SinkCard(props: {
   );
 }
 
-const ToastDemo = ilha
-  .action("show", async () => {
+const ToastDemo = ilha(() => {
+  const show = action(async () => {
     const { toast } = await import("areia/sonner");
     toast.success("Saved", { description: "Kitchen sink toast demo." });
-  })
-  .render(({ action }) => (
-    <Button variant="secondary" type="button" onclick={action.show}>
+  });
+  return (
+    <Button variant="secondary" type="button" onclick={show}>
       Show toast
     </Button>
-  ));
+  );
+});
 
 /** Interactive demos for every documented Areia component (except getting-started). */
 export function KitchenSinkGrid(): JSX.Element {

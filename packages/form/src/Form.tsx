@@ -1,4 +1,4 @@
-import { ilha, untrack } from "ilha";
+import { effect, ilha, untrack } from "ilha";
 import { resolveFieldType, humanize } from "./infer.ts";
 import { createFormState } from "./state.ts";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
@@ -12,7 +12,8 @@ import { Button } from "areia";
 
 export type FormProps<T extends Record<string, unknown>> = Record<string, unknown> & {
   schema: StandardSchemaV1<unknown, T>;
-  defaultValues: T;
+  /** Initial values. Omit to derive them from schema defaults (`.default()`). */
+  defaultValues?: T;
   uiOverrides?: UIOverrides;
   state?: FormStateResult<T>;
   onChange?: (values: T) => void;
@@ -69,7 +70,7 @@ export function renderForm(input: FormProps<any>) {
 
   return (
     <form class="space-y-4">
-      {Object.entries(input.defaultValues).map(([key, value]) => {
+      {Object.entries(input.defaultValues ?? state.defaults).map(([key, value]) => {
         return renderField(key, value, (input.schema as any)?.shape?.[key]);
       })}
       <Button type="submit">{input.submitLabel || "Submit"}</Button>
@@ -92,8 +93,9 @@ export function renderForm(input: FormProps<any>) {
  */
 export function createFormIsland<T extends Record<string, unknown>>(
   schema: StandardSchemaV1<unknown, T>,
-  defaultValues: T,
   options: {
+    /** Initial values. Omit to derive them from schema defaults (`.default()`). */
+    defaultValues?: T;
     uiOverrides?: UIOverrides;
     submitLabel?: string;
     validateOn?: "submit" | "change" | "blur";
@@ -102,26 +104,41 @@ export function createFormIsland<T extends Record<string, unknown>>(
   } = {},
 ) {
   // The schema lives here in closure — never touches props serialization.
-  const formState = createFormState(schema, defaultValues);
+  const formState = createFormState(schema, options.defaultValues);
 
-  return ilha
-    .input<Record<string, unknown>>()
-    .effect(() => {
+  return ilha(() => {
+    effect(() => {
       const values = formState.values();
       if (!formState.isDirty()) return;
       options.onChange?.(values);
       if (options.validateOn === "change") void formState.validate();
-    })
-    .on("input,select,textarea@blur:capture", () => {
-      if (options.validateOn === "blur") void formState.validate();
-    })
-    .on("form@submit", async ({ event }) => {
-      event.preventDefault();
-      if (await formState.validate()) {
-        options.onSubmit?.(formState.values(), event);
-      }
-    })
-    .render(() => {
+    });
+
+    effect.once(({ host, signal }: { host: Element; signal: AbortSignal }) => {
+      host.addEventListener(
+        "blur",
+        (event) => {
+          const target = event.target as Element | null;
+          if (!target?.matches("input,select,textarea")) return;
+          if (options.validateOn === "blur") void formState.validate();
+        },
+        { capture: true, signal },
+      );
+      host.addEventListener(
+        "submit",
+        async (event) => {
+          const target = event.target as Element | null;
+          if (target?.tagName !== "FORM") return;
+          event.preventDefault();
+          if (await formState.validate()) {
+            options.onSubmit?.(formState.values(), event);
+          }
+        },
+        { signal },
+      );
+    });
+
+    return (() => {
       // Remorph only when validation errors change. Nested Combobox islands portal
       // their lists — remorphing on every `values()` write recreates items in the
       // empty host slot and duplicates them after restore.
@@ -129,13 +146,14 @@ export function createFormIsland<T extends Record<string, unknown>>(
       return untrack(() =>
         renderForm({
           schema,
-          defaultValues,
+          defaultValues: options.defaultValues,
           uiOverrides: options.uiOverrides,
           state: formState,
           submitLabel: options.submitLabel,
         }),
       );
-    });
+    })();
+  });
 }
 
 /**

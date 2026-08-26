@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Field, Input, Textarea } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="w-full max-w-sm">
     <Field label="Email" description="Use your work email.">
       <Input data-slot="field-control" type="email" name="email" placeholder="you@example.com" />
@@ -9,7 +9,7 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <div class="w-full max-w-sm">
     <Field label="Username" description="This will be visible on your profile.">
       <Input data-slot="field-control" name="username" placeholder="ryuz" />
@@ -17,7 +17,7 @@ export const Demo2 = ilha.render(() => (
   </div>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <div class="w-full max-w-sm">
     <Field label="Project name" error="Project name is required.">
       <Input data-slot="field-control" name="project" required placeholder="My app" />
@@ -25,7 +25,7 @@ export const Demo3 = ilha.render(() => (
   </div>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <div class="w-full max-w-sm">
     <Field label="Workspace slug" invalid error="This slug is already taken.">
       <Input data-slot="field-control" name="slug" value="areia" />
@@ -33,7 +33,7 @@ export const Demo4 = ilha.render(() => (
   </div>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="w-full max-w-sm">
     <Field>
       <Field.Label label="Description" />

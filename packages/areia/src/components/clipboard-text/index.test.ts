@@ -33,7 +33,7 @@ describe("ClipboardText", () => {
       configurable: true,
     });
 
-    const panel = ilha.render(
+    const panel = ilha(
       () =>
         html`${ClipboardText({
           text: "secret",
@@ -65,9 +65,7 @@ describe("ClipboardText", () => {
       configurable: true,
     });
 
-    const panel = ilha.render(
-      () => html`${ClipboardText({ text: "secret", onCopy: () => copies++ })}`,
-    );
+    const panel = ilha(() => html`${ClipboardText({ text: "secret", onCopy: () => copies++ })}`);
 
     const mountResult = await mountSsr({ Panel: panel }, "Panel");
     await frame();

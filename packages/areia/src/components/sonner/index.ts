@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { effect, ilha, html, raw } from "ilha";
 import { toast as sonnerToast } from "sonner";
 import { cn } from "$lib/cn";
 import { toAttrs } from "$lib/input";
@@ -717,16 +717,21 @@ if (typeof document !== "undefined") {
   }
 }
 
-export const ToasterRoot = ilha
-  .input<ToasterInput>()
-  .onMount(({ host, input }) => {
+export const ToasterRoot = ilha((input: ToasterInput) => {
+  let host: Element;
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+
     const root = host.matches("[data-areia-sonner-toaster]")
       ? (host as HTMLElement)
       : host.querySelector<HTMLElement>("[data-areia-sonner-toaster]");
     if (!root) return;
     return acquireDocumentRuntime(root.ownerDocument).registerOwner(root, input);
-  })
-  .render(({ input }) => renderToaster(input));
+  });
+
+  return renderToaster(input);
+});
 
 export function ToasterStatic(input: ToasterInput = {}) {
   return renderToaster(input);

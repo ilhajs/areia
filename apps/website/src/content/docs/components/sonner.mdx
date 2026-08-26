@@ -63,7 +63,7 @@ toast.message("Invite sent", {
 
 <Preview
   code={
-    '// @ts-nocheck\n// ---cut---\nimport { ilha } from "ilha";\nimport { Button } from "areia";\nimport { Toaster, toast } from "areia/sonner";\n\nexport default ilha\n  .action("save", () => {\n    toast.success("Project saved", {\n      description: "Your changes are now live.",\n    });\n  })\n  .render(({ action }) => (\n    <div class="flex flex-col gap-4">\n      <Button variant="primary" onclick={action.save}>Save project</Button>\n      <Toaster\n        position="bottom-right"\n        closeButton\n        richColors\n        theme="system"\n      />\n    </div>\n  ));'
+    '// @ts-nocheck\n// ---cut---\nimport { action, ilha } from "ilha";\nimport { Button } from "areia";\nimport { Toaster, toast } from "areia/sonner";\n\nexport default ilha(() => {\n  const save = action(() => {\n    toast.success("Project saved", {\n      description: "Your changes are now live.",\n    });\n  });\n  return (\n    <div class="flex flex-col gap-4">\n      <Button variant="primary" onclick={save}>Save project</Button>\n      <Toaster\n        position="bottom-right"\n        closeButton\n        richColors\n        theme="system"\n      />\n    </div>\n  );\n});'
   }
   lang="tsx"
   size="sm"

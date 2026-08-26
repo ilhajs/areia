@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { ilha, html, raw, action, state, effect } from "ilha";
 import { Checkbox as CheckboxPrimitive } from "@areia/slots";
 import {
   boundVoidElement,
@@ -261,7 +261,7 @@ export type CheckboxItemInput = CheckboxInput & {
 };
 
 /** Individual checkbox item intended for use inside a checkbox group. */
-export function CheckboxItem(input: CheckboxItemInput = {}) {
+export function CheckboxItem(input: CheckboxItemInput = {}): ReturnType<typeof Checkbox> {
   return Checkbox(input);
 }
 
@@ -304,17 +304,15 @@ export type CheckboxGroupInput = Omit<
     className?: string;
   };
 
-type CheckboxGroupChild = unknown;
-
 /** Fieldset wrapper for related checkbox controls. */
-export function CheckboxGroup(children: CheckboxGroupChild[]): ReturnType<typeof html>;
+export function CheckboxGroup(children: unknown[]): ReturnType<typeof html>;
 export function CheckboxGroup(
   input?: CheckboxGroupInput,
-  children?: CheckboxGroupChild[],
+  children?: unknown[],
 ): ReturnType<typeof html>;
 export function CheckboxGroup(
-  inputOrChildren: CheckboxGroupInput | CheckboxGroupChild[] = {},
-  children?: CheckboxGroupChild[],
+  inputOrChildren: CheckboxGroupInput | unknown[] = {},
+  children?: unknown[],
 ) {
   const input = Array.isArray(inputOrChildren) ? {} : inputOrChildren;
   const {
@@ -342,12 +340,18 @@ export function CheckboxGroup(
   </fieldset>`;
 }
 
-export const CheckboxRoot = ilha
-  .input<CheckboxInput>()
-  .action("checkedChange", (checked: boolean, { host }) => {
+export const CheckboxRoot = ilha((input: CheckboxInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const checkedChange = action((checked: boolean) => {
     getBindBridge(host, "checked")?.onUserChange(checked);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = resolveCheckboxRoot(host);
     if (!root) return;
 
@@ -365,7 +369,7 @@ export const CheckboxRoot = ilha
       required: typeof input.required === "boolean" ? input.required : undefined,
       name: typeof input.name === "string" ? input.name : undefined,
       value: itemValue,
-      onCheckedChange: (checked) => action.checkedChange(checked),
+      onCheckedChange: (checked) => checkedChange(checked),
     } satisfies CheckboxPrimitive.CheckboxOptions);
 
     createBindBridge(
@@ -379,11 +383,14 @@ export const CheckboxRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "checked")?.applyFromSignal();
-  })
-  .render(({ input }) => renderCheckbox(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "checked")?.applyFromSignal();
+  });
+
+  return renderCheckbox(input);
+});
 
 function resolveCheckboxRoot(host: Element): HTMLElement | null {
   const root = host.matches('[data-slot="checkbox"]')

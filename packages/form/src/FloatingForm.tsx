@@ -1,14 +1,14 @@
-import { ilha, untrack } from "ilha";
+import { effect, ilha, untrack } from "ilha";
 import { setupDrag } from "./drag.ts";
 import { renderForm } from "./Form.tsx";
 import { createFormState } from "./state.ts";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import type { UIOverrides } from "./types.ts";
-import { Collapsible } from "areia";
 
 export type FloatingFormProps<T extends Record<string, unknown>> = Record<string, unknown> & {
   schema: StandardSchemaV1<unknown, T>;
-  defaultValues: T;
+  /** Initial values. Omit to derive them from schema defaults (`.default()`). */
+  defaultValues?: T;
   uiOverrides?: UIOverrides;
   title?: string;
   position?: { x: number; y: number };
@@ -34,6 +34,8 @@ export type FloatingFormProps<T extends Record<string, unknown>> = Record<string
  * ```
  */
 export interface FloatingFormOptions<T extends Record<string, unknown>> {
+  /** Initial values. Omit to derive them from schema defaults (`.default()`). */
+  defaultValues?: T;
   uiOverrides?: UIOverrides;
   title?: string;
   position?: { x: number; y: number };
@@ -46,41 +48,57 @@ export interface FloatingFormOptions<T extends Record<string, unknown>> {
 
 export function createFloatingFormIsland<T extends Record<string, unknown>>(
   schema: StandardSchemaV1<unknown, T>,
-  defaultValues: T,
   options: FloatingFormOptions<T> = {},
 ) {
   // Schema and state live in closure — never serialized through props.
-  const formState = createFormState(schema, defaultValues);
+  const formState = createFormState(schema, options.defaultValues);
   const title = options.title || "Controls";
   const width = typeof options.width === "number" ? `${options.width}px` : options.width || "320px";
 
-  return ilha
-    .input<Record<string, unknown>>()
-    .onMount(({ host }) => {
-      const header = host.querySelector('[data-slot="floating-form-header"]') as HTMLElement;
+  return ilha(() => {
+    effect.once(({ host, signal }: { host: Element; signal: AbortSignal }) => {
+      const headerEl = host.querySelector(
+        '[data-slot="floating-form-header"]',
+      ) as HTMLElement | null;
       let cleanupDrag: (() => void) | undefined;
 
-      if (header) {
-        cleanupDrag = setupDrag(header, host as HTMLElement, options.position);
+      if (headerEl) {
+        cleanupDrag = setupDrag(headerEl, host as HTMLElement, options.position);
       }
+
+      host.addEventListener(
+        "submit",
+        async (event) => {
+          const target = event.target as Element | null;
+          if (target?.tagName !== "FORM") return;
+          event.preventDefault();
+          if (await formState.validate()) {
+            options.onSubmit?.(formState.values());
+          }
+        },
+        { signal },
+      );
+      host.addEventListener(
+        "click",
+        (event) => {
+          const target = event.target as Element | null;
+          if (target?.closest("[data-action=close]")) options.onClose?.();
+        },
+        { signal },
+      );
 
       return () => {
         cleanupDrag?.();
       };
-    })
-    .effect(() => {
+    });
+
+    effect(() => {
       const values = formState.values();
       if (!formState.isDirty()) return;
       options.onChange?.(values);
-    })
-    .on("form@submit", async ({ event }) => {
-      event.preventDefault();
-      if (await formState.validate()) {
-        options.onSubmit?.(formState.values());
-      }
-    })
-    .on("[data-action=close]@click", () => options.onClose?.())
-    .render(() => {
+    });
+
+    return (() => {
       // Same discipline as Form: remorph on validation errors only. Nested Combobox
       // islands portal their lists — remorphing on every values() write duplicates them.
       formState.errors();
@@ -105,22 +123,34 @@ export function createFloatingFormIsland<T extends Record<string, unknown>>(
             )}
           </div>
 
-          <div class="max-h-[calc(100vh-100px)] overflow-y-auto p-4">
-            <Collapsible.Root defaultOpen={!options.collapsed}>
-              <Collapsible.DefaultTrigger label="Settings" />
-              <Collapsible.DefaultPanel>
-                {renderForm({
-                  schema,
-                  defaultValues,
-                  uiOverrides: options.uiOverrides,
-                  state: formState,
-                })}
-              </Collapsible.DefaultPanel>
-            </Collapsible.Root>
-          </div>
+          <details class="group" open={!options.collapsed}>
+            <summary class="flex w-full cursor-pointer items-center justify-between px-4 py-2 text-left text-sm font-medium text-areia-default select-none hover:text-areia-strong [&::-webkit-details-marker]:hidden">
+              Settings
+              <svg
+                aria-hidden="true"
+                class="size-3 transition-transform group-open:rotate-180"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </summary>
+            <div class="max-h-[calc(100vh-100px)] overflow-y-auto px-4 pb-4">
+              {renderForm({
+                schema,
+                uiOverrides: options.uiOverrides,
+                state: formState,
+              })}
+            </div>
+          </details>
         </div>
       ));
-    });
+    })();
+  });
 }
 
 /**

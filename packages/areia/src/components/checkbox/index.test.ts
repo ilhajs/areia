@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import { ilha, html } from "ilha";
+import { ilha, html, state } from "ilha";
 import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Checkbox, checkboxVariants } from "./index";
 
@@ -33,9 +33,10 @@ describe("Checkbox", () => {
   });
 
   it("uses bind:checked on the island", () => {
-    const Panel = ilha
-      .state("ok", false)
-      .render(({ state }) => html`${Checkbox({ label: "OK", "bind:checked": state.ok })}`);
+    const Panel = ilha(() => {
+      const ok = state(false);
+      return html`${Checkbox({ label: "OK", "bind:checked": ok })}`;
+    });
     const output = markup(Panel());
     expect(output).toContain("data-ilha-bind");
     expect(output).toContain("data-ilha-slot");
@@ -106,15 +107,17 @@ describe("Checkbox", () => {
     it("updates child island signal when nested under parent page", async () => {
       let readOk!: () => boolean;
 
-      const Child = ilha.state("ok", false).render(({ state }) => {
-        readOk = state.ok as () => boolean;
+      const Child = ilha(() => {
+        const ok = state(false);
+
+        readOk = ok as () => boolean;
         return html`
-          ${Checkbox({ label: "OK", "bind:checked": state.ok })}
-          <span data-testid="flag">${state.ok()}</span>
+          ${Checkbox({ label: "OK", "bind:checked": ok })}
+          <span data-testid="flag">${ok()}</span>
         `;
       });
 
-      const Page = ilha.render(() => html`<div>${Child()}</div>`);
+      const Page = ilha(() => html`<div>${Child()}</div>`);
 
       await mountSsr({ Page, Child }, "Page");
       await new Promise<void>((r) => requestAnimationFrame(() => r()));
@@ -143,11 +146,13 @@ describe("Checkbox", () => {
 
       let setOk!: (v: boolean) => void;
 
-      const Panel = ilha.state("ok", false).render(({ state }) => {
-        setOk = (v: boolean) => state.ok(v);
+      const Panel = ilha(() => {
+        const ok = state(false);
+
+        setOk = (v: boolean) => ok(v);
         return html`
-          ${Checkbox({ label: "OK", "bind:checked": state.ok })}
-          <span data-testid="flag">${state.ok()}</span>
+          ${Checkbox({ label: "OK", "bind:checked": ok })}
+          <span data-testid="flag">${ok()}</span>
         `;
       });
 
@@ -195,7 +200,7 @@ describe("Checkbox interactions (onCheckedChange + bind)", () => {
   const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
   const tick = () => new Promise<void>((r) => queueMicrotask(() => r()));
 
-  async function mountPanel(panel: ReturnType<typeof ilha.render>) {
+  async function mountPanel(panel: ReturnType<typeof ilha>) {
     const mountResult = await mountSsr({ Panel: panel }, "Panel");
     await frame();
     await tick();
@@ -205,7 +210,7 @@ describe("Checkbox interactions (onCheckedChange + bind)", () => {
 
   it("emits onCheckedChange exactly once per click", async () => {
     const calls: boolean[] = [];
-    const panel = ilha.render(
+    const panel = ilha(
       () => html`${Checkbox({ label: "Accept", onCheckedChange: (c) => calls.push(c) })}`,
     );
     await mountPanel(panel);
@@ -230,14 +235,14 @@ describe("Checkbox interactions (onCheckedChange + bind)", () => {
 
   it("updates bind:checked once and calls onCheckedChange once per click", async () => {
     const calls: boolean[] = [];
-    const panel = ilha.state("ok", false).render(
-      ({ state }) =>
-        html`${Checkbox({
-            label: "OK",
-            "bind:checked": state.ok,
-            onCheckedChange: (c) => calls.push(c),
-          })} <span data-testid="flag">${state.ok() ? "on" : "off"}</span>`,
-    );
+    const panel = ilha(() => {
+      const ok = state(false);
+      return html`${Checkbox({
+          label: "OK",
+          "bind:checked": ok,
+          onCheckedChange: (c) => calls.push(c),
+        })} <span data-testid="flag">${ok() ? "on" : "off"}</span>`;
+    });
 
     await mountPanel(panel as never);
     const flag = () => document.querySelector("[data-testid=flag]")?.textContent ?? "";
@@ -256,7 +261,7 @@ describe("Checkbox interactions (onCheckedChange + bind)", () => {
 
   it("fires onCheckedChange once on keyboard space activation", async () => {
     const calls: boolean[] = [];
-    const panel = ilha.render(
+    const panel = ilha(
       () => html`${Checkbox({ label: "OK", onCheckedChange: (c) => calls.push(c) })}`,
     );
     await mountPanel(panel);
@@ -271,7 +276,7 @@ describe("Checkbox interactions (onCheckedChange + bind)", () => {
   it("keeps multiple instances' callbacks independent", async () => {
     const callsA: boolean[] = [];
     const callsB: boolean[] = [];
-    const panel = ilha.render(
+    const panel = ilha(
       () =>
         html`${Checkbox({ label: "A", onCheckedChange: (c) => callsA.push(c) })}
         ${Checkbox({ label: "B", onCheckedChange: (c) => callsB.push(c) })}`,
@@ -293,7 +298,7 @@ describe("Checkbox interactions (onCheckedChange + bind)", () => {
 
   it("stops emitting onCheckedChange after unmount", async () => {
     const calls: boolean[] = [];
-    const panel = ilha.render(
+    const panel = ilha(
       () => html`${Checkbox({ label: "OK", onCheckedChange: (c) => calls.push(c) })}`,
     );
     const mountResult = await mountPanel(panel);

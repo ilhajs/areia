@@ -26,24 +26,24 @@ const mockSchema = {
 
 describe("Form select combobox", () => {
   it("filters after clear → pick → clear without remorphing duplicates", async () => {
-    const BasicForm = Form(
-      mockSchema as any,
-      { name: "John", theme: "system", active: true },
-      {
-        uiOverrides: {
-          theme: {
-            type: "select",
-            options: [
-              { value: "light", label: "light" },
-              { value: "dark", label: "dark" },
-              { value: "system", label: "system" },
-            ],
-          },
+    const BasicForm = Form(mockSchema as any, {
+      defaultValues: { name: "John", theme: "system", active: true },
+      uiOverrides: {
+        theme: {
+          type: "select",
+          options: [
+            { value: "light", label: "light" },
+            { value: "dark", label: "dark" },
+            { value: "system", label: "system" },
+          ],
         },
       },
-    );
+    });
 
-    document.body.innerHTML = await BasicForm.hydratable({}, { name: "BasicForm", snapshot: true });
+    document.body.innerHTML = await BasicForm.hydratable(
+      {},
+      { name: "BasicForm", snapshot: true, skipOnMount: false },
+    );
     mount({ BasicForm }, { root: document.body, lazy: false });
     await settle();
 

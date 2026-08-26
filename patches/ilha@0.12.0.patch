@@ -1,0 +1,11 @@
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -2824,7 +2824,7 @@
+ 		if (snapshot !== false) {
+ 			const doState = snapshot === true || snapshot.state !== false;
+ 			const doDerived = snapshot === true || snapshot.derived !== false;
+-			const doSkipOnMount = explicitSkipOnMount ?? (doState || doDerived);
++			const doSkipOnMount = explicitSkipOnMount ?? false;
+ 			const snapshotData = { v: 2 };
+ 			const input = resolveInput(resolvedProps);
+ 			const probeFrame = freshFrame({ ssr: true });

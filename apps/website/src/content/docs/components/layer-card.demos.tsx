@@ -2,7 +2,7 @@ import { ilha } from "ilha";
 import { ArrowRight, Boxes, Code2 } from "lucide";
 import { Badge, Button, Icon, Input, LayerCard } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="w-full max-w-md">
     <LayerCard>
       <LayerCard.Title>Next Steps</LayerCard.Title>
@@ -26,7 +26,7 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <div class="w-full max-w-md">
     <LayerCard>
       <LayerCard.Title>Documentation</LayerCard.Title>
@@ -38,7 +38,7 @@ export const Demo2 = ilha.render(() => (
   </div>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <div class="w-full max-w-md">
     <LayerCard class="p-4">
       <h3 class="font-medium">Quick start guide</h3>
@@ -47,7 +47,7 @@ export const Demo3 = ilha.render(() => (
   </div>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <div class="w-full max-w-md">
     <LayerCard>
       <LayerCard.Title>Getting Started</LayerCard.Title>
@@ -59,7 +59,7 @@ export const Demo4 = ilha.render(() => (
   </div>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="w-full max-w-md">
     <LayerCard class="p-4">
       <h3 class="font-medium">Quick start guide</h3>
@@ -68,7 +68,7 @@ export const Demo5 = ilha.render(() => (
   </div>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <div class="grid w-full max-w-2xl gap-3 sm:grid-cols-2">
     <LayerCard>
       <LayerCard.Title>
@@ -93,7 +93,7 @@ export const Demo6 = ilha.render(() => (
   </div>
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <div class="w-full max-w-2xl">
     <LayerCard>
       <LayerCard.Title>
@@ -129,7 +129,7 @@ export const Demo7 = ilha.render(() => (
   </div>
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <div class="w-full max-w-md">
     <LayerCard>
       <LayerCard.Title data-testid="layer-card-title">Getting Started</LayerCard.Title>

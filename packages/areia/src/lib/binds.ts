@@ -296,7 +296,7 @@ export function getBindBridge<Value = unknown>(
 /**
  * Dispose every bridge on a host (or one named bridge). Use the named form
  * *before* creating a controller on a possibly-rebound host, and the host form
- * as the island `.onMount` cleanup. Idempotent.
+ * as the island `effect.once` cleanup. Idempotent.
  */
 export function disposeBindBridge(host: Element, name?: string): void {
   const map = bridgesByHost.get(host);

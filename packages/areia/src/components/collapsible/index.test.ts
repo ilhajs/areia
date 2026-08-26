@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import { ilha, html } from "ilha";
+import { ilha, html, state } from "ilha";
 import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Collapsible } from "./index";
 
@@ -90,17 +90,17 @@ describe("Collapsible interactions (onOpenChange + bind)", () => {
 
   it("emits onOpenChange once and updates bind:open when toggled", async () => {
     const calls: boolean[] = [];
-    const panel = ilha.state("open", false).render(
-      ({ state }) =>
-        html`${Collapsible({
-          children: [
-            Collapsible.Trigger({ children: "Toggle" }),
-            Collapsible.Panel({ children: "Body" }),
-          ],
-          "bind:open": state.open,
-          onOpenChange: (o) => calls.push(o),
-        })}`,
-    );
+    const panel = ilha(() => {
+      const open = state(false);
+      return html`${Collapsible({
+        children: [
+          Collapsible.Trigger({ children: "Toggle" }),
+          Collapsible.Panel({ children: "Body" }),
+        ],
+        "bind:open": open,
+        onOpenChange: (o) => calls.push(o),
+      })}`;
+    });
 
     await mountSsr({ Panel: panel }, "Panel");
     await frame();

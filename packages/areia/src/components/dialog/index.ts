@@ -1,4 +1,4 @@
-import { ilha, html, raw, untrack } from "ilha";
+import { ilha, html, untrack, raw, action, state, effect } from "ilha";
 import { Dialog as DialogPrimitive } from "@areia/slots";
 import {
   boundElement,
@@ -388,12 +388,18 @@ function renderDialog(input: DialogInput = {}) {
   return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-export const DialogRoot = ilha
-  .input<DialogInput>()
-  .action("openChange", (open: boolean, { host }) => {
+export const DialogRoot = ilha((input: DialogInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const openChange = action((open: boolean) => {
     getBindBridge(host, "open")?.onUserChange(open);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = host.matches('[data-slot="dialog"]')
       ? host
       : host.querySelector('[data-slot="dialog"]');
@@ -410,7 +416,7 @@ export const DialogRoot = ilha
       closeOnEscape: input.closeOnEscape,
       defaultOpen: openBindDefault(input, input.defaultOpen),
       lockScroll: input.lockScroll,
-      onOpenChange: (open) => action.openChange(open),
+      onOpenChange: (open) => openChange(open),
       onPortalMounted: input.onPortalMounted,
     });
 
@@ -424,13 +430,14 @@ export const DialogRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "open")?.applyFromSignal();
-  })
-  .render(({ input }) =>
-    renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"])),
-  );
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "open")?.applyFromSignal();
+  });
+
+  return renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
+});
 
 function DialogBase(input: DialogInput = {}) {
   return renderDialog(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));

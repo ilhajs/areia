@@ -2,7 +2,7 @@ import { ilha } from "ilha";
 import { Button, HoverCard, Icon } from "areia";
 import { CalendarDays, Info, Mail, User } from "lucide";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <HoverCard
     content={
       <div class="flex w-64 flex-col gap-2">
@@ -17,7 +17,7 @@ export const Demo1 = ilha.render(() => (
   </HoverCard>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <HoverCard
     content={
       <div class="flex flex-col gap-1">
@@ -32,7 +32,7 @@ export const Demo2 = ilha.render(() => (
   </HoverCard>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <HoverCard
     content={
       <div class="flex flex-col gap-1">
@@ -52,7 +52,7 @@ export const Demo3 = ilha.render(() => (
   </HoverCard>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <HoverCard
     triggerAs="span"
     triggerClass="underline decoration-dotted underline-offset-4"
@@ -69,7 +69,7 @@ export const Demo4 = ilha.render(() => (
   </HoverCard>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="flex items-center gap-2">
     <HoverCard
       content={
@@ -104,7 +104,7 @@ export const Demo5 = ilha.render(() => (
   </div>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <div class="grid grid-cols-2 gap-3">
     <HoverCard side="top" content={<HoverCard.Description>Top hover-card</HoverCard.Description>}>
       <Button>Top</Button>
@@ -127,7 +127,7 @@ export const Demo6 = ilha.render(() => (
   </div>
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <div class="flex items-center gap-3">
     <HoverCard align="start" content={<HoverCard.Description>Start aligned</HoverCard.Description>}>
       <Button>Start</Button>
@@ -144,7 +144,7 @@ export const Demo7 = ilha.render(() => (
   </div>
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <div class="flex flex-wrap items-center gap-3">
     <HoverCard
       delay={1000}
@@ -167,7 +167,7 @@ export const Demo8 = ilha.render(() => (
   </div>
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <HoverCard
     content={
       <div class="flex flex-col gap-3">
@@ -190,7 +190,7 @@ export const Demo9 = ilha.render(() => (
   </HoverCard>
 ));
 
-export const Demo10 = ilha.render(() => (
+export const Demo10 = ilha(() => (
   <HoverCard.Static content="Static hover-card markup" triggerAs="span">
     Hover me
   </HoverCard.Static>

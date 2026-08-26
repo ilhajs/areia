@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import { ilha, html, mount } from "ilha";
+import { ilha, html, mount, state } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { Popover, bindPopoverRoot, popoverVariants } from "./index";
 
@@ -176,14 +176,14 @@ describe("Popover bind:open in parent island", () => {
   });
 
   it("keeps bind:open off the template (bridged by createOpenBindSync)", () => {
-    const Panel = ilha.state("open", false).render(
-      ({ state }) =>
-        html`${Popover({
-          children: "Open",
-          content: "Body",
-          "bind:open": state.open,
-        })}`,
-    );
+    const Panel = ilha(() => {
+      const open = state(false);
+      return html`${Popover({
+        children: "Open",
+        content: "Body",
+        "bind:open": open,
+      })}`;
+    });
 
     const output = markup(Panel());
     // Open stays off the SSR template so remorphs don't recreate portaled content.
@@ -196,16 +196,21 @@ describe("Popover bind:open in parent island", () => {
   it("opens from ilha signal after hydrate", async () => {
     let setOpen!: (value?: boolean) => boolean | void;
 
-    const Panel = ilha.state("open", false).render(({ state }) => {
-      setOpen = state.open as typeof setOpen;
+    const Panel = ilha(() => {
+      const open = state(false);
+
+      setOpen = open as typeof setOpen;
       return html`${Popover({
         children: "Open",
         content: "Body",
-        "bind:open": state.open,
+        "bind:open": open,
       })}`;
     });
 
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    document.body.innerHTML = await Panel.hydratable(
+      {},
+      { name: "Panel", snapshot: true, skipOnMount: false },
+    );
     mount({ Panel }, { root: document.body, lazy: false });
     await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
     await new Promise<void>((resolve) => queueMicrotask(() => resolve()));

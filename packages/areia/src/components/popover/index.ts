@@ -1,4 +1,4 @@
-import { ilha, html, raw, untrack } from "ilha";
+import { action, effect, ilha, html, raw, state, untrack } from "ilha";
 import { Popover as PopoverPrimitive } from "@areia/slots";
 import {
   boundElement,
@@ -352,7 +352,7 @@ function renderPopover(input: PopoverInput = {}) {
   const generatedTrigger = hasComposedTrigger
     ? undefined
     : (withSlot(trigger, "popover-trigger", triggerClass, triggerClassName) ??
-      (trigger != null ? render(trigger) : undefined) ??
+      (trigger == null ? undefined : render(trigger)) ??
       withSlot(children, "popover-trigger", triggerClass, triggerClassName) ??
       PopoverTrigger({
         as: triggerAs,
@@ -416,12 +416,18 @@ export function bindPopoverRoot(root: Element) {
   return controller;
 }
 
-export const PopoverRoot = ilha
-  .input<PopoverInput>()
-  .action("openChange", (open: boolean, { host }) => {
+export const PopoverRoot = ilha((input: PopoverInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const openChange = action((open: boolean) => {
     getBindBridge(host, "open")?.onUserChange(open);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = host.matches('[data-slot="popover"]')
       ? host
       : host.querySelector('[data-slot="popover"]');
@@ -445,7 +451,7 @@ export const PopoverRoot = ilha
       closeOnEscape: input.closeOnEscape,
       collisionPadding: input.collisionPadding,
       defaultOpen: openBindDefault(input, input.defaultOpen),
-      onOpenChange: (open) => action.openChange(open),
+      onOpenChange: (open) => openChange(open),
       portal: input.portal,
       side: input.side,
       sideOffset: input.sideOffset,
@@ -470,25 +476,37 @@ export const PopoverRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "open")?.applyFromSignal();
-  })
-  .on("[data-slot='popover-content']@animationend", ({ host }) => {
-    const root = host.matches('[data-slot="popover"]')
-      ? host
-      : host.querySelector('[data-slot="popover"]');
-    if (root) syncPopoverArrowSide(root);
-  })
-  .on("[data-slot='popover-content']@transitionend", ({ host }) => {
-    const root = host.matches('[data-slot="popover"]')
-      ? host
-      : host.querySelector('[data-slot="popover"]');
-    if (root) syncPopoverArrowSide(root);
-  })
-  .render(({ input }) =>
-    renderPopover(normalizeStaticChildSlots(input, ["content", "trigger", "children"])),
-  );
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "open")?.applyFromSignal();
+  });
+
+  effect.once(({ signal }) => {
+    hostRef()?.addEventListener(
+      "animationend",
+      () => {
+        const root = host.matches('[data-slot="popover"]')
+          ? host
+          : host.querySelector('[data-slot="popover"]');
+        if (root) syncPopoverArrowSide(root);
+      },
+      { signal },
+    );
+    hostRef()?.addEventListener(
+      "transitionend",
+      () => {
+        const root = host.matches('[data-slot="popover"]')
+          ? host
+          : host.querySelector('[data-slot="popover"]');
+        if (root) syncPopoverArrowSide(root);
+      },
+      { signal },
+    );
+  });
+
+  return renderPopover(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
+});
 
 function PopoverBase(input: PopoverInput = {}) {
   return renderPopover(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));

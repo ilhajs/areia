@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import { ilha, html, mount } from "ilha";
+import { ilha, html, mount, state } from "ilha";
 import { Input } from "$components/input";
 import { Radio } from "$components/radio";
 import { Textarea } from "$components/textarea";
@@ -15,6 +15,7 @@ import {
   groupBindSource,
   openBindSource,
 } from "./binds";
+import { markupValue as markup } from "$lib/test-markup";
 import type { SignalAccessor as IlhaSignalAccessor } from "ilha";
 
 try {
@@ -23,22 +24,17 @@ try {
   // Already registered by another DOM test file in the same Bun process.
 }
 
-function markup(value: unknown): string {
-  if (value && typeof value === "object" && "value" in value) {
-    return String(value.value);
-  }
-  return String(value);
-}
-
 describe("boundVoidElement", () => {
   it("forwards bind:value to native inputs", async () => {
-    const App = ilha
-      .state("name", "Ada")
-      .render(({ state }) =>
-        boundVoidElement("input", { "bind:value": state.name }, ` class="x">`),
-      );
+    const App = ilha(() => {
+      const name = state("Ada");
+      return boundVoidElement("input", { "bind:value": name }, ` class="x">`);
+    });
 
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    document.body.innerHTML = await App.hydratable(
+      {},
+      { name: "App", snapshot: true, skipOnMount: false },
+    );
     mount({ App }, { root: document.body, lazy: false });
     await Promise.resolve();
 
@@ -55,15 +51,19 @@ describe("boundVoidElement", () => {
 
 describe("Input bind:value", () => {
   it("renders data-ilha-bind and syncs with state", async () => {
-    const App = ilha
-      .state("email", "a@b.c")
-      .render(({ state }) => Input({ "bind:value": state.email }));
+    const App = ilha(() => {
+      const email = state("a@b.c");
+      return Input({ "bind:value": email });
+    });
 
     const html = markup(App());
     expect(html).toContain("data-ilha-bind");
     expect(html).toContain('value="a@b.c"');
 
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    document.body.innerHTML = await App.hydratable(
+      {},
+      { name: "App", snapshot: true, skipOnMount: false },
+    );
     mount({ App }, { root: document.body, lazy: false });
     await Promise.resolve();
 
@@ -78,9 +78,10 @@ describe("Input bind:value", () => {
 
 describe("Textarea bind:value", () => {
   it("renders data-ilha-bind", () => {
-    const App = ilha
-      .state("bio", "Hello")
-      .render(({ state }) => Textarea({ "bind:value": state.bio }));
+    const App = ilha(() => {
+      const bio = state("Hello");
+      return Textarea({ "bind:value": bio });
+    });
 
     const html = markup(App());
     expect(html).toContain("data-ilha-bind");
@@ -90,14 +91,13 @@ describe("Textarea bind:value", () => {
 
 describe("Radio.Item bind:group", () => {
   it("renders data-ilha-bind on the native radio input", () => {
-    const App = ilha
-      .state("plan", "pro")
-      .render(({ state }) =>
-        Radio.Group({}, [
-          Radio.Item({ label: "Free", value: "free", name: "plan", "bind:group": state.plan }),
-          Radio.Item({ label: "Pro", value: "pro", name: "plan", "bind:group": state.plan }),
-        ]),
-      );
+    const App = ilha(() => {
+      const plan = state("pro");
+      return Radio.Group({}, [
+        Radio.Item({ label: "Free", value: "free", name: "plan", "bind:group": plan }),
+        Radio.Item({ label: "Pro", value: "pro", name: "plan", "bind:group": plan }),
+      ]);
+    });
 
     const html = markup(App());
     expect(html.match(/data-ilha-bind/g)?.length).toBe(2);
@@ -107,14 +107,18 @@ describe("Radio.Item bind:group", () => {
 
 describe("Input bind:this", () => {
   it("renders data-ilha-bind sentinel for imperative element access", async () => {
-    const App = ilha
-      .state<HTMLElement | null>("el", null)
-      .render(({ state }) => Input({ "bind:this": state.el }));
+    const App = ilha(() => {
+      const el = state<HTMLElement | null>(null);
+      return Input({ "bind:this": el });
+    });
 
     const html = markup(App());
     expect(html).toContain("data-ilha-bind");
 
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    document.body.innerHTML = await App.hydratable(
+      {},
+      { name: "App", snapshot: true, skipOnMount: false },
+    );
     mount({ App }, { root: document.body, lazy: false });
     await Promise.resolve();
 
@@ -251,17 +255,22 @@ describe("Dialog bind:open", () => {
   it("opens and closes from ilha signal", async () => {
     let setOpen!: (value?: boolean) => boolean | void;
 
-    const App = ilha.state("open", false).render(({ state }) => {
-      setOpen = state.open as typeof setOpen;
+    const App = ilha(() => {
+      const open = state(false);
+
+      setOpen = open as typeof setOpen;
       return html`${Dialog({
         trigger: "Open",
         content: "Body",
-        "bind:open": state.open,
+        "bind:open": open,
       })}`;
     });
 
     document.body.innerHTML = "";
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    document.body.innerHTML = await App.hydratable(
+      {},
+      { name: "App", snapshot: true, skipOnMount: false },
+    );
     mount({ App }, { root: document.body, lazy: false });
     await Promise.resolve();
 

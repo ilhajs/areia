@@ -20,9 +20,11 @@ export function setupDrag(
     isDragging = true;
     startX = e.clientX;
     startY = e.clientY;
-    const rect = panelRef.getBoundingClientRect();
-    startLeft = rect.left;
-    startTop = rect.top;
+    // left/top are relative to the offset parent, not the viewport — using
+    // getBoundingClientRect() here would jump the panel by the parent's
+    // viewport offset on the first pointermove.
+    startLeft = panelRef.offsetLeft;
+    startTop = panelRef.offsetTop;
 
     headerRef.setPointerCapture(e.pointerId);
     headerRef.addEventListener("pointermove", onPointerMove);

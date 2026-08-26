@@ -1,7 +1,7 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { markupValue as markup } from "$lib/test-markup";
 import { describe, expect, it } from "bun:test";
-import { ilha, html, mount } from "ilha";
+import { effect, ilha, html, mount, state } from "ilha";
 import { Resizable } from "./index";
 import { jsx, jsxs } from "ilha/jsx-runtime";
 
@@ -126,12 +126,13 @@ describe("Resizable", () => {
   it("mounts interactive Ilha child islands inside panels", async () => {
     document.body.innerHTML = "";
 
-    const Counter = ilha
-      .state("count", 0)
-      .on("button@click", ({ state }) => state.count(state.count() + 1))
-      .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+    const Counter = ilha(() => {
+      const count = state(0);
+      const bump = () => count(count() + 1);
+      return html`<button type="button" onclick=${bump}>Count: ${count()}</button>`;
+    });
 
-    const App = ilha.render(
+    const App = ilha(
       () =>
         html`${Resizable({
           direction: "horizontal",
@@ -143,7 +144,10 @@ describe("Resizable", () => {
         })}`,
     );
 
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    document.body.innerHTML = await App.hydratable(
+      {},
+      { name: "App", snapshot: true, skipOnMount: false },
+    );
     const { unmount } = mount({ App, Counter }, { root: document.body, lazy: false });
 
     try {
@@ -170,12 +174,13 @@ describe("Resizable", () => {
   it("mounts interactive Ilha child islands inside nested panels", async () => {
     document.body.innerHTML = "";
 
-    const Counter = ilha
-      .state("count", 0)
-      .on("button@click", ({ state }) => state.count(state.count() + 1))
-      .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+    const Counter = ilha(() => {
+      const count = state(0);
+      const bump = () => count(count() + 1);
+      return html`<button type="button" onclick=${bump}>Count: ${count()}</button>`;
+    });
 
-    const App = ilha.render(
+    const App = ilha(
       () =>
         html`${Resizable({
           direction: "horizontal",
@@ -197,7 +202,10 @@ describe("Resizable", () => {
         })}`,
     );
 
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    document.body.innerHTML = await App.hydratable(
+      {},
+      { name: "App", snapshot: true, skipOnMount: false },
+    );
     const { unmount } = mount({ App, Counter }, { root: document.body, lazy: false });
 
     try {
@@ -223,7 +231,7 @@ describe("Resizable", () => {
     document.body.innerHTML = "";
 
     let renderCount = 0;
-    const ResizableLayout = ilha.input<{ label?: string }>().render(({ input }) => {
+    const ResizableLayout = ilha<{ label?: string }>((input) => {
       renderCount++;
       return html`${Resizable.Root({
         direction: "horizontal",
@@ -235,8 +243,11 @@ describe("Resizable", () => {
       })}`;
     });
 
-    const App = ilha.render(() => html`<div>${ResizableLayout({ label: "Left" })}</div>`);
-    document.body.innerHTML = await App.hydratable({}, { name: "App", snapshot: true });
+    const App = ilha(() => html`<div>${ResizableLayout({ label: "Left" })}</div>`);
+    document.body.innerHTML = await App.hydratable(
+      {},
+      { name: "App", snapshot: true, skipOnMount: false },
+    );
     const island = mount({ App, ResizableLayout }, { root: document.body, lazy: false });
     await Promise.resolve();
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -297,7 +308,7 @@ describe("Resizable", () => {
   it("supports dragging after Resizable.Root hydration remount", async () => {
     document.body.innerHTML = "";
 
-    const Layout = ilha.render(
+    const Layout = ilha(
       () =>
         html`<div class="layout">
           ${Resizable.Root({
@@ -311,7 +322,10 @@ describe("Resizable", () => {
         </div>`,
     );
 
-    document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
+    document.body.innerHTML = await Layout.hydratable(
+      {},
+      { name: "Layout", snapshot: true, skipOnMount: false },
+    );
     const { unmount } = mount({ Layout }, { root: document.body, lazy: false });
     await Promise.resolve();
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -381,7 +395,7 @@ describe("Resizable", () => {
 
   it("nests panels inside root in SSR when used via JSX inside a layout island", async () => {
     document.body.innerHTML = "";
-    const Layout = ilha.render(() =>
+    const Layout = ilha(() =>
       jsxs("div", {
         class: "layout-container",
         children: [
@@ -396,7 +410,10 @@ describe("Resizable", () => {
         ],
       }),
     );
-    document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
+    document.body.innerHTML = await Layout.hydratable(
+      {},
+      { name: "Layout", snapshot: true, skipOnMount: false },
+    );
     const root = document.querySelector('[data-slot="resizable"]');
     expect(root).toBeTruthy();
     expect(root?.querySelector('[data-slot="resizable-panel"]')).toBeTruthy();
@@ -451,27 +468,38 @@ describe("Resizable", () => {
   it("keeps dragged layout across parent island re-renders (morph-safe)", async () => {
     document.body.innerHTML = "";
 
-    const Shell = ilha
-      .state("q", "")
-      .on("input@input", ({ state, event }) => {
-        state.q((event.target as HTMLInputElement).value);
-      })
-      .render(
-        ({ state }) =>
-          html`<div>
-            <input data-testid="q" value="${state.q}" />
-            ${Resizable.Root({
-              direction: "horizontal",
-              children: [
-                Resizable.Panel({ defaultSize: 20, minSize: 10, children: "sidebar" }),
-                Resizable.Handle(),
-                Resizable.Panel({ defaultSize: 80, minSize: 10, children: "main" }),
-              ],
-            })}
-          </div>`,
-      );
+    const Shell = ilha(() => {
+      const q = state("");
 
-    document.body.innerHTML = await Shell.hydratable({}, { name: "Shell", snapshot: true });
+      effect.once(({ host, signal }: { host: Element; signal: AbortSignal }) => {
+        host.addEventListener(
+          "input",
+          (event: Event) => {
+            if ((event.target as Element)?.tagName === "INPUT") {
+              q((event.target as HTMLInputElement).value);
+            }
+          },
+          { signal },
+        );
+      });
+
+      return html`<div>
+        <input data-testid="q" value="${q()}" />
+        ${Resizable.Root({
+          direction: "horizontal",
+          children: [
+            Resizable.Panel({ defaultSize: 20, minSize: 10, children: "sidebar" }),
+            Resizable.Handle(),
+            Resizable.Panel({ defaultSize: 80, minSize: 10, children: "main" }),
+          ],
+        })}
+      </div>`;
+    });
+
+    document.body.innerHTML = await Shell.hydratable(
+      {},
+      { name: "Shell", snapshot: true, skipOnMount: false },
+    );
     const { unmount } = mount({ Shell }, { root: document.body, lazy: false });
     await Promise.resolve();
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -550,25 +578,26 @@ describe("Resizable", () => {
   it("missing defaultSize sibling is ~20/80 after controller init and stable after re-render", async () => {
     document.body.innerHTML = "";
 
-    const Shell = ilha
-      .state("tick", 0)
-      .on("button@click", ({ state }) => state.tick(state.tick() + 1))
-      .render(
-        ({ state }) =>
-          html`<div>
-            <button type="button">bump ${state.tick}</button>
-            ${Resizable.Root({
-              direction: "horizontal",
-              children: [
-                Resizable.Panel({ defaultSize: 20, children: "side" }),
-                Resizable.Handle(),
-                Resizable.Panel({ children: "main" }),
-              ],
-            })}
-          </div>`,
-      );
+    const Shell = ilha(() => {
+      const tick = state(0);
+      const bump = () => tick(tick() + 1);
+      return html`<div>
+        <button type="button" onclick=${bump}>bump ${tick()}</button>
+        ${Resizable.Root({
+          direction: "horizontal",
+          children: [
+            Resizable.Panel({ defaultSize: 20, children: "side" }),
+            Resizable.Handle(),
+            Resizable.Panel({ children: "main" }),
+          ],
+        })}
+      </div>`;
+    });
 
-    document.body.innerHTML = await Shell.hydratable({}, { name: "Shell", snapshot: true });
+    document.body.innerHTML = await Shell.hydratable(
+      {},
+      { name: "Shell", snapshot: true, skipOnMount: false },
+    );
     const { unmount } = mount({ Shell }, { root: document.body, lazy: false });
     await Promise.resolve();
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -596,35 +625,36 @@ describe("Resizable", () => {
   it("nested Resizables keep both layouts across outer re-render", async () => {
     document.body.innerHTML = "";
 
-    const Shell = ilha
-      .state("tick", 0)
-      .on("button@click", ({ state }) => state.tick(state.tick() + 1))
-      .render(
-        ({ state }) =>
-          html`<div>
-            <button type="button">bump ${state.tick}</button>
-            ${Resizable.Root({
-              direction: "horizontal",
-              children: [
-                Resizable.Panel({ defaultSize: 30, children: "outer-a" }),
-                Resizable.Handle(),
-                Resizable.Panel({
-                  defaultSize: 70,
-                  children: Resizable.Root({
-                    direction: "horizontal",
-                    children: [
-                      Resizable.Panel({ defaultSize: 40, children: "inner-a" }),
-                      Resizable.Handle(),
-                      Resizable.Panel({ defaultSize: 60, children: "inner-b" }),
-                    ],
-                  }),
-                }),
-              ],
-            })}
-          </div>`,
-      );
+    const Shell = ilha(() => {
+      const tick = state(0);
+      const bump = () => tick(tick() + 1);
+      return html`<div>
+        <button type="button" onclick=${bump}>bump ${tick()}</button>
+        ${Resizable.Root({
+          direction: "horizontal",
+          children: [
+            Resizable.Panel({ defaultSize: 30, children: "outer-a" }),
+            Resizable.Handle(),
+            Resizable.Panel({
+              defaultSize: 70,
+              children: Resizable.Root({
+                direction: "horizontal",
+                children: [
+                  Resizable.Panel({ defaultSize: 40, children: "inner-a" }),
+                  Resizable.Handle(),
+                  Resizable.Panel({ defaultSize: 60, children: "inner-b" }),
+                ],
+              }),
+            }),
+          ],
+        })}
+      </div>`;
+    });
 
-    document.body.innerHTML = await Shell.hydratable({}, { name: "Shell", snapshot: true });
+    document.body.innerHTML = await Shell.hydratable(
+      {},
+      { name: "Shell", snapshot: true, skipOnMount: false },
+    );
     const { unmount } = mount({ Shell }, { root: document.body, lazy: false });
     await Promise.resolve();
     await new Promise((resolve) => setTimeout(resolve, 50));
@@ -708,7 +738,7 @@ describe("Resizable", () => {
     document.body.innerHTML = "";
     const layouts: number[][] = [];
 
-    const Layout = ilha.render(
+    const Layout = ilha(
       () =>
         html`${Resizable.Root({
           direction: "horizontal",
@@ -721,7 +751,10 @@ describe("Resizable", () => {
         })}`,
     );
 
-    document.body.innerHTML = await Layout.hydratable({}, { name: "Layout", snapshot: true });
+    document.body.innerHTML = await Layout.hydratable(
+      {},
+      { name: "Layout", snapshot: true, skipOnMount: false },
+    );
     const { unmount } = mount({ Layout }, { root: document.body, lazy: false });
     await Promise.resolve();
     await new Promise((resolve) => setTimeout(resolve, 50));

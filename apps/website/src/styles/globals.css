@@ -3,6 +3,11 @@
   darkmodeselector: "[data-mode='dark']";
 }
 
+/* Library classnames live outside apps/website — scan them explicitly or
+   utilities only used in packages/* (e.g. FloatingForm's pb-4) never generate. */
+@source "../../../../packages/form/src";
+@source "../../../../packages/areia/src";
+
 @custom-variant dark (&:where([data-mode=dark], [data-mode=dark] *));
 
 [component-url],

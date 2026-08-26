@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Checkbox, Input, Label, Select } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="flex flex-col gap-3">
     <Label for="default-label-demo" label="Default Label" />
     <Label for="optional-label-demo" label="Optional Label" showOptional />
@@ -13,7 +13,7 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-4">
     <Input id="middle-name" label="Middle name" required={false} placeholder="Ada" />
     <Input
@@ -26,21 +26,21 @@ export const Demo2 = ilha.render(() => (
   </div>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-1.5">
     <Label for="username" label="Username" />
     <Input id="username" placeholder="areia-user" />
   </div>
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-1.5">
     <Label for="nickname" label="Nickname" showOptional />
     <Input id="nickname" placeholder="Ryuz" />
   </div>
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-1.5">
     <Label
       for="email"
@@ -51,7 +51,7 @@ export const Demo5 = ilha.render(() => (
   </div>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Checkbox.Item
     value="terms"
     label={
@@ -62,7 +62,7 @@ export const Demo6 = ilha.render(() => (
   />
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <form class="flex w-full max-w-sm flex-col gap-4">
     <Input id="full-name" label="Full name" required placeholder="Ada Lovelace" />
 
@@ -84,7 +84,7 @@ export const Demo7 = ilha.render(() => (
   </form>
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <label class="text-base font-medium text-areia-default">
     <Label
       asContent

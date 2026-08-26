@@ -1,4 +1,4 @@
-import { ilha, html, raw, untrack } from "ilha";
+import { ilha, html, untrack, raw, action, state, effect } from "ilha";
 import { HoverCard as HoverCardPrimitive } from "@areia/slots";
 import {
   boundElement,
@@ -354,12 +354,18 @@ function renderHoverCard(input: HoverCardInput = {}) {
   return boundElement("div", rootBinds, openSuffix, inner);
 }
 
-export const HoverCardRoot = ilha
-  .input<HoverCardInput>()
-  .action("openChange", (open: boolean, { host }) => {
+export const HoverCardRoot = ilha((input: HoverCardInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const openChange = action((open: boolean) => {
     getBindBridge(host, "open")?.onUserChange(open);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = host.matches('[data-slot="hover-card"]')
       ? host
       : host.querySelector('[data-slot="hover-card"]');
@@ -378,7 +384,7 @@ export const HoverCardRoot = ilha
       collisionPadding: input.collisionPadding,
       defaultOpen: openBindDefault(input, input.defaultOpen),
       delay: input.delay,
-      onOpenChange: (open) => action.openChange(open),
+      onOpenChange: (open) => openChange(open),
       portal: input.portal,
       side: input.side,
       sideOffset: input.sideOffset,
@@ -396,13 +402,14 @@ export const HoverCardRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "open")?.applyFromSignal();
-  })
-  .render(({ input }) =>
-    renderHoverCard(normalizeStaticChildSlots(input, ["content", "trigger", "children"])),
-  );
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "open")?.applyFromSignal();
+  });
+
+  return renderHoverCard(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));
+});
 
 function HoverCardBase(input: HoverCardInput = {}) {
   return renderHoverCard(normalizeStaticChildSlots(input, ["content", "trigger", "children"]));

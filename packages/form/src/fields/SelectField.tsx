@@ -1,4 +1,4 @@
-import { Combobox } from "areia";
+import { Combobox, Field } from "areia";
 import type { SelectFieldProps } from "../types.ts";
 
 export function SelectField(props: SelectFieldProps) {
@@ -14,15 +14,13 @@ export function SelectField(props: SelectFieldProps) {
     {} as Record<string, string>,
   );
 
-  // Combobox is an island that wraps itself in Field.Static when given
-  // label/error/description — don't nest it inside another Field island.
-  return (
-    <Combobox
-      bind:value={props.bind}
-      items={items}
-      label={props.label}
-      error={props.error}
-      description={props.description}
-    />
-  );
+  // Field.Static wraps the chrome so the Combobox island stays a direct child
+  // of the form — nesting it (with label/error) inside another Field island
+  // duplicates its portaled list after hydration.
+  return Field.Static({
+    label: props.label,
+    error: props.error,
+    description: props.description,
+    children: <Combobox bind:value={props.bind} items={items} />,
+  });
 }

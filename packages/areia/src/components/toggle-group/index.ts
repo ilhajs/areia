@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { ilha, html, raw, action, state, effect } from "ilha";
 import { ToggleGroup as ToggleGroupPrimitive } from "@areia/slots";
 import {
   boundElement,
@@ -142,12 +142,18 @@ function resolveToggleGroupRoot(host: Element): HTMLElement | null {
   return root as HTMLElement | null;
 }
 
-const ToggleGroupRoot = ilha
-  .input<ToggleGroupInput>()
-  .action("valueChange", (value: string[], { host }) => {
+const ToggleGroupRoot = ilha((input: ToggleGroupInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const valueChange = action((value: string[]) => {
     getBindBridge(host, "value")?.onUserChange(value);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = resolveToggleGroupRoot(host);
     if (!root) return;
 
@@ -162,7 +168,7 @@ const ToggleGroupRoot = ilha
       orientation: input.orientation,
       loop: input.loop,
       disabled: input.disabled,
-      onValueChange: (value) => action.valueChange(value),
+      onValueChange: (value) => valueChange(value),
     } satisfies ToggleGroupPrimitive.ToggleGroupOptions);
 
     createBindBridge(
@@ -185,11 +191,14 @@ const ToggleGroupRoot = ilha
     );
 
     return () => disposeBindBridge(host);
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "value")?.applyFromSignal();
-  })
-  .render(({ input }) => renderToggleGroup(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "value")?.applyFromSignal();
+  });
+
+  return renderToggleGroup(input);
+});
 
 export type ToggleGroupSeparatorInput = Omit<
   HTMLElementProps<HTMLDivElement>,

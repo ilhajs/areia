@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import { ilha, html } from "ilha";
+import { ilha, html, state } from "ilha";
 import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Tabs, tabsVariants } from "./index";
 
@@ -104,16 +104,16 @@ describe("Tabs", () => {
   });
 
   it("uses bind:group on the island", () => {
-    const Panel = ilha.state("tab", "a").render(
-      ({ state }) =>
-        html`${Tabs({
-          "bind:group": state.tab,
-          tabs: [
-            { value: "a", label: "Alpha", content: "A" },
-            { value: "b", label: "Beta", content: "B" },
-          ],
-        })}`,
-    );
+    const Panel = ilha(() => {
+      const tab = state("a");
+      return html`${Tabs({
+        "bind:group": tab,
+        tabs: [
+          { value: "a", label: "Alpha", content: "A" },
+          { value: "b", label: "Beta", content: "B" },
+        ],
+      })}`;
+    });
 
     const output = markup(Panel());
     expect(output).toContain("data-ilha-bind");
@@ -138,11 +138,13 @@ describe("Tabs bind:group in parent island", () => {
 
     let readTab!: () => string;
 
-    const Panel = ilha.state("tab", "a").render(({ state }) => {
-      readTab = state.tab as () => string;
+    const Panel = ilha(() => {
+      const tab = state("a");
+
+      readTab = tab as () => string;
       return html`${Tabs({
         activationMode: "auto",
-        "bind:group": state.tab,
+        "bind:group": tab,
         tabs: [
           { value: "a", label: "Alpha" },
           { value: "b", label: "Beta" },
@@ -180,11 +182,13 @@ describe("Tabs bind:group in parent island", () => {
 
     let readTab!: () => string;
 
-    const UsefulExtrasSnippets = ilha.state("tab", "routing").render(({ state }) => {
-      readTab = state.tab as () => string;
+    const UsefulExtrasSnippets = ilha(() => {
+      const tab = state("routing");
+
+      readTab = tab as () => string;
       return html`${Tabs({
         activationMode: "auto",
-        "bind:group": state.tab,
+        "bind:group": tab,
         tabs: [
           { value: "routing", label: "Router" },
           { value: "store", label: "Store" },
@@ -192,9 +196,7 @@ describe("Tabs bind:group in parent island", () => {
       })}`;
     });
 
-    const Page = ilha.render(
-      () => html`<section data-testid="page">${UsefulExtrasSnippets()}</section>`,
-    );
+    const Page = ilha(() => html`<section data-testid="page">${UsefulExtrasSnippets()}</section>`);
 
     await mountSsr({ Page, UsefulExtrasSnippets }, "Page");
     await Promise.resolve();
@@ -217,7 +219,7 @@ describe("Tabs bind:group in parent island", () => {
 
   it("stamps data-morph-preserve including style after mount", async () => {
     document.body.innerHTML = "";
-    const App = ilha.render(
+    const App = ilha(
       () =>
         html`${Tabs({
           tabs: [

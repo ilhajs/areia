@@ -155,8 +155,11 @@ describe("Dialog.Description", () => {
 
 describe("Dialog behavior (island mount)", () => {
   async function mountDialog(input: Parameters<typeof Dialog>[0]) {
-    const Panel = ilha.render(() => html`${Dialog(input)}`);
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    const Panel = ilha(() => html`${Dialog(input)}`);
+    document.body.innerHTML = await Panel.hydratable(
+      {},
+      { name: "Panel", snapshot: true, skipOnMount: false },
+    );
     mount({ Panel }, { root: document.body, lazy: false });
     await settle();
   }

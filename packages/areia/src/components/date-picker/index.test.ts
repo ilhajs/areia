@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { describe, expect, it } from "bun:test";
-import { ilha, html, mount } from "ilha";
+import { ilha, html, mount, state } from "ilha";
 import { markupValue as markup } from "$lib/test-markup";
 import { DatePicker, datePickerVariants } from "./index";
 
@@ -77,12 +77,17 @@ describe("DatePicker", () => {
   it("reuses date bind sync when ilha effect re-runs after hydration", async () => {
     let setDate!: (d: Date | null) => void;
 
-    const Panel = ilha.state("picked", null as Date | null).render(({ state }) => {
-      setDate = (d: Date | null) => state.picked(d);
-      return html`${DatePicker({ mode: "single", "bind:valueAsDate": state.picked })}`;
+    const Panel = ilha(() => {
+      const picked = state(null as Date | null);
+
+      setDate = (d: Date | null) => picked(d);
+      return html`${DatePicker({ mode: "single", "bind:valueAsDate": picked })}`;
     });
 
-    document.body.innerHTML = await Panel.hydratable({}, { name: "Panel", snapshot: true });
+    document.body.innerHTML = await Panel.hydratable(
+      {},
+      { name: "Panel", snapshot: true, skipOnMount: false },
+    );
     mount({ Panel }, { root: document.body, lazy: false });
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
     await Promise.resolve();

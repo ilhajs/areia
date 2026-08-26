@@ -1,11 +1,9 @@
 import { ilha } from "ilha";
 import { Input } from "areia";
 
-export const Demo1 = ilha.render(() => (
-  <Input label="Email" placeholder="you@example.com" type="email" />
-));
+export const Demo1 = ilha(() => <Input label="Email" placeholder="you@example.com" type="email" />);
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Input
     id="email"
     label="Email"
@@ -15,11 +13,11 @@ export const Demo2 = ilha.render(() => (
   />
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Input aria-label="Search" placeholder="Search..." type="search" />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Input
     id="project-name"
     label="Project name"
@@ -28,7 +26,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Input
     id="email-error"
     label="Email"
@@ -39,7 +37,7 @@ export const Demo5 = ilha.render(() => (
   />
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Input
     id="username"
     label="Username"
@@ -52,7 +50,7 @@ export const Demo6 = ilha.render(() => (
   />
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-3">
     <Input size="xs" aria-label="Extra small input" placeholder="Extra small" />
     <Input size="sm" aria-label="Small input" placeholder="Small" />
@@ -61,11 +59,9 @@ export const Demo7 = ilha.render(() => (
   </div>
 ));
 
-export const Demo8 = ilha.render(() => (
-  <Input label="Email" placeholder="you@example.com" disabled />
-));
+export const Demo8 = ilha(() => <Input label="Email" placeholder="you@example.com" disabled />);
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Input
     id="website"
     label="Website"
@@ -75,7 +71,7 @@ export const Demo9 = ilha.render(() => (
   />
 ));
 
-export const Demo10 = ilha.render(() => (
+export const Demo10 = ilha(() => (
   <Input
     id="team-name"
     label="Team name"
@@ -84,7 +80,7 @@ export const Demo10 = ilha.render(() => (
   />
 ));
 
-export const Demo11 = ilha.render(() => (
+export const Demo11 = ilha(() => (
   <Input
     id="billing-email"
     label={
@@ -98,7 +94,7 @@ export const Demo11 = ilha.render(() => (
   />
 ));
 
-export const Demo12 = ilha.render(() => (
+export const Demo12 = ilha(() => (
   <Input
     id="search-error"
     aria-label="Search"
@@ -108,7 +104,7 @@ export const Demo12 = ilha.render(() => (
   />
 ));
 
-export const Demo13 = ilha.render(() => (
+export const Demo13 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-3">
     <Input label="Email" type="email" placeholder="you@example.com" />
     <Input label="Password" type="password" placeholder="••••••••" />
@@ -117,6 +113,6 @@ export const Demo13 = ilha.render(() => (
   </div>
 ));
 
-export const Demo14 = ilha.render(() => (
+export const Demo14 = ilha(() => (
   <Input label="Project slug" placeholder="my-ilha-app" passwordManagerIgnore />
 ));

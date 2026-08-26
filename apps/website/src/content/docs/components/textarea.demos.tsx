@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Textarea } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <Textarea
     label="Bio"
     description="Tell us a little about yourself. Max 500 characters."
@@ -10,7 +10,7 @@ export const Demo1 = ilha.render(() => (
   />
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Textarea
     id="notes"
     label="Notes"
@@ -20,11 +20,11 @@ export const Demo2 = ilha.render(() => (
   />
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Textarea aria-label="Message" placeholder="Type your message..." rows={4} />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Textarea
     id="bio"
     label="Bio"
@@ -34,7 +34,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <Textarea
     id="message-error"
     label="Message"
@@ -44,7 +44,7 @@ export const Demo5 = ilha.render(() => (
   />
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <Textarea
     id="comment"
     label="Comment"
@@ -57,7 +57,7 @@ export const Demo6 = ilha.render(() => (
   />
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-3">
     <Textarea size="xs" aria-label="Extra small textarea" placeholder="Extra small" rows={2} />
     <Textarea size="sm" aria-label="Small textarea" placeholder="Small" rows={2} />
@@ -66,18 +66,18 @@ export const Demo7 = ilha.render(() => (
   </div>
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-3">
     <Textarea label="Short response" placeholder="A couple of lines..." rows={2} />
     <Textarea label="Detailed response" placeholder="Take your time to explain..." rows={5} />
   </div>
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Textarea label="Notes" placeholder="Write your notes here..." disabled />
 ));
 
-export const Demo10 = ilha.render(() => (
+export const Demo10 = ilha(() => (
   <Textarea
     id="comments"
     label="Additional comments"
@@ -87,7 +87,7 @@ export const Demo10 = ilha.render(() => (
   />
 ));
 
-export const Demo11 = ilha.render(() => (
+export const Demo11 = ilha(() => (
   <Textarea
     id="release-notes"
     label="Release notes"
@@ -97,7 +97,7 @@ export const Demo11 = ilha.render(() => (
   />
 ));
 
-export const Demo12 = ilha.render(() => (
+export const Demo12 = ilha(() => (
   <Textarea
     id="review-notes"
     label={
@@ -111,7 +111,7 @@ export const Demo12 = ilha.render(() => (
   />
 ));
 
-export const Demo13 = ilha.render(() => (
+export const Demo13 = ilha(() => (
   <Textarea
     id="feedback-error"
     aria-label="Feedback"
@@ -121,7 +121,7 @@ export const Demo13 = ilha.render(() => (
   />
 ));
 
-export const Demo14 = ilha.render(() => (
+export const Demo14 = ilha(() => (
   <div class="flex w-full max-w-sm flex-col gap-3">
     <Textarea label="Vertical resize" placeholder="Resize vertically only..." rows={3} />
     <Textarea

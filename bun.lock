@@ -27,14 +27,14 @@
         "@fontsource-variable/geist": "^5.3.0",
         "@fontsource-variable/geist-mono": "^5.3.0",
         "@iconify-json/ph": "^1.2.0",
-        "@ilha/astro": "^0.1.9",
+        "@ilha/astro": "^0.2.0",
         "areia": "workspace:*",
         "astro": "^7.1.6",
         "astro-icon": "^1.1.5",
         "astro-og-canvas": "^0.13.0",
         "canvaskit-wasm": "^0.41.1",
         "clsx": "^2.1.1",
-        "ilha": "0.11.1",
+        "ilha": "0.12.0",
         "lucide": "^1.28.0",
         "sonner": "^2.0.7",
         "tailwind-merge": "^3.6.0",
@@ -51,7 +51,7 @@
     },
     "packages/areia": {
       "name": "areia",
-      "version": "0.2.6",
+      "version": "0.3.0",
       "dependencies": {
         "@areia/slots": "0.2.0",
         "alien-signals": "3.2.1",
@@ -60,12 +60,12 @@
         "tailwind-merge": "3.6.0",
       },
       "devDependencies": {
-        "ilha": "0.11.1",
+        "ilha": "0.12.0",
         "lucide": "^1.28.0",
         "tailwindcss": "^4.3.3",
       },
       "peerDependencies": {
-        "ilha": "0.11.1",
+        "ilha": "0.12.0",
         "sonner": "^2.0.7",
         "tailwindcss": ">=4.0.0",
       },
@@ -75,21 +75,21 @@
     },
     "packages/form": {
       "name": "@areia/form",
-      "version": "0.1.4",
+      "version": "0.2.0",
       "dependencies": {
         "alien-signals": "3.2.1",
       },
       "devDependencies": {
         "@areia/slots": "^0.2.0",
         "@standard-schema/spec": "^1.1.0",
-        "areia": "^0.2.6",
-        "ilha": "0.11.1",
+        "areia": "^0.3.0",
+        "ilha": "0.12.0",
       },
       "peerDependencies": {
         "@areia/slots": ">=0.2.0",
         "@standard-schema/spec": ">=1.1.0",
-        "areia": ">=0.2.6",
-        "ilha": ">=0.11.1",
+        "areia": ">=0.3.0",
+        "ilha": ">=0.12.0",
       },
       "optionalPeers": [
         "@standard-schema/spec",
@@ -99,6 +99,10 @@
       "name": "@areia/slots",
       "version": "0.2.0",
     },
+  },
+  "patchedDependencies": {
+    "ilha@0.12.0": "./patches/ilha@0.12.0.patch",
+    "@ilha/astro@0.2.0": "./patches/@ilha astro@0.2.0.patch",
   },
   "packages": {
     "@antfu/install-pkg": ["@antfu/install-pkg@1.1.0", "", { "dependencies": { "package-manager-detector": "^1.3.0", "tinyexec": "^1.0.1" } }, "sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ=="],
@@ -277,7 +281,7 @@
 
     "@iconify/utils": ["@iconify/utils@2.3.0", "", { "dependencies": { "@antfu/install-pkg": "^1.0.0", "@antfu/utils": "^8.1.0", "@iconify/types": "^2.0.0", "debug": "^4.4.0", "globals": "^15.14.0", "kolorist": "^1.8.0", "local-pkg": "^1.0.0", "mlly": "^1.7.4" } }, "sha512-GmQ78prtwYW6EtzXRU1rY+KwOKfz32PD7iJh6Iyqw68GiKuoZ2A6pRtzWONz5VQJbp50mEjXh/7NkumtrAgRKA=="],
 
-    "@ilha/astro": ["@ilha/astro@0.1.9", "", { "peerDependencies": { "astro": "^7.2.4", "ilha": ">=0.11.1" } }, "sha512-hVbC+g8P+YKC/azBZHsZ8kafoqySiviKE33f2kXQ/A/tgKnUJf76PpYj8fcZmtLENjHEc8TQy6vn72QEDR3/HA=="],
+    "@ilha/astro": ["@ilha/astro@0.2.0", "", { "peerDependencies": { "astro": "^7.2.4", "ilha": ">=0.12.0" } }, "sha512-wgRKc7rjecUQe9DLxRI7iH73zL2AvPtc9/ZuRRhuwfQawDO/FZwmgaIOBy0ELNUr+YLUyzxk7usLWYn0hyFtYg=="],
 
     "@img/colour": ["@img/colour@1.1.0", "", {}, "sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ=="],
 
@@ -865,7 +869,7 @@
 
     "iconv-lite": ["iconv-lite@0.6.3", "", { "dependencies": { "safer-buffer": ">= 2.1.2 < 3.0.0" } }, "sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw=="],
 
-    "ilha": ["ilha@0.11.1", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-ODPGuFYgbGRKa0mI59pifrGyHXuHxzlmK46imjt8Hxdw+4qB+sS76DqIIXau3//cr0YcCx9r9Nc4yMYVA0nIBA=="],
+    "ilha": ["ilha@0.12.0", "", { "dependencies": { "alien-signals": "3.2.1" } }, "sha512-Zi9MSZYcylp8aTaqPvYeVZCSUd3mmRF5+VqGeY9VTsIsIT3rHpUXm8d23NOwaRjhUCpa86lugevT5KU19H3XzA=="],
 
     "import-without-cache": ["import-without-cache@0.4.0", "", {}, "sha512-NkJQA7oZ4YHQhd2+H3BoRFKF3d/XNsiKpHZCQEMH9pDX27hQQLsTyOocyRgaIVtf8gHX3Nt3LPkR4e5EdtPAGQ=="],
 

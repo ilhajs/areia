@@ -1,4 +1,4 @@
-import { ilha, html, raw } from "ilha";
+import { effect, ilha, html, raw } from "ilha";
 import { Toggle as TogglePrimitive } from "@areia/slots";
 import { cn } from "$lib/cn";
 import { render } from "$lib/markup";
@@ -95,9 +95,12 @@ function renderToggle(input: ToggleInput = {}) {
   </button>`;
 }
 
-export const ToggleRoot = ilha
-  .input<ToggleInput>()
-  .onMount(({ host, input }) => {
+export const ToggleRoot = ilha((input: ToggleInput) => {
+  let host: Element;
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+
     const root = host.matches('[data-slot="toggle"]')
       ? (host as HTMLElement)
       : (host.querySelector('[data-slot="toggle"]') as HTMLElement | null);
@@ -111,8 +114,10 @@ export const ToggleRoot = ilha
     } satisfies TogglePrimitive.ToggleOptions);
 
     return () => controller.destroy();
-  })
-  .render(({ input }) => renderToggle(input));
+  });
+
+  return renderToggle(input);
+});
 
 export const Toggle = Object.assign(ToggleRoot, {
   Root: ToggleRoot,

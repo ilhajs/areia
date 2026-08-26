@@ -1,4 +1,4 @@
-import { ilha, html, raw, untrack, type SignalAccessor } from "ilha";
+import { ilha, html, untrack, raw, action, state, effect, type SignalAccessor } from "ilha";
 import { Combobox as ComboboxPrimitive } from "@areia/slots";
 import {
   applyThisBind,
@@ -808,15 +808,21 @@ function renderField(input: ComboboxInput, children?: unknown[]) {
   });
 }
 
-export const ComboboxRoot = ilha
-  .input<ComboboxInput>()
-  .action("openChange", (open: boolean, { host }) => {
+export const ComboboxRoot = ilha((input: ComboboxInput) => {
+  let host: Element;
+  const hostRef = state<Element | null>(null);
+
+  const openChange = action((open: boolean) => {
     getBindBridge(host, "open")?.onUserChange(open);
-  })
-  .action("valueChange", (value: string | string[] | null, { host }) => {
+  });
+  const valueChange = action((value: string | string[] | null) => {
     getBindBridge(host, "value")?.onUserChange(value);
-  })
-  .onMount(({ host, input, action }) => {
+  });
+
+  effect.once(({ host: __host }) => {
+    host = __host;
+    hostRef(__host);
+
     const root = host.matches('[data-slot="combobox"]')
       ? host
       : host.querySelector('[data-slot="combobox"]');
@@ -843,8 +849,8 @@ export const ComboboxRoot = ilha
       multiple: input.multiple,
       name: input.name,
       onInputValueChange: input.onInputValueChange,
-      onOpenChange: (open) => action.openChange(open),
-      onValueChange: (value) => action.valueChange(value),
+      onOpenChange: (open) => openChange(open),
+      onValueChange: (value) => valueChange(value),
       openOnFocus: input.openOnFocus,
       placeholder: input.placeholder,
       required: input.required,
@@ -889,12 +895,15 @@ export const ComboboxRoot = ilha
       cleanupThis?.();
       disposeBindBridge(host);
     };
-  })
-  .effect(({ host }) => {
-    getBindBridge(host, "open")?.applyFromSignal();
-    getBindBridge(host, "value")?.applyFromSignal();
-  })
-  .render(({ input }) => renderField(input));
+  });
+
+  effect(() => {
+    getBindBridge(hostRef() ?? host, "open")?.applyFromSignal();
+    getBindBridge(hostRef() ?? host, "value")?.applyFromSignal();
+  });
+
+  return renderField(input);
+});
 
 function ComboboxBase(children: unknown[]): ReturnType<typeof html>;
 function ComboboxBase(input?: ComboboxInput, children?: unknown[]): ReturnType<typeof html>;

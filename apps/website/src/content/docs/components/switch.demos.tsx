@@ -1,9 +1,9 @@
 import { ilha } from "ilha";
 import { Switch } from "areia";
 
-export const Demo1 = ilha.render(() => <Switch label="Enable notifications" />);
+export const Demo1 = ilha(() => <Switch label="Enable notifications" />);
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Switch
     id="marketing-emails"
     label="Marketing emails"
@@ -13,20 +13,20 @@ export const Demo2 = ilha.render(() => (
   />
 ));
 
-export const Demo3 = ilha.render(() => <Switch label="Dark mode" />);
+export const Demo3 = ilha(() => <Switch label="Dark mode" />);
 
-export const Demo4 = ilha.render(() => <Switch label="Dark mode" checked />);
+export const Demo4 = ilha(() => <Switch label="Dark mode" checked />);
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="flex flex-col gap-3">
     <Switch label="Disabled off" disabled />
     <Switch label="Disabled on" checked disabled />
   </div>
 ));
 
-export const Demo6 = ilha.render(() => <Switch label="Managed by policy" checked readOnly />);
+export const Demo6 = ilha(() => <Switch label="Managed by policy" checked readOnly />);
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <div class="grid gap-3 sm:grid-cols-2">
     <Switch label="Default off" variant="default" />
     <Switch label="Default on" variant="default" checked />
@@ -35,9 +35,9 @@ export const Demo7 = ilha.render(() => (
   </div>
 ));
 
-export const Demo8 = ilha.render(() => <Switch label="Compact setting" variant="neutral" />);
+export const Demo8 = ilha(() => <Switch label="Compact setting" variant="neutral" />);
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <div class="flex flex-col gap-3">
     <Switch label="Small" size="sm" />
     <Switch label="Base" size="base" />
@@ -45,11 +45,9 @@ export const Demo9 = ilha.render(() => (
   </div>
 ));
 
-export const Demo10 = ilha.render(() => (
-  <Switch label="Enable beta features" controlFirst={false} />
-));
+export const Demo10 = ilha(() => <Switch label="Enable beta features" controlFirst={false} />);
 
-export const Demo11 = ilha.render(() => (
+export const Demo11 = ilha(() => (
   <Switch
     label="Usage analytics"
     labelTooltip="Helps improve the product by sending anonymous usage data."
@@ -57,11 +55,11 @@ export const Demo11 = ilha.render(() => (
   />
 ));
 
-export const Demo12 = ilha.render(() => <Switch id="custom-switch-id" label="Custom id switch" />);
+export const Demo12 = ilha(() => <Switch id="custom-switch-id" label="Custom id switch" />);
 
-export const Demo13 = ilha.render(() => <Switch aria-label="Enable setting" />);
+export const Demo13 = ilha(() => <Switch aria-label="Enable setting" />);
 
-export const Demo14 = ilha.render(() => (
+export const Demo14 = ilha(() => (
   <Switch.Group
     legend="Notification settings"
     description="Choose how you want to receive account updates."
@@ -72,14 +70,14 @@ export const Demo14 = ilha.render(() => (
   </Switch.Group>
 ));
 
-export const Demo15 = ilha.render(() => (
+export const Demo15 = ilha(() => (
   <Switch.Group legend="Privacy settings" controlFirst={false}>
     <Switch.Item label="Show profile publicly" name="public-profile" />
     <Switch.Item label="Allow search indexing" name="search-indexing" />
   </Switch.Group>
 ));
 
-export const Demo16 = ilha.render(() => (
+export const Demo16 = ilha(() => (
   <Switch.Group>
     <Switch.Legend class="sr-only">Notification settings</Switch.Legend>
     <Switch.Item label="Email" name="email" />
@@ -87,7 +85,7 @@ export const Demo16 = ilha.render(() => (
   </Switch.Group>
 ));
 
-export const Demo17 = ilha.render(() => (
+export const Demo17 = ilha(() => (
   <Switch.Group>
     <Switch.Legend class="text-sm font-semibold uppercase tracking-wide text-areia-subtle">
       Notification settings

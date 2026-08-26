@@ -1,6 +1,6 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import { afterEach, describe, expect, it } from "bun:test";
-import { ilha, html } from "ilha";
+import { derived, ilha, html, state } from "ilha";
 import { markupValue as markup, mountSsr } from "$lib/test-markup";
 import { Switch } from "./index";
 
@@ -40,16 +40,10 @@ describe("Switch in ilha island", () => {
   });
 
   it("nests Switch island with bind:checked under a parent island", () => {
-    const ProjectCreatorForm = ilha
-      .state("useBun", false)
-      .derived("createCommand", ({ state }) => {
-        const pm = state.useBun() ? "bunx" : "npx";
-        return `${pm} giget@latest gh:ilhajs/ilha/templates/vite`;
-      })
-      .render(
-        ({ state }) =>
-          html`${Switch({ label: "Use Bun", name: "useBun", "bind:checked": state.useBun })}`,
-      );
+    const ProjectCreatorForm = ilha(() => {
+      const useBun = state(false);
+      return html`${Switch({ label: "Use Bun", name: "useBun", "bind:checked": useBun })}`;
+    });
 
     const output = markup(ProjectCreatorForm());
     expect(output).toContain("data-ilha-bind");
@@ -60,23 +54,19 @@ describe("Switch in ilha island", () => {
   });
 
   it("toggles with checked + onCheckedChange", async () => {
-    const ProjectCreatorForm = ilha
-      .state("useBun", false)
-      .derived("createCommand", ({ state }) => {
-        const pm = state.useBun() ? "bunx" : "npx";
-        return `${pm} giget@latest`;
-      })
-      .render(
-        ({ state, derived }) => html`
-          ${Switch({
-            label: "Use Bun",
-            name: "useBunCb",
-            checked: state.useBun(),
-            onCheckedChange: (c) => state.useBun(c),
-          })}
-          <span data-testid="cmd">${derived.createCommand()}</span>
-        `,
-      );
+    const ProjectCreatorForm = ilha(() => {
+      const useBun = state(false);
+      const createCommand = derived(() => `${useBun() ? "bunx" : "npx"} giget@latest`);
+      return html`
+        ${Switch({
+          label: "Use Bun",
+          name: "useBunCb",
+          checked: useBun(),
+          onCheckedChange: (c) => useBun(c),
+        })}
+        <span data-testid="cmd">${createCommand()}</span>
+      `;
+    });
 
     await mountSsr({ ProjectCreatorForm }, "ProjectCreatorForm");
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
@@ -109,18 +99,14 @@ describe("Switch in ilha island", () => {
       warn(...args);
     };
 
-    const ProjectCreatorForm = ilha
-      .state("useBun", false)
-      .derived("createCommand", ({ state }) => {
-        const pm = state.useBun() ? "bunx" : "npx";
-        return `${pm} giget@latest`;
-      })
-      .render(
-        ({ state, derived }) => html`
-          ${Switch({ label: "Use Bun", name: "useBun", "bind:checked": state.useBun })}
-          <span data-testid="cmd">${derived.createCommand()}</span>
-        `,
-      );
+    const ProjectCreatorForm = ilha(() => {
+      const useBun = state(false);
+      const createCommand = derived(() => `${useBun() ? "bunx" : "npx"} giget@latest`);
+      return html`
+        ${Switch({ label: "Use Bun", name: "useBun", "bind:checked": useBun })}
+        <span data-testid="cmd">${createCommand()}</span>
+      `;
+    });
 
     await mountSsr({ ProjectCreatorForm }, "ProjectCreatorForm");
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
@@ -153,22 +139,16 @@ describe("Switch in ilha island", () => {
       warn(...args);
     };
 
-    const ProjectCreatorForm = ilha
-      .state("useBun", false)
-      .derived("createCommand", ({ state }) => {
-        const pm = state.useBun() ? "bunx" : "npx";
-        return `${pm} giget@latest`;
-      })
-      .render(
-        ({ state, derived }) => html`
-          ${Switch({ label: "Use Bun", name: "useBun", "bind:checked": state.useBun })}
-          <span data-testid="cmd">${derived.createCommand()}</span>
-        `,
-      );
+    const ProjectCreatorForm = ilha(() => {
+      const useBun = state(false);
+      const createCommand = derived(() => `${useBun() ? "bunx" : "npx"} giget@latest`);
+      return html`
+        ${Switch({ label: "Use Bun", name: "useBun", "bind:checked": useBun })}
+        <span data-testid="cmd">${createCommand()}</span>
+      `;
+    });
 
-    const Page = ilha.render(
-      () => html`<section data-testid="page">${ProjectCreatorForm()}</section>`,
-    );
+    const Page = ilha(() => html`<section data-testid="page">${ProjectCreatorForm()}</section>`);
 
     await mountSsr({ Page, ProjectCreatorForm }, "Page");
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
@@ -200,14 +180,14 @@ describe("Switch interactions (onCheckedChange + bind)", () => {
 
   it("emits onCheckedChange once and updates bind:checked once per toggle", async () => {
     const calls: boolean[] = [];
-    const panel = ilha.state("on", false).render(
-      ({ state }) =>
-        html`${Switch({
-            label: "S",
-            "bind:checked": state.on,
-            onCheckedChange: (c) => calls.push(c),
-          })} <span data-testid="f">${state.on() ? "on" : "off"}</span>`,
-    );
+    const panel = ilha(() => {
+      const on = state(false);
+      return html`${Switch({
+          label: "S",
+          "bind:checked": on,
+          onCheckedChange: (c) => calls.push(c),
+        })} <span data-testid="f">${on() ? "on" : "off"}</span>`;
+    });
 
     await mountSsr({ Panel: panel }, "Panel");
     await frame();

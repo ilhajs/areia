@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { renderForm } from "../src/Form.tsx";
+import { Form, renderForm } from "../src/Form.tsx";
+import { createFormState } from "../src/state.ts";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 try {
   GlobalRegistrator.register();
@@ -8,6 +9,38 @@ try {
 }
 
 describe("Form component", () => {
+  it("derives default values from schema defaults", async () => {
+    const schema = {
+      "~standard": {
+        version: 1 as const,
+        vendor: "mock",
+        validate: (val: any) => {
+          // Sync Standard Schema: fill defaults for missing keys.
+          const value = { name: "Jane", age: 42, ...val };
+          return { value };
+        },
+      },
+    };
+
+    const state = createFormState(schema);
+    expect(state.defaults).toEqual({ name: "Jane", age: 42 });
+    const output = String((renderForm({ schema, state, submitLabel: "Save" }) as any).value);
+
+    expect(output).toContain("Jane");
+    expect(output).toContain("42");
+  });
+
+  it("throws a helpful error when defaults cannot be derived", () => {
+    const schema = {
+      "~standard": {
+        version: 1 as const,
+        vendor: "mock",
+        validate: () => ({ issues: [{ message: "missing default" }] }),
+      },
+    };
+    expect(() => Form(schema as never)).toThrow(/derive default values/);
+  });
+
   it("renders fields based on defaultValues", async () => {
     const mockSchema = {
       "~standard": {

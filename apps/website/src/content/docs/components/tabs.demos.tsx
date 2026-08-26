@@ -1,7 +1,7 @@
 import { ilha } from "ilha";
 import { Tabs } from "areia";
 
-export const Demo1 = ilha.render(() => (
+export const Demo1 = ilha(() => (
   <div class="flex flex-col gap-6">
     <div>
       <p class="mb-2 text-sm text-areia-subtle">Segmented</p>
@@ -29,7 +29,7 @@ export const Demo1 = ilha.render(() => (
   </div>
 ));
 
-export const Demo2 = ilha.render(() => (
+export const Demo2 = ilha(() => (
   <Tabs selectedValue="overview">
     <Tabs.List>
       <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
@@ -38,7 +38,7 @@ export const Demo2 = ilha.render(() => (
   </Tabs>
 ));
 
-export const Demo3 = ilha.render(() => (
+export const Demo3 = ilha(() => (
   <Tabs
     variant="segmented"
     tabs={[
@@ -50,7 +50,7 @@ export const Demo3 = ilha.render(() => (
   />
 ));
 
-export const Demo4 = ilha.render(() => (
+export const Demo4 = ilha(() => (
   <Tabs
     variant="underline"
     tabs={[
@@ -62,7 +62,7 @@ export const Demo4 = ilha.render(() => (
   />
 ));
 
-export const Demo5 = ilha.render(() => (
+export const Demo5 = ilha(() => (
   <div class="flex flex-col gap-6">
     <Tabs
       size="sm"
@@ -86,7 +86,7 @@ export const Demo5 = ilha.render(() => (
   </div>
 ));
 
-export const Demo6 = ilha.render(() => (
+export const Demo6 = ilha(() => (
   <div class="w-full max-w-md">
     <Tabs
       tabs={[
@@ -104,7 +104,7 @@ export const Demo6 = ilha.render(() => (
   </div>
 ));
 
-export const Demo7 = ilha.render(() => (
+export const Demo7 = ilha(() => (
   <Tabs selectedValue="overview">
     <Tabs.List>
       <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
@@ -129,7 +129,7 @@ export const Demo7 = ilha.render(() => (
   </Tabs>
 ));
 
-export const Demo8 = ilha.render(() => (
+export const Demo8 = ilha(() => (
   <Tabs
     selectedValue="overview"
     tabs={[
@@ -147,7 +147,7 @@ export const Demo8 = ilha.render(() => (
   />
 ));
 
-export const Demo9 = ilha.render(() => (
+export const Demo9 = ilha(() => (
   <Tabs
     tabs={[
       { value: "profile", label: "Profile" },

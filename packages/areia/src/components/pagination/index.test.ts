@@ -101,7 +101,7 @@ describe("Pagination interactions (onPageChange)", () => {
 
   it("calls onPageChange once when next is clicked", async () => {
     const calls: number[] = [];
-    const panel = ilha.render(
+    const panel = ilha(
       () =>
         html`${Pagination({
           page: 1,
@@ -125,7 +125,7 @@ describe("Pagination interactions (onPageChange)", () => {
 
   it("fires onPageSizeChange once when the page-size select changes", async () => {
     const calls: number[] = [];
-    const panel = ilha.render(
+    const panel = ilha(
       () =>
         html`${Pagination({
           page: 1,

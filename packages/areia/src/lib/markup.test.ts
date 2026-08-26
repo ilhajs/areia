@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { ilha, html } from "ilha";
+import { markupValue as markup } from "$lib/test-markup";
+import { ilha, html, state } from "ilha";
 import {
   decodeMarkupEntities,
   hasRenderableContent,
@@ -11,19 +12,18 @@ import {
   withSlot,
 } from "./markup";
 
-function markup(value: unknown): string {
-  const rendered = render(value);
-  if (rendered && typeof rendered === "object" && "value" in rendered) {
-    return String(rendered.value);
-  }
-  return String(rendered);
-}
-
 describe("markup", () => {
   it("decodes escaped HTML entities in serialized markup", () => {
     const escaped = "&lt;button type=&quot;button&quot;&gt;Open&lt;/button&gt;";
     expect(decodeMarkupEntities(escaped)).toBe('<button type="button">Open</button>');
-    expect(markup({ value: escaped })).toBe('<button type="button">Open</button>');
+    const rendered = render({ value: escaped });
+    expect(
+      markup(
+        rendered && typeof rendered === "object" && "value" in rendered
+          ? { value: decodeMarkupEntities(String(rendered.value)) }
+          : rendered,
+      ),
+    ).toBe('<button type="button">Open</button>');
   });
 
   it("passes serialized markup with escaped attribute values through untouched", () => {
@@ -88,9 +88,10 @@ describe("markup", () => {
   });
 
   it("injects data-slot into Ilha island host wrappers", () => {
-    const Counter = ilha
-      .state("count", 0)
-      .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+    const Counter = ilha(() => {
+      const count = state(0);
+      return html`<button type="button">Count: ${count}</button>`;
+    });
     const output = markup(withSlot(Counter, "popover-trigger", "custom"));
 
     expect(output).toContain("data-ilha-slot");
@@ -99,9 +100,10 @@ describe("markup", () => {
   });
 
   it("detects composed slots inside Ilha islands", () => {
-    const Counter = ilha
-      .state("count", 0)
-      .render(({ state }) => html`<button type="button">Count: ${state.count}</button>`);
+    const Counter = ilha(() => {
+      const count = state(0);
+      return html`<button type="button">Count: ${count}</button>`;
+    });
     expect(renderStringForSlots(Counter)).toContain("data-ilha-slot");
     expect(hasRenderableContent(Counter)).toBe(true);
     expect(hasRenderableContent("")).toBe(false);
