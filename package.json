@@ -5,7 +5,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "bun run --filter @areia/slots build && bun run --filter areia build && bun run --filter @areia/form build",
+    "build": "bun run --filter @areia/slots build && bun run --filter areia build && bun run --filter @areia/form build && bun run --filter @areia/cmd build",
     "cleanup": "bun run --parallel --filter '*' cleanup && rimraf node_modules bun.lock",
     "lint": "oxlint",
     "fmt": "oxfmt",

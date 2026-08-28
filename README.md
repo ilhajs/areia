@@ -21,7 +21,6 @@ npm install areia
 Or with your package manager of choice:
 
 ```bash
-bun add areia
 pnpm add areia
 yarn add areia
 ```
@@ -30,6 +29,12 @@ Some components use optional peer packages. For example, install `sonner` when u
 
 ```bash
 npm install sonner
+```
+
+Command palettes ship as `@areia/cmd`:
+
+```bash
+npm install @areia/cmd
 ```
 
 ## Quick start
@@ -83,10 +88,10 @@ Areia ships documented components and lower-level primitives for building produc
 ## Development
 
 ```bash
-bun install
-bun run docs:dev
-bun run test
-bun run build
+npm install
+npm run docs:dev
+npm test
+npm run build
 ```
 
 ## License

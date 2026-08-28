@@ -85,6 +85,7 @@ export type {
   DialogTriggerInput,
   DialogVariantsProps,
 } from "$components/dialog";
+export { MORPH_CONTROLLER_STYLE, stampMorphPreserve } from "$lib/morph-preserve";
 export { Dropdown, dropdownVariants } from "$components/dropdown";
 export type {
   DropdownAlign,

@@ -3,10 +3,11 @@
 ## Project overview
 
 - Areia is a handcrafted, Tailwind-native UI kit for [Ilha](https://ilha.build) — import ready components first, eject the source later when a product needs deeper customization.
-- It is a Bun monorepo with three publishable packages (`@areia/slots`, `areia`, `@areia/form`) and one documentation site (`apps/website`).
+- It is a Bun monorepo with four publishable packages (`@areia/slots`, `areia`, `@areia/form`, `@areia/cmd`) and one documentation site (`apps/website`).
 - `@areia/slots` is the headless layer: vanilla TypeScript controllers and slot markup with no styles. Package `exports` point at `dist/` — it must be built before dependents can resolve types or runtime entrypoints.
 - `areia` is the styled component library: Ilha islands + Tailwind tokens (`--areia-*`) on top of `@areia/slots`.
 - `@areia/form` is schema-driven forms (Standard Schema) on top of `areia`. Its `tsc` step needs `areia`'s `dist/` present.
+- `@areia/cmd` is a command-palette island on top of `areia`, `@areia/form`, and the `@areia/slots` command/dialog primitives. Schema-driven input commands use the same validated callback for the human form and WebMCP.
 - The docs site (`apps/website`, `@areia/website`) uses Blume (Astro) + Ilha + Areia. Content lives under `apps/website/docs/` (`components/` and `slots/`). Build packages before running or building the site.
 
 ## Build and run
@@ -15,7 +16,7 @@
   `bun install`
 - Build all packages in dependency order (required after install and for CI):  
   `bun run build`  
-  (runs `@areia/slots` → `areia` → `@areia/form`. Do **not** parallelize package builds — form typechecks against `areia`'s `dist/` exports.)
+  (runs `@areia/slots` → `areia` → `@areia/form` → `@areia/cmd`. Do **not** parallelize package builds — form typechecks against `areia`'s `dist/` exports.)
 - Run checks before finishing a change:
   - Lint: `bun run lint` (oxlint)
   - Format: `bun run fmt` (oxfmt)
@@ -30,6 +31,7 @@
 - `packages/slots/src/` — one folder per primitive (`combobox/`, `dialog/`, …) plus `core/` shared helpers. Entry is `src/index.ts`; build with `tsc && tsdown`.
 - `packages/areia/src/components/<name>/` — one folder per styled component (`index.ts` + tests). Shared helpers live in `packages/areia/src/lib/` (`binds.ts`, `morph-preserve.ts`, `markup.ts`, `cn.ts`, …).
 - `packages/form/src/` — `Form.tsx`, `FloatingForm.tsx`, `state.ts`, `infer.ts`, and `fields/*`. Factories return Ilha islands with the schema held in closure (never serialize schemas through `data-ilha-props`).
+- `packages/cmd/src/` — `CommandPalette.tsx` (styled), `CommandPaletteBase.tsx` (headless + shared controller wiring), `types.ts`. Factories return Ilha islands with commands and callbacks held in closure (never serialize through `data-ilha-props`).
 - `apps/website/docs/` — MDX guides (Blume) (`components/`, `slots/`). Sibling `*.demos.tsx` files hold Preview demos; each folder's `meta.ts` sets sidebar order.
 - Package `exports` always target `dist/`. After `bun install` or a clean checkout, run `bun run build` before typecheck, tests that import built packages, or the docs site.
 

@@ -15,7 +15,7 @@ Inspired by Leva, but built on Standard Schema types and Areia's headless vanill
 ## Installation
 
 ```bash
-bun add @areia/form
+npm install @areia/form
 ```
 
 Peers: `areia`, `ilha`, `@areia/slots`.

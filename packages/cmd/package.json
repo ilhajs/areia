@@ -1,7 +1,13 @@
 {
-  "name": "@areia/form",
-  "version": "0.2.2",
-  "description": "Schema-driven, auto-generating form components for Areia",
+  "name": "@areia/cmd",
+  "version": "0.1.0",
+  "description": "Command palette island for Areia applications",
+  "keywords": [
+    "command-palette",
+    "ilha",
+    "ui",
+    "webmcp"
+  ],
   "license": "MIT",
   "author": "Ryuz <ryuzer@proton.me>",
   "repository": {
@@ -23,18 +29,19 @@
   },
   "scripts": {
     "build": "tsc && tsdown",
-    "test": "bun test"
-  },
-  "dependencies": {
-    "alien-signals": "3.2.1"
+    "test": "bun test",
+    "cleanup": "rimraf dist"
   },
   "devDependencies": {
+    "@areia/form": "^0.2.2",
     "@areia/slots": "^0.2.0",
+    "@happy-dom/global-registrator": "^20.10.6",
     "@standard-schema/spec": "^1.1.0",
     "areia": "^0.3.2",
     "ilha": "0.12.1"
   },
   "peerDependencies": {
+    "@areia/form": ">=0.2.2",
     "@areia/slots": ">=0.2.0",
     "@standard-schema/spec": ">=1.1.0",
     "areia": ">=0.3.2",

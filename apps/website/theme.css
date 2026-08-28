@@ -5,6 +5,7 @@
 @source "./pages";
 @source "./docs";
 @source "./src/components";
+@source "../../packages/cmd/src";
 @plugin "areia";
 
 @theme inline {
@@ -94,6 +95,10 @@
 }
 
 :root[data-theme="dark"] {
+  --areia-overlay: oklch(0 0 0 / 0.65);
+  --areia-primary-soft: color-mix(in oklch, var(--blume-accent) 32%, var(--blume-background));
+  --areia-control-active: var(--blume-muted);
+  --areia-control-disabled: color-mix(in oklch, var(--blume-muted) 50%, transparent);
   --shj-fg: #f8f8f2;
   --shj-numbers: #7d828b;
   --shj-kwd: #ff7cc6;

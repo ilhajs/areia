@@ -9,6 +9,7 @@ export default defineMeta({
     "button",
     "checkbox",
     "clipboard-text",
+    "command-palette",
     "collapsible",
     "combobox",
     "context-menu",
