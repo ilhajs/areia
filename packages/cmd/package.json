@@ -1,6 +1,6 @@
 {
   "name": "@areia/cmd",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Command palette island for Areia applications",
   "keywords": [
     "command-palette",
@@ -25,10 +25,15 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./standalone": {
+      "types": "./dist/standalone.d.ts",
+      "import": "./dist/standalone.js"
+    },
+    "./standalone.css": "./dist/standalone.css"
   },
   "scripts": {
-    "build": "tsc && tsdown",
+    "build": "tsc && tsdown && tailwindcss -i src/standalone.css -o dist/standalone.css",
     "test": "bun test",
     "cleanup": "rimraf dist"
   },
@@ -37,8 +42,10 @@
     "@areia/slots": "^0.2.0",
     "@happy-dom/global-registrator": "^20.10.6",
     "@standard-schema/spec": "^1.1.0",
+    "@tailwindcss/cli": "^4.3.3",
     "areia": "^0.3.2",
-    "ilha": "0.12.1"
+    "ilha": "0.12.1",
+    "tailwindcss": "^4.3.3"
   },
   "peerDependencies": {
     "@areia/form": ">=0.2.2",
@@ -48,7 +55,19 @@
     "ilha": ">=0.12.1"
   },
   "peerDependenciesMeta": {
+    "@areia/form": {
+      "optional": true
+    },
+    "@areia/slots": {
+      "optional": true
+    },
     "@standard-schema/spec": {
+      "optional": true
+    },
+    "areia": {
+      "optional": true
+    },
+    "ilha": {
       "optional": true
     }
   }

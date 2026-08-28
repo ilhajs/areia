@@ -10,7 +10,38 @@ Declare actions, links, and schema-driven input commands once. People open the p
 npm install @areia/cmd
 ```
 
-Peers: `areia`, `ilha`, `@areia/slots`, `@areia/form`. Install `@standard-schema/spec` when you declare input commands; your schema library implements it.
+Peers for the default entry: `areia`, `ilha`, `@areia/slots`, `@areia/form`. Install `@standard-schema/spec` when you declare input commands; your schema library implements it.
+
+## Standalone bundle
+
+Use this when you do not want to install Ilha, Areia, `@areia/form`, or Tailwind. The bundle includes those runtimes and ships compiled CSS.
+
+```bash
+npm install @areia/cmd
+```
+
+```tsx
+import "@areia/cmd/standalone.css";
+import { CommandPalette, html, ilha } from "@areia/cmd/standalone";
+
+const AppCommands = CommandPalette(
+  [
+    {
+      id: "refresh_dashboard",
+      label: "Refresh dashboard",
+      run: ({ signal }) => refreshDashboard({ signal }),
+    },
+  ],
+  {
+    hotkey: false,
+    trigger: html`<button type="button">Open commands</button>`,
+  },
+);
+
+export default ilha(() => <AppCommands />);
+```
+
+Do not mix `@areia/cmd` and `@areia/cmd/standalone` in the same page — you would load two copies of Ilha.
 
 ## Usage
 
